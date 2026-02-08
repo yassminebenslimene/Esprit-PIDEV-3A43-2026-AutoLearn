@@ -39,15 +39,5 @@ class BackofficeController extends AbstractController
         return $this->render('backoffice/about-templatemo.html.twig');
     }
 
-    #[Route('/backoffice/login', name: 'backoffice_login')]
-    public function login(): Response
-    {
-        return $this->render('backoffice/login.html.twig');
-    }
-
-    #[Route('/backoffice/register', name: 'backoffice_register')]
-    public function register(): Response
-    {
-        return $this->render('backoffice/register.html.twig');
-    }
+    
 }

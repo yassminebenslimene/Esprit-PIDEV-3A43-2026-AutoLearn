@@ -13,4 +13,10 @@ class FrontofficeController extends AbstractController
     {
         return $this->render('frontoffice/index.html.twig');
     }
+
+      #[Route('/home', name: 'app_home')]
+    public function home(): Response
+    {
+        return $this->render('frontoffice/index.html.twig');
+    }
 }
