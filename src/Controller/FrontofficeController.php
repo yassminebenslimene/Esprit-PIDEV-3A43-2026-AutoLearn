@@ -8,9 +8,20 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FrontofficeController extends AbstractController
 {
-    #[Route('/', name: 'app_frontoffice')]
+     #[Route('/', name: 'app_frontoffice')]
     public function index(): Response
     {
+        // Si l'utilisateur est connecté
+        if ($this->getUser()) {
+            $user = $this->getUser();
+            
+            // Si c'est un admin, rediriger vers le backoffice
+            if ($user instanceof Admin || $user->getRole() === 'ADMIN') {
+                return $this->redirectToRoute('app_backoffice');
+            }
+        }
+        
+        // Sinon, afficher le frontoffice normalement
         return $this->render('frontoffice/index.html.twig');
     }
 
