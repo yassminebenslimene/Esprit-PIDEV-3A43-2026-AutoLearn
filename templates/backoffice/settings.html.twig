@@ -222,33 +222,34 @@ https://templatemo.com/tm-607-glass-admin
     {{ form_start(form, {'attr': {'class': 'profile-form'}}) }}
     
     <div class="settings-section">
-        <h3 class="settings-section-title">Profile Information</h3>
-        <div class="form-grid">
-            <div class="form-group-settings">
-                {{ form_label(form.prenom, 'Prénom') }}
-                {{ form_widget(form.prenom) }}
-                {{ form_errors(form.prenom) }}
-            </div>
-            <div class="form-group-settings">
-                {{ form_label(form.nom, 'Nom') }}
-                {{ form_widget(form.nom) }}
-                {{ form_errors(form.nom) }}
-            </div>
-            <div class="form-group-settings">
-                {{ form_label(form.email, 'Email') }}
-                {{ form_widget(form.email) }}
-                {{ form_errors(form.email) }}
-            </div>
-            
-{% if isEtudiant %}
-            <div class="form-group-settings">
-                {{ form_label(form.niveau, 'Niveau') }}
-                {{ form_widget(form.niveau, {'attr': {'class': 'settings-select'}}) }}
-                {{ form_errors(form.niveau) }}
-            </div>
-            {% endif %}
+    <h3 class="settings-section-title">Profile Information</h3>
+    <div class="form-grid">
+        <div class="form-group-settings">
+            {{ form_label(form.prenom, 'Prénom') }}
+            {{ form_widget(form.prenom) }}
+            {{ form_errors(form.prenom) }}
         </div>
+        <div class="form-group-settings">
+            {{ form_label(form.nom, 'Nom') }}
+            {{ form_widget(form.nom) }}
+            {{ form_errors(form.nom) }}
+        </div>
+        <div class="form-group-settings">
+            {{ form_label(form.email, 'Email') }}
+            {{ form_widget(form.email) }}
+            {{ form_errors(form.email) }}
+        </div>
+        
+        {# Niveau field will automatically appear here ONLY if user is Etudiant #}
+        {% if form.niveau is defined %}
+        <div class="form-group-settings">
+            {{ form_label(form.niveau, 'Niveau') }}
+            {{ form_widget(form.niveau, {'attr': {'class': 'settings-select'}}) }}
+            {{ form_errors(form.niveau) }}
+        </div>
+        {% endif %}
     </div>
+</div>
 
     <div class="settings-section">
         <h3 class="settings-section-title">Changer le mot de passe</h3>
