@@ -85,7 +85,7 @@
 <!-- ***** Header Area End ***** -->
 
 <!-- ***** Page Header Banner Start ***** -->
-<div class="page-heading" style="background-image: linear-gradient(127deg, rgba(247, 95, 29, 0.8) 0%, rgba(248, 168, 120, 0.8) 91%), url({{ asset('frontoffice/images/course-01.jpg') }}); background-position: center center; background-repeat: no-repeat; background-size: cover; padding: 150px 0 80px 0;">
+<div class="page-heading" style="background-image: linear-gradient(127deg, rgb(158, 159, 245) 0%, rgba(187, 183, 231, 0.53) 91%), url({{ asset('frontoffice/images/course-01.jpg') }}); background-position: center center; background-repeat: no-repeat; background-size: cover; padding: 150px 0 80px 0;">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
@@ -115,26 +115,26 @@
                     
                     {# Messages d'erreur #}
                     {% for message in app.flashes('error') %}
-                        <div style="padding: 15px; background: #f8d7da; border-left: 4px solid #dc3545; border-radius: 5px; margin-bottom: 25px; color: #721c24;">
+                        <div style="padding: 15px; background: #e2d7f8; border-left: 4px solid #353ddc; border-radius: 5px; margin-bottom: 25px; color: #4a1c72;">
                             <strong>✗</strong> {{ message }}
                         </div>
                     {% endfor %}
 
                     {# En-tête du profil #}
                     <div class="profile-header" style="text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #eee;">
-                        <div class="profile-avatar" style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #f75f1d 0%, #f8a878 100%); color: white; font-size: 42px; font-weight: bold; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 8px 16px rgba(247,95,29,0.3);">
+                        <div class="profile-avatar" style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #a19cec 0%, #58379c 100%); color: white; font-size: 42px; font-weight: bold; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 8px 16px rgba(247,95,29,0.3);">
                             {{ user.prenom[:1]|upper }}{{ user.nom[:1]|upper }}
                         </div>
                         <h3 style="color: #1e1e1e; font-weight: 700; margin-bottom: 8px;">{{ user.prenom }} {{ user.nom }}</h3>
                         <p style="color: #777; font-size: 15px;">{{ user.email }}</p>
-                        <span style="display: inline-block; padding: 6px 16px; background: #f75f1d; color: white; border-radius: 20px; font-size: 13px; font-weight: 600; margin-top: 8px;">{{ user.role }}</span>
+                        <span style="display: inline-block; padding: 6px 16px; background: #a1abf1; color: white; border-radius: 20px; font-size: 13px; font-weight: 600; margin-top: 8px;">{{ user.role }}</span>
                     </div>
 
                     {{ form_start(form) }}
                     
                     <div class="profile-section" style="margin-bottom: 35px;">
                         <h4 style="margin-bottom: 25px; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0; color: #1e1e1e; font-weight: 700; font-size: 18px;">
-                            <i class="fa fa-user" style="color: #f75f1d; margin-right: 8px;"></i>
+                            <i class="fa fa-user" style="color: #b4b1ff; margin-right: 8px;"></i>
                             Informations Personnelles
                         </h4>
                         
@@ -178,7 +178,7 @@
 
                     <div class="profile-section" style="margin-bottom: 35px;">
                         <h4 style="margin-bottom: 25px; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0; color: #1e1e1e; font-weight: 700; font-size: 18px;">
-                            <i class="fa fa-lock" style="color: #f75f1d; margin-right: 8px;"></i>
+                            <i class="fa fa-lock" style="color: #a6a0fc; margin-right: 8px;"></i>
                             Changer le mot de passe
                         </h4>
                         
@@ -239,8 +239,8 @@
 
 <style>
 input:focus, select:focus, textarea:focus {
-    border-color: #f75f1d !important;
-    box-shadow: 0 0 0 0.2rem rgba(247, 95, 29, 0.15) !important;
+    border-color: #a31df7 !important;
+    box-shadow: 0 0 0 0.2rem rgba(145, 29, 247, 0.15) !important;
     outline: none;
 }
 </style>
