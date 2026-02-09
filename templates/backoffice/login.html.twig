@@ -43,7 +43,7 @@
                     </div>
                 {% endif %}
 
-                <form method="post" action="{{ path('app_login') }}">
+                <form method="post" action="{{ path('backoffice_login') }}">
                     <div class="form-group">
                         <label class="form-label" for="username">Email Address</label>
                         <input 
@@ -92,7 +92,7 @@
                 </form>
 
                 <p class="login-footer">
-                    Don't have an account? <a href="{{ path('app_register') }}">Create Account</a>
+                    Don't have an account? <a href="{{ path('backoffice_register') }}">Create Account</a>
                 </p>
             </div>
         </div>

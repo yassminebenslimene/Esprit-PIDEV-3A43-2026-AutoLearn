@@ -86,7 +86,7 @@ $token = Uuid::v4()->__toString();
                 $request->getSession()->remove('reset_token_expiry_' . $token);
                 
                 $this->addFlash('success', 'Password updated successfully! You can now login.');
-                return $this->redirectToRoute('app_login');
+                return $this->redirectToRoute('backoffice_login');
             }
         }
         

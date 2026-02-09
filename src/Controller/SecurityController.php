@@ -30,10 +30,10 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route('/logout', name: 'app_logout')]
+    #[Route('/logout', name: 'backoffice_logout')]
     public function logout(): void {}
 
-    #[Route('/register', name: 'app_register')]
+    #[Route('/register', name: 'backoffice_register')]
     public function register(
         Request $request,
         EntityManagerInterface $em,
@@ -122,7 +122,7 @@ class SecurityController extends AbstractController
                     $em->flush();
 
                     $this->addFlash('success', 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
-                    return $this->redirectToRoute('app_login');
+                    return $this->redirectToRoute('backoffice_login');
                 }
             }
         }
