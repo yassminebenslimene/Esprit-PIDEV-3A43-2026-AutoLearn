@@ -41,6 +41,10 @@
             color: #2e7d32;
             border: 1px solid #c8e6c9;
         }
+        .input-error {
+            border-color: #c62828 !important;
+            box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.2) !important;
+        }
     </style>
 </head>
 <body>
@@ -76,10 +80,12 @@
                     </div>
                 {% endif %}
                 
-                <form method="post">
+                {# Formulaire avec validation HTML5 désactivée #}
+                <form method="post" novalidate="novalidate">
                     <div class="form-group">
                         <label class="form-label">Email Address</label>
-                        <input type="email" name="email" class="form-input" placeholder="Enter your email" required>
+                        {# Pas de required HTML5, validation serveur seulement #}
+                        <input type="email" name="email" class="form-input" placeholder="Enter your email">
                     </div>
                     
                     <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">
