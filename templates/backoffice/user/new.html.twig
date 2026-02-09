@@ -1,14 +1,86 @@
-{% extends 'base.html.twig' %}
+{# Désactiver la validation HTML5 #}
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 
-{% block title %}Nouvel utilisateur{% endblock %}
+    {# Afficher les erreurs globales #}
+    {% if form.vars.errors|length > 0 %}
+        <div class="alert alert-danger">
+            {{ form_errors(form) }}
+        </div>
+    {% endif %}
 
-{% block body %}
-<div class="container mt-4">
-    <h1>Créer un nouvel utilisateur</h1>
+    {# Champs du formulaire #}
+    <div class="mb-3">
+        {{ form_label(form.nom) }}
+        {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
+            {{ form_errors(form.nom) }}
+        </div>
+    </div>
 
-    {{ include('backoffice/user/_form.html.twig', {
-        form: form,
-        button_label: 'Créer'
-    }) }}
-</div>
-{% endblock %}
+    <div class="mb-3">
+        {{ form_label(form.prenom) }}
+        {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
+            {{ form_errors(form.prenom) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.email) }}
+        {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
+            {{ form_errors(form.email) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.password) }}
+        {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
+            {{ form_errors(form.password) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.role) }}
+        {{ form_widget(form.role, {'attr': {'class': 'form-select'}}) }}
+        <div class="text-danger">
+            {{ form_errors(form.role) }}
+        </div>
+    </div>
+
+    <div class="mb-3" id="niveau-field">
+        {{ form_label(form.niveau) }}
+        {{ form_widget(form.niveau, {'attr': {'class': 'form-select'}}) }}
+        <div class="text-danger">
+            {{ form_errors(form.niveau) }}
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+
+{{ form_end(form) }}
+
+{# Script pour afficher/masquer le champ niveau selon le rôle #}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.querySelector('#{{ form.role.vars.id }}');
+    const niveauField = document.getElementById('niveau-field');
+    
+    function toggleNiveauField() {
+        if (roleSelect.value === 'ETUDIANT') {
+            niveauField.style.display = 'block';
+            niveauField.querySelector('select').required = true;
+        } else {
+            niveauField.style.display = 'none';
+            niveauField.querySelector('select').required = false;
+        }
+    }
+    
+    // Initial state
+    toggleNiveauField();
+    
+    // On change
+    roleSelect.addEventListener('change', toggleNiveauField);
+});
+</script>

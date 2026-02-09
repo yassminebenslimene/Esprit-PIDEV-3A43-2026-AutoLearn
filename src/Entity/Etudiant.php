@@ -8,11 +8,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity]
 class Etudiant extends User
 {
-    #[ORM\Column(length: 50)]
-    #[Assert\NotBlank(message: "Le niveau est requis")]
+    #[ORM\Column(length: 20)]
+    #[Assert\NotBlank(message: 'Le niveau est obligatoire pour un étudiant')]
     #[Assert\Choice(
         choices: ['DEBUTANT', 'INTERMEDIAIRE', 'AVANCE'],
-        message: "Choisissez un niveau valide"
+        message: 'Veuillez choisir un niveau valide'
     )]
     private ?string $niveau = null;
 
