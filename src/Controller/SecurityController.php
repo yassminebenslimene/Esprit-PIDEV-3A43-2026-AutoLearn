@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SecurityController extends AbstractController
 {
-    #[Route('/login', name: 'app_login')]
+    #[Route('/login', name: 'backoffice_login')]
     public function login(AuthenticationUtils $authUtils): Response
     {
         // Si déjà connecté, rediriger vers frontoffice

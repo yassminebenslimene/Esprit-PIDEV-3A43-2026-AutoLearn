@@ -30,6 +30,7 @@ class BackofficeController extends AbstractController
     #[Route('/backoffice/settings', name: 'backoffice_settings')]
     public function settings(): Response
     {
+        
         return $this->render('backoffice/settings.html.twig');
     }
 
