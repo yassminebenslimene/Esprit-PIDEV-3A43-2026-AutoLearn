@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de {{ user.prenom }} {{ user.nom }}{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Détails de l'utilisateur</h1>
+
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th style="width: 30%">ID:</th>
+                        <td>{{ user.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Nom complet:</th>
+                        <td>{{ user.prenom }} {{ user.nom }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email:</th>
+                        <td>{{ user.email }}</td>
+                    </tr>
+                    <tr>
+                        <th>Rôle:</th>
+                        <td>
+                            <span class="badge {% if user.role == 'ADMIN' %}bg-danger{% else %}bg-success{% endif %}">
+                                {{ user.role }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% if user.role == 'ETUDIANT' and user.niveau %}
+                    <tr>
+                        <th>Niveau:</th>
+                        <td>
+                            <span class="badge bg-info">{{ user.niveau }}</span>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th>Créé le:</th>
+                        <td>{{ user.createdAt|date('d/m/Y H:i') }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex gap-2">
+                    <a href="{{ path('app_user_index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </a>
+                    <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                    
+                    {# Formulaire de suppression #}
+                    <form method="post" action="{{ path('app_user_delete', {'id': user.id}) }}" 
+                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');"
+                          class="d-inline">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                        <button class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
