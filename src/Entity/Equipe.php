@@ -113,8 +113,8 @@ class Equipe
                 ->addViolation();
         }
 
-        if ($nb > 5) {
-            $context->buildViolation("Une équipe ne peut pas avoir plus de 5 étudiants.")
+        if ($nb > 6) {
+            $context->buildViolation("Une équipe ne peut pas avoir plus de 6 étudiants.")
                 ->atPath('etudiants')
                 ->addViolation();
         }

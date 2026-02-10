@@ -18,14 +18,14 @@ class EquipeType extends AbstractType
             ->add('nom')
             ->add('evenement', EntityType::class, [
                 'class' => Evenement::class,
-                'choice_label' => 'id',
+                'choice_label' => 'titre',
+            ])
+            ->add('etudiants', EntityType::class, [
+                'class' => Etudiant::class,
+                'choice_label' => fn(Etudiant $e) => $e->getPrenom() . ' ' . $e->getNom(),
+                'multiple' => true,
+                'label' => 'Membres de l\'équipe (4-6 étudiants)',
             ]);
-            // Optionnel : ajouter les étudiants si nécessaire
-            // ->add('etudiants', EntityType::class, [
-            //     'class' => Etudiant::class,
-            //     'choice_label' => 'nom',
-            //     'multiple' => true,
-            // ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

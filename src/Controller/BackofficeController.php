@@ -41,9 +41,10 @@ class BackofficeController extends AbstractController
         UserPasswordHasherInterface $passwordHasher
     ): Response {
         // Get the currently logged-in user
+        /** @var User|null $user */
         $user = $this->getUser();
-        
-        if (!$user) {
+
+        if (!$user instanceof User) {
             return $this->redirectToRoute('backoffice_login');
         }
 

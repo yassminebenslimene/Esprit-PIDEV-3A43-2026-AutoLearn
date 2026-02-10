@@ -90,22 +90,42 @@ class Participation
     return $this->statut;
 }
 
+/**
+ * Vérifie si cette participation peut être acceptée (sans exception)
+ * Retourne true si la capaciteMax n'est pas atteinte
+ */
+public function canBeAccepted(): bool
+{
+    if (!$this->evenement) {
+        return false;
+    }
+
+    $capaciteMax = $this->evenement->getCapaciteMax();
+    $nbEquipesAcceptees = 0;
+
+    foreach ($this->evenement->getParticipations() as $participation) {
+        if ($participation->getStatut() === StatutParticipation::ACCEPTEE && $participation->getId() !== $this->getId()) {
+            $nbEquipesAcceptees++;
+        }
+    }
+
+    return $nbEquipesAcceptees < $capaciteMax;
+}
+
+/**
+ * Auto-détermine le statut en fonction de la capaciteMax
+ * Retourne ACCEPTEE si possible, REFUSEE sinon
+ */
+public function determineStatut(): StatutParticipation
+{
+    return $this->canBeAccepted() ? StatutParticipation::ACCEPTEE : StatutParticipation::REFUSEE;
+}
+
 public function setStatut(StatutParticipation $statut): static
 {
-    if ($statut === StatutParticipation::ACCEPTEE) {
-
-        $capaciteMax = $this->evenement->getCapaciteMax();
-        $nbEquipesAcceptees = 0;
-
-        foreach ($this->evenement->getParticipations() as $participation) {
-            if ($participation->getStatut() === StatutParticipation::ACCEPTEE) {
-                $nbEquipesAcceptees++;
-            }
-        }
-
-        if ($nbEquipesAcceptees >= $capaciteMax) {
-            throw new \LogicException("Le nombre maximal d'équipes acceptées est atteint.");
-        }
+    // Si on essaie de passer à ACCEPTEE sans vérification, c'est un problème
+    if ($statut === StatutParticipation::ACCEPTEE && !$this->canBeAccepted()) {
+        throw new \LogicException("Le nombre maximal d'équipes acceptées est atteint pour cet événement.");
     }
 
     $this->statut = $statut;

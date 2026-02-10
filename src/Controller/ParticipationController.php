@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Participation;
+use App\Enum\StatutParticipation;
 use App\Form\ParticipationType;
 use App\Repository\ParticipationRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,9 +31,27 @@ final class ParticipationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Auto-déterminer le statut basé sur la capaciteMax de l'événement
+            // Si c'est une nouvelle participation (statut par défaut EN_ATTENTE), 
+            // vérifier si on peut l'accepter
+            if ($participation->getStatut() === StatutParticipation::EN_ATTENTE) {
+                $participation->setStatut($participation->determineStatut());
+            } else if ($participation->getStatut() === StatutParticipation::ACCEPTEE) {
+                // L'admin essaie de créer une participation directement acceptée
+                // Vérifier si c'est possible, sinon refuser
+                if (!$participation->canBeAccepted()) {
+                    $this->addFlash('error', 'Impossible d\'accepter cette participation : capacité maximale atteinte pour cet événement.');
+                    return $this->render('participation/new.html.twig', [
+                        'participation' => $participation,
+                        'form' => $form,
+                    ]);
+                }
+            }
+
             $entityManager->persist($participation);
             $entityManager->flush();
 
+            $this->addFlash('success', 'Participation créée avec succès. Statut: ' . $participation->getStatut()->value);
             return $this->redirectToRoute('app_participation_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -53,12 +72,26 @@ final class ParticipationController extends AbstractController
     #[Route('/{id}/edit', name: 'app_participation_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Participation $participation, EntityManagerInterface $entityManager): Response
     {
+        $originalStatus = $participation->getStatut();
+        
         $form = $this->createForm(ParticipationType::class, $participation);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            // Si le statut change vers ACCEPTEE, vérifier que c'est possible
+            if ($participation->getStatut() === StatutParticipation::ACCEPTEE && $originalStatus !== StatutParticipation::ACCEPTEE) {
+                if (!$participation->canBeAccepted()) {
+                    $participation->setStatut($originalStatus);
+                    $this->addFlash('error', 'Impossible d\'accepter cette participation : capacité maximale atteinte pour cet événement.');
+                    return $this->render('participation/edit.html.twig', [
+                        'participation' => $participation,
+                        'form' => $form,
+                    ]);
+                }
+            }
 
+            $entityManager->flush();
+            $this->addFlash('success', 'Participation mise à jour. Nouveau statut: ' . $participation->getStatut()->value);
             return $this->redirectToRoute('app_participation_index', [], Response::HTTP_SEE_OTHER);
         }
 
