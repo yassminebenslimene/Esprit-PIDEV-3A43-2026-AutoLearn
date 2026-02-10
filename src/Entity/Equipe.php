@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\EtudiantTemp;
+use App\Entity\Etudiant;
 use App\Entity\Evenement;
 
 #[ORM\Entity(repositoryClass: EquipeRepository::class)]
@@ -33,7 +33,7 @@ class Equipe
     #[Assert\NotNull]
     private ?Evenement $evenement = null;
 
-    #[ORM\ManyToMany(targetEntity: EtudiantTemp::class)]
+    #[ORM\ManyToMany(targetEntity: Etudiant::class)]
     private Collection $etudiants;
 
     public function __construct()
@@ -81,7 +81,7 @@ class Equipe
         return $this->etudiants;
     }
 
-    public function addEtudiant(EtudiantTemp $etudiant): static
+    public function addEtudiant(Etudiant $etudiant): static
     {
         if (!$this->etudiants->contains($etudiant)) {
             $this->etudiants->add($etudiant);
@@ -90,7 +90,7 @@ class Equipe
         return $this;
     }
 
-    public function removeEtudiant(EtudiantTemp $etudiant): static
+    public function removeEtudiant(Etudiant $etudiant): static
     {
         $this->etudiants->removeElement($etudiant);
         return $this;
