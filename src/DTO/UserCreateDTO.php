@@ -61,4 +61,6 @@ class UserCreateDTO
     #[Assert\Choice(['DEBUTANT', 'INTERMEDIAIRE', 'AVANCE'], groups: ['niveau_validation'])]
     #[Assert\NotBlank(message: 'Le niveau est obligatoire pour un étudiant', groups: ['niveau_validation'])]
     public ?string $niveau = null;
+
+    
 }

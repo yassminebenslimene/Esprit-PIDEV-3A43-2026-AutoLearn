@@ -85,14 +85,20 @@ https://templatemo.com/tm-607-glass-admin
                     <span class="nav-section-title">Account</span>
                     <ul>
                         <li class="nav-item">
-                            <a href="{{ path('backoffice_login') }}" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                                    <polyline points="16 17 21 12 16 7"/>
-                                    <line x1="21" y1="12" x2="9" y2="12"/>
-                                </svg>
-                                Logout
-                            </a>
+                            <a href="{{ path('backoffice_logout') }}" class="nav-link"
+   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+    </svg>
+    Logout
+</a>
+
+<form id="logout-form" action="{{ path('backoffice_logout') }}" method="POST" style="display: none;">
+    <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
+</form>
+
                         </li>
                     </ul>
                 </li>
