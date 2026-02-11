@@ -4,11 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
-    "content-hash": "ab9f2ceb51860a0b8665e2df4b5cce6e",
-=======
     "content-hash": "46fcafe65c9333af9dbb32f0a568e7b0",
->>>>>>> 0f594dcf3634bc7c60098b751374d16e49b266fa
     "packages": [
         {
             "name": "composer/semver",
@@ -7647,8 +7643,6 @@
             "time": "2025-12-02T11:50:18+00:00"
         },
         {
-<<<<<<< HEAD
-=======
             "name": "symfonycasts/reset-password-bundle",
             "version": "v1.24.0",
             "source": {
@@ -7696,7 +7690,6 @@
             "time": "2025-11-29T13:26:50+00:00"
         },
         {
->>>>>>> 0f594dcf3634bc7c60098b751374d16e49b266fa
             "name": "twig/extra-bundle",
             "version": "v3.23.0",
             "source": {
@@ -9945,7 +9938,6 @@
         },
         {
             "name": "symfony/maker-bundle",
-<<<<<<< HEAD
             "version": "v1.66.0",
             "source": {
                 "type": "git",
@@ -9956,18 +9948,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/maker-bundle/zipball/b5b4afa2a570b926682e9f34615a6766dd560ff4",
                 "reference": "b5b4afa2a570b926682e9f34615a6766dd560ff4",
-=======
-            "version": "v1.65.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/maker-bundle.git",
-                "reference": "eba30452d212769c9a5bcf0716959fd8ba1e54e3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/maker-bundle/zipball/eba30452d212769c9a5bcf0716959fd8ba1e54e3",
-                "reference": "eba30452d212769c9a5bcf0716959fd8ba1e54e3",
->>>>>>> 0f594dcf3634bc7c60098b751374d16e49b266fa
                 "shasum": ""
             },
             "require": {
@@ -9990,11 +9970,7 @@
             },
             "require-dev": {
                 "composer/semver": "^3.0",
-<<<<<<< HEAD
                 "doctrine/doctrine-bundle": "^2.10|^3.0",
-=======
-                "doctrine/doctrine-bundle": "^2.5.0|^3.0.0",
->>>>>>> 0f594dcf3634bc7c60098b751374d16e49b266fa
                 "doctrine/orm": "^2.15|^3",
                 "doctrine/persistence": "^3.1|^4.0",
                 "symfony/http-client": "^6.4|^7.0|^8.0",
@@ -10036,11 +10012,7 @@
             ],
             "support": {
                 "issues": "https://github.com/symfony/maker-bundle/issues",
-<<<<<<< HEAD
                 "source": "https://github.com/symfony/maker-bundle/tree/v1.66.0"
-=======
-                "source": "https://github.com/symfony/maker-bundle/tree/v1.65.1"
->>>>>>> 0f594dcf3634bc7c60098b751374d16e49b266fa
             },
             "funding": [
                 {
@@ -10060,11 +10032,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
             "time": "2026-02-09T08:55:54+00:00"
-=======
-            "time": "2025-12-02T07:14:37+00:00"
->>>>>>> 0f594dcf3634bc7c60098b751374d16e49b266fa
         },
         {
             "name": "symfony/phpunit-bridge",
