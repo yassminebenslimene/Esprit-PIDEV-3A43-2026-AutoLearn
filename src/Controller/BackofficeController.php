@@ -194,6 +194,7 @@ class BackofficeController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function showUser(User $user): Response
     {
+        
         return $this->render('backoffice/user_show.html.twig', [
             'user' => $user,
         ]);
@@ -245,6 +246,10 @@ class BackofficeController extends AbstractController
         $form = $this->createForm(UserType::class, $dto, [
             'is_edit' => true,
         ]);
+            $form->remove('role');
+    if (!$user instanceof Etudiant) {
+        $form->remove('niveau');
+    }
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -296,7 +301,8 @@ class BackofficeController extends AbstractController
             'user' => $user,
             'isEtudiant' => $user instanceof Etudiant,
             'is_edit' => true,
-            'hide_role' => ($user instanceof Etudiant), // 👈 HIDE role for students, SHOW for admins
+            'hide_role' => true, // 👈 HIDE role for students, SHOW for admins
+            'hide_niveau' => !($user instanceof Etudiant), // 👈 HIDE role for students, SHOW for admins
         ]);
     }
 
