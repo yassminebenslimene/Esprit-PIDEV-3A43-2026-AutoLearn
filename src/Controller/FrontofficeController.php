@@ -1,9 +1,7 @@
 <?php
 
 namespace App\Controller;
-<<<<<<< HEAD
 use App\Repository\ChallengeRepository;
-=======
 
 use  App\Entity\Admin;
 use App\Entity\Etudiant;
@@ -11,7 +9,6 @@ use App\Entity\User;
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
->>>>>>> cbd2e773930cb70cefbc6082f3b24c49fb76374d
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,7 +25,7 @@ class FrontofficeController extends AbstractController
             $user = $this->getUser();
             
             // Si c'est un admin, rediriger vers le backoffice
-            if ($user instanceof Admin || $user->getRole() === 'ADMIN') {
+            if ($user instanceof Admin || $user->getRoles() === 'ADMIN') {
                 return $this->redirectToRoute('app_backoffice');
             }
         }
@@ -57,7 +54,7 @@ class FrontofficeController extends AbstractController
         }
 
         // Si admin, rediriger vers backoffice settings
-        if ($user instanceof Admin || $user->getRole() === 'ADMIN') {
+        if ($user instanceof Admin || $user->getRoles() === 'ADMIN') {
             return $this->redirectToRoute('backoffice_settings');
         }
 

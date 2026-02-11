@@ -2,17 +2,13 @@
 // src/Controller/BackofficeController.php
 
 namespace App\Controller;
-<<<<<<< HEAD
 use Symfony\Bundle\SecurityBundle\Security;
 use App\Entity\Exercice;
 use App\Form\ExerciceType;
 use App\Repository\ExerciceRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Challenge;
 use App\Form\ChallengeType;
 use App\Repository\ChallengeRepository;
-=======
-
 use App\Entity\User;
 use App\Entity\Etudiant;
 use App\Entity\Admin;
@@ -20,7 +16,6 @@ use App\Repository\UserRepository; // ← AJOUTEZ CET IMPORT
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
->>>>>>> cbd2e773930cb70cefbc6082f3b24c49fb76374d
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -345,8 +340,6 @@ public function editUser(User $user, Request $request, UserPasswordHasherInterfa
     {
         return $this->render('backoffice/about-templatemo.html.twig');
     }
-<<<<<<< HEAD
-
     #[Route('/backoffice/login', name: 'backoffice_login')]
     public function login(): Response
     {
@@ -507,6 +500,4 @@ public function editUser(User $user, Request $request, UserPasswordHasherInterfa
 
         return $this->redirectToRoute('backoffice_challenges');
     }
-=======
->>>>>>> cbd2e773930cb70cefbc6082f3b24c49fb76374d
 }
