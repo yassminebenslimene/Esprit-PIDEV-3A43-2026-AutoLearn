@@ -67,8 +67,8 @@ https://templatemo.com/tm-586-scholar
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
                         <li class="scroll-to-section"><a href="#top" class="active">Home</a></li>
-                        <li class="scroll-to-section"><a href="#services">Services</a></li>
-                        <li class="scroll-to-section"><a href="#courses">Courses</a></li>
+                        <li class="scroll-to-section"><a href="#services">Cours</a></li>
+                        <li class="scroll-to-section"><a href="#courses">Challenge</a></li>
                         <li class="scroll-to-section"><a href="#team">Team</a></li>
                         <li class="scroll-to-section"><a href="#events">Events</a></li>
                         <li class="scroll-to-section"><a href="#contact">Register Now!</a></li>
@@ -143,51 +143,34 @@ https://templatemo.com/tm-586-scholar
 <div class="services section" id="services">
     <div class="container">
         <div class="row">
-            <div class="col-lg-4 col-md-6">
-                <div class="service-item">
-                    <div class="icon">
-                        <!-- CORRECTION : Utiliser asset() -->
-                        <img src="{{ asset('frontoffice/images/service-01.png') }}" alt="online degrees">
-                    </div>
-                    <div class="main-content">
-                        <h4>Online Degrees</h4>
-                        <p>Whenever you need free templates in HTML CSS, you just remember TemplateMo website.</p>
-                        <div class="main-button">
-                            <a href="#">Read More</a>
+            {% if cours is empty %}
+                <div class="col-12 text-center">
+                    <p>Aucun cours disponible pour le moment.</p>
+                </div>
+            {% else %}
+                {% for cour in cours %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="service-item">
+                            <div class="icon">
+                                {# Vous pouvez ici choisir une icône dynamique selon la matière #}
+                                <img src="{{ asset('frontoffice/images/service-01.png') }}" alt="icône cours">
+                            </div>
+                            <div class="main-content">
+                                <h4>{{ cour.titre }}</h4>
+                                <p>{{ cour.description|slice(0, 100) ~ (cour.description|length > 100 ? '...' : '') }}</p>
+                                <div class="main-button">
+    <a href="{{ path('app_frontoffice_chapitre_by_cours', {'coursId': cour.id}) }}" class="btn">
+        Voir le cours
+    </a>
+     <a href="#" class="btn" style="background: linear-gradient(135deg, #6c5ce7, #4a69bd);">
+        <i class="fa fa-users me-1"></i> Communauté
+    </a>
+</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="service-item">
-                    <div class="icon">
-                        <!-- CORRECTION -->
-                        <img src="{{ asset('frontoffice/images/service-02.png') }}" alt="short courses">
-                    </div>
-                    <div class="main-content">
-                        <h4>Short Courses</h4>
-                        <p>You can browse free templates based on different tags such as digital marketing, etc.</p>
-                        <div class="main-button">
-                            <a href="#">Read More</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="service-item">
-                    <div class="icon">
-                        <!-- CORRECTION -->
-                        <img src="{{ asset('frontoffice/images/service-03.png') }}" alt="web experts">
-                    </div>
-                    <div class="main-content">
-                        <h4>Web Experts</h4>
-                        <p>You can start learning HTML CSS by modifying free templates from our website too.</p>
-                        <div class="main-button">
-                            <a href="#">Read More</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </div>
