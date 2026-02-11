@@ -1,0 +1,30 @@
+{{ form_start(form, {'attr': {'style': 'display: grid; gap: 1.5rem;', 'novalidate': 'novalidate'}}) }}
+    <div style="display: grid; gap: 1rem;">
+        <div>
+            {{ form_label(form.titre) }}
+            {{ form_widget(form.titre, {'attr': {'style': 'width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; color: var(--text-primary);'}}) }}
+            {{ form_help(form.titre) }}
+            {{ form_errors(form.titre) }}
+        </div>
+        <div>
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description, {'attr': {'style': 'width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; color: var(--text-primary); min-height: 100px;'}}) }}
+            {{ form_help(form.description) }}
+            {{ form_errors(form.description) }}
+        </div>
+        <div>
+            {{ form_label(form.etat) }}
+            {{ form_widget(form.etat, {'attr': {'style': 'width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; color: var(--text-primary);'}}) }}
+            {{ form_help(form.etat) }}
+            {{ form_errors(form.etat) }}
+        </div>
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+        <button type="submit" class="card-btn" style="background: linear-gradient(135deg, var(--emerald-light), var(--emerald)); color: white; padding: 0.75rem 1.5rem; border: none; cursor: pointer;">
+            <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            {{ button_label|default('Enregistrer') }}
+        </button>
+    </div>
+{{ form_end(form) }}
