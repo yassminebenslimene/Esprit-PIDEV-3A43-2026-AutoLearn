@@ -427,66 +427,36 @@ https://templatemo.com/tm-586-scholar
 <div class="team section" id="team">
     <div class="container">
         <div class="row">
-            <!-- TEAM MEMBER 1 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="team-member">
-                    <div class="main-content">
-                        <img src="{{ asset('frontoffice/images/member-01.jpg') }}" alt="">
-                        <span class="category">UX Teacher</span>
-                        <h4>Sophia Rose</h4>
-                        <ul class="social-icons">
-                            <li><a href="#"><i class="fab fa-facebook"></i></a></li>
-                            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
-                        </ul>
-                    </div>
+            <div class="col-lg-12 text-center">
+                <div class="section-heading">
+                    <h6>Nos Équipes</h6>
+                    <h2>Les Équipes Participantes</h2>
                 </div>
             </div>
-            <!-- TEAM MEMBER 2 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="team-member">
-                    <div class="main-content">
-                        <img src="{{ asset('frontoffice/images/member-02.jpg') }}" alt="">
-                        <span class="category">Graphic Teacher</span>
-                        <h4>Cindy Walker</h4>
-                        <ul class="social-icons">
-                            <li><a href="#"><i class="fab fa-facebook"></i></a></li>
-                            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
-                        </ul>
+        </div>
+        <div class="row">
+            {% if equipes is empty %}
+                <div class="col-lg-12">
+                    <div style="text-align: center; padding: 40px;">
+                        <p style="color: #7a7a7a; font-size: 16px;">Aucune équipe pour le moment</p>
                     </div>
                 </div>
-            </div>
-            <!-- TEAM MEMBER 3 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="team-member">
-                    <div class="main-content">
-                        <img src="{{ asset('frontoffice/images/member-03.jpg') }}" alt="">
-                        <span class="category">Full Stack Master</span>
-                        <h4>David Hutson</h4>
-                        <ul class="social-icons">
-                            <li><a href="#"><i class="fab fa-facebook"></i></a></li>
-                            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
-                        </ul>
+            {% else %}
+                {% for equipe in equipes %}
+                    <div class="col-lg-3 col-md-6">
+                        <div class="team-member">
+                            <div class="main-content">
+                                <img src="{{ asset('frontoffice/images/member-0' ~ (loop.index0 % 4 + 1) ~ '.jpg') }}" alt="{{ equipe.nom }}">
+                                <span class="category">{{ equipe.evenement.titre }}</span>
+                                <h4>{{ equipe.nom }}</h4>
+                                <p style="font-size: 14px; color: #7a7a7a; margin-top: 10px;">
+                                    {{ equipe.etudiants|length }} membres
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <!-- TEAM MEMBER 4 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="team-member">
-                    <div class="main-content">
-                        <img src="{{ asset('frontoffice/images/member-04.jpg') }}" alt="">
-                        <span class="category">Digital Animator</span>
-                        <h4>Stella Blair</h4>
-                        <ul class="social-icons">
-                            <li><a href="#"><i class="fab fa-facebook"></i></a></li>
-                            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </div> 
@@ -538,109 +508,67 @@ https://templatemo.com/tm-586-scholar
         <div class="row">
             <div class="col-lg-12 text-center">
                 <div class="section-heading">
-                    <h6>Schedule</h6>
-                    <h2>Upcoming Events</h2>
+                    <h6>Événements</h6>
+                    <h2>Nos Événements</h2>
                 </div>
             </div>
-            <!-- EVENT 1 -->
-            <div class="col-lg-12 col-md-6">
-                <div class="item">
-                    <div class="row">
-                        <div class="col-lg-3">
-                            <div class="image">
-                                <img src="{{ asset('frontoffice/images/event-01.jpg') }}" alt="">
-                            </div>
-                        </div>
-                        <div class="col-lg-9">
-                            <ul>
-                                <li>
-                                    <span class="category">Web Design</span>
-                                    <h4>UI Best Practices</h4>
-                                </li>
-                                <li>
-                                    <span>Date:</span>
-                                    <h6>16 Feb 2036</h6>
-                                </li>
-                                <li>
-                                    <span>Duration:</span>
-                                    <h6>22 Hours</h6>
-                                </li>
-                                <li>
-                                    <span>Price:</span>
-                                    <h6>$120</h6>
-                                </li>
-                            </ul>
-                            <a href="#"><i class="fa fa-angle-right"></i></a>
-                        </div>
+            
+            {% if evenements is empty %}
+                <div class="col-lg-12">
+                    <div class="item" style="text-align: center; padding: 40px;">
+                        <p style="color: #7a7a7a; font-size: 16px;">Aucun événement pour le moment</p>
                     </div>
                 </div>
-            </div>
-            <!-- EVENT 2 -->
-            <div class="col-lg-12 col-md-6">
-                <div class="item">
-                    <div class="row">
-                        <div class="col-lg-3">
-                            <div class="image">
-                                <img src="{{ asset('frontoffice/images/event-02.jpg') }}" alt="">
+            {% else %}
+                {% for evenement in evenements %}
+                    <div class="col-lg-12 col-md-6">
+                        <div class="item">
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="image">
+                                        {% if loop.index0 % 3 == 0 %}
+                                            <img src="{{ asset('frontoffice/images/event-01.jpg') }}" alt="{{ evenement.titre }}">
+                                        {% elseif loop.index0 % 3 == 1 %}
+                                            <img src="{{ asset('frontoffice/images/event-02.jpg') }}" alt="{{ evenement.titre }}">
+                                        {% else %}
+                                            <img src="{{ asset('frontoffice/images/event-03.jpg') }}" alt="{{ evenement.titre }}">
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-lg-9">
+                                    <ul>
+                                        <li>
+                                            <span class="category">{{ evenement.type.value }}</span>
+                                            <h4>{{ evenement.titre }}</h4>
+                                        </li>
+                                        <li>
+                                            <span>Date:</span>
+                                            <h6>{{ evenement.dateDebut|date('d M Y') }}</h6>
+                                        </li>
+                                        <li>
+                                            <span>Durée:</span>
+                                            <h6>{{ evenement.dateDebut.diff(evenement.dateFin).days }} jours</h6>
+                                        </li>
+                                        <li>
+                                            <span>Places:</span>
+                                            <h6>
+                                                {% set acceptedCount = 0 %}
+                                                {% for participation in evenement.participations %}
+                                                    {% if participation.statut.value == 'Accepté' %}
+                                                        {% set acceptedCount = acceptedCount + 1 %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {{ evenement.nbMax - acceptedCount }} / {{ evenement.nbMax }} disponibles
+                                            </h6>
+                                        </li>
+                                    </ul>
+                                    <a href="#"><i class="fa fa-angle-right"></i></a>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-lg-9">
-                            <ul>
-                                <li>
-                                    <span class="category">Front End</span>
-                                    <h4>New Design Trend</h4>
-                                </li>
-                                <li>
-                                    <span>Date:</span>
-                                    <h6>24 Feb 2036</h6>
-                                </li>
-                                <li>
-                                    <span>Duration:</span>
-                                    <h6>30 Hours</h6>
-                                </li>
-                                <li>
-                                    <span>Price:</span>
-                                    <h6>$320</h6>
-                                </li>
-                            </ul>
-                            <a href="#"><i class="fa fa-angle-right"></i></a>
-                        </div>
                     </div>
-                </div>
-            </div>
-            <!-- EVENT 3 -->
-            <div class="col-lg-12 col-md-6">
-                <div class="item">
-                    <div class="row">
-                        <div class="col-lg-3">
-                            <div class="image">
-                                <img src="{{ asset('frontoffice/images/event-03.jpg') }}" alt="">
-                            </div>
-                        </div>
-                        <div class="col-lg-9">
-                            <ul>
-                                <li>
-                                    <span class="category">Full Stack</span>
-                                    <h4>Web Programming</h4>
-                                </li>
-                                <li>
-                                    <span>Date:</span>
-                                    <h6>12 Mar 2036</h6>
-                                </li>
-                                <li>
-                                    <span>Duration:</span>
-                                    <h6>48 Hours</h6>
-                                </li>
-                                <li>
-                                    <span>Price:</span>
-                                    <h6>$440</h6>
-                                </li>
-                            </ul>
-                            <a href="#"><i class="fa fa-angle-right"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </div>

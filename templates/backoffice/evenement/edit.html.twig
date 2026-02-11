@@ -1,0 +1,65 @@
+{% extends 'backoffice/base.html.twig' %}
+
+{% block title %}Modifier Événement{% endblock %}
+{% block page_title %}Modifier l'Événement{% endblock %}
+
+{% block body %}
+<div class="glass-card">
+    <h2 class="card-title">Modifier l'Événement: {{ evenement.titre }}</h2>
+    
+    {{ form_start(form, {'attr': {'class': 'custom-form'}}) }}
+        <div class="form-group">
+            {{ form_label(form.titre, 'Titre') }}
+            {{ form_widget(form.titre, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.titre) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.description, 'Description') }}
+            {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 4}}) }}
+            {{ form_errors(form.description) }}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                {{ form_label(form.type, 'Type') }}
+                {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.type) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.nbMax, 'Nombre maximum d\'équipes') }}
+                {{ form_widget(form.nbMax, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.nbMax) }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                {{ form_label(form.dateDebut, 'Date de début') }}
+                {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.dateDebut) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.dateFin, 'Date de fin') }}
+                {{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.dateFin) }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                {{ form_label(form.isCanceled, 'Annulé') }}
+                {{ form_widget(form.isCanceled, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.isCanceled) }}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <a href="{{ path('backoffice_evenements') }}" class="btn btn-secondary">Annuler</a>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

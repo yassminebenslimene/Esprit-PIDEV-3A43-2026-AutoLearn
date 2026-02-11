@@ -35,7 +35,7 @@ class Challenge
     #[ORM\OneToMany(targetEntity: Exercice::class, mappedBy: 'challenge')]
     private Collection $exercices;
 
-    #[ORM\ManyToOne(inversedBy: 'challenges')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: true)]
     private ?User $created_by = null;
 

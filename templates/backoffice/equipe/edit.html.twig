@@ -1,0 +1,38 @@
+{% extends 'backoffice/base.html.twig' %}
+
+{% block title %}Modifier Équipe{% endblock %}
+{% block page_title %}Modifier l'Équipe{% endblock %}
+
+{% block body %}
+<div class="glass-card">
+    <h2 class="card-title">Modifier l'Équipe: {{ equipe.nom }}</h2>
+    
+    {{ form_start(form, {'attr': {'class': 'custom-form'}}) }}
+        <div class="form-group">
+            {{ form_label(form.nom, 'Nom de l\'équipe') }}
+            {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.nom) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.evenement, 'Événement') }}
+            {{ form_widget(form.evenement, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.evenement) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.etudiants, 'Étudiants (4 à 6)') }}
+            {{ form_widget(form.etudiants, {'attr': {'class': 'form-control', 'size': 10}}) }}
+            {{ form_errors(form.etudiants) }}
+            <small style="color: var(--text-muted); display: block; margin-top: 5px;">
+                Maintenez Ctrl (Cmd sur Mac) pour sélectionner plusieurs étudiants
+            </small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <a href="{{ path('backoffice_equipes') }}" class="btn btn-secondary">Annuler</a>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'backoffice/base.html.twig' %}
+
+{% block title %}Gestion des Événements{% endblock %}
+{% block page_title %}Gestion des Événements{% endblock %}
+
+{% block body %}
+<div class="glass-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 class="card-title">Liste des Événements</h2>
+        <a href="{{ path('backoffice_evenement_new') }}" class="btn btn-primary">
+            ➕ Ajouter un événement
+        </a>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div style="padding: 12px; background: rgba(127, 183, 126, 0.2); border-left: 3px solid #7fb77e; margin-bottom: 20px; border-radius: 8px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Titre</th>
+                    <th>Type</th>
+                    <th>Date Début</th>
+                    <th>Date Fin</th>
+                    <th>Statut</th>
+                    <th>Places Max</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for evenement in evenements %}
+                <tr>
+                    <td>{{ evenement.titre }}</td>
+                    <td>{{ evenement.type.value }}</td>
+                    <td>{{ evenement.dateDebut|date('d/m/Y H:i') }}</td>
+                    <td>{{ evenement.dateFin|date('d/m/Y H:i') }}</td>
+                    <td>
+                        <span class="status-badge {% if evenement.status.value == 'En cours' %}processing{% elseif evenement.status.value == 'Annulé' %}pending{% else %}completed{% endif %}">
+                            {{ evenement.status.value }}
+                        </span>
+                    </td>
+                    <td>{{ evenement.nbMax }}</td>
+                    <td>
+                        <div style="display: flex; gap: 8px;">
+                            <a href="{{ path('backoffice_evenement_show', {'id': evenement.id}) }}" 
+                               class="btn btn-sm" 
+                               style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px;">
+                                👁 Voir
+                            </a>
+                            <a href="{{ path('backoffice_evenement_edit', {'id': evenement.id}) }}" 
+                               class="btn btn-warning btn-sm" 
+                               style="background: linear-gradient(135deg, var(--gold), var(--amber)); color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px;">
+                                ✏ Modifier
+                            </a>
+                            <a href="{{ path('backoffice_evenement_delete', {'id': evenement.id}) }}" 
+                               class="btn btn-danger btn-sm" 
+                               onclick="return confirm('Confirmer la suppression ?')"
+                               style="background: linear-gradient(135deg, var(--coral), var(--gold)); color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px;">
+                                🗑 Supprimer
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        Aucun événement trouvé
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -11,18 +11,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/equipe')]
+#[Route('/backoffice/equipe')]
 final class EquipeController extends AbstractController
 {
-    #[Route(name: 'app_equipe_index', methods: ['GET'])]
+    #[Route('/', name: 'backoffice_equipes', methods: ['GET'])]
     public function index(EquipeRepository $equipeRepository): Response
     {
-        return $this->render('equipe/index.html.twig', [
+        return $this->render('backoffice/equipe/index.html.twig', [
             'equipes' => $equipeRepository->findAll(),
         ]);
     }
 
-    #[Route('/new', name: 'app_equipe_new', methods: ['GET', 'POST'])]
+    #[Route('/new', name: 'backoffice_equipe_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $equipe = new Equipe();
@@ -33,24 +33,25 @@ final class EquipeController extends AbstractController
             $entityManager->persist($equipe);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_equipe_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Équipe créée avec succès');
+            return $this->redirectToRoute('backoffice_equipes', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('equipe/new.html.twig', [
+        return $this->render('backoffice/equipe/new.html.twig', [
             'equipe' => $equipe,
             'form' => $form,
         ]);
     }
 
-    #[Route('/{id}', name: 'app_equipe_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'backoffice_equipe_show', methods: ['GET'])]
     public function show(Equipe $equipe): Response
     {
-        return $this->render('equipe/show.html.twig', [
+        return $this->render('backoffice/equipe/show.html.twig', [
             'equipe' => $equipe,
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_equipe_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'backoffice_equipe_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Equipe $equipe, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(EquipeType::class, $equipe);
@@ -59,23 +60,23 @@ final class EquipeController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_equipe_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Équipe modifiée avec succès');
+            return $this->redirectToRoute('backoffice_equipes', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('equipe/edit.html.twig', [
+        return $this->render('backoffice/equipe/edit.html.twig', [
             'equipe' => $equipe,
             'form' => $form,
         ]);
     }
 
-    #[Route('/{id}', name: 'app_equipe_delete', methods: ['POST'])]
-    public function delete(Request $request, Equipe $equipe, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/delete', name: 'backoffice_equipe_delete', methods: ['GET'])]
+    public function delete(Equipe $equipe, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$equipe->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($equipe);
-            $entityManager->flush();
-        }
+        $entityManager->remove($equipe);
+        $entityManager->flush();
 
-        return $this->redirectToRoute('app_equipe_index', [], Response::HTTP_SEE_OTHER);
+        $this->addFlash('success', 'Équipe supprimée avec succès');
+        return $this->redirectToRoute('backoffice_equipes', [], Response::HTTP_SEE_OTHER);
     }
 }

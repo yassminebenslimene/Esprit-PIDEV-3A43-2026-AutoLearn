@@ -15,14 +15,23 @@ class ParticipationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('statut')
             ->add('equipe', EntityType::class, [
                 'class' => Equipe::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
+                'label' => 'Équipe',
+                'placeholder' => 'Sélectionnez une équipe'
             ])
             ->add('evenement', EntityType::class, [
                 'class' => Evenement::class,
-                'choice_label' => 'id',
+                'choice_label' => 'titre',
+                'label' => 'Événement',
+                'placeholder' => 'Sélectionnez un événement'
+            ])
+            ->add('statut', null, [
+                'label' => 'Statut',
+                'choice_label' => function($choice) {
+                    return $choice->value;
+                }
             ])
         ;
     }

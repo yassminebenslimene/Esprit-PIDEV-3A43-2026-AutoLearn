@@ -15,15 +15,25 @@ class EquipeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nom')
+            ->add('nom', null, [
+                'label' => 'Nom de l\'équipe',
+                'attr' => ['placeholder' => 'Ex: Les Champions']
+            ])
             ->add('evenement', EntityType::class, [
                 'class' => Evenement::class,
-                'choice_label' => 'id',
+                'choice_label' => 'titre',
+                'label' => 'Événement',
+                'placeholder' => 'Sélectionnez un événement'
             ])
             ->add('etudiants', EntityType::class, [
                 'class' => Etudiant::class,
-                'choice_label' => 'id',
+                'choice_label' => function($etudiant) {
+                    return $etudiant->getPrenom() . ' ' . $etudiant->getNom() . ' (' . $etudiant->getEmail() . ')';
+                },
+                'label' => 'Étudiants (4 à 6 membres)',
                 'multiple' => true,
+                'expanded' => false,
+                'attr' => ['size' => 10]
             ])
         ;
     }
