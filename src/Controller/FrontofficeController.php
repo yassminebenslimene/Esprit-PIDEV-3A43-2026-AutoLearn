@@ -6,6 +6,7 @@ use App\Repository\ChallengeRepository;
 use  App\Entity\Admin;
 use App\Entity\Etudiant;
 use App\Entity\User;
+use App\Repository\UserRepository; // ← AJOUTEZ CET IMPORT
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
