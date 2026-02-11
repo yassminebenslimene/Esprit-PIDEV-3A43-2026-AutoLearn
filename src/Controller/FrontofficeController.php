@@ -13,13 +13,4 @@ class FrontofficeController extends AbstractController
     {
         return $this->render('frontoffice/index.html.twig');
     }
-    #[Route('/', name: 'app_frontoffice')]
-    public function chal(ChallengeRepository $challengeRepository): Response
-    {
-        $challenges = $challengeRepository->findAll();
-
-        return $this->render('frontoffice/index.html.twig', [
-            'challenges' => $challenges
-        ]);
-    }
 }

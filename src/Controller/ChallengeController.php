@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ChallengeController extends AbstractController
 {
-    #[Route('/', name: 'app_frontoffice')]
+    #[Route('/', name: 'frontchallenge')]
     public function index(ChallengeRepository $challengeRepository): Response
     {
         $challenges = $challengeRepository->findAll();
