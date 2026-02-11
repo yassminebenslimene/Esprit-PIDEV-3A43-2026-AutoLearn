@@ -292,8 +292,7 @@
                         {{ form_label(form.password) }}
                         {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
                         <div class="form-help">
-                            {{ form_help(form.password)|default('') }}
-                        </div>
+ 8 caractères min avec : majuscule, minuscule, chiffre, caractère spécial (@$!%*?&)                        </div>
                         {{ form_errors(form.password) }}
                     </div>
 
@@ -306,11 +305,26 @@
                         </div>
                     {% endif %}
 
-                    <div class="form-group" id="niveau-field">
-                        {{ form_label(form.niveau) }}
-                        {{ form_widget(form.niveau, {'attr': {'class': 'form-control form-select'}}) }}
-                        {{ form_errors(form.niveau) }}
-                    </div>
+                    {# ADMIN FORM - Niveau field disabled when role is not ETUDIANT #}
+<div class="form-group" id="niveau-field">
+    {{ form_label(form.niveau) }}
+    
+    {# Si le rôle est défini dans le formulaire (mode création admin) #}
+    {% if form.role is defined %}
+        {{ form_widget(form.niveau, {
+            'attr': {
+                'class': 'form-control form-select',
+                'id': 'user_niveau',
+                'disabled': form.role.vars.value != 'ETUDIANT'
+            }
+        }) }}
+    {% else %}
+        {# Mode édition - toujours activé car on ne modifie que des étudiants #}
+        {{ form_widget(form.niveau, {'attr': {'class': 'form-control form-select', 'id': 'user_niveau'}}) }}
+    {% endif %}
+    
+    {{ form_errors(form.niveau) }}
+</div>
 
                     <div class="btn-group">
                         <button type="submit" class="btn btn-primary">
