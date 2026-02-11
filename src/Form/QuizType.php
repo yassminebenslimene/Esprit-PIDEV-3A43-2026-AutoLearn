@@ -43,7 +43,6 @@ class QuizType extends AbstractType
                     'Archivé' => 'archive'
                 ],
                 'required' => true,
-                'placeholder' => 'Sélectionnez un état',
                 'help' => 'Définissez le statut du quiz'
             ])
         ;

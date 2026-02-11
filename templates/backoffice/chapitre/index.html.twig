@@ -72,6 +72,14 @@
                                             <circle cx="12" cy="12" r="3"/>
                                         </svg>
                                     </a>
+                                    {% if chapitre.cours %}
+                                    <a href="{{ path('app_cours_chapitre_quizzes', {'coursId': chapitre.cours.id, 'chapitreId': chapitre.id}) }}" style="padding: 6px 12px; background: rgba(139, 92, 246, 0.2); border-radius: 6px; text-decoration: none; color: #8b5cf6;" title="Voir Quiz">
+                                        <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M9 11l3 3L22 4"/>
+                                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                                        </svg>
+                                    </a>
+                                    {% endif %}
                                     <a href="{{ path('app_chapitre_edit', {'id': chapitre.id}) }}" style="padding: 6px 12px; background: rgba(255,255,255,0.1); border-radius: 6px; text-decoration: none; color: var(--text-primary);" title="Modifier">
                                         <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
