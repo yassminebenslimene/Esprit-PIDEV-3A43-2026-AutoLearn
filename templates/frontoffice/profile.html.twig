@@ -201,7 +201,7 @@
                 <nav class="main-nav">
                     <!-- ***** Logo Start ***** -->
                     <a href="{{ path('app_frontoffice') }}" class="logo">
-                        <h1>Scholar</h1>
+                        <h1>AutoLearn</h1>
                     </a>
                     <!-- ***** Logo End ***** -->
                     <!-- ***** Search Start ***** -->
@@ -297,10 +297,12 @@
 
                     {# En-tête du profil #}
                     <div class="profile-header" style="text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #eee;">
-                        <div class="profile-avatar" style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #a19cec 0%, #58379c 100%); color: white; font-size: 42px; font-weight: bold; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 8px 16px rgba(247,95,29,0.3);">
+                        <div class="profile-avatar" style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #a19cec 0%, #58379c 100%); color: white; font-size: 42px; font-weight: bold; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 8px 16px rgb(220, 202, 223);">
                             {{ user.prenom[:1]|upper }}{{ user.nom[:1]|upper }}
                         </div>
-                        <h3 style="color: #1e1e1e; font-weight: 700; margin-bottom: 8px;">{{ user.prenom }} {{ user.nom }}</h3>
+                        <h3 style="color: #c37add; font-weight: 700;"><h2 style="color: black ; font-weight: 500; font-size: 35px; margin: 0; text-transform: capitalize;">
+    {{ app.user.prenom }} {{ app.user.nom }}
+</h2></h3>
                         <p style="color: #777; font-size: 15px;">{{ user.email }}</p>
                         <span style="display: inline-block; padding: 6px 16px; background: #a1abf1; color: white; border-radius: 20px; font-size: 13px; font-weight: 600; margin-top: 8px;">{{ user.role }}</span>
                     </div>
