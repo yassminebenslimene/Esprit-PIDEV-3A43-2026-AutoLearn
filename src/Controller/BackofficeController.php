@@ -5,21 +5,21 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Etudiant;
+use App\Entity\Admin;
+use App\Repository\UserRepository; // ← AJOUTEZ CET IMPORT
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Security\Http\Attribute\IsGranted; // ← AJOUTEZ CET IMPORT
 
 class BackofficeController extends AbstractController
 {
     #[Route('/backoffice', name: 'app_backoffice')]
-    #[IsGranted('ROLE_ADMIN')]
     public function index(): Response
     {
         return $this->render('backoffice/index.html.twig');
@@ -32,37 +32,182 @@ class BackofficeController extends AbstractController
     }
 
     #[Route('/backoffice/users', name: 'backoffice_users')]
-    public function users(Request $request, UserRepository $userRepository): Response
+    #[IsGranted('ROLE_ADMIN')]
+    public function users(UserRepository $userRepository, Request $request): Response
     {
+        // Gérer la recherche
         $search = $request->query->get('search');
-
-        $qb = $userRepository->createQueryBuilder('u')->orderBy('u.createdAt', 'DESC');
+        
         if ($search) {
-            $qb->andWhere('u.nom LIKE :q OR u.prenom LIKE :q OR u.email LIKE :q')
-               ->setParameter('q', '%' . $search . '%');
+            // Méthode de recherche - créer si elle n'existe pas encore
+            try {
+                $users = $userRepository->createQueryBuilder('u')
+                    ->where('u.nom LIKE :search')
+                    ->orWhere('u.prenom LIKE :search')
+                    ->orWhere('u.email LIKE :search')
+                    ->setParameter('search', '%' . $search . '%')
+                    ->getQuery()
+                    ->getResult();
+            } catch (\Exception $e) {
+                // Fallback si erreur
+                $users = $userRepository->findAll();
+            }
+        } else {
+            $users = $userRepository->findAll();
         }
-
-        $users = $qb->getQuery()->getResult();
-
-        $totalUsers = $userRepository->count([]);
-        $totalStudents = $userRepository->count(['role' => 'ETUDIANT']);
-        $totalAdmins = $userRepository->count(['role' => 'ADMIN']);
-
-        $today = new \DateTime('today');
-        $newTodayCount = $userRepository->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
-            ->andWhere('u.createdAt >= :today')
-            ->setParameter('today', $today)
-            ->getQuery()->getSingleScalarResult();
-
+        
+        // Calculer les statistiques
+        $totalUsers = count($users);
+        $students = array_filter($users, fn($user) => $user->getRole() === 'ETUDIANT');
+        $admins = array_filter($users, fn($user) => $user->getRole() === 'ADMIN');
+        
+        // Utilisateurs créés aujourd'hui
+        $today = new \DateTime();
+        $today->setTime(0, 0, 0);
+        $newToday = array_filter($users, fn($user) => $user->getCreatedAt() >= $today);
+        
         return $this->render('backoffice/users.html.twig', [
             'users' => $users,
             'search' => $search,
-            'totalUsers' => (int) $totalUsers,
-            'totalStudents' => (int) $totalStudents,
-            'totalAdmins' => (int) $totalAdmins,
-            'newTodayCount' => (int) $newTodayCount,
+            'totalUsers' => $totalUsers,
+            'totalStudents' => count($students),
+            'totalAdmins' => count($admins),
+            'newTodayCount' => count($newToday),
         ]);
+    }
+
+    #[Route('/backoffice/users/new', name: 'backoffice_user_new')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function newUser(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
+    {
+        $userDto = new UserCreateDTO();
+        $form = $this->createForm(UserType::class, $userDto, ['is_edit' => false]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Créer l'utilisateur selon le rôle
+            if ($userDto->role === 'ADMIN') {
+                $user = new Admin();
+            } else {
+                $user = new Etudiant();
+                $user->setNiveau($userDto->niveau);
+            }
+
+            $user->setNom($userDto->nom);
+            $user->setPrenom($userDto->prenom);
+            $user->setEmail($userDto->email);
+            $user->setPassword($passwordHasher->hashPassword($user, $userDto->password));
+            $user->setRole($userDto->role);
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Utilisateur créé avec succès!');
+            return $this->redirectToRoute('backoffice_users');
+        }
+
+        return $this->render('backoffice/user_form.html.twig', [
+            'form' => $form->createView(),
+            'title' => 'Créer un nouvel utilisateur',
+        ]);
+    }
+
+    #[Route('/backoffice/users/{id}/edit', name: 'backoffice_user_edit')]
+#[IsGranted('ROLE_ADMIN')]
+public function editUser(User $user, Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
+{
+    // Créer le DTO manuellement (sans fromEntity)
+    $userDto = new UserCreateDTO();
+    $userDto->nom = $user->getNom();
+    $userDto->prenom = $user->getPrenom();
+    $userDto->email = $user->getEmail();
+    $userDto->role = $user->getRole();
+    
+    if ($user instanceof Etudiant) {
+        $userDto->niveau = $user->getNiveau();
+    }
+    
+    $form = $this->createForm(UserType::class, $userDto, ['is_edit' => true]);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Mettre à jour l'utilisateur
+        $user->setNom($userDto->nom);
+        $user->setPrenom($userDto->prenom);
+        $user->setEmail($userDto->email);
+        $user->setRole($userDto->role);
+        
+        // Gérer le mot de passe (seulement si fourni)
+        if ($userDto->password) {
+            $user->setPassword($passwordHasher->hashPassword($user, $userDto->password));
+        }
+        
+        // Pour les étudiants, mettre à jour le niveau
+        if ($user instanceof Etudiant) {
+            $user->setNiveau($userDto->niveau);
+        }
+
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Utilisateur mis à jour avec succès!');
+        return $this->redirectToRoute('backoffice_users');
+    }
+
+    return $this->render('backoffice/user_form.html.twig', [
+        'form' => $form->createView(),
+        'title' => 'Modifier ' . $user->getPrenom() . ' ' . $user->getNom(),
+        'user' => $user,
+    ]);
+}
+    #[Route('/backoffice/users/export', name: 'backoffice_users_export')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function exportUsers(UserRepository $userRepository): Response
+    {
+        $users = $userRepository->findAll();
+        
+        $csvData = "ID,Nom,Prenom,Email,Role,Niveau,Created At\n";
+        
+        foreach ($users as $user) {
+            $csvData .= sprintf(
+                "%d,%s,%s,%s,%s,%s,%s\n",
+                $user->getId(),
+                $user->getNom(),
+                $user->getPrenom(),
+                $user->getEmail(),
+                $user->getRole(),
+                $user->isEtudiant() && $user->getNiveau() ? $user->getNiveau() : 'N/A',
+                $user->getCreatedAt()->format('Y-m-d H:i:s')
+            );
+        }
+        
+        $response = new Response($csvData);
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="users_' . date('Y-m-d') . '.csv"');
+        
+        return $response;
+    }
+
+    #[Route('/backoffice/users/{id}', name: 'backoffice_user_show')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function showUser(User $user): Response
+    {
+        return $this->render('backoffice/user_show.html.twig', [
+            'user' => $user,
+        ]);
+    }
+
+    #[Route('/backoffice/users/{id}/delete', name: 'backoffice_user_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function deleteUser(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($user);
+            $entityManager->flush();
+            
+            $this->addFlash('success', 'Utilisateur supprimé avec succès!');
+        }
+
+        return $this->redirectToRoute('backoffice_users');
     }
 
     #[Route('/backoffice/settings', name: 'backoffice_settings', methods: ['GET', 'POST'])]
@@ -72,10 +217,9 @@ class BackofficeController extends AbstractController
         UserPasswordHasherInterface $passwordHasher
     ): Response {
         // Get the currently logged-in user
-        /** @var User|null $user */
         $user = $this->getUser();
-
-        if (!$user instanceof User) {
+        
+        if (!$user) {
             return $this->redirectToRoute('backoffice_login');
         }
 
@@ -136,18 +280,15 @@ class BackofficeController extends AbstractController
         }
 
         return $this->render('backoffice/settings.html.twig', [
-    'form' => $form->createView(),
-    'user' => $user,
-    'isEtudiant' => $user instanceof Etudiant,
-]);
+            'form' => $form->createView(),
+            'user' => $user,
+            'isEtudiant' => $user instanceof Etudiant,
+        ]);
     }
-
 
     #[Route('/backoffice/about-templatemo', name: 'backoffice_about_templatemo')]
     public function aboutTemplatemo(): Response
     {
         return $this->render('backoffice/about-templatemo.html.twig');
     }
-
-    
 }
