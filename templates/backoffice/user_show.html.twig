@@ -239,16 +239,7 @@
                             </div>
                         </div>
 
-                        <div class="info-item">
-                            <div class="info-label">User Type</div>
-                            <div class="info-value">
-                                {% if user.role == 'ADMIN' %}
-                                    Administrator
-                                {% else %}
-                                    Student
-                                {% endif %}
-                            </div>
-                        </div>
+                        
 
                         {% if user.isEtudiant() and user.niveau %}
                         <div class="info-item">

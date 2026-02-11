@@ -82,6 +82,8 @@ class BackofficeController extends AbstractController
         $userDto->role = 'ETUDIANT'; // Force role to ETUDIANT
         
         $form = $this->createForm(UserType::class, $userDto, ['is_edit' => false]);
+        $form->remove('role');
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
