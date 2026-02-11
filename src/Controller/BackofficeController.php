@@ -6,7 +6,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Etudiant;
 use App\Entity\Admin;
-use App\Repository\UserRepository; // ← AJOUTEZ CET IMPORT
+use App\Repository\UserRepository;
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Http\Attribute\IsGranted; // ← AJOUTEZ CET IMPORT
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class BackofficeController extends AbstractController
 {
@@ -39,7 +39,6 @@ class BackofficeController extends AbstractController
         $search = $request->query->get('search');
         
         if ($search) {
-            // Méthode de recherche - créer si elle n'existe pas encore
             try {
                 $users = $userRepository->createQueryBuilder('u')
                     ->where('u.nom LIKE :search')
@@ -49,7 +48,6 @@ class BackofficeController extends AbstractController
                     ->getQuery()
                     ->getResult();
             } catch (\Exception $e) {
-                // Fallback si erreur
                 $users = $userRepository->findAll();
             }
         } else {
@@ -77,86 +75,91 @@ class BackofficeController extends AbstractController
     }
 
     #[Route('/backoffice/users/new', name: 'backoffice_user_new')]
-#[IsGranted('ROLE_ADMIN')]
-public function newUser(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
-{
-    $userDto = new UserCreateDTO();
-    $userDto->role = 'ETUDIANT'; // Force role to ETUDIANT
-    
-    $form = $this->createForm(UserType::class, $userDto, ['is_edit' => false]);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Always create Etudiant
-        $user = new Etudiant();
-        $user->setNom($userDto->nom);
-        $user->setPrenom($userDto->prenom);
-        $user->setEmail($userDto->email);
-        $user->setPassword($passwordHasher->hashPassword($user, $userDto->password));
-        $user->setRole('ETUDIANT');
-        $user->setNiveau($userDto->niveau);
-
-        $entityManager->persist($user);
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Étudiant créé avec succès!');
-        return $this->redirectToRoute('backoffice_users');
-    }
-
-    return $this->render('backoffice/user_form.html.twig', [
-        'form' => $form->createView(),
-        'title' => 'Créer un nouvel étudiant',
-    ]);
-}
-
-#[Route('/backoffice/users/{id}/edit', name: 'backoffice_user_edit')]
-#[IsGranted('ROLE_ADMIN')]
-public function editUser(User $user, Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
-{
-    // SIMPLE CHECK: Only allow editing ETUDIANT users
-    if ($user->getRole() !== 'ETUDIANT') {
-        $this->addFlash('error', 'Vous ne pouvez modifier que les étudiants.');
-        return $this->redirectToRoute('backoffice_users');
-    }
-
-    // Create DTO
-    $userDto = new UserCreateDTO();
-    $userDto->nom = $user->getNom();
-    $userDto->prenom = $user->getPrenom();
-    $userDto->email = $user->getEmail();
-    $userDto->role = $user->getRole();
-    
-    if ($user instanceof Etudiant) {
-        $userDto->niveau = $user->getNiveau();
-    }
-    
-    $form = $this->createForm(UserType::class, $userDto, ['is_edit' => true]);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        $user->setNom($userDto->nom);
-        $user->setPrenom($userDto->prenom);
-        $user->setEmail($userDto->email);
+    #[IsGranted('ROLE_ADMIN')]
+    public function newUser(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
+    {
+        $userDto = new UserCreateDTO();
+        $userDto->role = 'ETUDIANT'; // Force role to ETUDIANT
         
-        if ($userDto->password) {
+        $form = $this->createForm(UserType::class, $userDto, ['is_edit' => false]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Always create Etudiant
+            $user = new Etudiant();
+            $user->setNom($userDto->nom);
+            $user->setPrenom($userDto->prenom);
+            $user->setEmail($userDto->email);
             $user->setPassword($passwordHasher->hashPassword($user, $userDto->password));
+            $user->setRole('ETUDIANT');
+            $user->setNiveau($userDto->niveau);
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Étudiant créé avec succès!');
+            return $this->redirectToRoute('backoffice_users');
         }
+
+        return $this->render('backoffice/user_form.html.twig', [
+            'form' => $form->createView(),
+            'title' => 'Créer un nouvel étudiant',
+            'is_edit' => false,
+            'hide_role' => true, // 👈 HIDE role field (forced to ETUDIANT)
+        ]);
+    }
+
+    #[Route('/backoffice/users/{id}/edit', name: 'backoffice_user_edit')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function editUser(User $user, Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
+    {
+        // SIMPLE CHECK: Only allow editing ETUDIANT users
+        if ($user->getRole() !== 'ETUDIANT') {
+            $this->addFlash('error', 'Vous ne pouvez modifier que les étudiants.');
+            return $this->redirectToRoute('backoffice_users');
+        }
+
+        // Create DTO
+        $userDto = new UserCreateDTO();
+        $userDto->nom = $user->getNom();
+        $userDto->prenom = $user->getPrenom();
+        $userDto->email = $user->getEmail();
+        $userDto->role = $user->getRole();
         
         if ($user instanceof Etudiant) {
-            $user->setNiveau($userDto->niveau);
+            $userDto->niveau = $user->getNiveau();
+        }
+        
+        $form = $this->createForm(UserType::class, $userDto, ['is_edit' => true]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setNom($userDto->nom);
+            $user->setPrenom($userDto->prenom);
+            $user->setEmail($userDto->email);
+            
+            if ($userDto->password) {
+                $user->setPassword($passwordHasher->hashPassword($user, $userDto->password));
+            }
+            
+            if ($user instanceof Etudiant) {
+                $user->setNiveau($userDto->niveau);
+            }
+
+            $entityManager->flush();
+            $this->addFlash('success', 'Étudiant modifié avec succès!');
+            return $this->redirectToRoute('backoffice_users');
         }
 
-        $entityManager->flush();
-        $this->addFlash('success', 'Étudiant modifié avec succès!');
-        return $this->redirectToRoute('backoffice_users');
+        return $this->render('backoffice/user_form.html.twig', [
+            'form' => $form->createView(),
+            'title' => 'Modifier ' . $user->getPrenom() . ' ' . $user->getNom(),
+            'user' => $user,
+            'is_edit' => true,
+            'hide_role' => true, // 👈 HIDE role field (only editing students)
+        ]);
     }
-
-    return $this->render('backoffice/user_form.html.twig', [
-        'form' => $form->createView(),
-        'title' => 'Modifier ' . $user->getPrenom() . ' ' . $user->getNom(),
-        'user' => $user,
-    ]);
-}
+    
     #[Route('/backoffice/users/export', name: 'backoffice_users_export')]
     #[IsGranted('ROLE_ADMIN')]
     public function exportUsers(UserRepository $userRepository): Response
@@ -195,23 +198,24 @@ public function editUser(User $user, Request $request, UserPasswordHasherInterfa
     }
 
     #[Route('/backoffice/users/{id}/delete', name: 'backoffice_user_delete', methods: ['POST'])]
-#[IsGranted('ROLE_ADMIN')]
-public function deleteUser(Request $request, User $user, EntityManagerInterface $entityManager): Response
-{
-    // SIMPLE CHECK: Only allow deleting ETUDIANT users
-    if ($user->getRole() !== 'ETUDIANT') {
-        $this->addFlash('error', 'Vous ne pouvez supprimer que les étudiants.');
+    #[IsGranted('ROLE_ADMIN')]
+    public function deleteUser(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    {
+        // SIMPLE CHECK: Only allow deleting ETUDIANT users
+        if ($user->getRole() !== 'ETUDIANT') {
+            $this->addFlash('error', 'Vous ne pouvez supprimer que les étudiants.');
+            return $this->redirectToRoute('backoffice_users');
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($user);
+            $entityManager->flush();
+            $this->addFlash('success', 'Étudiant supprimé avec succès!');
+        }
+
         return $this->redirectToRoute('backoffice_users');
     }
-
-    if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
-        $entityManager->remove($user);
-        $entityManager->flush();
-        $this->addFlash('success', 'Étudiant supprimé avec succès!');
-    }
-
-    return $this->redirectToRoute('backoffice_users');
-}
+    
     #[Route('/backoffice/settings', name: 'backoffice_settings', methods: ['GET', 'POST'])]
     public function settings(
         Request $request,
@@ -250,6 +254,10 @@ public function deleteUser(Request $request, User $user, EntityManagerInterface 
                     $this->addFlash('error', 'Cet email est déjà utilisé!');
                     return $this->render('backoffice/settings.html.twig', [
                         'form' => $form->createView(),
+                        'user' => $user,
+                        'isEtudiant' => $user instanceof Etudiant,
+                        'is_edit' => true,
+                        'hide_role' => ($user instanceof Etudiant), // 👈 HIDE role for students, SHOW for admins
                     ]);
                 }
             }
@@ -285,6 +293,8 @@ public function deleteUser(Request $request, User $user, EntityManagerInterface 
             'form' => $form->createView(),
             'user' => $user,
             'isEtudiant' => $user instanceof Etudiant,
+            'is_edit' => true,
+            'hide_role' => ($user instanceof Etudiant), // 👈 HIDE role for students, SHOW for admins
         ]);
     }
 

@@ -27,48 +27,50 @@ class UserController extends AbstractController
     }
 
     #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
-public function new(
-    Request $request,
-    EntityManagerInterface $entityManager,
-    UserPasswordHasherInterface $passwordHasher
-): Response {
-    $dto = new UserCreateDTO();
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        UserPasswordHasherInterface $passwordHasher
+    ): Response {
+        $dto = new UserCreateDTO();
 
-    $form = $this->createForm(UserType::class, $dto, [
-        'is_edit' => false,
-    ]);
-    $form->handleRequest($request);
+        $form = $this->createForm(UserType::class, $dto, [
+            'is_edit' => false,
+        ]);
+        $form->handleRequest($request);
 
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Vérifier si l'email existe déjà (la contrainte UniqueEntity s'en charge)
-        // Créer l'utilisateur
-        if ($dto->role === 'ADMIN') {
-            $user = new Admin();
-        } else {
-            $user = new Etudiant();
-            $user->setNiveau($dto->niveau);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Vérifier si l'email existe déjà (la contrainte UniqueEntity s'en charge)
+            // Créer l'utilisateur
+            if ($dto->role === 'ADMIN') {
+                $user = new Admin();
+            } else {
+                $user = new Etudiant();
+                $user->setNiveau($dto->niveau);
+            }
+
+            $user->setNom($dto->nom);
+            $user->setPrenom($dto->prenom);
+            $user->setEmail($dto->email);
+            $user->setRole($dto->role);
+
+            $user->setPassword(
+                $passwordHasher->hashPassword($user, $dto->password)
+            );
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Utilisateur créé avec succès');
+            return $this->redirectToRoute('app_user_index');
         }
 
-        $user->setNom($dto->nom);
-        $user->setPrenom($dto->prenom);
-        $user->setEmail($dto->email);
-        $user->setRole($dto->role);
-
-        $user->setPassword(
-            $passwordHasher->hashPassword($user, $dto->password)
-        );
-
-        $entityManager->persist($user);
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Utilisateur créé avec succès');
-        return $this->redirectToRoute('app_user_index');
+        return $this->render('backoffice/user/new.html.twig', [
+            'form' => $form->createView(),
+            'hide_role' => false, // 👈 SHOW role field (admin can choose between Admin/Student)
+        ]);
     }
-
-    return $this->render('backoffice/user/new.html.twig', [
-        'form' => $form->createView(),
-    ]);
-}
+    
     #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
     public function show(User $user): Response
     {
@@ -109,6 +111,7 @@ public function new(
                     return $this->render('backoffice/user/edit.html.twig', [
                         'user' => $user,
                         'form' => $form->createView(),
+                        'hide_role' => false, // 👈 SHOW role field (admin can change role)
                     ]);
                 }
             }
@@ -119,6 +122,7 @@ public function new(
                 return $this->render('backoffice/user/edit.html.twig', [
                     'user' => $user,
                     'form' => $form->createView(),
+                    'hide_role' => false, // 👈 SHOW role field (admin can change role)
                 ]);
             }
 
@@ -179,6 +183,7 @@ public function new(
         return $this->render('backoffice/user/edit.html.twig', [
             'user' => $user,
             'form' => $form->createView(),
+            'hide_role' => false, // 👈 SHOW role field (admin can change role)
         ]);
     }
 

@@ -27,15 +27,18 @@
     {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
     {{ form_errors(form.password) }}
     {% if is_edit|default(false) %}
-        <small class="text-muted">Laisser vide pour ne pas changer</small>
+        <small class="text-muted">Laissez vide si vous ne souhaitez pas changer votre mot de passe</small>
     {% endif %}
 </div>
 
-<div class="mb-3">
-    {{ form_label(form.role) }}
-    {{ form_widget(form.role, {'attr': {'class': 'form-select', 'id': 'user_role'}}) }}
-    {{ form_errors(form.role) }}
-</div>
+{# Hide role field completely based on controller variable #}
+{% if not hide_role|default(false) %}
+    <div class="mb-3">
+        {{ form_label(form.role) }}
+        {{ form_widget(form.role, {'attr': {'class': 'form-select', 'id': 'user_role'}}) }}
+        {{ form_errors(form.role) }}
+    </div>
+{% endif %}
 
 {% if form.niveau is defined %}
     <div class="mb-3" id="niveau-wrapper">
@@ -46,8 +49,14 @@
 {% endif %}
 
 <div class="d-flex gap-2">
-    <button type="submit" class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
-    <a href="{{ path('app_user_index') }}" class="btn btn-secondary">Annuler</a>
+    <button type="submit" class="btn btn-primary">{{ button_label|default('Sauvegarder') }}</button>
+    <a href="
+        {% if hide_role|default(false) %}
+            {{ path('backoffice_settings') }}
+        {% else %}
+            {{ path('backoffice_users') }}
+        {% endif %}
+    " class="btn btn-secondary">Annuler</a>
 </div>
 
 {{ form_end(form) }}
@@ -59,23 +68,31 @@ document.addEventListener('DOMContentLoaded', function () {
     const niveauWrapper = document.getElementById('niveau-wrapper');
     const form = document.getElementById('user-form');
 
-    function toggleNiveau() {
-        if (roleSelect.value === 'ETUDIANT') {
-            niveauWrapper.style.display = 'block';
-        } else {
-            niveauWrapper.style.display = 'none';
-            const niveauSelect = document.getElementById('user_niveau');
-            if (niveauSelect) niveauSelect.value = '';
-        }
-    }
+    {% if not hide_role|default(false) %}
+        // Only show niveau toggle if role field exists
+        if (roleSelect) {
+            function toggleNiveau() {
+                if (roleSelect.value === 'ETUDIANT') {
+                    niveauWrapper.style.display = 'block';
+                } else {
+                    niveauWrapper.style.display = 'none';
+                    const niveauSelect = document.getElementById('user_niveau');
+                    if (niveauSelect) niveauSelect.value = '';
+                }
+            }
 
-    toggleNiveau();
-    roleSelect.addEventListener('change', toggleNiveau);
+            toggleNiveau();
+            roleSelect.addEventListener('change', toggleNiveau);
+        }
+    {% else %}
+        // When role is hidden (student editing), always show niveau
+        niveauWrapper.style.display = 'block';
+    {% endif %}
 
     // Pré-remplir niveau à l'édition
-    {% if user is defined and user.niveau is defined %}
+    {% if form.niveau.vars.value is defined and form.niveau.vars.value %}
         const niveauSelect = document.getElementById('user_niveau');
-        if (niveauSelect) niveauSelect.value = '{{ user.niveau }}';
+        if (niveauSelect) niveauSelect.value = '{{ form.niveau.vars.value }}';
     {% endif %}
 
     // Validation front-end
@@ -106,12 +123,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         {% endif %}
 
+        // Validate niveau
         const niveauSelect = document.getElementById('user_niveau');
-        if (niveauSelect && roleSelect.value === 'ETUDIANT' && !niveauSelect.value) {
-            niveauSelect.classList.add('is-invalid');
-            isValid = false;
-        } else if (niveauSelect) {
-            niveauSelect.classList.remove('is-invalid');
+        if (niveauSelect) {
+            {% if hide_role|default(false) %}
+                // Student editing - niveau always required
+                if (!niveauSelect.value) {
+                    niveauSelect.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    niveauSelect.classList.remove('is-invalid');
+                }
+            {% else %}
+                // Admin - validate only if role is ETUDIANT
+                if (roleSelect && roleSelect.value === 'ETUDIANT' && !niveauSelect.value) {
+                    niveauSelect.classList.add('is-invalid');
+                    isValid = false;
+                } else if (niveauSelect) {
+                    niveauSelect.classList.remove('is-invalid');
+                }
+            {% endif %}
         }
 
         if (!isValid) {
