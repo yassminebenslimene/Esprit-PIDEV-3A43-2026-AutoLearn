@@ -23,7 +23,6 @@ final class Version20260209060401 extends AbstractMigration
         $this->addSql('CREATE TABLE `option` (id INT AUTO_INCREMENT NOT NULL, texte_option VARCHAR(255) NOT NULL, est_correcte TINYINT(1) NOT NULL, question_id INT NOT NULL, INDEX IDX_5A8600B01E27F6BF (question_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4');
         $this->addSql('CREATE TABLE question (id INT AUTO_INCREMENT NOT NULL, texte_question LONGTEXT NOT NULL, point INT NOT NULL, quiz_id INT NOT NULL, INDEX IDX_B6F7494E853CD175 (quiz_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4');
         $this->addSql('CREATE TABLE quiz (id INT AUTO_INCREMENT NOT NULL, titre VARCHAR(255) NOT NULL, description LONGTEXT NOT NULL, etat VARCHAR(50) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4');
-        $this->addSql('CREATE TABLE messenger_messages (id BIGINT AUTO_INCREMENT NOT NULL, body LONGTEXT NOT NULL, headers LONGTEXT NOT NULL, queue_name VARCHAR(190) NOT NULL, created_at DATETIME NOT NULL, available_at DATETIME NOT NULL, delivered_at DATETIME DEFAULT NULL, INDEX IDX_75EA56E0FB7336F0E3BD61CE16BA31DBBF396750 (queue_name, available_at, delivered_at, id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4');
         $this->addSql('ALTER TABLE `option` ADD CONSTRAINT FK_5A8600B01E27F6BF FOREIGN KEY (question_id) REFERENCES question (id)');
         $this->addSql('ALTER TABLE question ADD CONSTRAINT FK_B6F7494E853CD175 FOREIGN KEY (quiz_id) REFERENCES quiz (id)');
     }
@@ -36,6 +35,6 @@ final class Version20260209060401 extends AbstractMigration
         $this->addSql('DROP TABLE `option`');
         $this->addSql('DROP TABLE question');
         $this->addSql('DROP TABLE quiz');
-        $this->addSql('DROP TABLE messenger_messages');
+        
     }
 }
