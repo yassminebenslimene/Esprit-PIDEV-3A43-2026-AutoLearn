@@ -1,3 +1,4 @@
+{{ dump(challenges) }}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -634,10 +635,38 @@ https://templatemo.com/tm-586-scholar
 </div>
 <section id="challenge" class="py-5">
     <div class="container">
-        <h2 class="text-center mb-4">Challenge</h2>
-        
-        <!-- Section vide pour le moment -->
-        
+        <h2 class="section-title">Challenges</h2>
+
+    {% if challenges is empty %}
+        <p class="no-challenge">Aucun challenge pour le moment</p>
+    {% else %}
+        <div class="challenges-container">
+            {% for challenge in challenges %}
+                <div class="challenge-card">
+                    <h3>{{ challenge.titre }}</h3>
+
+                    <p class="description">
+                        {{ challenge.description }}
+                    </p>
+
+                    <div class="dates">
+                        <span>
+                            <strong>Début :</strong>
+                            {{ challenge.dateDebut|date('d/m/Y') }}
+                        </span>
+                        <span>
+                            <strong>Fin :</strong>
+                            {{ challenge.dateFin|date('d/m/Y') }}
+                        </span>
+                    </div>
+
+                    <span class="niveau">
+                        Niveau : {{ challenge.niveau }}
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
     </div>
 </section>
 <div class="contact-us section" id="contact">

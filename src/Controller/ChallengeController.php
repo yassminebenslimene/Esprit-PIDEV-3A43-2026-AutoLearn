@@ -1,20 +1,19 @@
 <?php
 
 namespace App\Controller;
+use App\Entity\Challenge;
 use App\Repository\ChallengeRepository;
+use App\Form\ChallengeType;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class FrontofficeController extends AbstractController
+class ChallengeController extends AbstractController
 {
     #[Route('/', name: 'app_frontoffice')]
-    public function index(): Response
-    {
-        return $this->render('frontoffice/index.html.twig');
-    }
-    #[Route('/', name: 'app_frontoffice')]
-    public function chal(ChallengeRepository $challengeRepository): Response
+    public function index(ChallengeRepository $challengeRepository): Response
     {
         $challenges = $challengeRepository->findAll();
 
