@@ -5,8 +5,11 @@ namespace App\Controller;
 use  App\Entity\Admin;
 use App\Entity\Etudiant;
 use App\Entity\User;
+use App\Entity\Evenement;
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
+use App\Repository\EvenementRepository;
+use App\Repository\EquipeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,20 +20,18 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class FrontofficeController extends AbstractController
 {
      #[Route('/', name: 'app_frontoffice')]
-    public function index(): Response
+    public function index(EvenementRepository $evenementRepository, EquipeRepository $equipeRepository): Response
     {
-        // Si l'utilisateur est connecté
-        if ($this->getUser()) {
-            $user = $this->getUser();
-            
-            // Si c'est un admin, rediriger vers le backoffice
-            if ($user instanceof Admin || $user->getRole() === 'ADMIN') {
-                return $this->redirectToRoute('app_backoffice');
-            }
-        }
-        
-        // Sinon, afficher le frontoffice normalement
-        return $this->render('frontoffice/index.html.twig');
+        // Récupérer tous les événements non annulés
+        $evenements = $evenementRepository->findBy(['isCanceled' => false]);
+
+        // Récupérer les équipes (pour affichage public). On peut filtrer plus tard.
+        $equipes = $equipeRepository->findAll();
+
+        return $this->render('frontoffice/index.html.twig', [
+            'evenements' => $evenements,
+            'equipes' => $equipes,
+        ]);
     }
 
       #[Route('/home', name: 'app_home')]
@@ -45,6 +46,7 @@ class FrontofficeController extends AbstractController
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher
     ): Response {
+        /** @var User|null $user */
         $user = $this->getUser();
         
         // Si pas connecté, rediriger vers login
@@ -53,7 +55,7 @@ class FrontofficeController extends AbstractController
         }
 
         // Si admin, rediriger vers backoffice settings
-        if ($user instanceof Admin || $user->getRole() === 'ADMIN') {
+        if ($user instanceof Admin) {
             return $this->redirectToRoute('backoffice_settings');
         }
 
@@ -63,14 +65,13 @@ class FrontofficeController extends AbstractController
         $dto->email = $user->getEmail();
         $dto->role = $user->getRole();
 
-        $isEtudiant = $user instanceof Etudiant;
-        
-        if ($isEtudiant) {
+        if ($user instanceof Etudiant) {
             $dto->niveau = $user->getNiveau();
         }
 
         $form = $this->createForm(UserType::class, $dto, [
             'is_edit' => true,
+            'is_etudiant' => $user instanceof Etudiant,
         ]);
         
         $form->handleRequest($request);
@@ -85,7 +86,7 @@ class FrontofficeController extends AbstractController
                     return $this->render('frontoffice/profile.html.twig', [
                         'form' => $form->createView(),
                         'user' => $user,
-                        'isEtudiant' => $isEtudiant,
+                        'isEtudiant' => $user instanceof Etudiant,
                     ]);
                 }
             }
@@ -95,7 +96,7 @@ class FrontofficeController extends AbstractController
             $user->setPrenom($dto->prenom);
             $user->setEmail($dto->email);
             
-            if ($isEtudiant) {
+            if ($user instanceof Etudiant) {
                 $user->setNiveau($dto->niveau);
             }
 
@@ -120,7 +121,7 @@ class FrontofficeController extends AbstractController
         return $this->render('frontoffice/profile.html.twig', [
             'form' => $form->createView(),
             'user' => $user,
-            'isEtudiant' => $isEtudiant,
+            'isEtudiant' => $user instanceof Etudiant,
         ]);
     }
 

@@ -27,11 +27,11 @@ class SecurityController extends AbstractController
             $user = $this->getUser();
             
             // Vérifier si l'utilisateur est un Admin
-            if ($user instanceof Admin || $user->getRole() === 'ADMIN') {
+            if ($user instanceof Admin) {
                 return $this->redirectToRoute('app_backoffice');
             }
             
-            // Sinon, rediriger vers le frontoffice (pour les étudiants)
+            // Sinon (Étudiant), rediriger vers le frontoffice
             return $this->redirectToRoute('app_frontoffice');
         }
 

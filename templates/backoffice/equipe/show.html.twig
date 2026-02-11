@@ -1,0 +1,35 @@
+{% extends "backoffice/base_admin.html.twig" %}
+
+{% block admin_content %}
+<div class="card glass-card">
+    <div class="card-header">
+        <h4>👥 {{ equipe.nom }}</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Événement:</strong> {{ equipe.evenement.titre }}</p>
+                <p><strong>Nombre de membres:</strong> {{ equipe.etudiants|length }}</p>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h5>Membres:</h5>
+            <ul class="list-group">
+                {% for etudiant in equipe.etudiants %}
+                    <li class="list-group-item">
+                        {{ etudiant.prenom }} {{ etudiant.nom }}
+                        <span class="badge bg-info float-right">{{ etudiant.niveau.value }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <hr>
+        <div class="d-flex gap-2">
+            <a href="{{ path('app_equipe_edit', {id: equipe.id}) }}" class="btn btn-warning">Éditer</a>
+            <a href="{{ path('app_equipe_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

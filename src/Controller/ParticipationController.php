@@ -11,14 +11,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/participation')]
+#[Route('/backoffice/participation')]
+#[IsGranted('ROLE_ADMIN')]
 final class ParticipationController extends AbstractController
 {
     #[Route(name: 'app_participation_index', methods: ['GET'])]
     public function index(ParticipationRepository $participationRepository): Response
     {
-        return $this->render('participation/index.html.twig', [
+        return $this->render('backoffice/participation/index.html.twig', [
             'participations' => $participationRepository->findAll(),
         ]);
     }
@@ -31,31 +33,41 @@ final class ParticipationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Auto-déterminer le statut basé sur la capaciteMax de l'événement
-            // Si c'est une nouvelle participation (statut par défaut EN_ATTENTE), 
-            // vérifier si on peut l'accepter
             if ($participation->getStatut() === StatutParticipation::EN_ATTENTE) {
                 $participation->setStatut($participation->determineStatut());
+                if ($participation->getStatut() === StatutParticipation::REJETEE) {
+                    $this->addFlash('warning', 'Participation créée mais REJETÉE : capacité maximale.');
+                } else {
+                    $this->addFlash('success', 'Participation créée et ACCEPTÉE.');
+                }
             } else if ($participation->getStatut() === StatutParticipation::ACCEPTEE) {
-                // L'admin essaie de créer une participation directement acceptée
-                // Vérifier si c'est possible, sinon refuser
                 if (!$participation->canBeAccepted()) {
-                    $this->addFlash('error', 'Impossible d\'accepter cette participation : capacité maximale atteinte pour cet événement.');
-                    return $this->render('participation/new.html.twig', [
+                    $this->addFlash('error', 'Capacité maximale atteinte.');
+                    return $this->render('backoffice/participation/new.html.twig', [
                         'participation' => $participation,
                         'form' => $form,
                     ]);
                 }
+                $this->addFlash('success', 'Participation ACCEPTÉE.');
+            } else if ($participation->getStatut() === StatutParticipation::REJETEE) {
+                $this->addFlash('warning', 'Participation REJETÉE.');
             }
 
-            $entityManager->persist($participation);
-            $entityManager->flush();
+            try {
+                $entityManager->persist($participation);
+                $entityManager->flush();
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur: ' . $e->getMessage());
+                return $this->render('backoffice/participation/new.html.twig', [
+                    'participation' => $participation,
+                    'form' => $form,
+                ]);
+            }
 
-            $this->addFlash('success', 'Participation créée avec succès. Statut: ' . $participation->getStatut()->value);
             return $this->redirectToRoute('app_participation_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('participation/new.html.twig', [
+        return $this->render('backoffice/participation/new.html.twig', [
             'participation' => $participation,
             'form' => $form,
         ]);
@@ -64,7 +76,7 @@ final class ParticipationController extends AbstractController
     #[Route('/{id}', name: 'app_participation_show', methods: ['GET'])]
     public function show(Participation $participation): Response
     {
-        return $this->render('participation/show.html.twig', [
+        return $this->render('backoffice/participation/show.html.twig', [
             'participation' => $participation,
         ]);
     }
@@ -78,24 +90,27 @@ final class ParticipationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Si le statut change vers ACCEPTEE, vérifier que c'est possible
             if ($participation->getStatut() === StatutParticipation::ACCEPTEE && $originalStatus !== StatutParticipation::ACCEPTEE) {
                 if (!$participation->canBeAccepted()) {
                     $participation->setStatut($originalStatus);
-                    $this->addFlash('error', 'Impossible d\'accepter cette participation : capacité maximale atteinte pour cet événement.');
-                    return $this->render('participation/edit.html.twig', [
+                    $this->addFlash('error', 'Capacité maximale atteinte.');
+                    return $this->render('backoffice/participation/edit.html.twig', [
                         'participation' => $participation,
                         'form' => $form,
                     ]);
                 }
             }
 
-            $entityManager->flush();
-            $this->addFlash('success', 'Participation mise à jour. Nouveau statut: ' . $participation->getStatut()->value);
-            return $this->redirectToRoute('app_participation_index', [], Response::HTTP_SEE_OTHER);
+            try {
+                $entityManager->flush();
+                $this->addFlash('success', 'Participation mise à jour.');
+                return $this->redirectToRoute('app_participation_index', [], Response::HTTP_SEE_OTHER);
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur: ' . $e->getMessage());
+            }
         }
 
-        return $this->render('participation/edit.html.twig', [
+        return $this->render('backoffice/participation/edit.html.twig', [
             'participation' => $participation,
             'form' => $form,
         ]);
@@ -105,8 +120,13 @@ final class ParticipationController extends AbstractController
     public function delete(Request $request, Participation $participation, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$participation->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($participation);
-            $entityManager->flush();
+            try {
+                $entityManager->remove($participation);
+                $entityManager->flush();
+                $this->addFlash('success', 'Participation supprimée!');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur: ' . $e->getMessage());
+            }
         }
 
         return $this->redirectToRoute('app_participation_index', [], Response::HTTP_SEE_OTHER);

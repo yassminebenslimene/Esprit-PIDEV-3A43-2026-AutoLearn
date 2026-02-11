@@ -34,6 +34,9 @@ class Equipe
     private ?Evenement $evenement = null;
 
     #[ORM\ManyToMany(targetEntity: Etudiant::class)]
+    #[ORM\JoinTable(name: 'equipe_etudiant')]
+    #[ORM\JoinColumn(name: 'equipe_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'etudiant_id', referencedColumnName: 'userId')]
     private Collection $etudiants;
 
     public function __construct()
@@ -117,6 +120,28 @@ class Equipe
             $context->buildViolation("Une équipe ne peut pas avoir plus de 6 étudiants.")
                 ->atPath('etudiants')
                 ->addViolation();
+        }
+
+        // POINT 3: Vérifier qu'aucun étudiant n'est dans une autre équipe pour le même événement
+        if ($this->evenement) {
+            foreach ($this->etudiants as $etudiant) {
+                foreach ($this->evenement->getEquipes() as $autreEquipe) {
+                    // Ne pas se comparer soi-même
+                    if ($autreEquipe->getId() === $this->getId()) {
+                        continue;
+                    }
+
+                    // Vérifier si cet étudiant est dans une autre équipe du même événement
+                    if ($autreEquipe->getEtudiants()->contains($etudiant)) {
+                        $context->buildViolation(
+                            "L'étudiant " . $etudiant->getPrenom() . " " . $etudiant->getNom() . 
+                            " est déjà inscrit dans une autre équipe pour cet événement."
+                        )
+                            ->atPath('etudiants')
+                            ->addViolation();
+                    }
+                }
+            }
         }
     }
 }

@@ -1,0 +1,23 @@
+{% extends "backoffice/index.html.twig" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    {% if app.flashes %}
+    <div class="row mb-3">
+        <div class="col-12">
+            {% for type, messages in app.flashes %}
+                {% set alertClass = type == 'success' ? 'alert-success' : (type == 'error' ? 'alert-danger' : 'alert-warning') %}
+                {% for message in messages %}
+                    <div class="alert {{ alertClass }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% block admin_content %}{% endblock %}
+</div>
+{% endblock %}

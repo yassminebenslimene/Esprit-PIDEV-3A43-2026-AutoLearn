@@ -10,14 +10,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/evenement')]
+#[Route('/backoffice/evenement')]
+#[IsGranted('ROLE_ADMIN')]
 final class EvenementController extends AbstractController
 {
     #[Route(name: 'app_evenement_index', methods: ['GET'])]
     public function index(EvenementRepository $evenementRepository): Response
     {
-        return $this->render('evenement/index.html.twig', [
+        return $this->render('backoffice/evenement/index.html.twig', [
             'evenements' => $evenementRepository->findAll(),
         ]);
     }
@@ -30,13 +32,18 @@ final class EvenementController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($evenement);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_evenement_index', [], Response::HTTP_SEE_OTHER);
+            try {
+                $entityManager->persist($evenement);
+                $entityManager->flush();
+                
+                $this->addFlash('success', 'Événement créé avec succès!');
+                return $this->redirectToRoute('app_evenement_index', [], Response::HTTP_SEE_OTHER);
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de la création: ' . $e->getMessage());
+            }
         }
 
-        return $this->render('evenement/new.html.twig', [
+        return $this->render('backoffice/evenement/new.html.twig', [
             'evenement' => $evenement,
             'form' => $form,
         ]);
@@ -45,7 +52,7 @@ final class EvenementController extends AbstractController
     #[Route('/{id}', name: 'app_evenement_show', methods: ['GET'])]
     public function show(Evenement $evenement): Response
     {
-        return $this->render('evenement/show.html.twig', [
+        return $this->render('backoffice/evenement/show.html.twig', [
             'evenement' => $evenement,
         ]);
     }
@@ -57,12 +64,16 @@ final class EvenementController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_evenement_index', [], Response::HTTP_SEE_OTHER);
+            try {
+                $entityManager->flush();
+                $this->addFlash('success', 'Événement modifié avec succès!');
+                return $this->redirectToRoute('app_evenement_index', [], Response::HTTP_SEE_OTHER);
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de la modification: ' . $e->getMessage());
+            }
         }
 
-        return $this->render('evenement/edit.html.twig', [
+        return $this->render('backoffice/evenement/edit.html.twig', [
             'evenement' => $evenement,
             'form' => $form,
         ]);
@@ -71,9 +82,14 @@ final class EvenementController extends AbstractController
     #[Route('/{id}', name: 'app_evenement_delete', methods: ['POST'])]
     public function delete(Request $request, Evenement $evenement, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$evenement->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($evenement);
-            $entityManager->flush();
+        if ($this->isCsrfTokenValid('delete'.$evenement->getId(), $request->request->get('_token'))) {
+            try {
+                $entityManager->remove($evenement);
+                $entityManager->flush();
+                $this->addFlash('success', 'Événement supprimé avec succès!');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de la suppression: ' . $e->getMessage());
+            }
         }
 
         return $this->redirectToRoute('app_evenement_index', [], Response::HTTP_SEE_OTHER);

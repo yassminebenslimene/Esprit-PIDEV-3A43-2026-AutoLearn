@@ -11,6 +11,7 @@ use App\Entity\Equipe;
 use App\Entity\Participation;
 use App\Enum\TypeEvenement;
 use App\Enum\StatutEvenement;
+use App\Enum\StatutParticipation;
 
 #[ORM\Entity(repositoryClass: EvenementRepository::class)]
 class Evenement
@@ -134,13 +135,6 @@ class Evenement
         return $this;
     }
 
-    public function getStatut(): ?StatutEvenement { return $this->statut; }
-    public function setStatut(StatutEvenement $statut): static
-    {
-        $this->statut = $statut;
-        return $this;
-    }
-
     public function isCanceled(): bool { return $this->isCanceled; }
     public function setIsCanceled(bool $isCanceled): static
     {
@@ -150,9 +144,82 @@ class Evenement
 
     public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
 
+    // ================= LOGIQUE STATUT DYNAMIQUE =================
+
+    /**
+     * Détermine le statut réel de l'événement basé sur :
+     * 1. isCanceled = true → ANNULE
+     * 2. dateFin passée → TERMINE
+     * 3. dateDebut < now < dateFin → EN_COURS
+     * 4. dateDebut future → PLANIFIE
+     * 
+     * Le statut est auto-évalué à chaque accès (lecture)
+     */
+    public function evaluateStatut(): StatutEvenement
+    {
+        // Priorité 1: Si annulé manuellement
+        if ($this->isCanceled) {
+            return StatutEvenement::ANNULE;
+        }
+
+        $now = new \DateTimeImmutable();
+
+        // Priorité 2: Si la date de fin est passée
+        if ($this->dateFin < $now) {
+            return StatutEvenement::TERMINE;
+        }
+
+        // Priorité 3: Si la date début est passée mais fin future = EN_COURS
+        if ($this->dateDebut < $now && $this->dateFin > $now) {
+            return StatutEvenement::EN_COURS;
+        }
+
+        // Sinon: PLANIFIÉ (date future)
+        return StatutEvenement::PLANIFIE;
+    }
+
+    /**
+     * Retourne le statut évalué dynamiquement
+     * Le statut interne ($this->statut) peut être surcharger manuellement par l'Admin
+     * Mais la lecture retourne toujours la valeur évaluée (Auto-update)
+     */
+    public function getStatut(): ?StatutEvenement
+    {
+        return $this->evaluateStatut();
+    }
+
+    /**
+     * Permet à l'Admin de forcer manuellement un statut
+     * Note: Une fois appelé, le statut ne sera plus auto-évalué sauf si isCanceled/date change
+     */
+    public function setStatut(StatutEvenement $statut): static
+    {
+        $this->statut = $statut;
+        return $this;
+    }
+
     // ================= RELATIONS =================
 
     public function getEquipes(): Collection { return $this->equipes; }
 
     public function getParticipations(): Collection { return $this->participations; }
+
+    /**
+     * Retourne le nombre de places restantes (équipes) pour cet événement
+     * Calcul = capaciteMax - nombre de participations acceptées
+     */
+    public function getRemainingSpots(): int
+    {
+        $capacite = $this->capaciteMax ?? 0;
+        $accepted = 0;
+
+        foreach ($this->participations as $p) {
+            if ($p->getStatut() === StatutParticipation::ACCEPTEE) {
+                $accepted++;
+            }
+        }
+
+        $remaining = $capacite - $accepted;
+        return $remaining > 0 ? $remaining : 0;
+    }
 }

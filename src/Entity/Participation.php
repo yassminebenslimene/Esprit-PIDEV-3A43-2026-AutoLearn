@@ -93,6 +93,7 @@ class Participation
 /**
  * Vérifie si cette participation peut être acceptée (sans exception)
  * Retourne true si la capaciteMax n'est pas atteinte
+ * IMPORTANT: Ne compte que les participations déjà persistées (ID != null)
  */
 public function canBeAccepted(): bool
 {
@@ -104,7 +105,10 @@ public function canBeAccepted(): bool
     $nbEquipesAcceptees = 0;
 
     foreach ($this->evenement->getParticipations() as $participation) {
-        if ($participation->getStatut() === StatutParticipation::ACCEPTEE && $participation->getId() !== $this->getId()) {
+        // CORRECTION: Vérifier que l'ID existe (participation persistée)
+        if ($participation->getId() !== null 
+            && $participation->getStatut() === StatutParticipation::ACCEPTEE 
+            && $participation->getId() !== $this->getId()) {
             $nbEquipesAcceptees++;
         }
     }
@@ -118,16 +122,16 @@ public function canBeAccepted(): bool
  */
 public function determineStatut(): StatutParticipation
 {
-    return $this->canBeAccepted() ? StatutParticipation::ACCEPTEE : StatutParticipation::REFUSEE;
+    return $this->canBeAccepted() ? StatutParticipation::ACCEPTEE : StatutParticipation::REJETEE;
 }
 
 public function setStatut(StatutParticipation $statut): static
 {
-    // Si on essaie de passer à ACCEPTEE sans vérification, c'est un problème
-    if ($statut === StatutParticipation::ACCEPTEE && !$this->canBeAccepted()) {
-        throw new \LogicException("Le nombre maximal d'équipes acceptées est atteint pour cet événement.");
-    }
-
+    // CORRECTION: Supprimer l'exception ici
+    // La vérification capaciteMax doit être faite au niveau Controller
+    // Le setStatut() change simplement le statut sans exception
+    // Le pattern "auto-validation" veut dire: système suggère le statut via determineStatut()
+    // Client/Controller décide s'il force le changement
     $this->statut = $statut;
     return $this;
 }
@@ -151,6 +155,16 @@ public function setStatut(StatutParticipation $statut): static
 
     public function setEquipe(?Equipe $equipe): static
     {
+        // CORRECTION LOGIQUE: Vérifier que l'Equipe appartient au même Evenement
+        // Une Equipe est liée à UN Evenement spécifique
+        // On ne peut pas créer une Participation qui mélange Equipe+Evenement incohérents
+        if ($equipe !== null && $this->evenement !== null) {
+            if ($equipe->getEvenement() !== $this->evenement) {
+                throw new \InvalidArgumentException(
+                    "L'équipe '" . $equipe->getNom() . "' n'appartient pas à l'événement '" . $this->evenement->getTitre() . "'"
+                );
+            }
+        }
         $this->equipe = $equipe;
         return $this;
     }

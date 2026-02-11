@@ -1,0 +1,53 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h4>👤 Mon Profil</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Prénom:</strong> {{ user.prenom }}</p>
+                            <p><strong>Nom:</strong> {{ user.nom }}</p>
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Rôle:</strong> 
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <span class="badge bg-danger">ADMINISTRATEUR</span>
+                                {% else %}
+                                    <span class="badge bg-primary">ÉTUDIANT</span>
+                                    <p><strong>Niveau:</strong> {{ user.niveau.value }}</p>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_user_index') }}" class="btn btn-primary">Éditer le Profil</a>
+                        <a href="{{ path('app_logout') }}" class="btn btn-outline-danger">Se Déconnecter</a>
+                    </div>
+                </div>
+            </div>
+
+            {% if is_granted('ROLE_ADMIN') %}
+            <div class="alert alert-info mt-4">
+                <h5>Panel Administrateur</h5>
+                <p>Accédez au panel de gestion complet:</p>
+                <a href="{{ path('app_backoffice_index') }}" class="btn btn-sm btn-info">
+                    📊 Aller au Backoffice
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

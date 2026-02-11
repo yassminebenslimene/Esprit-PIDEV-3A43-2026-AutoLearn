@@ -1,0 +1,72 @@
+{% extends "backoffice/base_admin.html.twig" %}
+
+{% block admin_content %}
+<div class="card glass-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4>📅 Événements</h4>
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_evenement_new') }}" class="btn btn-primary btn-sm">+ Ajouter Événement</a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if evenements|length > 0 %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Type</th>
+                        <th>Dates</th>
+                        <th>Lieu</th>
+                        <th>Capacité</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for evenement in evenements %}
+                    <tr>
+                        <td><strong>{{ evenement.titre }}</strong></td>
+                        <td><span class="badge bg-info">{{ evenement.type.value }}</span></td>
+                        <td>
+                            <small>
+                                <strong>Début:</strong> {{ evenement.dateDebut|date('d/m/Y H:i') }}<br>
+                                <strong>Fin:</strong> {{ evenement.dateFin|date('d/m/Y H:i') }}
+                            </small>
+                        </td>
+                        <td>{{ evenement.lieu }}</td>
+                        <td>{{ evenement.capaciteMax }} équipes</td>
+                        <td>
+                            {% if evenement.statut.value == 'planifie' %}
+                                <span class="badge bg-warning">PLANIFIÉ</span>
+                            {% elseif evenement.statut.value == 'en_cours' %}
+                                <span class="badge bg-success">EN COURS</span>
+                            {% elseif evenement.statut.value == 'termine' %}
+                                <span class="badge bg-secondary">TERMINÉ</span>
+                            {% elseif evenement.isCanceled %}
+                                <span class="badge bg-danger">ANNULÉ</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ path('app_evenement_show', {id: evenement.id}) }}" class="btn btn-sm btn-info">Voir</a>
+                            <a href="{{ path('app_evenement_edit', {id: evenement.id}) }}" class="btn btn-sm btn-warning">Éditer</a>
+                            <form method="POST" action="{{ path('app_evenement_delete', {id: evenement.id}) }}" style="display:inline;" onsubmit="return confirm('Confirmer ?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evenement.id) }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">Aucun événement créé.
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_evenement_new') }}">Créer le premier</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

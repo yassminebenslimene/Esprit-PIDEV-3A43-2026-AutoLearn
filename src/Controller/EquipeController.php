@@ -10,14 +10,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/equipe')]
+#[Route('/backoffice/equipe')]
+#[IsGranted('ROLE_ADMIN')]
 final class EquipeController extends AbstractController
 {
     #[Route(name: 'app_equipe_index', methods: ['GET'])]
     public function index(EquipeRepository $equipeRepository): Response
     {
-        return $this->render('equipe/index.html.twig', [
+        return $this->render('backoffice/equipe/index.html.twig', [
             'equipes' => $equipeRepository->findAll(),
         ]);
     }
@@ -30,13 +32,18 @@ final class EquipeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($equipe);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_equipe_index', [], Response::HTTP_SEE_OTHER);
+            try {
+                $entityManager->persist($equipe);
+                $entityManager->flush();
+                $this->addFlash('success', 'Équipe créée avec succès!');
+                return $this->redirectToRoute('app_equipe_index', [], Response::HTTP_SEE_OTHER);
+            } catch (\Exception $e) {
+                // Erreur validations métier
+                $this->addFlash('error', 'Erreur: ' . $e->getMessage());
+            }
         }
 
-        return $this->render('equipe/new.html.twig', [
+        return $this->render('backoffice/equipe/new.html.twig', [
             'equipe' => $equipe,
             'form' => $form,
         ]);
@@ -45,7 +52,7 @@ final class EquipeController extends AbstractController
     #[Route('/{id}', name: 'app_equipe_show', methods: ['GET'])]
     public function show(Equipe $equipe): Response
     {
-        return $this->render('equipe/show.html.twig', [
+        return $this->render('backoffice/equipe/show.html.twig', [
             'equipe' => $equipe,
         ]);
     }
@@ -57,12 +64,16 @@ final class EquipeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_equipe_index', [], Response::HTTP_SEE_OTHER);
+            try {
+                $entityManager->flush();
+                $this->addFlash('success', 'Équipe modifiée avec succès!');
+                return $this->redirectToRoute('app_equipe_index', [], Response::HTTP_SEE_OTHER);
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur: ' . $e->getMessage());
+            }
         }
 
-        return $this->render('equipe/edit.html.twig', [
+        return $this->render('backoffice/equipe/edit.html.twig', [
             'equipe' => $equipe,
             'form' => $form,
         ]);
@@ -71,9 +82,14 @@ final class EquipeController extends AbstractController
     #[Route('/{id}', name: 'app_equipe_delete', methods: ['POST'])]
     public function delete(Request $request, Equipe $equipe, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$equipe->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($equipe);
-            $entityManager->flush();
+        if ($this->isCsrfTokenValid('delete'.$equipe->getId(), $request->request->get('_token'))) {
+            try {
+                $entityManager->remove($equipe);
+                $entityManager->flush();
+                $this->addFlash('success', 'Équipe supprimée avec succès!');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de la suppression: ' . $e->getMessage());
+            }
         }
 
         return $this->redirectToRoute('app_equipe_index', [], Response::HTTP_SEE_OTHER);

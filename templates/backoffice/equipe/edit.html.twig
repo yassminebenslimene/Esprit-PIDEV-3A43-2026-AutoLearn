@@ -1,0 +1,39 @@
+{% extends "backoffice/base_admin.html.twig" %}
+
+{% block admin_content %}
+<div class="card glass-card">
+    <div class="card-header">
+        <h4>👥 Éditer Équipe</h4>
+    </div>
+    <div class="card-body">
+        {{ form_start(form) }}
+        
+        <div class="mb-3">
+            {{ form_row(form.nom, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_row(form.evenement, {'attr': {'class': 'form-select'}}) }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Étudiants (4-6 membres)</label>
+            {{ form_widget(form.etudiants, {'attr': {'class': 'form-control', 'multiple': 'multiple', 'size': 8}}) }}
+            {% if form.etudiants.vars.errors|length > 0 %}
+                <div class="alert alert-danger mt-2">
+                    {% for error in form.etudiants.vars.errors %}
+                        <p>{{ error.message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">✓ Mettre à jour</button>
+            <a href="{{ path('app_equipe_index') }}" class="btn btn-secondary">Retour</a>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

@@ -7,16 +7,19 @@ use App\Entity\User;
 use App\Entity\Etudiant;
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class BackofficeController extends AbstractController
 {
     #[Route('/backoffice', name: 'app_backoffice')]
+    #[IsGranted('ROLE_ADMIN')]
     public function index(): Response
     {
         return $this->render('backoffice/index.html.twig');
@@ -29,9 +32,37 @@ class BackofficeController extends AbstractController
     }
 
     #[Route('/backoffice/users', name: 'backoffice_users')]
-    public function users(): Response
+    public function users(Request $request, UserRepository $userRepository): Response
     {
-        return $this->render('backoffice/users.html.twig');
+        $search = $request->query->get('search');
+
+        $qb = $userRepository->createQueryBuilder('u')->orderBy('u.createdAt', 'DESC');
+        if ($search) {
+            $qb->andWhere('u.nom LIKE :q OR u.prenom LIKE :q OR u.email LIKE :q')
+               ->setParameter('q', '%' . $search . '%');
+        }
+
+        $users = $qb->getQuery()->getResult();
+
+        $totalUsers = $userRepository->count([]);
+        $totalStudents = $userRepository->count(['role' => 'ETUDIANT']);
+        $totalAdmins = $userRepository->count(['role' => 'ADMIN']);
+
+        $today = new \DateTime('today');
+        $newTodayCount = $userRepository->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->andWhere('u.createdAt >= :today')
+            ->setParameter('today', $today)
+            ->getQuery()->getSingleScalarResult();
+
+        return $this->render('backoffice/users.html.twig', [
+            'users' => $users,
+            'search' => $search,
+            'totalUsers' => (int) $totalUsers,
+            'totalStudents' => (int) $totalStudents,
+            'totalAdmins' => (int) $totalAdmins,
+            'newTodayCount' => (int) $newTodayCount,
+        ]);
     }
 
     #[Route('/backoffice/settings', name: 'backoffice_settings', methods: ['GET', 'POST'])]

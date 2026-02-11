@@ -1,0 +1,39 @@
+{% extends "backoffice/base_admin.html.twig" %}
+
+{% block admin_content %}
+<div class="card glass-card">
+    <div class="card-header">
+        <h4>📅 {{ evenement.titre }}</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Type:</strong> <span class="badge bg-info">{{ evenement.type.value }}</span></p>
+                <p><strong>Lieu:</strong> {{ evenement.lieu }}</p>
+                <p><strong>Capacité Max:</strong> {{ evenement.capaciteMax }} équipes</p>
+                <p><strong>Places restantes:</strong> {{ evenement.getRemainingSpots() }} équipes</p>
+                <p><strong>Statut:</strong> 
+                    {% if evenement.isCanceled %}
+                        <span class="badge bg-danger">ANNULÉ</span>
+                    {% else %}
+                        <span class="badge bg-{{ evenement.statut.value == 'planifie' ? 'warning' : (evenement.statut.value == 'en_cours' ? 'success' : 'secondary') }}">
+                            {{ evenement.statut.value|upper }}
+                        </span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Début:</strong> {{ evenement.dateDebut|date('d/m/Y H:i') }}</p>
+                <p><strong>Fin:</strong> {{ evenement.dateFin|date('d/m/Y H:i') }}</p>
+                <p><strong>Description:</strong><br>{{ evenement.description }}</p>
+            </div>
+        </div>
+
+        <hr>
+        <div class="d-flex gap-2">
+            <a href="{{ path('app_evenement_edit', {id: evenement.id}) }}" class="btn btn-warning">Éditer</a>
+            <a href="{{ path('app_evenement_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

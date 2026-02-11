@@ -1,0 +1,40 @@
+{% extends "backoffice/base_admin.html.twig" %}
+
+{% block admin_content %}
+<div class="card glass-card">
+    <div class="card-header">
+        <h4>📝 Participation - {{ participation.evenement.titre }}</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Événement:</strong> {{ participation.evenement.titre }}</p>
+                <p><strong>Équipe:</strong> {{ participation.equipe.nom }}</p>
+                <p><strong>Date Inscription:</strong> {{ participation.dateInscription|date('d/m/Y H:i') }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Statut:</strong>
+                    {% if participation.statut.value == 'en_attente' %}
+                        <span class="badge bg-warning">EN ATTENTE</span>
+                    {% elseif participation.statut.value == 'acceptee' %}
+                        <span class="badge bg-success">ACCEPTÉE</span>
+                    {% elseif participation.statut.value == 'rejetee' %}
+                        <span class="badge bg-danger">REJETÉE</span>
+                    {% else %}
+                        <span class="badge bg-secondary">ANNULÉE</span>
+                    {% endif %}
+                </p>
+                {% if participation.commentaireAdmin %}
+                    <p><strong>Commentaire Admin:</strong> {{ participation.commentaireAdmin }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <hr>
+        <div class="d-flex gap-2">
+            <a href="{{ path('app_participation_edit', {id: participation.id}) }}" class="btn btn-warning">Éditer</a>
+            <a href="{{ path('app_participation_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
