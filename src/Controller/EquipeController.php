@@ -45,7 +45,7 @@ final class EquipeController extends AbstractController
 
         return $this->render('backoffice/equipe/new.html.twig', [
             'equipe' => $equipe,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -75,7 +75,7 @@ final class EquipeController extends AbstractController
 
         return $this->render('backoffice/equipe/edit.html.twig', [
             'equipe' => $equipe,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 

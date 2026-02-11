@@ -45,7 +45,7 @@ final class EvenementController extends AbstractController
 
         return $this->render('backoffice/evenement/new.html.twig', [
             'evenement' => $evenement,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -75,7 +75,7 @@ final class EvenementController extends AbstractController
 
         return $this->render('backoffice/evenement/edit.html.twig', [
             'evenement' => $evenement,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 

@@ -43,10 +43,10 @@ final class ParticipationController extends AbstractController
             } else if ($participation->getStatut() === StatutParticipation::ACCEPTEE) {
                 if (!$participation->canBeAccepted()) {
                     $this->addFlash('error', 'Capacité maximale atteinte.');
-                    return $this->render('backoffice/participation/new.html.twig', [
-                        'participation' => $participation,
-                        'form' => $form,
-                    ]);
+                        return $this->render('backoffice/participation/new.html.twig', [
+                            'participation' => $participation,
+                            'form' => $form->createView(),
+                        ]);
                 }
                 $this->addFlash('success', 'Participation ACCEPTÉE.');
             } else if ($participation->getStatut() === StatutParticipation::REJETEE) {
@@ -58,19 +58,19 @@ final class ParticipationController extends AbstractController
                 $entityManager->flush();
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Erreur: ' . $e->getMessage());
-                return $this->render('backoffice/participation/new.html.twig', [
-                    'participation' => $participation,
-                    'form' => $form,
-                ]);
+                    return $this->render('backoffice/participation/new.html.twig', [
+                        'participation' => $participation,
+                        'form' => $form->createView(),
+                    ]);
             }
 
             return $this->redirectToRoute('app_participation_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('backoffice/participation/new.html.twig', [
-            'participation' => $participation,
-            'form' => $form,
-        ]);
+            return $this->render('backoffice/participation/new.html.twig', [
+                'participation' => $participation,
+                'form' => $form->createView(),
+            ]);
     }
 
     #[Route('/{id}', name: 'app_participation_show', methods: ['GET'])]
@@ -94,10 +94,10 @@ final class ParticipationController extends AbstractController
                 if (!$participation->canBeAccepted()) {
                     $participation->setStatut($originalStatus);
                     $this->addFlash('error', 'Capacité maximale atteinte.');
-                    return $this->render('backoffice/participation/edit.html.twig', [
-                        'participation' => $participation,
-                        'form' => $form,
-                    ]);
+                        return $this->render('backoffice/participation/edit.html.twig', [
+                            'participation' => $participation,
+                            'form' => $form->createView(),
+                        ]);
                 }
             }
 
@@ -110,10 +110,10 @@ final class ParticipationController extends AbstractController
             }
         }
 
-        return $this->render('backoffice/participation/edit.html.twig', [
-            'participation' => $participation,
-            'form' => $form,
-        ]);
+            return $this->render('backoffice/participation/edit.html.twig', [
+                'participation' => $participation,
+                'form' => $form->createView(),
+            ]);
     }
 
     #[Route('/{id}', name: 'app_participation_delete', methods: ['POST'])]
