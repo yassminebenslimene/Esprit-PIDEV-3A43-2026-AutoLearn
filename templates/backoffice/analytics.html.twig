@@ -29,7 +29,7 @@ https://templatemo.com/tm-607-glass-admin
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">G</div>
-                <span class="logo-text">GlassDash</span>
+                <span class="logo-text">AutoLearn</span>
             </div>
 
             <ul class="nav-menu">
@@ -54,6 +54,29 @@ https://templatemo.com/tm-607-glass-admin
                                 <span class="nav-badge">New</span>
                             </a>
                         </li>
+                    </ul>
+                </li>
+
+                <li class="nav-section">
+                    <span class="nav-section-title">Gestion</span>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="{{ path('backoffice_quiz_management') }}" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 3h7v7H3z"/>
+                                    <path d="M14 3h7v7h-7z"/>
+                                    <path d="M14 14h7v7h-7z"/>
+                                    <path d="M3 14h7v7H3z"/>
+                                </svg>
+                                Gestion Quiz
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-section">
+                    <span class="nav-section-title">Système</span>
+                    <ul>
                         <li class="nav-item">
                             <a href="{{ path('app_cours_index') }}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -82,6 +105,24 @@ https://templatemo.com/tm-607-glass-admin
                                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                                 </svg>
                                 Users
+                            </a>
+                        </li>
+                                                <li class="nav-item">
+                            <a href="{{ path('backoffice_challenges') }}" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                                Challenges
+                            </a>
+                        </li>
+                                                <li class="nav-item">
+                            <a href="{{ path('backoffice_exercices') }}" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                                exercices
                             </a>
                         </li>
                         <li class="nav-item">
