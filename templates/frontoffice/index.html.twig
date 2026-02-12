@@ -68,11 +68,10 @@ https://templatemo.com/tm-586-scholar
                     <ul class="nav">
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}">Home</a></li>
                         <li class="scroll-to-section"><a href="#services">Services</a></li>
-                        <li class="scroll-to-section"><a href="#events">Events</a></li>
+                        <li><a href="{{ path('app_events') }}">Events</a></li>
                         <li><a href="{{ path('frontchallenge') }}">Challenges</a></li>
                         {% if app.user %}
-                            <li><a href="{{ path('app_mes_equipes') }}">Mes Équipes</a></li>
-                            <li><a href="{{ path('app_mes_participations') }}">Mes Participations</a></li>
+                            <li><a href="{{ path('app_mes_participations') }}">My Participations</a></li>
                             <li><a href="{{ path('app_profile') }}">Profile</a></li>
                             <li><a href="{{ path('backoffice_logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-nav').submit();">Logout</a></li>
                         {% else %}
@@ -421,43 +420,6 @@ https://templatemo.com/tm-586-scholar
     </div>
 </div>
 
-<div class="team section" id="team">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <div class="section-heading">
-                    <h6>Nos Équipes</h6>
-                    <h2>Les Équipes Participantes</h2>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            {% if equipes is not defined or equipes is empty %}
-                <div class="col-lg-12">
-                    <div style="text-align: center; padding: 40px;">
-                        <p style="color: #7a7a7a; font-size: 16px;">Aucune équipe pour le moment</p>
-                    </div>
-                </div>
-            {% else %}
-                {% for equipe in equipes %}
-                    <div class="col-lg-3 col-md-6">
-                        <div class="team-member">
-                            <div class="main-content">
-                                <img src="{{ asset('frontoffice/images/member-0' ~ (loop.index0 % 4 + 1) ~ '.jpg') }}" alt="{{ equipe.nom }}">
-                                <span class="category">{{ equipe.evenement.titre }}</span>
-                                <h4>{{ equipe.nom }}</h4>
-                                <p style="font-size: 14px; color: #7a7a7a; margin-top: 10px;">
-                                    {{ equipe.etudiants|length }} membres
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        </div>
-    </div>
-</div> 
-
 <div class="section testimonials">
     <div class="container">
         <div class="row">
@@ -509,63 +471,16 @@ https://templatemo.com/tm-586-scholar
                     <h2>Nos Événements</h2>
                 </div>
             </div>
-            
-            {% if evenements is not defined or evenements is empty %}
-                <div class="col-lg-12">
-                    <div class="item" style="text-align: center; padding: 40px;">
-                        <p style="color: #7a7a7a; font-size: 16px;">Aucun événement pour le moment</p>
-                    </div>
-                </div>
-            {% else %}
-                {% for evenement in evenements %}
-                    <div class="col-lg-12 col-md-6">
-                        <div class="item">
-                            <div class="row">
-                                <div class="col-lg-3">
-                                    <div class="image">
-                                        {% if loop.index0 % 3 == 0 %}
-                                            <img src="{{ asset('frontoffice/images/event-01.jpg') }}" alt="{{ evenement.titre }}">
-                                        {% elseif loop.index0 % 3 == 1 %}
-                                            <img src="{{ asset('frontoffice/images/event-02.jpg') }}" alt="{{ evenement.titre }}">
-                                        {% else %}
-                                            <img src="{{ asset('frontoffice/images/event-03.jpg') }}" alt="{{ evenement.titre }}">
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="col-lg-9">
-                                    <ul>
-                                        <li>
-                                            <span class="category">{{ evenement.type.value }}</span>
-                                            <h4>{{ evenement.titre }}</h4>
-                                        </li>
-                                        <li>
-                                            <span>Date:</span>
-                                            <h6>{{ evenement.dateDebut|date('d M Y') }}</h6>
-                                        </li>
-                                        <li>
-                                            <span>Durée:</span>
-                                            <h6>{{ evenement.dateDebut.diff(evenement.dateFin).days }} jours</h6>
-                                        </li>
-                                        <li>
-                                            <span>Places:</span>
-                                            <h6>
-                                                {% set acceptedCount = 0 %}
-                                                {% for participation in evenement.participations %}
-                                                    {% if participation.statut.value == 'Accepté' %}
-                                                        {% set acceptedCount = acceptedCount + 1 %}
-                                                    {% endif %}
-                                                {% endfor %}
-                                                {{ evenement.nbMax - acceptedCount }} / {{ evenement.nbMax }} disponibles
-                                            </h6>
-                                        </li>
-                                    </ul>
-                                    <a href="#"><i class="fa fa-angle-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-12">
+                <p style="text-align: center; margin-bottom: 40px;">
+                    <a href="{{ path('app_events') }}" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; border-radius: 10px; text-decoration: none; font-weight: 600; display: inline-block;">
+                        🎯 View All Events
+                    </a>
+                </p>
+            </div>
         </div>
     </div>
 </div>
