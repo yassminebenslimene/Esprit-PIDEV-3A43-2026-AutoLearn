@@ -158,7 +158,7 @@ class FrontofficeEquipeController extends AbstractController
     }
     
     #[Route('/{id}/delete', name: 'app_equipe_delete', methods: ['POST'])]
-    public function delete(Request $request, Equipe $equipe, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Equipe $equipe, EntityManagerInterface $entityManager, ParticipationRepository $participationRepository): Response
     {
         // Vérifier que l'utilisateur connecté est membre de cette équipe
         $user = $this->getUser();
@@ -176,10 +176,17 @@ class FrontofficeEquipeController extends AbstractController
         }
         
         if ($this->isCsrfTokenValid('delete'.$equipe->getId(), $request->request->get('_token'))) {
+            // Supprimer d'abord toutes les participations liées à cette équipe
+            $participations = $participationRepository->findBy(['equipe' => $equipe]);
+            foreach ($participations as $participation) {
+                $entityManager->remove($participation);
+            }
+            
+            // Ensuite supprimer l'équipe
             $entityManager->remove($equipe);
             $entityManager->flush();
             
-            $this->addFlash('success', 'Team deleted successfully!');
+            $this->addFlash('success', 'Team and its participations deleted successfully!');
         }
 
         return $this->redirectToRoute('app_mes_equipes', [], Response::HTTP_SEE_OTHER);
