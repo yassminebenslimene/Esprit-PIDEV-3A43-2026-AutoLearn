@@ -24,6 +24,10 @@ class Evenement
     #[Assert\NotBlank(message: "Le titre est obligatoire")]
     private string $titre;
 
+    #[ORM\Column(length:255)]
+    #[Assert\NotBlank(message: "Le lieu est obligatoire")]
+    private string $lieu;
+
     #[ORM\Column(type:"text")]
     #[Assert\NotBlank(message: "La description est obligatoire")]
     private string $description;
@@ -85,6 +89,9 @@ class Evenement
 
     public function getTitre(): string { return $this->titre; }
     public function setTitre(string $titre): self { $this->titre = $titre; return $this; }
+
+    public function getLieu(): string { return $this->lieu; }
+    public function setLieu(string $lieu): self { $this->lieu = $lieu; return $this; }
 
     public function getDescription(): string { return $this->description; }
     public function setDescription(string $description): self { $this->description = $description; return $this; }

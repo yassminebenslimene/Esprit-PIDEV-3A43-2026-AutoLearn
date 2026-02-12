@@ -71,21 +71,18 @@ https://templatemo.com/tm-586-scholar
                         <li class="scroll-to-section"><a href="#courses">Courses</a></li>
                         <li class="scroll-to-section"><a href="#team">Team</a></li>
                         <li class="scroll-to-section"><a href="#events">Events</a></li>
-<<<<<<< HEAD
-                        <li class="scroll-to-section"><a href="#challenge">Challenge</a></li>
-                        <li class="scroll-to-section"><a href="#contact">Register Now!</a></li>
-                    </ul>   
-=======
-{% if app.user %}
-    <li class="scroll-to-section">
-     <li><a href="{{ path('app_profile') }}">My Profil</a></li>
-        <a href="{{ path('backoffice_logout') }}">Logout ({{ app.user.prenom }})</a>
-    </li>
-{% else %}
-    <li class="scroll-to-section"><a href="{{ path('backoffice_login') }}">Login</a></li>
-    <li class="scroll-to-section"><a href="{{ path('backoffice_register') }}">Register</a></li>
-{% endif %}                    </ul>   
->>>>>>> cbd2e773930cb70cefbc6082f3b24c49fb76374d
+                        <li class="scroll-to-section"><a href="{{ path('app_challenges') }}">Challenges</a></li>
+                        {% if app.user %}
+                            <li><a href="{{ path('app_profile') }}">My Profile</a></li>
+                            <li><a href="{{ path('backoffice_logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-nav').submit();">Logout ({{ app.user.prenom }})</a></li>
+                        {% else %}
+                            <li><a href="{{ path('backoffice_login') }}">Login</a></li>
+                            <li><a href="{{ path('backoffice_register') }}">Register</a></li>
+                        {% endif %}
+                    </ul>
+                    <form id="logout-form-nav" action="{{ path('backoffice_logout') }}" method="POST" style="display: none;">
+                        <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
+                    </form>
                     <a class='menu-trigger'>
                         <span>Menu</span>
                     </a>

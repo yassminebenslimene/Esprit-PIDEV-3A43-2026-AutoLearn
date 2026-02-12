@@ -55,7 +55,7 @@ final class EvenementController extends AbstractController
     #[Route('/{id}/edit', name: 'backoffice_evenement_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Evenement $evenement, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(EvenementType::class, $evenement);
+        $form = $this->createForm(EvenementType::class, $evenement, ['is_edit' => true]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
