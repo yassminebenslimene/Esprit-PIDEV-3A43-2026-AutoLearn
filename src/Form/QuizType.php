@@ -2,7 +2,9 @@
 
 namespace App\Form;
 
+use App\Entity\Chapitre;
 use App\Entity\Quiz;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -44,6 +46,14 @@ class QuizType extends AbstractType
                 ],
                 'required' => true,
                 'help' => 'Définissez le statut du quiz'
+            ])
+            ->add('chapitre', EntityType::class, [
+                'class' => Chapitre::class,
+                'choice_label' => 'titre',
+                'label' => 'Chapitre',
+                'placeholder' => 'Sélectionnez un chapitre',
+                'required' => false,
+                'help' => 'Associez ce quiz à un chapitre spécifique'
             ])
         ;
     }
