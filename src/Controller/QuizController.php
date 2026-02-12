@@ -22,6 +22,24 @@ final class QuizController extends AbstractController
         ]);
     }
 
+    #[Route('/api/{id}/questions', name: 'api_quiz_questions', methods: ['GET'])]
+    public function getQuestions(Quiz $quiz): Response
+    {
+        $questions = $quiz->getQuestions();
+        $data = [];
+        
+        foreach ($questions as $question) {
+            $data[] = [
+                'id' => $question->getId(),
+                'texte' => $question->getTexteQuestion(),
+                'type' => 'Standard', // Vous pouvez ajouter un champ type si nécessaire
+                'points' => $question->getPoint(),
+            ];
+        }
+        
+        return $this->json($data);
+    }
+
     #[Route('/new', name: 'app_quiz_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -33,7 +51,7 @@ final class QuizController extends AbstractController
             $entityManager->persist($quiz);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_quiz_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('backoffice_quiz_management', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('quiz/new.html.twig', [
@@ -59,7 +77,7 @@ final class QuizController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_quiz_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('backoffice_quiz_management', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('quiz/edit.html.twig', [
@@ -76,6 +94,6 @@ final class QuizController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_quiz_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('backoffice_quiz_management', [], Response::HTTP_SEE_OTHER);
     }
 }

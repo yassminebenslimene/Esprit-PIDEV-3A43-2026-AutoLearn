@@ -25,6 +25,49 @@ class BackofficeController extends AbstractController
         return $this->render('backoffice/index.html.twig');
     }
 
+    #[Route('/backoffice/quiz-management', name: 'backoffice_quiz_management')]
+    public function quizManagement(\App\Repository\QuizRepository $quizRepository): Response
+    {
+        return $this->render('backoffice/quiz_management.html.twig', [
+            'quizzes' => $quizRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/backoffice/api/quiz/{id}/questions', name: 'backoffice_api_quiz_questions', methods: ['GET'])]
+    public function getQuizQuestions(\App\Entity\Quiz $quiz): Response
+    {
+        $questions = $quiz->getQuestions();
+        $data = [];
+        
+        foreach ($questions as $question) {
+            $data[] = [
+                'id' => $question->getId(),
+                'texteQuestion' => $question->getTexteQuestion(),
+                'point' => $question->getPoint(),
+                'optionsCount' => $question->getOptions()->count(),
+            ];
+        }
+        
+        return $this->json($data);
+    }
+
+    #[Route('/backoffice/api/question/{id}/options', name: 'backoffice_api_question_options', methods: ['GET'])]
+    public function getQuestionOptions(\App\Entity\Question $question): Response
+    {
+        $options = $question->getOptions();
+        $data = [];
+        
+        foreach ($options as $option) {
+            $data[] = [
+                'id' => $option->getId(),
+                'texteOption' => $option->getTexteOption(),
+                'estCorrecte' => $option->isEstCorrecte(),
+            ];
+        }
+        
+        return $this->json($data);
+    }
+
     #[Route('/backoffice/analytics', name: 'backoffice_analytics')]
     public function analytics(): Response
     {

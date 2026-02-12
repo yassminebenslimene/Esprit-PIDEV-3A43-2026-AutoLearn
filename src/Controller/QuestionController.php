@@ -22,6 +22,23 @@ final class QuestionController extends AbstractController
         ]);
     }
 
+    #[Route('/api/{id}/options', name: 'api_question_options', methods: ['GET'])]
+    public function getOptions(Question $question): Response
+    {
+        $options = $question->getOptions();
+        $data = [];
+        
+        foreach ($options as $option) {
+            $data[] = [
+                'id' => $option->getId(),
+                'texte' => $option->getTexteOption(),
+                'estCorrecte' => $option->isEstCorrecte(),
+            ];
+        }
+        
+        return $this->json($data);
+    }
+
     #[Route('/new', name: 'app_question_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -33,7 +50,7 @@ final class QuestionController extends AbstractController
             $entityManager->persist($question);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_question_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('backoffice_quiz_management', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('question/new.html.twig', [
@@ -59,7 +76,7 @@ final class QuestionController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_question_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('backoffice_quiz_management', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('question/edit.html.twig', [
@@ -76,6 +93,6 @@ final class QuestionController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_question_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('backoffice_quiz_management', [], Response::HTTP_SEE_OTHER);
     }
 }
