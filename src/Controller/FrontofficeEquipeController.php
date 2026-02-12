@@ -86,24 +86,13 @@ class FrontofficeEquipeController extends AbstractController
             $entityManager->persist($equipe);
             $entityManager->flush();
             
-            // Créer automatiquement une participation pour cette équipe
-            $participation = new Participation();
-            $participation->setEquipe($equipe);
-            $participation->setEvenement($evenement);
+            $this->addFlash('success', 'Équipe créée avec succès !');
             
-            // Valider la participation selon les règles
-            $participation->validateParticipation();
-            
-            $entityManager->persist($participation);
-            $entityManager->flush();
-            
-            if ($participation->getStatut()->value === 'ACCEPTE') {
-                $this->addFlash('success', 'Équipe créée et participation acceptée ! Vous êtes maintenant inscrits à l\'événement "' . $evenement->getTitre() . '".');
-            } else {
-                $this->addFlash('warning', 'Équipe créée mais participation refusée. L\'événement est peut-être complet ou un membre participe déjà avec une autre équipe.');
-            }
-            
-            return $this->redirectToRoute('app_mes_equipes', [], Response::HTTP_SEE_OTHER);
+            // Rediriger vers la page de détails de l'équipe avec l'événement en paramètre
+            return $this->redirectToRoute('app_equipe_show_with_event', [
+                'id' => $equipe->getId(),
+                'eventId' => $evenement->getId()
+            ], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('frontoffice/equipe/new.html.twig', [
@@ -152,6 +141,19 @@ class FrontofficeEquipeController extends AbstractController
     {
         return $this->render('frontoffice/equipe/show.html.twig', [
             'equipe' => $equipe,
+            'showParticipateButton' => false,
+        ]);
+    }
+    
+    #[Route('/{id}/event/{eventId}', name: 'app_equipe_show_with_event', methods: ['GET'])]
+    public function showWithEvent(Equipe $equipe, int $eventId, EvenementRepository $evenementRepository): Response
+    {
+        $evenement = $evenementRepository->find($eventId);
+        
+        return $this->render('frontoffice/equipe/show.html.twig', [
+            'equipe' => $equipe,
+            'evenement' => $evenement,
+            'showParticipateButton' => true,
         ]);
     }
 }

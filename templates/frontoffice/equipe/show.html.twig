@@ -20,6 +20,44 @@
             margin: 0 auto;
         }
         
+        .success-message {
+            background: #e9d8fd;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .success-icon {
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .success-text {
+            flex: 1;
+        }
+        
+        .success-text h4 {
+            color: #44337a;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .success-text p {
+            color: #553c9a;
+            margin: 0;
+        }
+        
         .detail-header {
             text-align: center;
             margin-bottom: 40px;
@@ -56,31 +94,6 @@
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        
-        .info-card {
-            background: #f7fafc;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .info-card strong {
-            display: block;
-            color: #2d3748;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-        
-        .info-card span {
-            color: #4a5568;
-            font-size: 16px;
         }
         
         .members-list {
@@ -142,7 +155,7 @@
         }
         
         .btn {
-            padding: 12px 30px;
+            padding: 15px 35px;
             border-radius: 10px;
             text-decoration: none;
             font-weight: 600;
@@ -150,16 +163,19 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            font-size: 16px;
         }
         
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .btn-participate {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             color: white;
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.3);
         }
         
-        .btn-primary:hover {
+        .btn-participate:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 20px rgba(72, 187, 120, 0.4);
+            color: white;
         }
         
         .btn-secondary {
@@ -170,6 +186,7 @@
         
         .btn-secondary:hover {
             background: #edf2f7;
+            color: #4a5568;
         }
     </style>
 {% endblock %}
@@ -178,44 +195,19 @@
 <div class="detail-section">
     <div class="container">
         <div class="detail-container">
+            {% for message in app.flashes('success') %}
+                <div class="success-message">
+                    <div class="success-icon">✓</div>
+                    <div class="success-text">
+                        <h4>Success!</h4>
+                        <p>{{ message }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+            
             <div class="detail-header">
                 <h1>{{ equipe.nom }}</h1>
                 <span class="team-badge">{{ equipe.etudiants|length }} Members</span>
-            </div>
-
-            <div class="info-section">
-                <h3>
-                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    Event Information
-                </h3>
-                <div class="info-grid">
-                    <div class="info-card">
-                        <strong>Event Name</strong>
-                        <span>{{ equipe.evenement.titre }}</span>
-                    </div>
-                    <div class="info-card">
-                        <strong>Location</strong>
-                        <span>{{ equipe.evenement.lieu }}</span>
-                    </div>
-                    <div class="info-card">
-                        <strong>Type</strong>
-                        <span>{{ equipe.evenement.type.value }}</span>
-                    </div>
-                    <div class="info-card">
-                        <strong>Start Date</strong>
-                        <span>{{ equipe.evenement.dateDebut|date('d/m/Y H:i') }}</span>
-                    </div>
-                    <div class="info-card">
-                        <strong>End Date</strong>
-                        <span>{{ equipe.evenement.dateFin|date('d/m/Y H:i') }}</span>
-                    </div>
-                    <div class="info-card">
-                        <strong>Status</strong>
-                        <span>{{ equipe.evenement.status.value }}</span>
-                    </div>
-                </div>
             </div>
 
             <div class="info-section">
@@ -241,11 +233,13 @@
             </div>
 
             <div class="action-buttons">
-                <a href="{{ path('app_mes_equipes') }}" class="btn btn-secondary">
-                    ← Back to My Teams
-                </a>
-                <a href="{{ path('app_equipe_edit', {'id': equipe.id}) }}" class="btn btn-primary">
-                    ✏️ Edit Team
+                {% if showParticipateButton and evenement is defined %}
+                    <a href="{{ path('app_participation_new_for_team', {'equipeId': equipe.id, 'eventId': evenement.id}) }}" class="btn btn-participate">
+                        🎯 Participate in {{ evenement.titre }}
+                    </a>
+                {% endif %}
+                <a href="{{ path('app_events') }}" class="btn btn-secondary">
+                    ← Back to Events
                 </a>
             </div>
         </div>

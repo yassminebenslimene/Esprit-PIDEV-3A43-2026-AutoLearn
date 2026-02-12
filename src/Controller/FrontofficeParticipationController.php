@@ -6,6 +6,7 @@ use App\Entity\Participation;
 use App\Form\ParticipationFrontType;
 use App\Repository\ParticipationRepository;
 use App\Repository\EquipeRepository;
+use App\Repository\EvenementRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -76,6 +77,44 @@ class FrontofficeParticipationController extends AbstractController
             'participation' => $participation,
             'form' => $form,
         ]);
+    }
+    
+    #[Route('/new-for-team/{equipeId}/event/{eventId}', name: 'app_participation_new_for_team', methods: ['GET', 'POST'])]
+    public function newForTeam(
+        int $equipeId,
+        int $eventId,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        EquipeRepository $equipeRepository,
+        EvenementRepository $evenementRepository
+    ): Response
+    {
+        $equipe = $equipeRepository->find($equipeId);
+        $evenement = $evenementRepository->find($eventId);
+        
+        if (!$equipe || !$evenement) {
+            $this->addFlash('error', 'Team or event not found.');
+            return $this->redirectToRoute('app_events');
+        }
+        
+        // Créer automatiquement la participation
+        $participation = new Participation();
+        $participation->setEquipe($equipe);
+        $participation->setEvenement($evenement);
+        
+        // Valider la participation selon les règles
+        $participation->validateParticipation();
+        
+        $entityManager->persist($participation);
+        $entityManager->flush();
+        
+        if ($participation->getStatut()->value === 'ACCEPTE') {
+            $this->addFlash('success', 'Participation accepted! Your team is now registered for "' . $evenement->getTitre() . '".');
+        } else {
+            $this->addFlash('warning', 'Participation refused. The event may be full or a member is already participating with another team.');
+        }
+        
+        return $this->redirectToRoute('app_mes_participations', [], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/{id}', name: 'app_participation_show', methods: ['GET'])]
