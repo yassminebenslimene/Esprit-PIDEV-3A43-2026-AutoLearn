@@ -96,6 +96,9 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeInterface $createdAt = null;
 
 
+
+
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();

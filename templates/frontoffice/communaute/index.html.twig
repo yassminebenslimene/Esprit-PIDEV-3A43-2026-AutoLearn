@@ -1,37 +1,115 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_front.html.twig' %}
 
-{% block title %}Communaute index{% endblock %}
+{% block title %}Communautés | Scholar{% endblock %}
 
 {% block body %}
-    <h1>Communaute index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Description</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for communaute in communautes %}
-            <tr>
-                <td>{{ communaute.id }}</td>
-                <td>{{ communaute.nom }}</td>
-                <td>{{ communaute.description }}</td>
-                <td>
-                    <a href="{{ path('app_communaute_show', {'id': communaute.id}) }}">show</a>
-                    <a href="{{ path('app_communaute_edit', {'id': communaute.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<div class="page-heading header-text">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h3>Communautés</h3>
+                <span class="breadcrumb">
+                    <a href="{{ path('app_frontoffice') }}">Home</a>
+                    > Communautés
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <a href="{{ path('app_communaute_new') }}">Create new</a>
+<style>
+.community-container {
+    max-width: 900px;
+    margin: 80px auto;
+}
+
+.community-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.community-title {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.community-desc {
+    color: #666;
+    margin-top: 8px;
+}
+
+.community-actions {
+    margin-top: 15px;
+}
+
+.btn-main {
+    background: linear-gradient(135deg, #7a6ad8, #6c63ff);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn-outline {
+    background: #f1f3ff;
+    color: #333;
+    padding: 8px 18px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 14px;
+    margin-left: 10px;
+}
+</style>
+
+<div class="community-container">
+
+    <a href="{{ path('app_communaute_new') }}" class="btn-main">
+        ➕ Nouvelle communauté
+    </a>
+
+    <br><br>
+
+    {% for communaute in communautes %}
+        <div class="community-card">
+
+            <div class="community-title">
+                {{ communaute.nom }}
+            </div>
+
+            <div class="community-desc">
+                {{ communaute.description }}
+            </div>
+
+            <div class="community-actions">
+                <a href="{{ path('app_communaute_show', {id: communaute.id}) }}"
+                   class="btn-outline">
+                    Voir
+                </a>
+
+                <a href="{{ path('app_communaute_edit', {id: communaute.id}) }}"
+                   class="btn-outline">
+                    Modifier
+                </a>
+            </div>
+
+        </div>
+    {% else %}
+        <p>Aucune communauté trouvée.</p>
+    {% endfor %}
+
+</div>
+
+<footer>
+    <div class="container">
+        <div class="col-lg-12">
+            <p>Copyright © 2036 Scholar Organization. All rights reserved. &nbsp;&nbsp;&nbsp; Design: <a href="https://templatemo.com" rel="nofollow" target="_blank">TemplateMo</a></p>
+        </div>
+    </div>
+</footer>
+
 {% endblock %}
