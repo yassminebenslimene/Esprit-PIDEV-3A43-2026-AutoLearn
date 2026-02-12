@@ -156,4 +156,32 @@ class FrontofficeEquipeController extends AbstractController
             'showParticipateButton' => true,
         ]);
     }
+    
+    #[Route('/{id}/delete', name: 'app_equipe_delete', methods: ['POST'])]
+    public function delete(Request $request, Equipe $equipe, EntityManagerInterface $entityManager): Response
+    {
+        // Vérifier que l'utilisateur connecté est membre de cette équipe
+        $user = $this->getUser();
+        $isMember = false;
+        foreach ($equipe->getEtudiants() as $etudiant) {
+            if ($etudiant->getId() === $user->getId()) {
+                $isMember = true;
+                break;
+            }
+        }
+        
+        if (!$isMember) {
+            $this->addFlash('error', 'You can only delete your own teams.');
+            return $this->redirectToRoute('app_mes_equipes');
+        }
+        
+        if ($this->isCsrfTokenValid('delete'.$equipe->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($equipe);
+            $entityManager->flush();
+            
+            $this->addFlash('success', 'Team deleted successfully!');
+        }
+
+        return $this->redirectToRoute('app_mes_equipes', [], Response::HTTP_SEE_OTHER);
+    }
 }

@@ -131,12 +131,79 @@ class FrontofficeParticipationController extends AbstractController
         }
         
         if (!$isMember) {
-            $this->addFlash('error', 'Vous ne pouvez voir que vos propres participations.');
+            $this->addFlash('error', 'You can only view your own participations.');
             return $this->redirectToRoute('app_mes_participations');
         }
 
         return $this->render('frontoffice/participation/show.html.twig', [
             'participation' => $participation,
         ]);
+    }
+    
+    #[Route('/{id}/edit', name: 'app_participation_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Participation $participation, EntityManagerInterface $entityManager): Response
+    {
+        // Vérifier que l'utilisateur connecté est membre de l'équipe
+        $user = $this->getUser();
+        $isMember = false;
+        foreach ($participation->getEquipe()->getEtudiants() as $etudiant) {
+            if ($etudiant->getId() === $user->getId()) {
+                $isMember = true;
+                break;
+            }
+        }
+        
+        if (!$isMember) {
+            $this->addFlash('error', 'You can only edit your own participations.');
+            return $this->redirectToRoute('app_mes_participations');
+        }
+
+        $form = $this->createForm(ParticipationFrontType::class, $participation, [
+            'user' => $this->getUser()
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Re-valider la participation après modification
+            $participation->validateParticipation();
+            
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Participation updated successfully!');
+            return $this->redirectToRoute('app_mes_participations', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('frontoffice/participation/edit.html.twig', [
+            'participation' => $participation,
+            'form' => $form,
+        ]);
+    }
+    
+    #[Route('/{id}/delete', name: 'app_participation_delete', methods: ['POST'])]
+    public function delete(Request $request, Participation $participation, EntityManagerInterface $entityManager): Response
+    {
+        // Vérifier que l'utilisateur connecté est membre de l'équipe
+        $user = $this->getUser();
+        $isMember = false;
+        foreach ($participation->getEquipe()->getEtudiants() as $etudiant) {
+            if ($etudiant->getId() === $user->getId()) {
+                $isMember = true;
+                break;
+            }
+        }
+        
+        if (!$isMember) {
+            $this->addFlash('error', 'You can only delete your own participations.');
+            return $this->redirectToRoute('app_mes_participations');
+        }
+        
+        if ($this->isCsrfTokenValid('delete'.$participation->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($participation);
+            $entityManager->flush();
+            
+            $this->addFlash('success', 'Participation deleted successfully!');
+        }
+
+        return $this->redirectToRoute('app_mes_participations', [], Response::HTTP_SEE_OTHER);
     }
 }
