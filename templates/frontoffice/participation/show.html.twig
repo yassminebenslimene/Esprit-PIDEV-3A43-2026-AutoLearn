@@ -1,0 +1,77 @@
+{% extends 'frontoffice/base.html.twig' %}
+
+{% block title %}Détails de la participation{% endblock %}
+
+{% block body %}
+<div class="container" style="margin-top: 120px; margin-bottom: 80px;">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="section-heading text-center">
+                <h2>Détails de la participation</h2>
+            </div>
+
+            <div style="background: white; padding: 40px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+                <div style="margin-bottom: 30px;">
+                    <h4 style="color: #7a6ad8; margin-bottom: 15px;">Événement</h4>
+                    
+                    <p><strong>Titre:</strong> {{ participation.evenement.titre }}</p>
+                    <p><strong>Lieu:</strong> {{ participation.evenement.lieu }}</p>
+                    <p><strong>Type:</strong> {{ participation.evenement.type.value }}</p>
+                    <p><strong>Date de début:</strong> {{ participation.evenement.dateDebut|date('d/m/Y H:i') }}</p>
+                    <p><strong>Date de fin:</strong> {{ participation.evenement.dateFin|date('d/m/Y H:i') }}</p>
+                    <p><strong>Description:</strong> {{ participation.evenement.description }}</p>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h4 style="color: #7a6ad8; margin-bottom: 15px;">Équipe</h4>
+                    
+                    <p><strong>Nom:</strong> {{ participation.equipe.nom }}</p>
+                    <p><strong>Membres:</strong></p>
+                    <ul style="list-style: none; padding: 0;">
+                        {% for etudiant in participation.equipe.etudiants %}
+                            <li style="padding: 10px; background: #f5f5f5; margin-bottom: 10px; border-radius: 5px;">
+                                {{ etudiant.prenom }} {{ etudiant.nom }} ({{ etudiant.email }})
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h4 style="color: #7a6ad8; margin-bottom: 15px;">Statut de la participation</h4>
+                    
+                    <p>
+                        {% if participation.statut.value == 'ACCEPTE' %}
+                            <span style="background-color: #d4edda; color: #155724; padding: 10px 20px; border-radius: 5px; font-size: 16px; display: inline-block;">
+                                ✓ Participation acceptée
+                            </span>
+                            <p style="margin-top: 15px; color: #155724;">Votre équipe est inscrite à cet événement !</p>
+                        {% elseif participation.statut.value == 'EN_ATTENTE' %}
+                            <span style="background-color: #fff3cd; color: #856404; padding: 10px 20px; border-radius: 5px; font-size: 16px; display: inline-block;">
+                                ⏳ En attente de validation
+                            </span>
+                            <p style="margin-top: 15px; color: #856404;">Votre participation est en cours de traitement.</p>
+                        {% else %}
+                            <span style="background-color: #f8d7da; color: #721c24; padding: 10px 20px; border-radius: 5px; font-size: 16px; display: inline-block;">
+                                ✗ Participation refusée
+                            </span>
+                            <p style="margin-top: 15px; color: #721c24;">
+                                Votre participation a été refusée. Raisons possibles :
+                                <ul>
+                                    <li>L'événement a atteint sa capacité maximale</li>
+                                    <li>Un ou plusieurs membres de votre équipe participent déjà avec une autre équipe</li>
+                                </ul>
+                            </p>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <a href="{{ path('app_mes_participations') }}" class="btn btn-secondary" style="padding: 12px 30px; border-radius: 5px; text-decoration: none;">
+                        Retour à mes participations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

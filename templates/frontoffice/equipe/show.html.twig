@@ -1,0 +1,48 @@
+{% extends 'frontoffice/base.html.twig' %}
+
+{% block title %}{{ equipe.nom }}{% endblock %}
+
+{% block body %}
+<div class="container" style="margin-top: 120px; margin-bottom: 80px;">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="section-heading text-center">
+                <h2>{{ equipe.nom }}</h2>
+            </div>
+
+            <div style="background: white; padding: 40px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+                <div style="margin-bottom: 30px;">
+                    <h4 style="color: #7a6ad8; margin-bottom: 15px;">Informations de l'équipe</h4>
+                    
+                    <p><strong>Nom:</strong> {{ equipe.nom }}</p>
+                    <p><strong>Événement:</strong> {{ equipe.evenement.titre }}</p>
+                    <p><strong>Lieu:</strong> {{ equipe.evenement.lieu }}</p>
+                    <p><strong>Date:</strong> {{ equipe.evenement.dateDebut|date('d/m/Y H:i') }}</p>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h4 style="color: #7a6ad8; margin-bottom: 15px;">Membres de l'équipe ({{ equipe.etudiants|length }})</h4>
+                    
+                    <ul style="list-style: none; padding: 0;">
+                        {% for etudiant in equipe.etudiants %}
+                            <li style="padding: 10px; background: #f5f5f5; margin-bottom: 10px; border-radius: 5px;">
+                                <strong>{{ etudiant.prenom }} {{ etudiant.nom }}</strong><br>
+                                <small style="color: #666;">{{ etudiant.email }} - Niveau: {{ etudiant.niveau }}</small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <a href="{{ path('app_mes_equipes') }}" class="btn btn-secondary" style="padding: 12px 30px; border-radius: 5px; text-decoration: none;">
+                        Retour à mes équipes
+                    </a>
+                    <a href="{{ path('app_equipe_edit', {'id': equipe.id}) }}" class="btn btn-primary" style="background-color: #7a6ad8; border: none; padding: 12px 30px; border-radius: 5px; color: white; font-weight: 600; text-decoration: none; margin-left: 10px;">
+                        Modifier
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
