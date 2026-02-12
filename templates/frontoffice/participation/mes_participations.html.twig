@@ -1,86 +1,243 @@
 {% extends 'frontoffice/base.html.twig' %}
 
-{% block title %}Mes participations{% endblock %}
+{% block title %}My Participations{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .participations-section {
+            padding: 120px 0 80px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            min-height: 100vh;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+        }
+        
+        .section-header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .section-header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .participation-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .participation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+        
+        .participation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .status-accepted {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .status-pending {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+        
+        .status-refused {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .event-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            color: #4a5568;
+        }
+        
+        .info-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            color: #48bb78;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border-left: 4px solid #38a169;
+        }
+        
+        .alert-warning {
+            background: #feebc8;
+            color: #7c2d12;
+            border-left: 4px solid #dd6b20;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-<div class="container" style="margin-top: 120px; margin-bottom: 80px;">
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="section-heading text-center">
-                <h2>Mes participations</h2>
-                <p>Suivez vos participations aux événements</p>
-            </div>
+<div class="participations-section">
+    <div class="container">
+        <div class="section-header">
+            <h1>My Participations</h1>
+            <p>Track your event participations</p>
+        </div>
 
-            <div style="text-align: right; margin-bottom: 20px;">
-                <a href="{{ path('app_participation_new') }}" class="btn btn-primary" style="background-color: #7a6ad8; border: none; padding: 12px 30px; border-radius: 5px; color: white; font-weight: 600; text-decoration: none;">
-                    + Participer à un événement
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                ✓ {{ message }}
+            </div>
+        {% endfor %}
+
+        {% for message in app.flashes('warning') %}
+            <div class="alert alert-warning">
+                ⚠️ {{ message }}
+            </div>
+        {% endfor %}
+
+        {% if participations is empty %}
+            <div class="empty-state">
+                <div class="empty-state-icon">🎯</div>
+                <h3>No participations yet</h3>
+                <p>Register your team for an event!</p>
+                <a href="{{ path('app_mes_equipes') }}" class="btn btn-primary">
+                    View My Teams
                 </a>
             </div>
-
-            {% for message in app.flashes('success') %}
-                <div class="alert alert-success" style="padding: 15px; background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 5px; margin-bottom: 20px;">
-                    {{ message }}
-                </div>
-            {% endfor %}
-
-            {% for message in app.flashes('warning') %}
-                <div class="alert alert-warning" style="padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; margin-bottom: 20px;">
-                    {{ message }}
-                </div>
-            {% endfor %}
-
-            {% for message in app.flashes('error') %}
-                <div class="alert alert-danger" style="padding: 15px; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px; margin-bottom: 20px;">
-                    {{ message }}
-                </div>
-            {% endfor %}
-
-            {% if participations is empty %}
-                <div style="text-align: center; padding: 60px; background: white; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
-                    <h4>Vous n'avez pas encore de participation</h4>
-                    <p>Inscrivez votre équipe à un événement !</p>
-                    <a href="{{ path('app_participation_new') }}" class="btn btn-primary" style="background-color: #7a6ad8; border: none; padding: 12px 30px; border-radius: 5px; color: white; font-weight: 600; text-decoration: none; display: inline-block; margin-top: 20px;">
-                        Participer à un événement
-                    </a>
-                </div>
-            {% else %}
-                <div class="row">
-                    {% for participation in participations %}
-                        <div class="col-lg-6" style="margin-bottom: 30px;">
-                            <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); height: 100%;">
-                                <h4 style="color: #7a6ad8; margin-bottom: 15px;">{{ participation.evenement.titre }}</h4>
-                                
-                                <p style="color: #666; margin-bottom: 8px;">
-                                    <strong>Équipe:</strong> {{ participation.equipe.nom }}
-                                </p>
-                                <p style="color: #666; margin-bottom: 8px;">
-                                    <strong>Lieu:</strong> {{ participation.evenement.lieu }}
-                                </p>
-                                <p style="color: #666; margin-bottom: 8px;">
-                                    <strong>Date:</strong> {{ participation.evenement.dateDebut|date('d/m/Y H:i') }}
-                                </p>
-                                <p style="margin-bottom: 15px;">
-                                    <strong>Statut:</strong> 
-                                    {% if participation.statut.value == 'ACCEPTE' %}
-                                        <span style="background-color: #d4edda; color: #155724; padding: 5px 15px; border-radius: 20px; font-size: 13px;">✓ Acceptée</span>
-                                    {% elseif participation.statut.value == 'EN_ATTENTE' %}
-                                        <span style="background-color: #fff3cd; color: #856404; padding: 5px 15px; border-radius: 20px; font-size: 13px;">⏳ En attente</span>
-                                    {% else %}
-                                        <span style="background-color: #f8d7da; color: #721c24; padding: 5px 15px; border-radius: 20px; font-size: 13px;">✗ Refusée</span>
-                                    {% endif %}
-                                </p>
-                                
-                                <div style="margin-top: 20px;">
-                                    <a href="{{ path('app_participation_show', {'id': participation.id}) }}" class="btn btn-sm" style="background-color: #7a6ad8; padding: 8px 15px; border-radius: 5px; text-decoration: none; color: white;">
-                                        Voir détails
-                                    </a>
+        {% else %}
+            <div class="row">
+                {% for participation in participations %}
+                    <div class="col-lg-6">
+                        <div class="participation-card">
+                            {% if participation.statut.value == 'ACCEPTE' %}
+                                <span class="status-badge status-accepted">✓ Accepted</span>
+                            {% elseif participation.statut.value == 'EN_ATTENTE' %}
+                                <span class="status-badge status-pending">⏳ Pending</span>
+                            {% else %}
+                                <span class="status-badge status-refused">✗ Refused</span>
+                            {% endif %}
+                            
+                            <h3 class="event-title">{{ participation.evenement.titre }}</h3>
+                            
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                    </svg>
+                                    <strong>Team:</strong>&nbsp;{{ participation.equipe.nom }}
+                                </div>
+                                <div class="info-item">
+                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    <strong>Location:</strong>&nbsp;{{ participation.evenement.lieu }}
+                                </div>
+                                <div class="info-item">
+                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <strong>Date:</strong>&nbsp;{{ participation.evenement.dateDebut|date('d/m/Y H:i') }}
                                 </div>
                             </div>
+                            
+                            <div style="margin-top: 20px;">
+                                <a href="{{ path('app_participation_show', {'id': participation.id}) }}" class="btn btn-primary">
+                                    👁️ View Details
+                                </a>
+                            </div>
                         </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

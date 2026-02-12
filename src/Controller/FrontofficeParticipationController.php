@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Participation;
 use App\Form\ParticipationFrontType;
 use App\Repository\ParticipationRepository;
+use App\Repository\EquipeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,9 +37,20 @@ class FrontofficeParticipationController extends AbstractController
     }
 
     #[Route('/new', name: 'app_participation_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, EquipeRepository $equipeRepository): Response
     {
         $participation = new Participation();
+        
+        // Pré-sélectionner l'équipe si passée en paramètre
+        $equipeId = $request->query->get('equipe');
+        if ($equipeId) {
+            $equipe = $equipeRepository->find($equipeId);
+            if ($equipe) {
+                $participation->setEquipe($equipe);
+                $participation->setEvenement($equipe->getEvenement());
+            }
+        }
+        
         $form = $this->createForm(ParticipationFrontType::class, $participation, [
             'user' => $this->getUser()
         ]);
@@ -52,9 +64,9 @@ class FrontofficeParticipationController extends AbstractController
             $entityManager->flush();
 
             if ($participation->getStatut()->value === 'ACCEPTE') {
-                $this->addFlash('success', 'Participation créée et acceptée avec succès !');
+                $this->addFlash('success', 'Participation created and accepted successfully!');
             } else {
-                $this->addFlash('warning', 'Participation créée mais refusée. Vérifiez la capacité de l\'événement ou les doublons d\'étudiants.');
+                $this->addFlash('warning', 'Participation created but refused. Check event capacity or student duplicates.');
             }
             
             return $this->redirectToRoute('app_mes_participations', [], Response::HTTP_SEE_OTHER);
