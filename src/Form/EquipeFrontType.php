@@ -18,29 +18,31 @@ class EquipeFrontType extends AbstractType
         $builder
             ->add('nom', TextType::class, [
                 'label' => 'Nom de l\'équipe',
-                'attr' => ['placeholder' => 'Ex: Les Champions']
+                'attr' => ['placeholder' => 'Ex: Les Champions', 'class' => 'form-control']
             ])
             ->add('evenement', EntityType::class, [
                 'class' => Evenement::class,
                 'choice_label' => function(Evenement $evenement) {
-                    return $evenement->getTitre() . ' - ' . $evenement->getDateDebut()->format('d/m/Y');
+                    return $evenement->getTitre() . ' - ' . $evenement->getLieu() . ' (' . $evenement->getDateDebut()->format('d/m/Y') . ')';
                 },
                 'label' => 'Événement',
                 'placeholder' => 'Sélectionnez un événement',
+                'attr' => ['class' => 'form-control']
             ])
             ->add('etudiants', EntityType::class, [
                 'class' => Etudiant::class,
                 'choice_label' => function(Etudiant $etudiant) {
-                    return $etudiant->getPrenom() . ' ' . $etudiant->getNom() . ' (' . $etudiant->getEmail() . ')';
+                    return $etudiant->getPrenom() . ' ' . $etudiant->getNom() . ' - ' . $etudiant->getNiveau();
                 },
                 'label' => 'Membres de l\'équipe (4 à 6 étudiants)',
                 'multiple' => true,
                 'expanded' => false,
                 'attr' => [
-                    'class' => 'select2-multiple',
+                    'class' => 'form-control select2-multiple',
+                    'size' => '8',
                     'data-placeholder' => 'Recherchez et sélectionnez les étudiants...'
                 ],
-                'help' => 'Sélectionnez entre 4 et 6 étudiants pour former votre équipe'
+                'help' => 'Maintenez Ctrl (ou Cmd sur Mac) pour sélectionner plusieurs étudiants. Vous devez sélectionner entre 4 et 6 étudiants.'
             ])
         ;
     }

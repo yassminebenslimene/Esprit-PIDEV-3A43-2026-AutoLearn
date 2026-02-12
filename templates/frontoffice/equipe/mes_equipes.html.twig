@@ -1,68 +1,300 @@
 {% extends 'frontoffice/base.html.twig' %}
 
-{% block title %}Mes équipes{% endblock %}
+{% block title %}My Teams{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .teams-section {
+            padding: 120px 0 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+        }
+        
+        .section-header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .section-header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .create-team-btn {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            margin-bottom: 40px;
+        }
+        
+        .create-team-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            color: #764ba2;
+        }
+        
+        .team-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .team-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .team-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+        }
+        
+        .team-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .team-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin: 0;
+        }
+        
+        .team-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .team-info {
+            margin: 20px 0;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #4a5568;
+        }
+        
+        .info-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            color: #667eea;
+        }
+        
+        .team-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+        }
+        
+        .btn-secondary:hover {
+            background: #edf2f7;
+        }
+        
+        .btn-participate {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+        
+        .btn-participate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .empty-state h3 {
+            font-size: 28px;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            color: #718096;
+            margin-bottom: 30px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border-left: 4px solid #38a169;
+        }
+        
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border-left: 4px solid #e53e3e;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-<div class="container" style="margin-top: 120px; margin-bottom: 80px;">
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="section-heading text-center">
-                <h2>Mes équipes</h2>
-                <p>Gérez vos équipes et participez aux événements</p>
-            </div>
+<div class="teams-section">
+    <div class="container">
+        <div class="section-header">
+            <h1>My Teams</h1>
+            <p>Create and manage your teams for events</p>
+        </div>
 
-            <div style="text-align: right; margin-bottom: 20px;">
-                <a href="{{ path('app_equipe_new') }}" class="btn btn-primary" style="background-color: #7a6ad8; border: none; padding: 12px 30px; border-radius: 5px; color: white; font-weight: 600; text-decoration: none;">
-                    + Créer une nouvelle équipe
+        <div style="text-align: center;">
+            <a href="{{ path('app_equipe_new') }}" class="create-team-btn">
+                ➕ Create New Team
+            </a>
+        </div>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                ✓ {{ message }}
+            </div>
+        {% endfor %}
+
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-error">
+                ✗ {{ message }}
+            </div>
+        {% endfor %}
+
+        {% if equipes is empty %}
+            <div class="empty-state">
+                <div class="empty-state-icon">👥</div>
+                <h3>No teams yet</h3>
+                <p>Create your first team to participate in events!</p>
+                <a href="{{ path('app_equipe_new') }}" class="btn btn-primary">
+                    Create My First Team
                 </a>
             </div>
-
-            {% for message in app.flashes('success') %}
-                <div class="alert alert-success" style="padding: 15px; background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 5px; margin-bottom: 20px;">
-                    {{ message }}
-                </div>
-            {% endfor %}
-
-            {% for message in app.flashes('error') %}
-                <div class="alert alert-danger" style="padding: 15px; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px; margin-bottom: 20px;">
-                    {{ message }}
-                </div>
-            {% endfor %}
-
-            {% if equipes is empty %}
-                <div style="text-align: center; padding: 60px; background: white; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
-                    <h4>Vous n'avez pas encore d'équipe</h4>
-                    <p>Créez votre première équipe pour participer aux événements !</p>
-                    <a href="{{ path('app_equipe_new') }}" class="btn btn-primary" style="background-color: #7a6ad8; border: none; padding: 12px 30px; border-radius: 5px; color: white; font-weight: 600; text-decoration: none; display: inline-block; margin-top: 20px;">
-                        Créer une équipe
-                    </a>
-                </div>
-            {% else %}
-                <div class="row">
-                    {% for equipe in equipes %}
-                        <div class="col-lg-4 col-md-6" style="margin-bottom: 30px;">
-                            <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); height: 100%;">
-                                <h4 style="color: #7a6ad8; margin-bottom: 15px;">{{ equipe.nom }}</h4>
-                                <p style="color: #666; margin-bottom: 10px;">
-                                    <strong>Événement:</strong> {{ equipe.evenement.titre }}
-                                </p>
-                                <p style="color: #666; margin-bottom: 15px;">
-                                    <strong>Membres:</strong> {{ equipe.etudiants|length }} étudiants
-                                </p>
-                                <div style="margin-top: 20px;">
-                                    <a href="{{ path('app_equipe_show', {'id': equipe.id}) }}" class="btn btn-sm" style="background-color: #f5f5f5; padding: 8px 15px; border-radius: 5px; text-decoration: none; color: #333; margin-right: 5px;">
-                                        Voir détails
-                                    </a>
-                                    <a href="{{ path('app_equipe_edit', {'id': equipe.id}) }}" class="btn btn-sm" style="background-color: #7a6ad8; padding: 8px 15px; border-radius: 5px; text-decoration: none; color: white;">
-                                        Modifier
-                                    </a>
+        {% else %}
+            <div class="row">
+                {% for equipe in equipes %}
+                    <div class="col-lg-6">
+                        <div class="team-card">
+                            <div class="team-header">
+                                <h3 class="team-name">{{ equipe.nom }}</h3>
+                                <span class="team-badge">{{ equipe.etudiants|length }} members</span>
+                            </div>
+                            
+                            <div class="team-info">
+                                <div class="info-item">
+                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <strong>Event:</strong>&nbsp;{{ equipe.evenement.titre }}
+                                </div>
+                                <div class="info-item">
+                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    <strong>Location:</strong>&nbsp;{{ equipe.evenement.lieu }}
+                                </div>
+                                <div class="info-item">
+                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <strong>Date:</strong>&nbsp;{{ equipe.evenement.dateDebut|date('d/m/Y H:i') }}
                                 </div>
                             </div>
+                            
+                            <div class="team-actions">
+                                <a href="{{ path('app_equipe_show', {'id': equipe.id}) }}" class="btn btn-secondary">
+                                    👁️ View Details
+                                </a>
+                                <a href="{{ path('app_equipe_edit', {'id': equipe.id}) }}" class="btn btn-secondary">
+                                    ✏️ Edit
+                                </a>
+                                <a href="{{ path('app_participation_new') }}?equipe={{ equipe.id }}" class="btn btn-participate">
+                                    🎯 Participate in Event
+                                </a>
+                            </div>
                         </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

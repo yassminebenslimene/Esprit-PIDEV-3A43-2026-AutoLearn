@@ -59,10 +59,11 @@
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
                         <li><a href="{{ path('app_frontoffice') }}">Home</a></li>
-                        <li><a href="{{ path('frontchallenge') }}">Challenges</a></li>
                         {% if app.user %}
-                            <li><a href="{{ path('app_mes_equipes') }}">Mes Équipes</a></li>
-                            <li><a href="{{ path('app_mes_participations') }}">Mes Participations</a></li>
+                            <li><a href="{{ path('app_mes_equipes') }}">Team</a></li>
+                            <li><a href="{{ path('app_frontoffice') }}#events">Events</a></li>
+                            <li><a href="{{ path('frontchallenge') }}">Challenges</a></li>
+                            <li><a href="{{ path('app_mes_participations') }}">My Participations</a></li>
                             <li><a href="{{ path('app_profile') }}">Profile</a></li>
                             <li><a href="{{ path('backoffice_logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-nav').submit();">Logout</a></li>
                         {% else %}
