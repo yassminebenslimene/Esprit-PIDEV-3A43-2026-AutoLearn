@@ -68,7 +68,6 @@
             border-radius: 15px;
             object-fit: cover;
             margin-right: 25px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
         .event-info {
@@ -203,29 +202,49 @@
         
         .teams-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 30px;
             margin-top: 15px;
         }
         
         .team-card-mini {
-            background: #f7fafc;
-            padding: 20px;
-            border-radius: 12px;
-            border-left: 4px solid #667eea;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
             transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .team-card-mini:hover {
-            background: #edf2f7;
-            transform: translateX(5px);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .team-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            border: 4px solid #667eea;
         }
         
         .team-name {
             font-weight: 700;
             color: #2d3748;
-            font-size: 16px;
+            font-size: 18px;
             margin-bottom: 8px;
+        }
+        
+        .team-event-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-bottom: 10px;
         }
         
         .team-members-count {
@@ -290,7 +309,7 @@
                 
                 <div class="event-card" id="event-{{ evenement.id }}">
                     <div class="event-header" onclick="toggleEvent({{ evenement.id }})">
-                        <div class="event-image"></div>
+                        <img src="{{ asset('frontoffice/images/event-0' ~ ((loop.index0 % 3) + 1) ~ '.jpg') }}" alt="{{ evenement.titre }}" class="event-image">
                         
                         <div class="event-info">
                             <span class="event-type">{{ evenement.type.value }}</span>
@@ -378,6 +397,8 @@
                                     <div class="teams-grid">
                                         {% for equipe in data.equipes %}
                                             <div class="team-card-mini">
+                                                <img src="{{ asset('frontoffice/images/member-0' ~ ((loop.index0 % 4) + 1) ~ '.jpg') }}" alt="{{ equipe.nom }}" class="team-image">
+                                                <span class="team-event-badge">{{ evenement.type.value }}</span>
                                                 <div class="team-name">{{ equipe.nom }}</div>
                                                 <div class="team-members-count">
                                                     👥 {{ equipe.etudiants|length }} members
