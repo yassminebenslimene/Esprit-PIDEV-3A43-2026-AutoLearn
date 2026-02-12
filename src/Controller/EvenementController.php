@@ -75,10 +75,21 @@ final class EvenementController extends AbstractController
     #[Route('/{id}/delete', name: 'backoffice_evenement_delete', methods: ['GET'])]
     public function delete(Evenement $evenement, EntityManagerInterface $entityManager): Response
     {
+        // Supprimer d'abord toutes les participations liées à cet événement
+        foreach ($evenement->getParticipations() as $participation) {
+            $entityManager->remove($participation);
+        }
+        
+        // Ensuite supprimer toutes les équipes liées à cet événement
+        foreach ($evenement->getEquipes() as $equipe) {
+            $entityManager->remove($equipe);
+        }
+        
+        // Enfin supprimer l'événement
         $entityManager->remove($evenement);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Événement supprimé avec succès');
+        $this->addFlash('success', 'Événement, équipes et participations supprimés avec succès');
         return $this->redirectToRoute('backoffice_evenements', [], Response::HTTP_SEE_OTHER);
     }
 }
