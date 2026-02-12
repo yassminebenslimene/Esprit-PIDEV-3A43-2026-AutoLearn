@@ -26,7 +26,7 @@ class FrontofficeEquipeController extends AbstractController
         // Récupérer les équipes où l'utilisateur est membre
         $equipes = $equipeRepository->createQueryBuilder('e')
             ->join('e.etudiants', 'et')
-            ->where('et.userId = :userId')
+            ->where('et.id = :userId')
             ->setParameter('userId', $user->getId())
             ->getQuery()
             ->getResult();

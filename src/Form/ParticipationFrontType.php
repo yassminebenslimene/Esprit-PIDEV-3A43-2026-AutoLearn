@@ -35,7 +35,7 @@ class ParticipationFrontType extends AbstractType
                     // Afficher seulement les équipes dont l'utilisateur est membre
                     return $repository->createQueryBuilder('e')
                         ->join('e.etudiants', 'et')
-                        ->where('et.userId = :userId')
+                        ->where('et.id = :userId')
                         ->setParameter('userId', $user->getId());
                 },
                 'help' => 'Sélectionnez l\'équipe avec laquelle vous souhaitez participer'

@@ -25,7 +25,7 @@ class FrontofficeParticipationController extends AbstractController
         $participations = $participationRepository->createQueryBuilder('p')
             ->join('p.equipe', 'e')
             ->join('e.etudiants', 'et')
-            ->where('et.userId = :userId')
+            ->where('et.id = :userId')
             ->setParameter('userId', $user->getId())
             ->getQuery()
             ->getResult();
