@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Evenement;
 use App\Form\EvenementType;
 use App\Repository\EvenementRepository;
+use App\Repository\ParticipationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -73,27 +74,33 @@ final class EvenementController extends AbstractController
     }
 
     #[Route('/{id}/delete', name: 'backoffice_evenement_delete', methods: ['GET'])]
-    public function delete(Evenement $evenement, EntityManagerInterface $entityManager): Response
+    public function delete(Evenement $evenement, EntityManagerInterface $entityManager, ParticipationRepository $participationRepository): Response
     {
         // IMPORTANT: Ordre de suppression pour respecter les contraintes de clés étrangères
         
-        // 1. D'abord supprimer toutes les participations (qui référencent les équipes)
-        foreach ($evenement->getParticipations() as $participation) {
-            $entityManager->remove($participation);
+        // 1. Récupérer toutes les équipes de cet événement
+        $equipes = $evenement->getEquipes()->toArray();
+        
+        // 2. Pour chaque équipe, supprimer toutes ses participations
+        foreach ($equipes as $equipe) {
+            $participations = $participationRepository->findBy(['equipe' => $equipe]);
+            foreach ($participations as $participation) {
+                $entityManager->remove($participation);
+            }
         }
         
-        // 2. Flush pour appliquer la suppression des participations
+        // 3. Flush pour appliquer la suppression des participations
         $entityManager->flush();
         
-        // 3. Ensuite supprimer toutes les équipes (qui référencent l'événement)
-        foreach ($evenement->getEquipes() as $equipe) {
+        // 4. Supprimer toutes les équipes
+        foreach ($equipes as $equipe) {
             $entityManager->remove($equipe);
         }
         
-        // 4. Flush pour appliquer la suppression des équipes
+        // 5. Flush pour appliquer la suppression des équipes
         $entityManager->flush();
         
-        // 5. Enfin supprimer l'événement
+        // 6. Enfin supprimer l'événement
         $entityManager->remove($evenement);
         $entityManager->flush();
 
