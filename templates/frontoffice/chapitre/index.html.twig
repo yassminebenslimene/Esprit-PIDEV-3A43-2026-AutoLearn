@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tous les chapitres</title>
+
+    {% block stylesheets %}
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/vendor/bootstrap/css/bootstrap.min.css') }}">
+        <!-- FrontOffice CSS (Scholar) -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/animate.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/flex-slider.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/owl.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/templatemo-scholar.css') }}">
+        <!-- Nouveau CSS moderne pour les chapitres -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/chapitres-style.css') }}">
+        <!-- Animations avancées -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/chapitres-animations.css') }}">
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="page-title">📚 Découvrez nos chapitres</h1>
+
+        <div class="row">
+            {% if chapitres is empty %}
+                <div class="col-12">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📖</div>
+                        <h3 class="empty-state-title">Aucun chapitre disponible</h3>
+                        <p class="empty-state-text">Les chapitres seront bientôt disponibles. Revenez plus tard !</p>
+                    </div>
+                </div>
+            {% else %}
+                {% for chapitre in chapitres %}
+                    <div class="col-lg-4 col-md-6 mb-4 d-flex align-items-stretch">
+                        <div class="chapter-card w-100">
+                            <div class="chapter-icon">
+                                📖
+                            </div>
+                            <div class="flex-grow-1 d-flex flex-direction-column">
+                                <h4 class="chapter-title">{{ chapitre.titre }}</h4>
+                                <p class="chapter-excerpt">
+                                    {{ chapitre.contenu|slice(0, 150) ~ (chapitre.contenu|length > 150 ? '…' : '') }}
+                                </p>
+                                <div class="chapter-meta">
+                                    <span class="chapter-order">Chapitre {{ chapitre.ordre }}</span>
+                                    {% if chapitre.cours %}
+                                        <span class="chapter-course">{{ chapitre.cours.titre }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="chapter-actions">
+                                    <a href="{{ path('app_chapitre_show_front', {'id': chapitre.id}) }}" class="btn-modern">
+                                        <i class="fa fa-eye"></i>
+                                        Lire le chapitre
+                                    </a>
+                                    <a href="{{ path('app_frontoffice_quiz_list', {'chapitreId': chapitre.id}) }}" class="btn-modern btn-quiz">
+                                        <i class="fa fa-question-circle"></i>
+                                        Quiz
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    {# Scripts minimaux #}
+    <script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('frontoffice/vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+    <!-- Interactions dynamiques -->
+    <script src="{{ asset('frontoffice/js/chapitres-interactions.js') }}"></script>
+
+</body>
+</html>

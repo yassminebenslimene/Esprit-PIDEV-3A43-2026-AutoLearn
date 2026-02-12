@@ -49,6 +49,10 @@ class Quiz
     )]
     private ?string $etat = null;
 
+    #[ORM\ManyToOne(inversedBy: 'quizzes')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Chapitre $chapitre = null;
+
     /**
      * @var Collection<int, Question>
      */
@@ -119,6 +123,17 @@ class Quiz
                 $question->setQuiz(null);
             }
         }
+        return $this;
+    }
+
+    public function getChapitre(): ?Chapitre
+    {
+        return $this->chapitre;
+    }
+
+    public function setChapitre(?Chapitre $chapitre): static
+    {
+        $this->chapitre = $chapitre;
         return $this;
     }
 }

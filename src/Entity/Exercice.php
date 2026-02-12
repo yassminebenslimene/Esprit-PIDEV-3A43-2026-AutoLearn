@@ -23,7 +23,7 @@ class Exercice
     private ?int $points = null;
 
     #[ORM\ManyToOne(inversedBy: 'exercices')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Challenge $challenge = null;
 
     public function getId(): ?int

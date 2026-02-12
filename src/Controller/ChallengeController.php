@@ -12,12 +12,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ChallengeController extends AbstractController
 {
-    #[Route('/', name: 'frontchallenge')]
+    #[Route('/challenges', name: 'frontchallenge')]
     public function index(ChallengeRepository $challengeRepository): Response
     {
         $challenges = $challengeRepository->findAll();
 
-        return $this->render('frontoffice/index.html.twig', [
+        return $this->render('frontoffice/challenges.html.twig', [
             'challenges' => $challenges
         ]);
     }

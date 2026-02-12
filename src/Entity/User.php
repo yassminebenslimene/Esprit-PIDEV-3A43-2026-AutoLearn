@@ -23,7 +23,7 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
 private Collection $challenges;
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(name: 'userId', type: 'integer')]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
@@ -98,6 +98,9 @@ private Collection $challenges;
 
     #[ORM\Column(name: 'createdAt', type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
+
+
+
 
 
     public function __construct()

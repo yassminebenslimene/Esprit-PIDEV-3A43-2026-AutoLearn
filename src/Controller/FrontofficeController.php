@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Controller;
-use App\Repository\ChallengeRepository;
 
-use  App\Entity\Admin;
+use App\Repository\ChallengeRepository;
+use App\Repository\ChapitreRepository;
+use App\Repository\CoursRepository;
+use App\Entity\Admin;
 use App\Entity\Etudiant;
 use App\Entity\User;
-use App\Repository\UserRepository; // ← AJOUTEZ CET IMPORT
+use App\Repository\UserRepository;
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,27 +20,38 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class FrontofficeController extends AbstractController
 {
-     #[Route('/', name: 'app_frontoffice')]
-    public function index(): Response
+    #[Route('/', name: 'app_frontoffice')]
+    public function index(CoursRepository $coursRepository, ChallengeRepository $challengeRepository): Response
     {
         // Si l'utilisateur est connecté
         if ($this->getUser()) {
             $user = $this->getUser();
             
             // Si c'est un admin, rediriger vers le backoffice
-            if ($user instanceof Admin || $user->getRoles() === 'ADMIN') {
+            if ($user instanceof Admin || in_array('ROLE_ADMIN', $user->getRoles())) {
                 return $this->redirectToRoute('app_backoffice');
             }
         }
         
-        // Sinon, afficher le frontoffice normalement
-        return $this->render('frontoffice/index.html.twig');
+        $cours = $coursRepository->findAll();
+        $challenges = $challengeRepository->findAll();
+
+        return $this->render('frontoffice/index.html.twig', [
+            'cours' => $cours,
+            'challenges' => $challenges,
+        ]);
     }
 
-      #[Route('/home', name: 'app_home')]
-    public function home(): Response
+    #[Route('/home', name: 'app_home')]
+    public function home(CoursRepository $coursRepository, ChallengeRepository $challengeRepository): Response
     {
-        return $this->render('frontoffice/index.html.twig');
+        $cours = $coursRepository->findAll();
+        $challenges = $challengeRepository->findAll();
+        
+        return $this->render('frontoffice/index.html.twig', [
+            'cours' => $cours,
+            'challenges' => $challenges,
+        ]);
     }
 
     #[Route('/profile', name: 'app_profile', methods: ['GET', 'POST'])]
@@ -55,7 +68,7 @@ class FrontofficeController extends AbstractController
         }
 
         // Si admin, rediriger vers backoffice settings
-        if ($user instanceof Admin || $user->getRoles() === 'ADMIN') {
+        if ($user instanceof Admin || in_array('ROLE_ADMIN', $user->getRoles())) {
             return $this->redirectToRoute('backoffice_settings');
         }
 
@@ -125,5 +138,4 @@ class FrontofficeController extends AbstractController
             'isEtudiant' => $isEtudiant,
         ]);
     }
-
 }

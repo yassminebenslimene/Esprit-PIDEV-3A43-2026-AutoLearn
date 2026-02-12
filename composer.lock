@@ -5,10 +5,10 @@
         "This file is @generated automatically"
     ],
 <<<<<<< HEAD
-    "content-hash": "ab9f2ceb51860a0b8665e2df4b5cce6e",
-=======
     "content-hash": "46fcafe65c9333af9dbb32f0a568e7b0",
->>>>>>> cbd2e773930cb70cefbc6082f3b24c49fb76374d
+=======
+    "content-hash": "f839da3206d2a7a2cd255b0b1b5de487",
+>>>>>>> 6b6aa12 (frontoffice updated)
     "packages": [
         {
             "name": "composer/semver",
@@ -863,16 +863,16 @@
         },
         {
             "name": "doctrine/migrations",
-            "version": "3.9.5",
+            "version": "3.9.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/migrations.git",
-                "reference": "1b823afbc40f932dae8272574faee53f2755eac5"
+                "reference": "ffd8355cdd8505fc650d9604f058bf62aedd80a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/migrations/zipball/1b823afbc40f932dae8272574faee53f2755eac5",
-                "reference": "1b823afbc40f932dae8272574faee53f2755eac5",
+                "url": "https://api.github.com/repos/doctrine/migrations/zipball/ffd8355cdd8505fc650d9604f058bf62aedd80a1",
+                "reference": "ffd8355cdd8505fc650d9604f058bf62aedd80a1",
                 "shasum": ""
             },
             "require": {
@@ -946,7 +946,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/migrations/issues",
-                "source": "https://github.com/doctrine/migrations/tree/3.9.5"
+                "source": "https://github.com/doctrine/migrations/tree/3.9.6"
             },
             "funding": [
                 {
@@ -962,7 +962,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-11-20T11:15:36+00:00"
+            "time": "2026-02-11T06:46:11+00:00"
         },
         {
             "name": "doctrine/orm",
@@ -7647,8 +7647,6 @@
             "time": "2025-12-02T11:50:18+00:00"
         },
         {
-<<<<<<< HEAD
-=======
             "name": "symfonycasts/reset-password-bundle",
             "version": "v1.24.0",
             "source": {
@@ -7696,7 +7694,6 @@
             "time": "2025-11-29T13:26:50+00:00"
         },
         {
->>>>>>> cbd2e773930cb70cefbc6082f3b24c49fb76374d
             "name": "twig/extra-bundle",
             "version": "v3.23.0",
             "source": {
@@ -9945,18 +9942,6 @@
         },
         {
             "name": "symfony/maker-bundle",
-<<<<<<< HEAD
-            "version": "v1.65.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/maker-bundle.git",
-                "reference": "eba30452d212769c9a5bcf0716959fd8ba1e54e3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/maker-bundle/zipball/eba30452d212769c9a5bcf0716959fd8ba1e54e3",
-                "reference": "eba30452d212769c9a5bcf0716959fd8ba1e54e3",
-=======
             "version": "v1.66.0",
             "source": {
                 "type": "git",
@@ -9967,7 +9952,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/maker-bundle/zipball/b5b4afa2a570b926682e9f34615a6766dd560ff4",
                 "reference": "b5b4afa2a570b926682e9f34615a6766dd560ff4",
->>>>>>> cbd2e773930cb70cefbc6082f3b24c49fb76374d
                 "shasum": ""
             },
             "require": {
@@ -9990,11 +9974,7 @@
             },
             "require-dev": {
                 "composer/semver": "^3.0",
-<<<<<<< HEAD
-                "doctrine/doctrine-bundle": "^2.5.0|^3.0.0",
-=======
                 "doctrine/doctrine-bundle": "^2.10|^3.0",
->>>>>>> cbd2e773930cb70cefbc6082f3b24c49fb76374d
                 "doctrine/orm": "^2.15|^3",
                 "doctrine/persistence": "^3.1|^4.0",
                 "symfony/http-client": "^6.4|^7.0|^8.0",
@@ -10036,11 +10016,7 @@
             ],
             "support": {
                 "issues": "https://github.com/symfony/maker-bundle/issues",
-<<<<<<< HEAD
-                "source": "https://github.com/symfony/maker-bundle/tree/v1.65.1"
-=======
                 "source": "https://github.com/symfony/maker-bundle/tree/v1.66.0"
->>>>>>> cbd2e773930cb70cefbc6082f3b24c49fb76374d
             },
             "funding": [
                 {
@@ -10060,11 +10036,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2025-12-02T07:14:37+00:00"
-=======
             "time": "2026-02-09T08:55:54+00:00"
->>>>>>> cbd2e773930cb70cefbc6082f3b24c49fb76374d
         },
         {
             "name": "symfony/phpunit-bridge",

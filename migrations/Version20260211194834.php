@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20260210230919 extends AbstractMigration
+final class Version20260211194834 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,12 +20,16 @@ final class Version20260210230919 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE post ADD image_url VARCHAR(255) DEFAULT NULL, ADD video_url VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE quiz ADD chapitre_id INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE quiz ADD CONSTRAINT FK_A412FA921FBEEF7B FOREIGN KEY (chapitre_id) REFERENCES chapitre (id)');
+        $this->addSql('CREATE INDEX IDX_A412FA921FBEEF7B ON quiz (chapitre_id)');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE post DROP image_url, DROP video_url');
+        $this->addSql('ALTER TABLE quiz DROP FOREIGN KEY FK_A412FA921FBEEF7B');
+        $this->addSql('DROP INDEX IDX_A412FA921FBEEF7B ON quiz');
+        $this->addSql('ALTER TABLE quiz DROP chapitre_id');
     }
 }
