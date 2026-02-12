@@ -20,15 +20,6 @@ class EquipeFrontType extends AbstractType
                 'label' => 'Nom de l\'équipe',
                 'attr' => ['placeholder' => 'Ex: Les Champions', 'class' => 'form-control']
             ])
-            ->add('evenement', EntityType::class, [
-                'class' => Evenement::class,
-                'choice_label' => function(Evenement $evenement) {
-                    return $evenement->getTitre() . ' - ' . $evenement->getLieu() . ' (' . $evenement->getDateDebut()->format('d/m/Y') . ')';
-                },
-                'label' => 'Événement',
-                'placeholder' => 'Sélectionnez un événement',
-                'attr' => ['class' => 'form-control']
-            ])
             ->add('etudiants', EntityType::class, [
                 'class' => Etudiant::class,
                 'choice_label' => function(Etudiant $etudiant) {
@@ -36,13 +27,11 @@ class EquipeFrontType extends AbstractType
                 },
                 'label' => 'Membres de l\'équipe (4 à 6 étudiants)',
                 'multiple' => true,
-                'expanded' => false,
+                'expanded' => true, // Checkboxes au lieu de select multiple
                 'attr' => [
-                    'class' => 'form-control select2-multiple',
-                    'size' => '8',
-                    'data-placeholder' => 'Recherchez et sélectionnez les étudiants...'
+                    'class' => 'student-checkboxes'
                 ],
-                'help' => 'Maintenez Ctrl (ou Cmd sur Mac) pour sélectionner plusieurs étudiants. Vous devez sélectionner entre 4 et 6 étudiants.'
+                'help' => 'Sélectionnez entre 4 et 6 étudiants pour former votre équipe'
             ])
         ;
     }
