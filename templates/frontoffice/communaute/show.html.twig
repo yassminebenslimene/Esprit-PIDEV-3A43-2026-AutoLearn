@@ -1,0 +1,278 @@
+{% extends 'base_front.html.twig' %}
+
+{% block title %}{{ communaute.nom }} | Scholar{% endblock %}
+
+{% block body %}
+
+<style>
+.community-container {
+    max-width: 900px;
+    margin: 80px auto;
+}
+
+/* ===== POST ===== */
+.post-card {
+    position: relative;
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* ===== MEDIA STYLE PRO ===== */
+.post-media {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.post-media img,
+.post-media video,
+.post-media iframe {
+    max-width: 75%;
+    max-height: 420px;
+    border-radius: 14px;
+    object-fit: cover;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+@media (max-width: 768px) {
+    .post-media img,
+    .post-media video,
+    .post-media iframe {
+        max-width: 100%;
+        max-height: 300px;
+    }
+}
+
+/* ===== MENU ⋮ ===== */
+.menu-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.post-menu,
+.comment-menu {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+}
+
+.comment-menu {
+    top: 6px;
+    right: 8px;
+}
+
+.post-dropdown,
+.comment-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 26px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    overflow: hidden;
+    z-index: 10;
+}
+
+.post-menu:focus-within .post-dropdown,
+.comment-menu:focus-within .comment-dropdown {
+    display: block;
+}
+
+.post-dropdown a,
+.post-dropdown button,
+.comment-dropdown a,
+.comment-dropdown button {
+    display: block;
+    width: 100%;
+    padding: 8px 14px;
+    border: none;
+    background: white;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.post-dropdown a:hover,
+.post-dropdown button:hover,
+.comment-dropdown a:hover,
+.comment-dropdown button:hover {
+    background: #f2f4ff;
+}
+
+/* ===== COMMENT ===== */
+.comment {
+    position: relative;
+    margin-left: 20px;
+    padding: 10px 14px;
+    background: #f4f5ff;
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+/* ===== FORM COMMENT ===== */
+.comment-form textarea {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.comment-form button {
+    background: #7a6ad8;
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-top: 8px;
+}
+
+/* ===== BTN NEW POST ===== */
+.btn-new-post {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #7a6ad8, #6c63ff);
+    color: white;
+    border-radius: 999px;
+    text-decoration: none;
+    margin-bottom: 25px;
+}
+</style>
+
+<div class="community-container">
+
+    <!-- ===== MINI BANNER ===== -->
+    <div class="page-heading header-text" style="text-align:center; margin-bottom:30px;">
+        <h3>{{ communaute.nom }}</h3>
+        <span class="breadcrumb">
+            <a href="{{ path('app_frontoffice') }}">Home</a> > Communauté
+        </span>
+    </div>
+
+    <p>{{ communaute.description }}</p>
+
+    <a href="{{ path('app_post_new', { id: communaute.id }) }}" class="btn-new-post">
+        ➕ Nouveau post
+    </a>
+
+    {% for post in communaute.posts %}
+        <div class="post-card">
+
+            <!-- MENU POST -->
+            <div class="post-menu">
+                <button class="menu-btn">⋮</button>
+                <div class="post-dropdown">
+                    <a href="{{ path('app_post_edit', { id: post.id }) }}">Modifier</a>
+                    <form method="post"
+                          action="{{ path('app_post_delete', { id: post.id }) }}"
+                          onsubmit="return confirm('Supprimer ce post ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                        <button type="submit">Supprimer</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- TEXTE -->
+            {% if post.contenu %}
+                <p>{{ post.contenu }}</p>
+            {% endif %}
+
+            <!-- IMAGE URL -->
+            {% if post.imageUrl %}
+                <div class="post-media">
+                    <img src="{{ post.imageUrl }}">
+                </div>
+            {% endif %}
+
+            <!-- IMAGE UPLOAD -->
+            {% if post.imageFile %}
+                <div class="post-media">
+                    <img src="{{ asset('uploads/' ~ post.imageFile) }}">
+                </div>
+            {% endif %}
+
+            <!-- VIDEO YOUTUBE -->
+            {% if post.videoUrl %}
+                {% set videoId = null %}
+                {% if 'v=' in post.videoUrl %}
+                    {% set videoId = post.videoUrl|split('v=')[1]|split('&')[0] %}
+                {% elseif 'youtu.be/' in post.videoUrl %}
+                    {% set videoId = post.videoUrl|split('youtu.be/')[1]|split('?')[0] %}
+                {% elseif 'embed/' in post.videoUrl %}
+                    {% set videoId = post.videoUrl|split('embed/')[1]|split('?')[0] %}
+                {% endif %}
+
+                {% if videoId %}
+                    <div class="post-media">
+                        <iframe
+                            src="https://www.youtube.com/embed/{{ videoId }}"
+                            frameborder="0"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            <!-- VIDEO UPLOAD -->
+            {% if post.videoFile %}
+                <div class="post-media">
+                    <video controls>
+                        <source src="{{ asset('uploads/' ~ post.videoFile) }}">
+                        Votre navigateur ne supporte pas la vidéo.
+                    </video>
+                </div>
+            {% endif %}
+
+            <small>Posté le {{ post.createdAt|date('d/m/Y H:i') }}</small>
+
+            <hr>
+
+            <!-- COMMENTAIRES -->
+            {% for commentaire in post.commentaires %}
+                <div class="comment">
+
+                    <div class="comment-menu">
+                        <button class="menu-btn">⋮</button>
+                        <div class="comment-dropdown">
+                            <a href="{{ path('app_commentaire_edit', { id: commentaire.id }) }}">Modifier</a>
+                            <form method="post"
+                                  action="{{ path('app_commentaire_delete', { id: commentaire.id }) }}"
+                                  onsubmit="return confirm('Supprimer ce commentaire ?');">
+                                <input type="hidden" name="_token"
+                                       value="{{ csrf_token('delete' ~ commentaire.id) }}">
+                                <button type="submit">Supprimer</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    {{ commentaire.contenu }}<br>
+                    <small>{{ commentaire.createdAt|date('d/m/Y H:i') }}</small>
+                </div>
+            {% else %}
+                <small>Aucun commentaire</small>
+            {% endfor %}
+
+            <!-- FORM COMMENT -->
+            <form class="comment-form"
+                  method="post"
+                  action="{{ path('app_commentaire_new', { id: post.id }) }}">
+                <textarea name="commentaire[contenu]"
+                          placeholder="Écrire un commentaire..."
+                          required></textarea>
+                <button type="submit">Commenter</button>
+            </form>
+
+        </div>
+    {% else %}
+        <p>Aucun post pour le moment.</p>
+    {% endfor %}
+
+</div>
+
+{% endblock %}
