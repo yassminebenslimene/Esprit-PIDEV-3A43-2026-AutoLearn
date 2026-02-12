@@ -40,7 +40,8 @@ class UserRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
-    public function searchUsers(string $search): array
+
+ public function searchUsers(string $search): array
 {
     return $this->createQueryBuilder('u')
         ->where('u.nom LIKE :search')

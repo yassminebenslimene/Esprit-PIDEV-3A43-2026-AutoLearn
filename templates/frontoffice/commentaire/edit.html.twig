@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div style="max-width:600px;margin:40px auto;">
+    <h2>Modifier le commentaire</h2>
+
+    <form method="post">
+        <textarea
+            name="commentaire[contenu]"
+            style="width:100%;padding:10px;border-radius:8px;"
+            required>{{ commentaire.contenu }}</textarea>
+
+        <button type="submit" style="margin-top:10px;">
+            Enregistrer
+        </button>
+    </form>
+</div>
+{% endblock %}

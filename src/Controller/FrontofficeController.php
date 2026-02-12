@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Controller;
+use App\Repository\ChallengeRepository;
 
 use  App\Entity\Admin;
 use App\Entity\Etudiant;
 use App\Entity\User;
+use App\Repository\UserRepository; // ← AJOUTEZ CET IMPORT
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,7 +26,7 @@ class FrontofficeController extends AbstractController
             $user = $this->getUser();
             
             // Si c'est un admin, rediriger vers le backoffice
-            if ($user instanceof Admin || $user->getRole() === 'ADMIN') {
+            if ($user instanceof Admin || $user->getRoles() === 'ADMIN') {
                 return $this->redirectToRoute('app_backoffice');
             }
         }
@@ -53,7 +55,7 @@ class FrontofficeController extends AbstractController
         }
 
         // Si admin, rediriger vers backoffice settings
-        if ($user instanceof Admin || $user->getRole() === 'ADMIN') {
+        if ($user instanceof Admin || $user->getRoles() === 'ADMIN') {
             return $this->redirectToRoute('backoffice_settings');
         }
 

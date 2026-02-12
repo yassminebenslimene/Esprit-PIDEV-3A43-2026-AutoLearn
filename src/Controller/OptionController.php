@@ -33,7 +33,7 @@ final class OptionController extends AbstractController
             $entityManager->persist($option);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_option_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('backoffice_quiz_management', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('option/new.html.twig', [
@@ -59,7 +59,7 @@ final class OptionController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_option_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('backoffice_quiz_management', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('option/edit.html.twig', [
@@ -76,6 +76,6 @@ final class OptionController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_option_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('backoffice_quiz_management', [], Response::HTTP_SEE_OTHER);
     }
 }
