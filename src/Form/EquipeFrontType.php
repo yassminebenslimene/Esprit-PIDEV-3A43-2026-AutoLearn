@@ -33,6 +33,7 @@ class EquipeFrontType extends AbstractType
                 ],
                 'help' => 'Sélectionnez entre 4 et 6 étudiants pour former votre équipe'
             ])
+            // Pas de champ événement - sera défini automatiquement par le contrôleur
         ;
     }
 

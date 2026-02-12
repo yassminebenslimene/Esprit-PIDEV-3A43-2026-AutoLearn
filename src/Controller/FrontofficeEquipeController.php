@@ -4,9 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Equipe;
 use App\Entity\Etudiant;
+use App\Entity\Participation;
 use App\Form\EquipeFrontType;
 use App\Repository\EquipeRepository;
 use App\Repository\EvenementRepository;
+use App\Repository\ParticipationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,6 +56,60 @@ class FrontofficeEquipeController extends AbstractController
         return $this->render('frontoffice/equipe/new.html.twig', [
             'equipe' => $equipe,
             'form' => $form,
+        ]);
+    }
+    
+    #[Route('/new-for-event/{eventId}', name: 'app_equipe_new_for_event', methods: ['GET', 'POST'])]
+    public function newForEvent(
+        int $eventId,
+        Request $request, 
+        EntityManagerInterface $entityManager,
+        EvenementRepository $evenementRepository,
+        ParticipationRepository $participationRepository
+    ): Response
+    {
+        $evenement = $evenementRepository->find($eventId);
+        
+        if (!$evenement) {
+            $this->addFlash('error', 'Événement introuvable.');
+            return $this->redirectToRoute('app_events');
+        }
+        
+        $equipe = new Equipe();
+        $equipe->setEvenement($evenement);
+        
+        $form = $this->createForm(EquipeFrontType::class, $equipe);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Sauvegarder l'équipe
+            $entityManager->persist($equipe);
+            $entityManager->flush();
+            
+            // Créer automatiquement une participation pour cette équipe
+            $participation = new Participation();
+            $participation->setEquipe($equipe);
+            $participation->setEvenement($evenement);
+            
+            // Valider la participation selon les règles
+            $participation->validateParticipation();
+            
+            $entityManager->persist($participation);
+            $entityManager->flush();
+            
+            if ($participation->getStatut()->value === 'ACCEPTE') {
+                $this->addFlash('success', 'Équipe créée et participation acceptée ! Vous êtes maintenant inscrits à l\'événement "' . $evenement->getTitre() . '".');
+            } else {
+                $this->addFlash('warning', 'Équipe créée mais participation refusée. L\'événement est peut-être complet ou un membre participe déjà avec une autre équipe.');
+            }
+            
+            return $this->redirectToRoute('app_mes_equipes', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('frontoffice/equipe/new.html.twig', [
+            'equipe' => $equipe,
+            'form' => $form,
+            'evenement' => $evenement,
         ]);
     }
 
