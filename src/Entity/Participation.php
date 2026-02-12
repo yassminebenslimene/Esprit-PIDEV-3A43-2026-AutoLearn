@@ -37,18 +37,35 @@ class Participation
         $evenement = $this->getEvenement();
         $equipe = $this->getEquipe();
 
-        // Vérification nbMax
+        // Vérification nbMax - ne compter que les participations ACCEPTÉES (sauf celle-ci)
         $acceptedCount = 0;
         foreach ($evenement->getParticipations() as $p) {
-            if ($p->getStatut() === StatutParticipation::ACCEPTE) $acceptedCount++;
+            // Ne pas compter la participation actuelle
+            if ($p->getId() === $this->getId()) {
+                continue;
+            }
+            if ($p->getStatut() === StatutParticipation::ACCEPTE) {
+                $acceptedCount++;
+            }
         }
+        
         if ($acceptedCount >= $evenement->getNbMax()) {
             $this->setStatut(StatutParticipation::REFUSE);
             return;
         }
 
-        // Vérification doublon étudiants
+        // Vérification doublon étudiants - ne vérifier que les autres participations
         foreach ($evenement->getParticipations() as $p) {
+            // Ne pas vérifier contre soi-même
+            if ($p->getId() === $this->getId()) {
+                continue;
+            }
+            
+            // Vérifier uniquement les participations acceptées
+            if ($p->getStatut() !== StatutParticipation::ACCEPTE) {
+                continue;
+            }
+            
             foreach ($p->getEquipe()->getEtudiants() as $etudiant) {
                 foreach ($equipe->getEtudiants() as $membre) {
                     if ($etudiant->getId() === $membre->getId()) {
