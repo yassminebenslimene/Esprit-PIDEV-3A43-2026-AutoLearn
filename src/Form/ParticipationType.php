@@ -5,8 +5,10 @@ namespace App\Form;
 use App\Entity\Equipe;
 use App\Entity\Evenement;
 use App\Entity\Participation;
+use App\Enum\StatutParticipation;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -27,7 +29,8 @@ class ParticipationType extends AbstractType
                 'label' => 'Événement',
                 'placeholder' => 'Sélectionnez un événement'
             ])
-            ->add('statut', null, [
+            ->add('statut', EnumType::class, [
+                'class' => StatutParticipation::class,
                 'label' => 'Statut',
                 'choice_label' => function($choice) {
                     return $choice->value;
