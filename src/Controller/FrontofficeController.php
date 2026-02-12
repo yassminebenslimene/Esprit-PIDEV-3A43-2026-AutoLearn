@@ -50,9 +50,22 @@ class FrontofficeController extends AbstractController
     }
 
       #[Route('/home', name: 'app_home')]
-    public function home(): Response
+    public function home(
+        ChallengeRepository $challengeRepository,
+        EvenementRepository $evenementRepository,
+        EquipeRepository $equipeRepository
+    ): Response
     {
-        return $this->render('frontoffice/index.html.twig');
+        // Récupérer les challenges, événements et équipes
+        $challenges = $challengeRepository->findAll();
+        $evenements = $evenementRepository->findAll();
+        $equipes = $equipeRepository->findAll();
+        
+        return $this->render('frontoffice/index.html.twig', [
+            'challenges' => $challenges,
+            'evenements' => $evenements,
+            'equipes' => $equipes,
+        ]);
     }
 
     #[Route('/profile', name: 'app_profile', methods: ['GET', 'POST'])]

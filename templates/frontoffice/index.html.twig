@@ -435,7 +435,7 @@ https://templatemo.com/tm-586-scholar
             </div>
         </div>
         <div class="row">
-            {% if equipes is empty %}
+            {% if equipes is not defined or equipes is empty %}
                 <div class="col-lg-12">
                     <div style="text-align: center; padding: 40px;">
                         <p style="color: #7a7a7a; font-size: 16px;">Aucune équipe pour le moment</p>
@@ -513,7 +513,7 @@ https://templatemo.com/tm-586-scholar
                 </div>
             </div>
             
-            {% if evenements is empty %}
+            {% if evenements is not defined or evenements is empty %}
                 <div class="col-lg-12">
                     <div class="item" style="text-align: center; padding: 40px;">
                         <p style="color: #7a7a7a; font-size: 16px;">Aucun événement pour le moment</p>
