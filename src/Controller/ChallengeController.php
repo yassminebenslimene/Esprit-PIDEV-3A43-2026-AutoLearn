@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ChallengeController extends AbstractController
 {
-     #[Route('/challenges', name: 'app_challenges')]  // ✅ Route pour les étudiants
+     #[Route('/challenges', name: 'app_challenges')]  //  Route pour les étudiants
     public function index(ChallengeRepository $challengeRepository): Response
     {
         $challenges = $challengeRepository->findAll();

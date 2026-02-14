@@ -445,6 +445,7 @@
                             <tbody>
                                 {% if users is defined and users|length > 0 %}
                                     {% for user in users %}
+                                    {% if user.id != app.user.id %}
                                     <tr>
                                         <td>
                                             <div class="table-user">
@@ -519,6 +520,8 @@
                 </button>
             </form>
         {% endif %}
+                                                    {% endif %}
+
     </div>
 </td>
                                     </tr>
