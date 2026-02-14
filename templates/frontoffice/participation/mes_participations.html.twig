@@ -177,6 +177,12 @@
             </div>
         {% endfor %}
 
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-warning" style="background: #fed7d7; color: #742a2a; border-left: 4px solid #fc8181;">
+                ✗ {{ message }}
+            </div>
+        {% endfor %}
+
         {% for message in app.flashes('warning') %}
             <div class="alert alert-warning">
                 ⚠️ {{ message }}
@@ -197,9 +203,9 @@
                 {% for participation in participations %}
                     <div class="col-lg-6">
                         <div class="participation-card">
-                            {% if participation.statut.value == 'ACCEPTE' %}
+                            {% if participation.statut.value == 'Accepté' %}
                                 <span class="status-badge status-accepted">✓ Accepted</span>
-                            {% elseif participation.statut.value == 'EN_ATTENTE' %}
+                            {% elseif participation.statut.value == 'En attente' %}
                                 <span class="status-badge status-pending">⏳ Pending</span>
                             {% else %}
                                 <span class="status-badge status-refused">✗ Refused</span>

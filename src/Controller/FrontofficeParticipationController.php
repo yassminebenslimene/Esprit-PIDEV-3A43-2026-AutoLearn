@@ -19,16 +19,39 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class FrontofficeParticipationController extends AbstractController
 {
     #[Route('/mes-participations', name: 'app_mes_participations', methods: ['GET'])]
-    public function mesParticipations(ParticipationRepository $participationRepository): Response
+    public function mesParticipations(ParticipationRepository $participationRepository, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         
-        // Récupérer les participations des équipes où l'utilisateur est membre
-        $participations = $participationRepository->createQueryBuilder('p')
+        // Récupérer TOUTES les participations des équipes où l'utilisateur est membre
+        $allParticipations = $participationRepository->createQueryBuilder('p')
             ->join('p.equipe', 'e')
             ->join('e.etudiants', 'et')
             ->where('et.id = :userId')
             ->setParameter('userId', $user->getId())
+            ->getQuery()
+            ->getResult();
+        
+        // Supprimer les participations refusées (nettoyage automatique)
+        $deletedCount = 0;
+        foreach ($allParticipations as $participation) {
+            if ($participation->getStatut()->value === 'Refusé') {
+                $entityManager->remove($participation);
+                $deletedCount++;
+            }
+        }
+        if ($deletedCount > 0) {
+            $entityManager->flush();
+        }
+        
+        // Récupérer uniquement les participations ACCEPTÉES ou EN_ATTENTE
+        $participations = $participationRepository->createQueryBuilder('p')
+            ->join('p.equipe', 'e')
+            ->join('e.etudiants', 'et')
+            ->where('et.id = :userId')
+            ->andWhere('p.statut != :refuse')
+            ->setParameter('userId', $user->getId())
+            ->setParameter('refuse', 'Refusé')
             ->getQuery()
             ->getResult();
         
@@ -58,16 +81,20 @@ class FrontofficeParticipationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Valider automatiquement la participation
-            $participation->validateParticipation();
+            // Mettre à jour le statut de l'événement avant validation
+            $participation->getEvenement()->updateStatus();
             
-            $entityManager->persist($participation);
-            $entityManager->flush();
+            // Valider automatiquement la participation
+            $result = $participation->validateParticipation();
 
-            if ($participation->getStatut()->value === 'ACCEPTE') {
-                $this->addFlash('success', 'Participation created and accepted successfully!');
+            if ($result['accepted']) {
+                // Seulement persister si acceptée
+                $entityManager->persist($participation);
+                $entityManager->flush();
+                $this->addFlash('success', $result['message']);
             } else {
-                $this->addFlash('warning', 'Participation created but refused. Check event capacity or student duplicates.');
+                // Ne pas créer la participation si refusée
+                $this->addFlash('error', $result['message']);
             }
             
             return $this->redirectToRoute('app_mes_participations', [], Response::HTTP_SEE_OTHER);
@@ -102,16 +129,20 @@ class FrontofficeParticipationController extends AbstractController
         $participation->setEquipe($equipe);
         $participation->setEvenement($evenement);
         
+        // Mettre à jour le statut de l'événement avant validation
+        $evenement->updateStatus();
+        
         // Valider la participation selon les règles
-        $participation->validateParticipation();
+        $result = $participation->validateParticipation();
         
-        $entityManager->persist($participation);
-        $entityManager->flush();
-        
-        if ($participation->getStatut()->value === 'ACCEPTE') {
-            $this->addFlash('success', 'Participation accepted! Your team is now registered for "' . $evenement->getTitre() . '".');
+        if ($result['accepted']) {
+            // Seulement persister si acceptée
+            $entityManager->persist($participation);
+            $entityManager->flush();
+            $this->addFlash('success', $result['message']);
         } else {
-            $this->addFlash('warning', 'Participation refused. The event may be full or a member is already participating with another team.');
+            // Ne pas créer la participation si refusée
+            $this->addFlash('error', $result['message']);
         }
         
         return $this->redirectToRoute('app_mes_participations', [], Response::HTTP_SEE_OTHER);
@@ -164,12 +195,23 @@ class FrontofficeParticipationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Re-valider la participation après modification
-            $participation->validateParticipation();
+            // Mettre à jour le statut de l'événement avant validation
+            $participation->getEvenement()->updateStatus();
             
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Participation updated successfully!');
+            // Re-valider la participation après modification
+            $result = $participation->validateParticipation();
+            
+            if ($result['accepted']) {
+                // Sauvegarder si acceptée
+                $entityManager->flush();
+                $this->addFlash('success', $result['message']);
+            } else {
+                // Supprimer la participation si elle devient refusée
+                $entityManager->remove($participation);
+                $entityManager->flush();
+                $this->addFlash('error', $result['message']);
+            }
+            
             return $this->redirectToRoute('app_mes_participations', [], Response::HTTP_SEE_OTHER);
         }
 

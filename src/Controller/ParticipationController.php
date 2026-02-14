@@ -15,10 +15,33 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ParticipationController extends AbstractController
 {
     #[Route('/', name: 'backoffice_participations', methods: ['GET'])]
-    public function index(ParticipationRepository $participationRepository): Response
+    public function index(ParticipationRepository $participationRepository, EntityManagerInterface $entityManager): Response
     {
+        // Nettoyer automatiquement les participations refusées
+        $allParticipations = $participationRepository->findAll();
+        $deletedCount = 0;
+        
+        foreach ($allParticipations as $participation) {
+            if ($participation->getStatut()->value === 'Refusé') {
+                $entityManager->remove($participation);
+                $deletedCount++;
+            }
+        }
+        
+        if ($deletedCount > 0) {
+            $entityManager->flush();
+            $this->addFlash('info', $deletedCount . ' participation(s) refusée(s) supprimée(s) automatiquement.');
+        }
+        
+        // Récupérer uniquement les participations acceptées ou en attente
+        $participations = $participationRepository->createQueryBuilder('p')
+            ->where('p.statut != :refuse')
+            ->setParameter('refuse', 'Refusé')
+            ->getQuery()
+            ->getResult();
+        
         return $this->render('backoffice/participation/index.html.twig', [
-            'participations' => $participationRepository->findAll(),
+            'participations' => $participations,
         ]);
     }
 
@@ -30,11 +53,16 @@ final class ParticipationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $participation->validateParticipation();
-            $entityManager->persist($participation);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Participation créée avec succès');
+            $result = $participation->validateParticipation();
+            
+            if ($result['accepted']) {
+                $entityManager->persist($participation);
+                $entityManager->flush();
+                $this->addFlash('success', 'Participation créée et acceptée avec succès');
+            } else {
+                $this->addFlash('error', 'Participation refusée: ' . $result['message']);
+            }
+            
             return $this->redirectToRoute('backoffice_participations', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -59,10 +87,17 @@ final class ParticipationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $participation->validateParticipation();
-            $entityManager->flush();
+            $result = $participation->validateParticipation();
+            
+            if ($result['accepted']) {
+                $entityManager->flush();
+                $this->addFlash('success', 'Participation modifiée et acceptée avec succès');
+            } else {
+                $entityManager->remove($participation);
+                $entityManager->flush();
+                $this->addFlash('error', 'Participation refusée et supprimée: ' . $result['message']);
+            }
 
-            $this->addFlash('success', 'Participation modifiée avec succès');
             return $this->redirectToRoute('backoffice_participations', [], Response::HTTP_SEE_OTHER);
         }
 

@@ -140,6 +140,18 @@
                 <p>Update your team's participation details</p>
             </div>
 
+            {% for message in app.flashes('success') %}
+                <div style="background: #c6f6d5; color: #22543d; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #48bb78;">
+                    ✓ {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div style="background: #fed7d7; color: #742a2a; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #fc8181;">
+                    ✗ {{ message }}
+                </div>
+            {% endfor %}
+
             <div class="info-box">
                 <p><strong>Note:</strong> Changing the team or event will re-validate the participation according to event capacity and student availability rules.</p>
             </div>

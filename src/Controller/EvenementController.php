@@ -16,10 +16,18 @@ use Symfony\Component\Routing\Attribute\Route;
 final class EvenementController extends AbstractController
 {
     #[Route('/', name: 'backoffice_evenements', methods: ['GET'])]
-    public function index(EvenementRepository $evenementRepository): Response
+    public function index(EvenementRepository $evenementRepository, EntityManagerInterface $entityManager): Response
     {
+        $evenements = $evenementRepository->findAll();
+        
+        // Mettre à jour le statut de chaque événement
+        foreach ($evenements as $evenement) {
+            $evenement->updateStatus();
+        }
+        $entityManager->flush();
+        
         return $this->render('backoffice/evenement/index.html.twig', [
-            'evenements' => $evenementRepository->findAll(),
+            'evenements' => $evenements,
         ]);
     }
 

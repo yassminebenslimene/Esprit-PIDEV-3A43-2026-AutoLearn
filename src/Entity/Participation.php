@@ -31,13 +31,23 @@ class Participation
 
     /**
      * Validation automatique de la participation
+     * Retourne un tableau avec 'accepted' (bool) et 'message' (string)
      */
-    public function validateParticipation(): void
+    public function validateParticipation(): array
     {
         $evenement = $this->getEvenement();
         $equipe = $this->getEquipe();
 
-        // Vérification nbMax - ne compter que les participations ACCEPTÉES (sauf celle-ci)
+        // 1. Vérifier si l'événement est annulé
+        if ($evenement->getIsCanceled()) {
+            $this->setStatut(StatutParticipation::REFUSE);
+            return [
+                'accepted' => false,
+                'message' => 'L\'événement "' . $evenement->getTitre() . '" a été annulé. Aucune participation n\'est acceptée.'
+            ];
+        }
+
+        // 2. Vérification nbMax - ne compter que les participations ACCEPTÉES (sauf celle-ci)
         $acceptedCount = 0;
         foreach ($evenement->getParticipations() as $p) {
             // Ne pas compter la participation actuelle
@@ -51,10 +61,13 @@ class Participation
         
         if ($acceptedCount >= $evenement->getNbMax()) {
             $this->setStatut(StatutParticipation::REFUSE);
-            return;
+            return [
+                'accepted' => false,
+                'message' => 'La capacité maximale de l\'événement est atteinte (' . $evenement->getNbMax() . ' équipes maximum). Votre participation a été refusée.'
+            ];
         }
 
-        // Vérification doublon étudiants - ne vérifier que les autres participations
+        // 3. Vérification doublon étudiants - ne vérifier que les autres participations ACCEPTÉES
         foreach ($evenement->getParticipations() as $p) {
             // Ne pas vérifier contre soi-même
             if ($p->getId() === $this->getId()) {
@@ -70,13 +83,21 @@ class Participation
                 foreach ($equipe->getEtudiants() as $membre) {
                     if ($etudiant->getId() === $membre->getId()) {
                         $this->setStatut(StatutParticipation::REFUSE);
-                        return;
+                        return [
+                            'accepted' => false,
+                            'message' => 'L\'étudiant "' . $membre->getPrenom() . ' ' . $membre->getNom() . '" participe déjà à cet événement avec l\'équipe "' . $p->getEquipe()->getNom() . '". Un étudiant ne peut pas participer avec deux équipes différentes au même événement.'
+                        ];
                     }
                 }
             }
         }
 
+        // Tout est OK - accepter la participation
         $this->setStatut(StatutParticipation::ACCEPTE);
+        return [
+            'accepted' => true,
+            'message' => 'Participation acceptée avec succès ! Votre équipe "' . $equipe->getNom() . '" est inscrite à l\'événement "' . $evenement->getTitre() . '".'
+        ];
     }
 
     // ===== Getters / Setters =====

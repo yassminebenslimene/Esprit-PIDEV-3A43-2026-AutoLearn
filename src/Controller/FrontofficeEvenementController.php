@@ -18,18 +18,21 @@ use Doctrine\ORM\EntityManagerInterface;
 class FrontofficeEvenementController extends AbstractController
 {
     #[Route('/', name: 'app_events', methods: ['GET'])]
-    public function index(EvenementRepository $evenementRepository, ParticipationRepository $participationRepository): Response
+    public function index(EvenementRepository $evenementRepository, ParticipationRepository $participationRepository, EntityManagerInterface $entityManager): Response
     {
         $evenements = $evenementRepository->findAll();
         
-        // Pour chaque événement, calculer les places disponibles et récupérer les équipes
+        // Pour chaque événement, mettre à jour le statut et calculer les places disponibles
         $evenementsData = [];
         foreach ($evenements as $evenement) {
+            // Mettre à jour le statut automatiquement
+            $evenement->updateStatus();
+            
             $participationsAcceptees = $participationRepository->createQueryBuilder('p')
                 ->where('p.evenement = :evenement')
                 ->andWhere('p.statut = :statut')
                 ->setParameter('evenement', $evenement)
-                ->setParameter('statut', 'ACCEPTE')
+                ->setParameter('statut', 'Accepté')
                 ->getQuery()
                 ->getResult();
             
@@ -50,6 +53,8 @@ class FrontofficeEvenementController extends AbstractController
             ];
         }
         
+        $entityManager->flush();
+        
         return $this->render('frontoffice/evenement/index.html.twig', [
             'evenementsData' => $evenementsData,
         ]);
@@ -63,7 +68,7 @@ class FrontofficeEvenementController extends AbstractController
             ->where('p.evenement = :evenement')
             ->andWhere('p.statut = :statut')
             ->setParameter('evenement', $evenement)
-            ->setParameter('statut', 'ACCEPTE')
+            ->setParameter('statut', 'Accepté')
             ->getQuery()
             ->getResult();
         

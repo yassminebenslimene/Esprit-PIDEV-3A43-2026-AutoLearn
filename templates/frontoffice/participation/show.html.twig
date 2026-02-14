@@ -217,9 +217,9 @@
         <div class="detail-container">
             <div class="detail-header">
                 <h1>Participation Details</h1>
-                {% if participation.statut.value == 'ACCEPTE' %}
+                {% if participation.statut.value == 'Accepté' %}
                     <span class="status-badge status-accepted">✓ Accepted</span>
-                {% elseif participation.statut.value == 'EN_ATTENTE' %}
+                {% elseif participation.statut.value == 'En attente' %}
                     <span class="status-badge status-pending">⏳ Pending</span>
                 {% else %}
                     <span class="status-badge status-refused">✗ Refused</span>
@@ -291,10 +291,10 @@
                     Participation Status
                 </h3>
                 <div class="status-explanation">
-                    {% if participation.statut.value == 'ACCEPTE' %}
+                    {% if participation.statut.value == 'Accepté' %}
                         <h4 style="color: #22543d;">✓ Your participation has been accepted!</h4>
                         <p>Your team is registered for this event. See you there!</p>
-                    {% elseif participation.statut.value == 'EN_ATTENTE' %}
+                    {% elseif participation.statut.value == 'En attente' %}
                         <h4 style="color: #7c2d12;">⏳ Your participation is pending validation</h4>
                         <p>Your participation is being processed. You will be notified once validated.</p>
                     {% else %}

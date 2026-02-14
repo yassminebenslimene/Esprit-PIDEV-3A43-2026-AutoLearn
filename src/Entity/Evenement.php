@@ -73,15 +73,26 @@ class Evenement
     // Met à jour le status automatiquement
     public function updateStatus(): void
     {
-        $today = (new \DateTime())->setTime(0, 0, 0);
+        $today = new \DateTime();
+        $today->setTime(0, 0, 0);
+        
+        $dateDebut = (clone $this->getDateDebut())->setTime(0, 0, 0);
+        $dateFin = (clone $this->getDateFin())->setTime(0, 0, 0);
 
+        // Si l'événement est annulé, le statut reste ANNULE
         if ($this->getIsCanceled()) {
             $this->setStatus(StatutEvenement::ANNULE);
-        } elseif ($this->getDateDebut()->format('Y-m-d') === $today->format('Y-m-d')) {
+        } 
+        // Si la date d'aujourd'hui est entre dateDebut et dateFin (inclus)
+        elseif ($today >= $dateDebut && $today <= $dateFin) {
             $this->setStatus(StatutEvenement::EN_COURS);
-        } else {
+        } 
+        // Si la date d'aujourd'hui est avant dateDebut
+        elseif ($today < $dateDebut) {
             $this->setStatus(StatutEvenement::PLANIFIE);
         }
+        // Si la date d'aujourd'hui est après dateFin, on garde le statut actuel
+        // (l'événement est terminé mais on ne change pas le statut)
     }
 
     // ===== Getters / Setters =====
