@@ -302,14 +302,7 @@ https://templatemo.com/tm-607-glass-admin
             {{ form_errors(form.email) }}
         </div>
         
-        {# Niveau field will automatically appear here ONLY if user is Etudiant #}
-        {% if form.niveau is defined %}
-        <div class="form-group-settings">
-            {{ form_label(form.niveau, 'Niveau') }}
-            {{ form_widget(form.niveau, {'attr': {'class': 'settings-select'}}) }}
-            {{ form_errors(form.niveau) }}
-        </div>
-        {% endif %}
+       
     </div>
 </div>
 

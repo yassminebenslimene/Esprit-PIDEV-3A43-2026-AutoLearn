@@ -44,4 +44,17 @@ class ChapitreController extends AbstractController
             'chapitre' => $chapitre,
         ]);
     }
+
+    // Quiz d'un chapitre
+    #[Route('/{id}/quiz', name: 'quiz', methods: ['GET'])]
+    public function quiz(Chapitre $chapitre): Response
+    {
+        // Récupérer tous les quiz associés à ce chapitre
+        $quizzes = $chapitre->getQuizzes();
+
+        return $this->render('frontoffice/chapitre/quiz.html.twig', [
+            'chapitre' => $chapitre,
+            'quizzes' => $quizzes,
+        ]);
+    }
 }

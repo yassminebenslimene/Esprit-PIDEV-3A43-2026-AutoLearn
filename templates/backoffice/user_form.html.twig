@@ -56,9 +56,6 @@
             font-size: 0.85rem;
             margin-top: 0.25rem;
         }
-        .role-dependent {
-            display: none;
-        }
         .btn-group {
             display: flex;
             gap: 1rem;
@@ -295,22 +292,39 @@
                         {{ form_label(form.password) }}
                         {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
                         <div class="form-help">
-                            {{ form_help(form.password)|default('') }}
-                        </div>
+ 8 caractères min avec : majuscule, minuscule, chiffre, caractère spécial (@$!%*?&)                        </div>
                         {{ form_errors(form.password) }}
                     </div>
 
-                    <div class="form-group">
-                        {{ form_label(form.role) }}
-                        {{ form_widget(form.role, {'attr': {'class': 'form-control form-select'}}) }}
-                        {{ form_errors(form.role) }}
-                    </div>
+                    {# ONLY SHOW ROLE FIELD IF IT EXISTS AND WE'RE NOT HIDING IT #}
+                    {% if form.role is defined and not hide_role|default(false) %}
+                        <div class="form-group">
+                            {{ form_label(form.role) }}
+                            {{ form_widget(form.role, {'attr': {'class': 'form-control form-select'}}) }}
+                            {{ form_errors(form.role) }}
+                        </div>
+                    {% endif %}
 
-                    <div class="form-group" id="niveau-field">
-                        {{ form_label(form.niveau) }}
-                        {{ form_widget(form.niveau, {'attr': {'class': 'form-control form-select'}}) }}
-                        {{ form_errors(form.niveau) }}
-                    </div>
+                    {# ADMIN FORM - Niveau field disabled when role is not ETUDIANT #}
+<div class="form-group" id="niveau-field">
+    {{ form_label(form.niveau) }}
+    
+    {# Si le rôle est défini dans le formulaire (mode création admin) #}
+    {% if form.role is defined %}
+        {{ form_widget(form.niveau, {
+            'attr': {
+                'class': 'form-control form-select',
+                'id': 'user_niveau',
+                'disabled': form.role.vars.value != 'ETUDIANT'
+            }
+        }) }}
+    {% else %}
+        {# Mode édition - toujours activé car on ne modifie que des étudiants #}
+        {{ form_widget(form.niveau, {'attr': {'class': 'form-control form-select', 'id': 'user_niveau'}}) }}
+    {% endif %}
+    
+    {{ form_errors(form.niveau) }}
+</div>
 
                     <div class="btn-group">
                         <button type="submit" class="btn btn-primary">
@@ -321,7 +335,13 @@
                             {{ button_label|default('Save') }}
                         </button>
                         
-                        <a href="{{ path('backoffice_users') }}" class="btn btn-secondary">
+                        <a href="
+                            {% if hide_role|default(false) and app.user and app.user.isEtudiant() %}
+                                {{ path('backoffice_settings') }}
+                            {% else %}
+                                {{ path('backoffice_users') }}
+                            {% endif %}
+                        " class="btn btn-secondary">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
                                 <path d="M19 12H5M12 19l-7-7 7-7"/>
                             </svg>
@@ -337,25 +357,37 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const roleSelect = document.querySelector('#{{ form.role.vars.id }}');
+        const roleSelect = document.querySelector('#{{ form.role is defined ? form.role.vars.id : '' }}');
         const niveauField = document.getElementById('niveau-field');
         
         function toggleNiveauField() {
-            if (roleSelect.value === 'ETUDIANT') {
+            // If role field doesn't exist (edit mode), always show niveau
+            {% if form.role is not defined or hide_role|default(false) %}
                 niveauField.style.display = 'block';
-                niveauField.querySelector('select').required = true;
-            } else {
-                niveauField.style.display = 'none';
-                niveauField.querySelector('select').required = false;
-                niveauField.querySelector('select').value = '';
-            }
+                const niveauSelect = niveauField.querySelector('select');
+                if (niveauSelect) niveauSelect.required = true;
+            {% else %}
+                // Role field exists, toggle based on value
+                if (roleSelect && roleSelect.value === 'ETUDIANT') {
+                    niveauField.style.display = 'block';
+                    niveauField.querySelector('select').required = true;
+                } else {
+                    niveauField.style.display = 'none';
+                    niveauField.querySelector('select').required = false;
+                    niveauField.querySelector('select').value = '';
+                }
+            {% endif %}
         }
         
         // Initial toggle
         toggleNiveauField();
         
-        // Toggle on change
-        roleSelect.addEventListener('change', toggleNiveauField);
+        // Toggle on change - only if role field exists
+        {% if form.role is defined and not hide_role|default(false) %}
+            if (roleSelect) {
+                roleSelect.addEventListener('change', toggleNiveauField);
+            }
+        {% endif %}
         
         // Auto-hide flash messages
         setTimeout(function() {

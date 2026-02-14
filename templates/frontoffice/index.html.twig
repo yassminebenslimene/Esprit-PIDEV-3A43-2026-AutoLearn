@@ -21,16 +21,165 @@
         <!-- Swiper -->
         <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
     {% endblock %}
+    
+    <style>
+        /* Reset any conflicting styles - AVEC CENTRAGE VERTICAL */
+        .main-nav {
+            display: flex !important;
+            align-items: center !important;
+            height: 80px !important;  /* Ajuste si nécessaire */
+        }
+        
+        .main-nav .nav {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .main-nav .nav li {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            margin: 0 !important;
+        }
+        
+        .main-nav .nav li a {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            line-height: 1 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        
+        .main-nav .nav li.profile-dropdown-container {
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-btn {
+            background: none !important;
+            border: none !important;
+            padding: 0 15px !important;
+            color: #1e1e1e !important;
+            font-weight: 500 !important;
+            text-decoration: none !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            line-height: 1 !important;
+            gap: 5px !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-btn i {
+            display: flex !important;
+            align-items: center !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu {
+            display: none;
+            position: absolute !important;
+            top: 100% !important;
+            right: 0 !important;
+            z-index: 999999 !important;
+            min-width: 220px !important;
+            background: white !important;
+            border-radius: 8px !important;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.15) !important;
+            padding: 10px 0 !important;
+            margin-top: 0 !important;
+            list-style: none !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu.show {
+            display: block !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu li {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            display: block !important;
+            height: auto !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu a {
+            display: block !important;
+            padding: 12px 20px !important;
+            color: #333 !important;
+            text-decoration: none !important;
+            font-size: 15px !important;
+            transition: all 0.2s !important;
+            line-height: normal !important;
+            height: auto !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu a:hover {
+            background: linear-gradient(105deg, #7a6ad8 0%, #4e3b9c 100%) !important;
+            color: white !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu i {
+            margin-right: 10px !important;
+            width: 18px !important;
+            text-align: center !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-divider {
+            height: 1px !important;
+            background: #eeeeee !important;
+            margin: 8px 0 !important;
+        }
+        
+        /* Fix pour les autres liens de la navbar */
+        .main-nav .nav .scroll-to-section {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+        }
+        
+        .main-nav .nav .scroll-to-section a {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            padding: 0 15px !important;
+            line-height: 1 !important;
+        }
+        
+        @media (max-width: 992px) {
+            .main-nav,
+            .main-nav .nav,
+            .main-nav .nav li,
+            .main-nav .nav li a,
+            .main-nav .nav li.profile-dropdown-container,
+            .main-nav .nav .profile-dropdown-btn {
+                height: auto !important;
+                min-height: 50px !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-menu {
+                position: static !important;
+                width: 100% !important;
+                box-shadow: none !important;
+                background: transparent !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-menu a {
+                color: white !important;
+                padding-left: 30px !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-divider {
+                background: rgba(255,255,255,0.2) !important;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<!--
-
-TemplateMo 586 Scholar
-
-https://templatemo.com/tm-586-scholar
-
--->
 
 <!-- ***** Preloader Start ***** -->
 <div id="js-preloader" class="js-preloader">
@@ -53,9 +202,10 @@ https://templatemo.com/tm-586-scholar
                 <nav class="main-nav">
                     <!-- ***** Logo Start ***** -->
                     <a href="{{ path('app_frontoffice') }}" class="logo">
-                        <h1>Scholar</h1>
+                        <h1>AutoLearn</h1>
                     </a>
                     <!-- ***** Logo End ***** -->
+                    
                     <!-- ***** Search Start ***** -->
                     <div class="search-input">
                         <form id="search" action="#">
@@ -64,26 +214,47 @@ https://templatemo.com/tm-586-scholar
                         </form>
                     </div>
                     <!-- ***** Search End ***** -->
+                    
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
-                        <li class="scroll-to-section"><a href="#top" class="active">Home</a></li>
-                        <li class="scroll-to-section"><a href="#services">Cours</a></li>
-                        <li class="scroll-to-section"><a href="#courses">Courses</a></li>
-                        <li class="scroll-to-section"><a href="#team">Team</a></li>
-                        <li class="scroll-to-section"><a href="#events">Events</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#top">Home</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#courses">Courses</a></li>
                         <li class="scroll-to-section"><a href="#challenge">Challenge</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#events">Events</a></li>
+                        
                         {% if app.user %}
-                            <li class="scroll-to-section"><a href="{{ path('app_profile') }}">My Profile</a></li>
-                            <li class="scroll-to-section"><a href="{{ path('backoffice_logout') }}">Logout ({{ app.user.prenom }})</a></li>
+                            <!-- User Logged In - Profile Dropdown -->
+                            <li class="profile-dropdown-container">
+                                <a href="javascript:void(0);" onclick="toggleProfileDropdown(event)" class="profile-dropdown-btn">
+                                    <i class="fa fa-user-circle"></i>
+                                    {{ app.user.prenom }} {{ app.user.nom }}
+                                    <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                                </a>
+                                <ul class="profile-dropdown-menu" id="profileDropdown">
+                                    <li>
+                                        <a href="{{ path('app_profile') }}">
+                                            <i class="fa fa-id-card"></i> Mon Profil
+                                        </a>
+                                    </li>
+                                    <li class="profile-dropdown-divider"></li>
+                                    <li>
+                                        <a href="{{ path('backoffice_logout') }}">
+                                            <i class="fa fa-sign-out"></i> Déconnexion
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
                         {% else %}
+                            <!-- User Not Logged In -->
                             <li class="scroll-to-section"><a href="{{ path('backoffice_login') }}">Login</a></li>
                             <li class="scroll-to-section"><a href="{{ path('backoffice_register') }}">Register</a></li>
                         {% endif %}
-                    </ul>
+                    </ul> 
+                    <!-- ***** Menu End ***** -->
+                    
                     <a class='menu-trigger'>
                         <span>Menu</span>
                     </a>
-                    <!-- ***** Menu End ***** -->
                 </nav>
             </div>
         </div>
@@ -91,6 +262,7 @@ https://templatemo.com/tm-586-scholar
 </header>
 <!-- ***** Header Area End ***** -->
 
+<!-- ***** Main Banner Start ***** -->
 <div class="main-banner" id="top">
     <div class="container">
         <div class="row">
@@ -146,7 +318,9 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </div>
+<!-- ***** Main Banner End ***** -->
 
+<!-- ***** Services Section Start ***** -->
 <div class="services section" id="services">
     <div class="container">
         <div class="row">
@@ -159,20 +333,19 @@ https://templatemo.com/tm-586-scholar
                     <div class="col-lg-4 col-md-6">
                         <div class="service-item">
                             <div class="icon">
-                                {# Vous pouvez ici choisir une icône dynamique selon la matière #}
                                 <img src="{{ asset('frontoffice/images/service-01.png') }}" alt="icône cours">
                             </div>
                             <div class="main-content">
                                 <h4>{{ cour.titre }}</h4>
                                 <p>{{ cour.description|slice(0, 100) ~ (cour.description|length > 100 ? '...' : '') }}</p>
                                 <div class="main-button">
-    <a href="{{ path('app_frontoffice_chapitre_by_cours', {'coursId': cour.id}) }}" class="btn">
-        Voir le cours
-    </a>
-     <a href="#" class="btn" style="background: linear-gradient(135deg, #6c5ce7, #4a69bd);">
-        <i class="fa fa-users me-1"></i> Communauté
-    </a>
-</div>
+                                    <a href="{{ path('app_frontoffice_chapitre_by_cours', {'coursId': cour.id}) }}" class="btn">
+                                        Voir le cours
+                                    </a>
+                                    <a href="#" class="btn" style="background: linear-gradient(135deg, #6c5ce7, #4a69bd);">
+                                        <i class="fa fa-users me-1"></i> Communauté
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -181,7 +354,9 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </div>
+<!-- ***** Services Section End ***** -->
 
+<!-- ***** About Us Section Start ***** -->
 <div class="section about-us">
     <div class="container">
         <div class="row">
@@ -250,7 +425,9 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </div>
+<!-- ***** About Us Section End ***** -->
 
+<!-- ***** Courses Section Start ***** -->
 <section class="section courses" id="courses">
     <div class="container">
         <div class="row">
@@ -363,7 +540,9 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </section>
+<!-- ***** Courses Section End ***** -->
 
+<!-- ***** Fun Facts Section Start ***** -->
 <div class="section fun-facts">
     <div class="container">
         <div class="row">
@@ -400,7 +579,9 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </div>
+<!-- ***** Fun Facts Section End ***** -->
 
+<!-- ***** Team Section Start ***** -->
 <div class="team section" id="team">
     <div class="container">
         <div class="row">
@@ -466,8 +647,10 @@ https://templatemo.com/tm-586-scholar
             </div>
         </div>
     </div>
-</div> 
+</div>
+<!-- ***** Team Section End ***** -->
 
+<!-- ***** Testimonials Section Start ***** -->
 <div class="section testimonials">
     <div class="container">
         <div class="row">
@@ -509,7 +692,9 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </div>
+<!-- ***** Testimonials Section End ***** -->
 
+<!-- ***** Events Section Start ***** -->
 <div class="section events" id="events">
     <div class="container">
         <div class="row">
@@ -621,6 +806,9 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </div>
+<!-- ***** Events Section End ***** -->
+
+<!-- ***** Challenges Section Start ***** -->
 <section id="challenge" class="section events">
     <div class="container">
         <div class="row">
@@ -691,7 +879,7 @@ https://templatemo.com/tm-586-scholar
                                             </h6>
                                         </li>
                                     </ul>
-                                    <a href="{{ path('frontchallenge', {'id': challenge.id}) }}">
+<a href="{{ path('app_challenge_show', {'id': challenge.id}) }}">
                                         <i class="fa fa-angle-right"></i>
                                     </a>
                                 </div>
@@ -703,6 +891,9 @@ https://templatemo.com/tm-586-scholar
         {% endif %}
     </div>
 </section>
+<!-- ***** Challenges Section End ***** -->
+
+<!-- ***** Contact Us Section Start ***** -->
 <div class="contact-us section" id="contact">
     <div class="container">
         <div class="row">
@@ -750,7 +941,9 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </div>
+<!-- ***** Contact Us Section End ***** -->
 
+<!-- ***** Footer Start ***** -->
 <footer>
     <div class="container">
         <div class="col-lg-12">
@@ -758,6 +951,7 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </footer>
+<!-- ***** Footer End ***** -->
 
 {% block javascripts %}
     <!-- jQuery -->
@@ -774,19 +968,36 @@ https://templatemo.com/tm-586-scholar
     <!-- Custom JS -->
     <script src="{{ asset('frontoffice/js/custom.js') }}"></script>
     
-    <!-- Script d'initialisation -->
+    <!-- Profile Dropdown Toggle Script -->
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('FrontOffice Scholar Template chargé');
+        function toggleProfileDropdown(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            var dropdown = document.getElementById('profileDropdown');
+            var allDropdowns = document.querySelectorAll('.profile-dropdown-menu');
+            
+            allDropdowns.forEach(function(menu) {
+                if (menu.id !== 'profileDropdown') {
+                    menu.classList.remove('show');
+                }
+            });
+            
+            dropdown.classList.toggle('show');
+        }
         
-        // Script de test pour vérifier que tout est chargé
-        var images = document.querySelectorAll('img');
-        images.forEach(function(img) {
-            img.onerror = function() {
-                console.error('Image non chargée:', this.src);
-            };
+        document.addEventListener('click', function(event) {
+            var dropdown = document.getElementById('profileDropdown');
+            var isClickInside = event.target.closest('.profile-dropdown-container');
+            
+            if (!isClickInside && dropdown) {
+                dropdown.classList.remove('show');
+            }
         });
-    });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Profile dropdown initialized');
+        });
     </script>
 {% endblock %}
 

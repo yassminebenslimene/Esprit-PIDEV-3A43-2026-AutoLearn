@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class FrontOfficeController extends AbstractController
+class FrontofficeController extends AbstractController
 {
     #[Route('/', name: 'app_frontoffice')]
     public function index(CoursRepository $coursRepository, ChallengeRepository $challengeRepository): Response

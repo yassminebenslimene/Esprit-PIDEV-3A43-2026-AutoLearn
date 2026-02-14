@@ -1,15 +1,119 @@
 {% extends 'base_front.html.twig' %}
 
-
-
-{% block title %}New Communaute{% endblock %}
+{% block title %}Nouvelle communauté | Scholar{% endblock %}
 
 {% block body %}
-    <h1>Create new Communaute</h1>
 
+<<<<<<< HEAD
     {{ include('frontoffice/communaute/_form.html.twig') }}
+=======
+<!-- ===== PAGE HEADING ===== -->
+<div class="page-heading header-text">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h3>Nouvelle communauté</h3>
+                <span class="breadcrumb">
+                    <a href="{{ path('app_frontoffice') }}">Home</a>
+                    > Nouvelle communauté
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <a href="{{ path('app_communaute_index') }}">back to list</a>
+<style>
+.communaute-form-container {
+    max-width: 720px;
+    margin: 80px auto;
+}
+
+.communaute-form-card {
+    background: white;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+}
+
+.communaute-form-card h4 {
+    margin-bottom: 22px;
+}
+
+/* Inputs */
+.communaute-form-card input,
+.communaute-form-card textarea {
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    padding: 12px 14px;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.communaute-form-card textarea {
+    min-height: 120px;
+    resize: none;
+}
+
+/* Buttons */
+.communaute-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #7a6ad8, #6c63ff);
+    color: white;
+    border: none;
+    padding: 10px 26px;
+    border-radius: 999px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-back {
+    background: #f1f3ff;
+    color: #333;
+    padding: 10px 26px;
+    border-radius: 999px;
+    text-decoration: none;
+}
+</style>
+
+<div class="communaute-form-container">
+    <div class="communaute-form-card">
+
+        <h4>Créer une communauté</h4>
+
+        {{ form_start(form) }}
+
+            {{ form_widget(form) }}
+
+            <div class="communaute-actions">
+                <button type="submit" class="btn-save">
+                    Créer
+                </button>
+
+                <a href="{{ path('app_communaute_index') }}" class="btn-back">
+                    ← Retour à la liste
+                </a>
+            </div>
+
+        {{ form_end(form) }}
+
+    </div>
+</div>
+
+<footer>
+    <div class="container">
+        <div class="col-lg-12">
+            <p>Copyright © 2036 Scholar Organization. All rights reserved. &nbsp;&nbsp;&nbsp; Design: <a href="https://templatemo.com" rel="nofollow" target="_blank">TemplateMo</a></p>
+        </div>
+    </div>
+</footer>
+>>>>>>> 6b6aa12 (frontoffice updated)
+
 {% endblock %}
 
 

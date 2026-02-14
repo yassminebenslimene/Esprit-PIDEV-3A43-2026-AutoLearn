@@ -20,26 +20,22 @@ use Symfony\Component\Form\FormError;
 class SecurityController extends AbstractController
 {
     #[Route('/login', name: 'backoffice_login')]
-    public function login(AuthenticationUtils $authUtils): Response
-    {
-        // Si déjà connecté, rediriger selon le rôle
-        if ($this->getUser()) {
-            $user = $this->getUser();
-            
-            // Vérifier si l'utilisateur est un Admin
-            if ($user instanceof Admin || $user->getRole() === 'ADMIN') {
-                return $this->redirectToRoute('app_backoffice');
-            }
-            
-            // Sinon, rediriger vers le frontoffice (pour les étudiants)
-            return $this->redirectToRoute('app_frontoffice');
+public function login(AuthenticationUtils $authUtils): Response
+{
+    if ($this->getUser()) {
+        
+        $user = $this->getUser();
+        if (in_array('ROLE_ADMIN', $user->getRoles())) {
+            return $this->redirectToRoute('app_backoffice');
         }
-
-        return $this->render('backoffice/login.html.twig', [
-            'last_username' => $authUtils->getLastUsername(),
-            'error' => $authUtils->getLastAuthenticationError()
-        ]);
+        return $this->redirectToRoute('app_frontoffice');
     }
+
+    return $this->render('backoffice/login.html.twig', [
+        'last_username' => $authUtils->getLastUsername(),
+        'error' => $authUtils->getLastAuthenticationError()
+    ]);
+}
 
     #[Route('/logout', name: 'backoffice_logout')]
     public function logout(): void {}
