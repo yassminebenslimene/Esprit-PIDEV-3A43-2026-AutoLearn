@@ -125,7 +125,10 @@ class CoursController extends AbstractController
     }
 
     #[Route('/{coursId}/chapitres/{id}', name: 'app_cours_chapitre_show', methods: ['GET'])]
-    public function showChapitre(Cours $cours, Chapitre $chapitre): Response
+    public function showChapitre(
+        #[MapEntity(id: 'coursId')] Cours $cours,
+        Chapitre $chapitre
+    ): Response
     {
         // Vérifier que le chapitre appartient bien au cours
         if ($chapitre->getCours() !== $cours) {
@@ -139,7 +142,12 @@ class CoursController extends AbstractController
     }
 
     #[Route('/{coursId}/chapitres/{id}/edit', name: 'app_cours_chapitre_edit', methods: ['GET', 'POST'])]
-    public function editChapitre(Request $request, Cours $cours, Chapitre $chapitre, EntityManagerInterface $entityManager): Response
+    public function editChapitre(
+        Request $request,
+        #[MapEntity(id: 'coursId')] Cours $cours,
+        Chapitre $chapitre,
+        EntityManagerInterface $entityManager
+    ): Response
     {
         // Vérifier que le chapitre appartient bien au cours
         if ($chapitre->getCours() !== $cours) {
@@ -163,7 +171,12 @@ class CoursController extends AbstractController
     }
 
     #[Route('/{coursId}/chapitres/{id}/delete', name: 'app_cours_chapitre_delete', methods: ['POST'])]
-    public function deleteChapitre(Request $request, Cours $cours, Chapitre $chapitre, EntityManagerInterface $entityManager): Response
+    public function deleteChapitre(
+        Request $request,
+        #[MapEntity(id: 'coursId')] Cours $cours,
+        Chapitre $chapitre,
+        EntityManagerInterface $entityManager
+    ): Response
     {
         // Vérifier que le chapitre appartient bien au cours
         if ($chapitre->getCours() !== $cours) {

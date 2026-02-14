@@ -66,7 +66,7 @@ class Cours
     /**
      * @var Collection<int, Chapitre>
      */
-    #[ORM\OneToMany(targetEntity: Chapitre::class, mappedBy: 'cours')]
+    #[ORM\OneToMany(targetEntity: Chapitre::class, mappedBy: 'cours', orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $chapitres;
 
     public function __construct()
