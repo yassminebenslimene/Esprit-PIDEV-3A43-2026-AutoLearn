@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - 3D Glassmorphism Dashboard</title>
+    <meta name="description" content="3D Glassmorphism Dashboard Template by TemplateMo">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('backoffice/css/templatemo-glass-admin-style.css') }}">
+</head>
+<body>
+    <div class="background"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="login-page">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="login-logo">G</div>
+                    <h1 class="login-title">Create Account</h1>
+                    <p class="login-subtitle">Start your journey with AutoLearn</p>
+                </div>
+
+                {# SUPPRIMEZ L'AFFICHAGE DES ERREURS FLASH - Gardez seulement le succès #}
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success" style="color: #10b981; 
+                        background: rgba(16, 185, 129, 0.1); 
+                        padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #10b981;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+
+                {# Form avec novalidate pour désactiver HTML5 validation #}
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'register-form'}}) }}
+                    
+                    {# NOM - Validation serveur seulement #}
+                    <div class="form-group">
+                        {{ form_label(form.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.nom, {'attr': {
+                            'class': 'form-input' ~ (form.nom.vars.errors|length > 0 ? ' input-error' : ''),
+                            'placeholder': 'Votre nom'
+                            # NOTE: Pas de pattern HTML5, validation serveur seulement
+                        }}) }}
+                        {# ERREURS SERVEUR sous le champ #}
+                        <div class="text-danger" style="color: #ef4444; font-size: 14px; margin-top: 5px;">
+                            {{ form_errors(form.nom) }}
+                        </div>
+                        <small class="form-text" style="color: var(--text-muted); font-size: 12px; margin-top: 5px;">
+                            Lettres, espaces et apostrophes seulement. Pas de chiffres.
+                        </small>
+                    </div>
+
+                    {# PRÉNOM - Validation serveur seulement #}
+                    <div class="form-group">
+                        {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.prenom, {'attr': {
+                            'class': 'form-input' ~ (form.prenom.vars.errors|length > 0 ? ' input-error' : ''),
+                            'placeholder': 'Votre prénom'
+                            # NOTE: Pas de pattern HTML5, validation serveur seulement
+                        }}) }}
+                        {# ERREURS SERVEUR sous le champ #}
+                        <div class="text-danger" style="color: #ef4444; font-size: 14px; margin-top: 5px;">
+                            {{ form_errors(form.prenom) }}
+                        </div>
+                        <small class="form-text" style="color: var(--text-muted); font-size: 12px; margin-top: 5px;">
+                            Lettres, espaces et apostrophes seulement. Pas de chiffres.
+                        </small>
+                    </div>
+
+                    {# EMAIL - Validation serveur seulement #}
+                    <div class="form-group">
+                        {{ form_label(form.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.email, {'attr': {
+                            'class': 'form-input' ~ (form.email.vars.errors|length > 0 ? ' input-error' : ''),
+                            'placeholder': 'exemple@domaine.com'
+                            # NOTE: Pas de pattern HTML5, validation serveur seulement
+                        }}) }}
+                        {# ERREURS SERVEUR sous le champ #}
+                        <div class="text-danger" style="color: #ef4444; font-size: 14px; margin-top: 5px;">
+                            {{ form_errors(form.email) }}
+                        </div>
+                        <small class="form-text" style="color: var(--text-muted); font-size: 12px; margin-top: 5px;">
+                            Format valide: nom.prenom@domaine.com
+                        </small>
+                    </div>
+
+                    {# MOT DE PASSE - Validation serveur seulement #}
+                    <div class="form-group">
+                        {{ form_label(form.password, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.password, {'attr': {
+                            'class': 'form-input' ~ (form.password.vars.errors|length > 0 ? ' input-error' : ''),
+                            'placeholder': 'Minimum 8 caractères'
+                            # NOTE: Pas de pattern HTML5, validation serveur seulement
+                        }}) }}
+                        {# ERREURS SERVEUR sous le champ #}
+                        <div class="text-danger" style="color: #ef4444; font-size: 14px; margin-top: 5px;">
+                            {{ form_errors(form.password) }}
+                        </div>
+                        <small class="form-text" style="color: var(--text-muted); font-size: 12px; margin-top: 5px;">
+                            Exigences: 8+ caractères, majuscule, minuscule, chiffre, caractère spécial (@$!%*?&)
+                        </small>
+                    </div>
+
+                    {# RÔLE - Validation serveur seulement #}
+                    <div class="form-group">
+                        {{ form_label(form.role, 'Type de compte', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.role, {'attr': {
+                            'class': 'form-input' ~ (form.role.vars.errors|length > 0 ? ' input-error' : ''),
+                            'id': 'register_role'
+                        }}) }}
+                        {# ERREURS SERVEUR sous le champ #}
+                        <div class="text-danger" style="color: #ef4444; font-size: 14px; margin-top: 5px;">
+                            {{ form_errors(form.role) }}
+                        </div>
+                    </div>
+
+                    {# NIVEAU - Masqué par défaut, validation serveur seulement #}
+                    <div class="form-group" id="niveau-group" style="display: none;">
+                        {{ form_label(form.niveau, 'Niveau', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.niveau, {'attr': {
+                            'class': 'form-input' ~ (form.niveau.vars.errors|length > 0 ? ' input-error' : ''),
+                            'id': 'register_niveau'
+                        }}) }}
+                        {# ERREURS SERVEUR sous le champ #}
+                        <div class="text-danger" style="color: #ef4444; font-size: 14px; margin-top: 5px;">
+                            {{ form_errors(form.niveau) }}
+                        </div>
+                        <small class="form-text" style="color: var(--text-muted); font-size: 12px; margin-top: 5px;">
+                            Sélectionnez votre niveau d'études
+                        </small>
+                    </div>
+
+                    {# TERMES - Validation côté client minimal (requis par HTML) #}
+                    <div class="form-row" style="margin-bottom: 24px;">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="terms" required>
+                            I agree to the <a href="#" style="color: var(--emerald-light);">Terms & Conditions</a>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        Create Account
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </button>
+                {{ form_end(form) }}
+
+                <p class="login-footer">
+                    Already have an account? <a href="{{ path('backoffice_login') }}">Sign In</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.getElementById('register_role');
+        const niveauGroup = document.getElementById('niveau-group');
+        const niveauSelect = document.getElementById('register_niveau');
+
+        function toggleNiveau() {
+            if (roleSelect.value === 'ETUDIANT') {
+                niveauGroup.style.display = 'block';
+                // Pas de required HTML5, validation serveur seulement
+            } else {
+                niveauGroup.style.display = 'none';
+                if (niveauSelect) {
+                    niveauSelect.value = '';
+                }
+            }
+        }
+
+        // Initial state - Afficher si déjà sélectionné (après erreur de soumission)
+        {% if form.role.vars.value == 'ETUDIANT' or form.niveau.vars.errors|length > 0 %}
+            if (niveauGroup) niveauGroup.style.display = 'block';
+        {% else %}
+            toggleNiveau();
+        {% endif %}
+        
+        // On change
+        if (roleSelect) {
+            roleSelect.addEventListener('change', toggleNiveau);
+        }
+
+        // Validation front-end pour les termes seulement (HTML required)
+        const form = document.querySelector('.register-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const termsCheckbox = form.querySelector('input[name="terms"]');
+                if (!termsCheckbox.checked) {
+                    e.preventDefault();
+                    alert('Vous devez accepter les termes et conditions');
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        // SUPPRIMEZ la validation en temps réel du mot de passe
+        // La validation se fait uniquement côté serveur
+    });
+    </script>
+
+    <style>
+    /* Style pour les champs en erreur */
+    .input-error {
+        border-color: #ef4444 !important;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+    }
+    </style>
+
+    <script src="{{ asset('backoffice/js/templatemo-glass-admin-script.js') }}"></script>
+</body>
+</html>

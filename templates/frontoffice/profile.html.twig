@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <title>Mon Profil - Scholar</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="{{ asset('frontoffice/vendor/bootstrap/css/bootstrap.min.css') }}">
+
+    <!-- FrontOffice CSS -->
+    <link rel="stylesheet" href="{{ asset('frontoffice/css/animate.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontoffice/css/flex-slider.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontoffice/css/owl.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontoffice/css/templatemo-scholar.css') }}">
+
+    <!-- Swiper -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
+</head>
+<body>
+
+<!-- ***** Preloader Start ***** -->
+<div id="js-preloader" class="js-preloader">
+    <div class="preloader-inner">
+        <span class="dot"></span>
+        <div class="dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</div>
+<!-- ***** Preloader End ***** -->
+
+<!-- ***** Header Area Start ***** -->
+<header class="header-area header-sticky">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                    <!-- ***** Logo Start ***** -->
+                    <a href="{{ path('app_frontoffice') }}" class="logo">
+                        <h1>Scholar</h1>
+                    </a>
+                    <!-- ***** Logo End ***** -->
+                    <!-- ***** Search Start ***** -->
+                    <div class="search-input">
+                        <form id="search" action="#">
+                            <input type="text" placeholder="Type Something" id='searchText' name="searchKeyword" />
+                            <i class="fa fa-search"></i>
+                        </form>
+                    </div>
+                    <!-- ***** Search End ***** -->
+                    <!-- ***** Menu Start ***** -->
+                    <ul class="nav">
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#top">Home</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#services">Services</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#courses">Courses</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#team">Team</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#events">Events</a></li>
+                        {% if app.user %}
+                            <li class="scroll-to-section">
+                                <a href="{{ path('app_profile') }}" class="active">Mon Profil</a>
+                            </li>
+                            <li class="scroll-to-section">
+                                <a href="{{ path('backoffice_logout') }}">Logout ({{ app.user.prenom }})</a>
+                            </li>
+                        {% else %}
+                            <li class="scroll-to-section"><a href="{{ path('backoffice_login') }}">Login</a></li>
+                            <li class="scroll-to-section"><a href="{{ path('backoffice_register') }}">Register</a></li>
+                        {% endif %}
+                    </ul>   
+                    <a class='menu-trigger'>
+                        <span>Menu</span>
+                    </a>
+                    <!-- ***** Menu End ***** -->
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- ***** Header Area End ***** -->
+
+<!-- ***** Page Header Banner Start ***** -->
+<div class="page-heading" style="background-image: linear-gradient(127deg, rgb(158, 159, 245) 0%, rgba(187, 183, 231, 0.53) 91%), url({{ asset('frontoffice/images/course-01.jpg') }}); background-position: center center; background-repeat: no-repeat; background-size: cover; padding: 150px 0 80px 0;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="header-text" style="text-align: center;">
+                    <h6 style="color: white; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Mon Compte</h6>
+                    <h2 style="color: white; font-weight: 800; font-size: 48px; margin: 0;">Mon Profil</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ***** Page Header Banner End ***** -->
+
+<!-- ***** Profile Section Start ***** -->
+<div class="section" style="padding: 80px 0;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="profile-card" style="background: white; padding: 50px; border-radius: 23px; box-shadow: 0 0 44px rgba(0,0,0,0.08);">
+                    
+                    {# Messages de succès #}
+                    {% for message in app.flashes('success') %}
+                        <div style="padding: 15px; background: #d4edda; border-left: 4px solid #28a745; border-radius: 5px; margin-bottom: 25px; color: #155724;">
+                            <strong>✓</strong> {{ message }}
+                        </div>
+                    {% endfor %}
+                    
+                    {# Messages d'erreur #}
+                    {% for message in app.flashes('error') %}
+                        <div style="padding: 15px; background: #e2d7f8; border-left: 4px solid #353ddc; border-radius: 5px; margin-bottom: 25px; color: #4a1c72;">
+                            <strong>✗</strong> {{ message }}
+                        </div>
+                    {% endfor %}
+
+                    {# En-tête du profil #}
+                    <div class="profile-header" style="text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #eee;">
+                        <div class="profile-avatar" style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #a19cec 0%, #58379c 100%); color: white; font-size: 42px; font-weight: bold; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 8px 16px rgba(247,95,29,0.3);">
+                            {{ user.prenom[:1]|upper }}{{ user.nom[:1]|upper }}
+                        </div>
+                        <h3 style="color: #1e1e1e; font-weight: 700; margin-bottom: 8px;">{{ user.prenom }} {{ user.nom }}</h3>
+                        <p style="color: #777; font-size: 15px;">{{ user.email }}</p>
+                        <span style="display: inline-block; padding: 6px 16px; background: #a1abf1; color: white; border-radius: 20px; font-size: 13px; font-weight: 600; margin-top: 8px;">{{ user.role }}</span>
+                    </div>
+
+                    {{ form_start(form) }}
+                    
+                    <div class="profile-section" style="margin-bottom: 35px;">
+                        <h4 style="margin-bottom: 25px; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0; color: #1e1e1e; font-weight: 700; font-size: 18px;">
+                            <i class="fa fa-user" style="color: #b4b1ff; margin-right: 8px;"></i>
+                            Informations Personnelles
+                        </h4>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div style="margin-bottom: 25px;">
+                                    {{ form_label(form.prenom, 'Prénom', {'label_attr': {'style': 'font-weight: 600; margin-bottom: 10px; display: block; color: #1e1e1e; font-size: 14px;'}}) }}
+                                    {{ form_widget(form.prenom, {'attr': {'style': 'padding: 15px; border: 1px solid #ddd; border-radius: 8px; width: 100%; font-size: 15px;', 'placeholder': 'Votre prénom'}}) }}
+                                    {{ form_errors(form.prenom) }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div style="margin-bottom: 25px;">
+                                    {{ form_label(form.nom, 'Nom', {'label_attr': {'style': 'font-weight: 600; margin-bottom: 10px; display: block; color: #1e1e1e; font-size: 14px;'}}) }}
+                                    {{ form_widget(form.nom, {'attr': {'style': 'padding: 15px; border: 1px solid #ddd; border-radius: 8px; width: 100%; font-size: 15px;', 'placeholder': 'Votre nom'}}) }}
+                                    {{ form_errors(form.nom) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-{% if form.niveau is defined %}6{% else %}12{% endif %}">
+                                <div style="margin-bottom: 25px;">
+                                    {{ form_label(form.email, 'Email', {'label_attr': {'style': 'font-weight: 600; margin-bottom: 10px; display: block; color: #1e1e1e; font-size: 14px;'}}) }}
+                                    {{ form_widget(form.email, {'attr': {'style': 'padding: 15px; border: 1px solid #ddd; border-radius: 8px; width: 100%; font-size: 15px;', 'placeholder': 'votre@email.com'}}) }}
+                                    {{ form_errors(form.email) }}
+                                </div>
+                            </div>
+                            
+                            {% if form.niveau is defined %}
+                            <div class="col-md-6">
+                                <div style="margin-bottom: 25px;">
+                                    {{ form_label(form.niveau, 'Niveau', {'label_attr': {'style': 'font-weight: 600; margin-bottom: 10px; display: block; color: #1e1e1e; font-size: 14px;'}}) }}
+                                    {{ form_widget(form.niveau, {'attr': {'style': 'padding: 15px; border: 1px solid #ddd; border-radius: 8px; width: 100%; font-size: 15px;'}}) }}
+                                    {{ form_errors(form.niveau) }}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="profile-section" style="margin-bottom: 35px;">
+                        <h4 style="margin-bottom: 25px; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0; color: #1e1e1e; font-weight: 700; font-size: 18px;">
+                            <i class="fa fa-lock" style="color: #a6a0fc; margin-right: 8px;"></i>
+                            Changer le mot de passe
+                        </h4>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div style="margin-bottom: 25px;">
+                                    {{ form_label(form.password, 'Nouveau mot de passe', {'label_attr': {'style': 'font-weight: 600; margin-bottom: 10px; display: block; color: #1e1e1e; font-size: 14px;'}}) }}
+                                    {{ form_widget(form.password, {'attr': {'style': 'padding: 15px; border: 1px solid #ddd; border-radius: 8px; width: 100%; font-size: 15px;', 'placeholder': '••••••••'}}) }}
+                                    {{ form_errors(form.password) }}
+                                    <small style="color: #999; display: block; margin-top: 8px; font-size: 13px;">
+                                        <i class="fa fa-info-circle"></i> Laissez vide si vous ne souhaitez pas changer votre mot de passe
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px; justify-content: center; padding-top: 20px; border-top: 1px solid #eee;">
+                        <button type="submit" class="orange-button" style="padding: 15px 45px; font-size: 15px; font-weight: 600; border-radius: 8px;">
+                            <i class="fa fa-check" style="margin-right: 8px;"></i>
+                            Sauvegarder
+                        </button>
+                        <a href="{{ path('app_frontoffice') }}" style="padding: 15px 45px; background: #e8e8e8; color: #666; border: none; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block; font-size: 15px;">
+                            <i class="fa fa-times" style="margin-right: 8px;"></i>
+                            Annuler
+                        </a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ***** Profile Section End ***** -->
+
+<footer>
+    <div class="container">
+        <div class="col-lg-12">
+            <p>Copyright © 2036 Scholar Organization. All rights reserved. &nbsp;&nbsp;&nbsp; Design: <a href="https://templatemo.com" rel="nofollow" target="_blank">TemplateMo</a></p>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
+
+<!-- Bootstrap -->
+<script src="{{ asset('frontoffice/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+<!-- Plugin JS -->
+<script src="{{ asset('frontoffice/js/isotope.min.js') }}"></script>
+<script src="{{ asset('frontoffice/js/owl-carousel.js') }}"></script>
+<script src="{{ asset('frontoffice/js/counter.js') }}"></script>
+
+<!-- Custom JS -->
+<script src="{{ asset('frontoffice/js/custom.js') }}"></script>
+
+<style>
+input:focus, select:focus, textarea:focus {
+    border-color: #a31df7 !important;
+    box-shadow: 0 0 0 0.2rem rgba(145, 29, 247, 0.15) !important;
+    outline: none;
+}
+</style>
+
+</body>
+</html>

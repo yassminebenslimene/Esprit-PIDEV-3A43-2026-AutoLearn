@@ -1,0 +1,84 @@
+/* Form Error Styles */
+
+/* Global form errors */
+.form-errors {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.2));
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    color: #fca5a5;
+}
+
+.form-errors ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.form-errors li {
+    padding: 0.25rem 0;
+    display: flex;
+    align-items: center;
+}
+
+.form-errors li:before {
+    content: "⚠";
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+}
+
+/* Field-specific errors */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-error-message {
+    color: #fca5a5;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-error-message:before {
+    content: "⚠";
+    margin-right: 0.25rem;
+}
+
+/* Invalid field styling */
+.glass-card input.is-invalid,
+.glass-card textarea.is-invalid,
+.glass-card select.is-invalid {
+    border-color: rgba(239, 68, 68, 0.6);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.glass-card input.is-invalid:focus,
+.glass-card textarea.is-invalid:focus,
+.glass-card select.is-invalid:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+/* Valid field styling */
+.glass-card input.is-valid,
+.glass-card textarea.is-valid,
+.glass-card select.is-valid {
+    border-color: rgba(16, 185, 129, 0.6);
+    background: rgba(16, 185, 129, 0.05);
+}
+
+/* Help text */
+.form-help {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    opacity: 0.8;
+}
+
+/* Required field indicator */
+.form-label.required:after {
+    content: " *";
+    color: #fca5a5;
+}
