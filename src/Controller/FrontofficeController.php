@@ -2,16 +2,13 @@
 
 namespace App\Controller;
 
-
 use App\Repository\ChallengeRepository;
-use App\Repository\Cours\ChapitreRepository;
 use App\Repository\Cours\CoursRepository;
 use App\Repository\EvenementRepository;
 use App\Repository\EquipeRepository;
-use  App\Entity\Admin;
+use App\Entity\Admin;
 use App\Entity\Etudiant;
 use App\Entity\User;
-use App\Repository\UserRepository;
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,13 +20,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class FrontofficeController extends AbstractController
 {
-
-
-     #[Route('/', name: 'app_frontoffice')]
+    #[Route('/', name: 'app_frontoffice')]
     public function index(
         ChallengeRepository $challengeRepository,
         EvenementRepository $evenementRepository,
-        EquipeRepository $equipeRepository ,
+        EquipeRepository $equipeRepository,
         CoursRepository $coursRepository
     ): Response
     {
@@ -43,50 +38,14 @@ class FrontofficeController extends AbstractController
             }
         }
         
+        // Récupérer les données
         $cours = $coursRepository->findAll();
-        $challenges = $challengeRepository->findAll();
-
-        return $this->render('frontoffice/index.html.twig', [
-            'cours' => $cours,
-            'challenges' => $challenges,
-        ]);
-    }
-
-    #[Route('/home', name: 'app_home')]
-    public function home(CoursRepository $coursRepository, ChallengeRepository $challengeRepository): Response
-    {
-        $cours = $coursRepository->findAll();
-        $challenges = $challengeRepository->findAll();
-        
-        return $this->render('frontoffice/index.html.twig', [
-            'cours' => $cours,
-            'challenges' => $challenges,
-        // Récupérer les challenges, événements et équipes
-        $challenges = $challengeRepository->findAll();
-        $evenements = $evenementRepository->findAll();
-        $equipes = $equipeRepository->findAll();
-        
-        // Sinon, afficher le frontoffice normalement
-        return $this->render('frontoffice/index.html.twig', [
-            'challenges' => $challenges,
-            'evenements' => $evenements,
-            'equipes' => $equipes,
-        ]);
-    }
-
-      #[Route('/home', name: 'app_home')]
-    public function home(
-        ChallengeRepository $challengeRepository,
-        EvenementRepository $evenementRepository,
-        EquipeRepository $equipeRepository
-    ): Response
-    {
-        // Récupérer les challenges, événements et équipes
         $challenges = $challengeRepository->findAll();
         $evenements = $evenementRepository->findAll();
         $equipes = $equipeRepository->findAll();
         
         return $this->render('frontoffice/index.html.twig', [
+            'cours' => $cours,
             'challenges' => $challenges,
             'evenements' => $evenements,
             'equipes' => $equipes,
