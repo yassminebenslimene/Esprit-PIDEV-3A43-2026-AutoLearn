@@ -21,7 +21,8 @@
 <style>
 .community-container {
     max-width: 900px;
-    margin: 80px auto;
+    margin: 140px auto 80px;
+    padding-top: 20px;
 }
 
 .community-card {
@@ -49,10 +50,14 @@
 .btn-main {
     background: linear-gradient(135deg, #7a6ad8, #6c63ff);
     color: white;
-    padding: 8px 18px;
+    padding: 10px 20px;
     border-radius: 999px;
     text-decoration: none;
     font-size: 14px;
+    display: inline-block;
+    position: relative;
+    z-index: 10;
+    cursor: pointer;
 }
 
 .btn-outline {
@@ -68,7 +73,7 @@
 
 <div class="community-container">
 
-    <a href="{{ path('app_communaute_new') }}" class="btn-main">
+    <a href="/communaute/new" class="btn-main">
         ➕ Nouvelle communauté
     </a>
 
@@ -86,12 +91,12 @@
             </div>
 
             <div class="community-actions">
-                <a href="{{ path('app_communaute_show', {id: communaute.id}) }}"
+                <a href="/communaute/{{ communaute.id }}"
                    class="btn-outline">
                     Voir
                 </a>
 
-                <a href="{{ path('app_communaute_edit', {id: communaute.id}) }}"
+                <a href="/communaute/{{ communaute.id }}/edit"
                    class="btn-outline">
                     Modifier
                 </a>

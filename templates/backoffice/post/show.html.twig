@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails du Post - GlassAdmin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('backoffice/css/templatemo-glass-admin-style.css') }}">
+    <style>
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .info-item { padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px; }
+        .info-label { font-size: 0.875rem; opacity: 0.7; margin-bottom: 0.5rem; }
+        .info-value { font-size: 1.125rem; font-weight: 600; }
+        .comment-list { display: flex; flex-direction: column; gap: 0.75rem; }
+        .comment-item {
+            padding: 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="dashboard">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">G</div>
+                <span class="logo-text">AutoLearn</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-section">
+                    <span class="nav-section-title">Communauté</span>
+                    <ul>
+                        <li class="nav-item"><a href="{{ path('backoffice_post_index') }}" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>Posts</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <nav class="navbar">
+                <div class="page-header">
+                    <h1 class="page-title">Détails du Post</h1>
+                    <div class="page-breadcrumb">
+                        <a href="{{ path('app_backoffice') }}">Dashboard</a><span>/</span>
+                        <a href="{{ path('backoffice_post_index') }}">Posts</a><span>/</span>
+                        <span>Détails</span>
+                    </div>
+                </div>
+                <div class="navbar-right">
+                    <a href="{{ path('backoffice_post_index') }}" class="card-btn">Retour</a>
+                </div>
+            </nav>
+
+            <section class="content-grid" style="grid-template-columns: 1fr;">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Informations du Post</h2>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Auteur</div>
+                            <div class="info-value">
+                                {% if post.user %}
+                                    {{ post.user.prenom }} {{ post.user.nom }}
+                                {% else %}
+                                    <span style="opacity:0.5">Anonyme</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Communauté</div>
+                            <div class="info-value">
+                                {% if post.communaute %}
+                                    <a href="{{ path('backoffice_communaute_show', {id: post.communaute.id}) }}" style="color: var(--cyan);">
+                                        {{ post.communaute.nom }}
+                                    </a>
+                                {% else %}
+                                    <span style="opacity:0.5">-</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Date de création</div>
+                            <div class="info-value">{{ post.createdAt|date('d/m/Y à H:i') }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Commentaires</div>
+                            <div class="info-value">{{ post.commentaires|length }}</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <div class="info-label">Contenu</div>
+                        <div class="info-value" style="white-space: pre-wrap;">{{ post.contenu }}</div>
+                    </div>
+
+                    {% if post.imageFile or post.imageUrl %}
+                    <div style="margin-top: 1.5rem;">
+                        <div class="info-label">Image</div>
+                        {% if post.imageFile %}
+                            <img src="{{ asset('uploads/' ~ post.imageFile) }}" alt="Image du post" style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
+                        {% elseif post.imageUrl %}
+                            <img src="{{ post.imageUrl }}" alt="Image du post" style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if post.videoFile or post.videoUrl %}
+                    <div style="margin-top: 1.5rem;">
+                        <div class="info-label">Vidéo</div>
+                        {% if post.videoFile %}
+                            <video controls style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
+                                <source src="{{ asset('uploads/' ~ post.videoFile) }}" type="video/mp4">
+                                Votre navigateur ne supporte pas la lecture de vidéos.
+                            </video>
+                        {% elseif post.videoUrl %}
+                            {% set videoId = post.videoUrl|split('v=')[1]|split('&')[0] %}
+                            <iframe width="100%" height="400" style="border-radius: 12px; margin-top: 0.5rem;"
+                                src="https://www.youtube.com/embed/{{ videoId }}" 
+                                frameborder="0" allowfullscreen>
+                            </iframe>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Commentaires ({{ post.commentaires|length }})</h2>
+                    </div>
+                    {% if post.commentaires|length > 0 %}
+                        <div class="comment-list">
+                            {% for commentaire in post.commentaires %}
+                            <div class="comment-item">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                    <div style="font-weight: 600;">
+                                        {% if commentaire.user %}
+                                            {{ commentaire.user.prenom }} {{ commentaire.user.nom }}
+                                        {% else %}
+                                            Anonyme
+                                        {% endif %}
+                                    </div>
+                                    <div style="font-size: 0.875rem; opacity: 0.7;">
+                                        {{ commentaire.createdAt|date('d/m/Y à H:i') }}
+                                    </div>
+                                </div>
+                                <div>{{ commentaire.contenu }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p style="opacity:0.5; text-align:center; padding:2rem;">Aucun commentaire</p>
+                    {% endif %}
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="{{ asset('backoffice/js/templatemo-glass-admin-script.js') }}"></script>
+</body>
+</html>

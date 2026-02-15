@@ -136,4 +136,10 @@ class FrontofficeController extends AbstractController
             'isEtudiant' => $isEtudiant,
         ]);
     }
+    #[Route('/communaute', name: 'front_communaute')]
+public function communaute(): Response
+{
+    return $this->render('frontoffice/communaute/communaute.html.twig');
+}
+
 }

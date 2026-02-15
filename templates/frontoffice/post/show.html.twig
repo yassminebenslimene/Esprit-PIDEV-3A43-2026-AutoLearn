@@ -1,39 +1,112 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_front.html.twig' %}
 
-{% block title %}Post{% endblock %}
+{% block title %}Post | Scholar{% endblock %}
 
 {% block body %}
-    <h1>Post</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ post.id }}</td>
-            </tr>
-            <tr>
-                <th>Contenu</th>
-                <td>{{ post.contenu }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ post.createdAt ? post.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+<style>
+.post-show-container { max-width: 720px; margin: 80px auto; }
+.post-show-card {
+    background: white;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+.post-show-card .post-media img,
+.post-show-card .post-media video {
+    max-width: 100%;
+    border-radius: 12px;
+    margin-top: 12px;
+}
+.post-show-card .post-meta { color: #666; font-size: 14px; margin-top: 12px; }
+.post-actions { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-back {
+    background: #f1f3ff;
+    color: #333;
+    padding: 10px 20px;
+    border-radius: 999px;
+    text-decoration: none;
+}
+.btn-edit {
+    background: linear-gradient(135deg, #7a6ad8, #6c63ff);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 999px;
+    text-decoration: none;
+}
+</style>
 
-    <a href="{{ path('app_post_index') }}">back to list</a>
+<div class="page-heading header-text">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h3>Post</h3>
+                <span class="breadcrumb">
+                    <a href="{{ path('app_frontoffice') }}">Home</a>
+                    > <a href="{{ path('app_communaute_show', { id: post.communaute.id }) }}">{{ post.communaute.nom }}</a>
+                    > Post
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <a href="{{ path('app_post_edit', {'id': post.id}) }}">edit</a>
+<div class="post-show-container">
+    <div class="post-show-card">
+        {% if post.contenu %}
+            <p>{{ post.contenu }}</p>
+        {% endif %}
 
+<<<<<<< HEAD
 
     {{ include('post/_delete_form.html.twig') }}
+=======
+        {% if post.imageFile %}
+            <div class="post-media">
+                <img src="{{ asset('uploads/' ~ post.imageFile) }}" alt="Image du post">
+            </div>
+        {% elseif post.imageUrl %}
+            <div class="post-media">
+                <img src="{{ post.imageUrl }}" alt="Image du post">
+            </div>
+        {% endif %}
+>>>>>>> cfb395af102040282b5c092027ab22ecc58f164a
 
-    <footer>
+        {% if post.videoFile %}
+            <div class="post-media">
+                <video controls src="{{ asset('uploads/' ~ post.videoFile) }}"></video>
+            </div>
+        {% elseif post.videoUrl %}
+            <div class="post-media">
+                {% set embedUrl = post.videoUrl|replace({'watch?v=': 'embed/'}) %}
+                <iframe width="100%" height="400" src="{{ embedUrl }}" frameborder="0" allowfullscreen></iframe>
+            </div>
+        {% endif %}
+
+        <p class="post-meta">
+            Posté le {{ post.createdAt|date('d/m/Y H:i') }}
+            dans <a href="{{ path('app_communaute_show', { id: post.communaute.id }) }}">{{ post.communaute.nom }}</a>
+        </p>
+
+        <div class="post-actions">
+            <a href="{{ path('app_communaute_show', { id: post.communaute.id }) }}" class="btn-back">← Retour à la communauté</a>
+            {% if app.user %}
+                <a href="{{ path('app_post_edit', { id: post.id }) }}" class="btn-edit">Modifier</a>
+                {{ include('frontoffice/post/_delete_form.html.twig') }}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<footer>
     <div class="container">
         <div class="col-lg-12">
             <p>Copyright © 2036 Scholar Organization. All rights reserved. &nbsp;&nbsp;&nbsp; Design: <a href="https://templatemo.com" rel="nofollow" target="_blank">TemplateMo</a></p>
         </div>
     </div>
 </footer>
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfb395af102040282b5c092027ab22ecc58f164a
 {% endblock %}
