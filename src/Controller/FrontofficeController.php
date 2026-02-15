@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Repository\ChallengeRepository;
-use App\Repository\ChapitreRepository;
-use App\Repository\CoursRepository;
+use App\Repository\Cours\ChapitreRepository;
+use App\Repository\Cours\CoursRepository;
 use App\Entity\Admin;
 use App\Entity\Etudiant;
 use App\Entity\User;

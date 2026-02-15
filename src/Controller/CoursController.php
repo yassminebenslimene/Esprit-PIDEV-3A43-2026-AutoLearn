@@ -2,16 +2,17 @@
 
 namespace App\Controller;
 
-use App\Entity\Cours;
-use App\Entity\Chapitre;
+use App\Entity\GestionDeCours\Cours;
+use App\Entity\GestionDeCours\Chapitre;
 use App\Entity\Quiz;
-use App\Form\CoursType;
-use App\Form\ChapitreType;
+use App\Form\GestionCours\CoursType;
+use App\Form\GestionCours\ChapitreType;
 use App\Form\QuizType;
-use App\Repository\CoursRepository;
+use App\Repository\Cours\CoursRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -111,9 +112,40 @@ class CoursController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // 🔹 Gestion upload fichier
+            $file = $form->get('ressourceFichierUpload')->getData();
+            
+            if ($file) {
+                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+
+                try {
+                    $file->move(
+                        $this->getParameter('uploads_dir').'/chapitres',
+                        $newFilename
+                    );
+                    $chapitre->setRessourceFichier($newFilename);
+                    $chapitre->setRessourceType('fichier');
+                    $chapitre->setRessources(null); // Supprimer le lien si fichier uploadé
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Erreur lors de l\'upload du fichier.');
+                }
+            } elseif ($chapitre->getRessourceType() === 'lien' && !empty($chapitre->getRessources())) {
+                // 🔹 Si type lien → supprimer fichier
+                $chapitre->setRessourceFichier(null);
+                $chapitre->setRessourceType('lien');
+            } else {
+                // Aucune ressource
+                $chapitre->setRessourceType(null);
+                $chapitre->setRessources(null);
+                $chapitre->setRessourceFichier(null);
+            }
+
             $entityManager->persist($chapitre);
             $entityManager->flush();
 
+            $this->addFlash('success', 'Le chapitre a été créé avec succès.');
             return $this->redirectToRoute('app_cours_chapitres', ['id' => $cours->getId()], Response::HTTP_SEE_OTHER);
         }
 
@@ -154,12 +186,65 @@ class CoursController extends AbstractController
             throw $this->createNotFoundException('Ce chapitre n\'appartient pas à ce cours.');
         }
 
+        $oldFile = $chapitre->getRessourceFichier();
+
         $form = $this->createForm(ChapitreType::class, $chapitre);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // 🔹 Gestion upload fichier
+            $file = $form->get('ressourceFichierUpload')->getData();
+            
+            if ($file) {
+                // 🔹 Supprimer ancien fichier
+                if ($oldFile) {
+                    $oldFilePath = $this->getParameter('uploads_dir').'/chapitres/'.$oldFile;
+                    if (file_exists($oldFilePath)) {
+                        unlink($oldFilePath);
+                    }
+                }
+
+                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+
+                try {
+                    $file->move(
+                        $this->getParameter('uploads_dir').'/chapitres',
+                        $newFilename
+                    );
+                    $chapitre->setRessourceFichier($newFilename);
+                    $chapitre->setRessourceType('fichier');
+                    $chapitre->setRessources(null); // Supprimer le lien si fichier uploadé
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Erreur lors de l\'upload du fichier.');
+                }
+            } elseif ($chapitre->getRessourceType() === 'lien' && !empty($chapitre->getRessources())) {
+                // 🔹 Si type lien → supprimer fichier
+                if ($chapitre->getRessourceFichier()) {
+                    $oldFilePath = $this->getParameter('uploads_dir').'/chapitres/'.$chapitre->getRessourceFichier();
+                    if (file_exists($oldFilePath)) {
+                        unlink($oldFilePath);
+                    }
+                    $chapitre->setRessourceFichier(null);
+                }
+                $chapitre->setRessourceType('lien');
+            } else {
+                // Aucune ressource - supprimer le fichier s'il existe
+                if ($chapitre->getRessourceFichier()) {
+                    $oldFilePath = $this->getParameter('uploads_dir').'/chapitres/'.$chapitre->getRessourceFichier();
+                    if (file_exists($oldFilePath)) {
+                        unlink($oldFilePath);
+                    }
+                }
+                $chapitre->setRessourceType(null);
+                $chapitre->setRessources(null);
+                $chapitre->setRessourceFichier(null);
+            }
+
             $entityManager->flush();
 
+            $this->addFlash('success', 'Le chapitre a été modifié avec succès.');
             return $this->redirectToRoute('app_cours_chapitres', ['id' => $cours->getId()], Response::HTTP_SEE_OTHER);
         }
 

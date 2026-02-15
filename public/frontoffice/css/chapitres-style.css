@@ -1,12 +1,13 @@
 /* ===== STYLES MODERNES POUR LES CHAPITRES FRONTOFFICE ===== */
 
 :root {
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --primary-gradient: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
     --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    --warning-gradient: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
     --gold-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
     --purple-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    --ocean-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     
     --text-dark: #2c3e50;
     --text-light: #6c757d;
@@ -46,6 +47,45 @@ body {
 .col-lg-4, .col-md-6 {
     padding-left: 15px;
     padding-right: 15px;
+}
+
+/* ===== NAVIGATION DE RETOUR ===== */
+.back-navigation {
+    margin-bottom: 2rem;
+}
+
+.btn-back-to-courses {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1.75rem;
+    background: var(--white);
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: var(--shadow-light);
+    transition: var(--transition);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.btn-back-to-courses:hover {
+    background: var(--primary-gradient);
+    color: var(--white);
+    transform: translateX(-5px);
+    box-shadow: var(--shadow-medium);
+    text-decoration: none;
+    border-color: transparent;
+}
+
+.btn-back-to-courses i {
+    font-size: 1.1rem;
+    transition: var(--transition);
+}
+
+.btn-back-to-courses:hover i {
+    transform: translateX(-3px);
 }
 
 /* ===== TITRE DE PAGE ===== */

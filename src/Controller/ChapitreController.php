@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Chapitre;
-use App\Form\ChapitreType;
-use App\Repository\ChapitreRepository;
+use App\Entity\GestionDeCours\Chapitre;
+use App\Form\GestionCours\ChapitreType;
+use App\Repository\Cours\ChapitreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

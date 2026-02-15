@@ -2,9 +2,9 @@
 
 namespace App\Controller\FrontOffice;
 
-use App\Entity\Chapitre;
-use App\Entity\Cours;
-use App\Repository\ChapitreRepository;
+use App\Entity\GestionDeCours\Chapitre;
+use App\Entity\GestionDeCours\Cours;
+use App\Repository\Cours\ChapitreRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

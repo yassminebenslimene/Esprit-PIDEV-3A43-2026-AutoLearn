@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Form;
+namespace App\Form\GestionCours;
 
-use App\Entity\Cours;
+use App\Entity\GestionDeCours\Cours;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;

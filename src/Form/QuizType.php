@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Chapitre;
+use App\Entity\GestionDeCours\Chapitre;
 use App\Entity\Quiz;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;

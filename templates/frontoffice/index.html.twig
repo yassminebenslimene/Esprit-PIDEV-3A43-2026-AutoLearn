@@ -217,7 +217,8 @@
                     
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#top">Home</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#top">Acceuil</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#cours">Cours</a></li>
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#courses">Courses</a></li>
                         <li class="scroll-to-section"><a href="#challenge">Challenge</a></li>
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#events">Events</a></li>
@@ -270,45 +271,45 @@
                 <div class="owl-carousel owl-banner">
                     <div class="item item-1">
                         <div class="header-text">
-                            <span class="category">Our Courses</span>
-                            <h2>With Scholar Teachers, Everything Is Easier</h2>
-                            <p>Scholar is free CSS template designed by TemplateMo for online educational related websites. This layout is based on the famous Bootstrap v5.3.0 framework.</p>
+                            <span class="category">Nos Cours</span>
+                            <h2>Apprenez la Programmation avec des Experts</h2>
+                            <p>Découvrez nos cours de programmation conçus par des professionnels. Maîtrisez les langages modernes comme Python, JavaScript, Java et bien plus encore avec des projets pratiques et des défis stimulants.</p>
                             <div class="buttons">
                                 <div class="main-button">
-                                    <a href="#">Request Demo</a>
+                                    <a href="#cours">Voir les Cours</a>
                                 </div>
                                 <div class="icon-button">
-                                    <a href="#"><i class="fa fa-play"></i> What's Scholar?</a>
+                                    <a href="#courses"><i class="fa fa-play"></i> Commencer Maintenant</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="item item-2">
                         <div class="header-text">
-                            <span class="category">Best Result</span>
-                            <h2>Get the best result out of your effort</h2>
-                            <p>You are allowed to use this template for any educational or commercial purpose. You are not allowed to re-distribute the template ZIP file on any other website.</p>
+                            <span class="category">Meilleurs Résultats</span>
+                            <h2>Développez vos Compétences en Programmation</h2>
+                            <p>Progressez rapidement grâce à nos méthodes d'apprentissage interactives. Des exercices pratiques, des quiz et des projets réels pour transformer vos efforts en compétences concrètes et recherchées sur le marché.</p>
                             <div class="buttons">
                                 <div class="main-button">
-                                    <a href="#">Request Demo</a>
+                                    <a href="#challenge">Relever un Défi</a>
                                 </div>
                                 <div class="icon-button">
-                                    <a href="#"><i class="fa fa-play"></i> What's the best result?</a>
+                                    <a href="#courses"><i class="fa fa-play"></i> Explorer les Cours</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="item item-3">
                         <div class="header-text">
-                            <span class="category">Online Learning</span>
-                            <h2>Online Learning helps you save the time</h2>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod temporious incididunt ut labore et dolore magna aliqua suspendisse.</p>
+                            <span class="category">Apprentissage en Ligne</span>
+                            <h2>Apprenez à Coder à Votre Rythme</h2>
+                            <p>Accédez à nos cours de programmation 24/7 depuis n'importe où. Apprenez les technologies web, le développement mobile, l'intelligence artificielle et plus encore, avec un suivi personnalisé de votre progression.</p>
                             <div class="buttons">
                                 <div class="main-button">
-                                    <a href="#">Request Demo</a>
+                                    <a href="{{ path('backoffice_register') }}">S'inscrire Gratuitement</a>
                                 </div>
                                 <div class="icon-button">
-                                    <a href="#"><i class="fa fa-play"></i> What's Online Course?</a>
+                                    <a href="#cours"><i class="fa fa-play"></i> Découvrir AutoLearn</a>
                                 </div>
                             </div>
                         </div>
@@ -320,8 +321,8 @@
 </div>
 <!-- ***** Main Banner End ***** -->
 
-<!-- ***** Services Section Start ***** -->
-<div class="services section" id="services">
+<!-- ***** cours Section Start ***** -->
+<div class="services section" id="cours">
     <div class="container">
         <div class="row">
             {% if cours is empty %}
@@ -354,7 +355,7 @@
         </div>
     </div>
 </div>
-<!-- ***** Services Section End ***** -->
+<!-- ***** cours Section End ***** -->
 
 <!-- ***** About Us Section Start ***** -->
 <div class="section about-us">

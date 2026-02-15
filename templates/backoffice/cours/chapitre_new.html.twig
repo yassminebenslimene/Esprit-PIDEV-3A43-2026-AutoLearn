@@ -23,7 +23,7 @@
             </div>
             
             <div class="form-container">
-                {{ form_start(form, {'attr': {'class': 'form-grid'}}) }}
+                {{ form_start(form, {'attr': {'class': 'form-grid', 'enctype': 'multipart/form-data'}}) }}
                 
                 <div class="form-group">
                     {{ form_label(form.titre, 'Titre du chapitre', {'label_attr': {'class': 'form-label'}}) }}
@@ -44,9 +44,27 @@
                 </div>
 
                 <div class="form-group full-width">
-                    {{ form_label(form.ressources, 'Ressources (optionnel)', {'label_attr': {'class': 'form-label'}}) }}
-                    {{ form_widget(form.ressources, {'attr': {'class': 'form-input', 'placeholder': 'Liens vers des ressources supplémentaires'}}) }}
+                    {{ form_label(form.ressourceType, 'Type de ressource', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.ressourceType, {'attr': {'class': 'form-input', 'id': 'ressource-type-select', 'onchange': 'toggleRessourceFields()'}}) }}
+                    {{ form_errors(form.ressourceType) }}
+                </div>
+
+                <div class="form-group full-width" id="ressource-lien-group" style="display: none;">
+                    {{ form_label(form.ressources, 'Lien de la ressource', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.ressources, {'attr': {'class': 'form-input', 'placeholder': 'https://drive.google.com/... ou https://youtube.com/...'}}) }}
                     {{ form_errors(form.ressources) }}
+                    <small style="color: rgba(255,255,255,0.6); margin-top: 4px; display: block;">
+                        Exemples : Google Drive, YouTube, Vimeo, etc.
+                    </small>
+                </div>
+
+                <div class="form-group full-width" id="ressource-fichier-group" style="display: none;">
+                    {{ form_label(form.ressourceFichierUpload, 'Fichier de ressource', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.ressourceFichierUpload, {'attr': {'class': 'form-input', 'accept': '.pdf,.pptx,.ppt,.docx,.doc,.zip,.rar,.mp4,.avi,.mov'}}) }}
+                    {{ form_errors(form.ressourceFichierUpload) }}
+                    <small style="color: rgba(255,255,255,0.6); margin-top: 4px; display: block;">
+                        Taille maximale : 100 Mo. Formats acceptés : PDF, PPTX, DOCX, ZIP, RAR, MP4, AVI, MOV
+                    </small>
                 </div>
 
                 {# Le champ cours est automatiquement défini, on le cache #}
@@ -66,4 +84,41 @@
             </div>
         </div>
     </section>
+
+    <script type="text/javascript">
+        function toggleRessourceFields() {
+            var select = document.getElementById('ressource-type-select');
+            var lienGroup = document.getElementById('ressource-lien-group');
+            var fichierGroup = document.getElementById('ressource-fichier-group');
+            
+            if (!select || !lienGroup || !fichierGroup) {
+                console.error('Elements not found');
+                return;
+            }
+            
+            var value = select.value;
+            console.log('Selected value:', value);
+            
+            // Hide all first
+            lienGroup.style.display = 'none';
+            fichierGroup.style.display = 'none';
+            
+            // Show the right one
+            if (value === 'lien') {
+                lienGroup.style.display = 'block';
+                console.log('Showing lien group');
+            } else if (value === 'fichier') {
+                fichierGroup.style.display = 'block';
+                console.log('Showing fichier group');
+            }
+        }
+        
+        // Execute immediately when script loads
+        setTimeout(toggleRessourceFields, 100);
+        
+        // Also execute when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', toggleRessourceFields);
+        }
+    </script>
 {% endblock %}
