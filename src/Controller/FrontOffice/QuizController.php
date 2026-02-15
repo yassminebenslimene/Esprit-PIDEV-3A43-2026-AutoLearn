@@ -2,9 +2,9 @@
 
 namespace App\Controller\FrontOffice;
 
-use App\Entity\Chapitre;
+use App\Entity\GestionDeCours\Chapitre;
 use App\Entity\Quiz;
-use App\Repository\ChapitreRepository;
+use App\Repository\Cours\ChapitreRepository;
 use App\Repository\QuizRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

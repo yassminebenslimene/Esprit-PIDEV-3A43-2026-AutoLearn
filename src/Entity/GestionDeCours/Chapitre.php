@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\GestionDeCours;
 
-use App\Repository\ChapitreRepository;
+use App\Entity\Quiz;
+use App\Repository\Cours\ChapitreRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -52,6 +53,12 @@ class Chapitre
     )]
     private ?string $ressources = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $ressourceType = null; // 'lien' ou 'fichier'
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $ressourceFichier = null; // Nom du fichier uploadé
+
     #[ORM\ManyToOne(inversedBy: 'chapitres')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Cours $cours = null;
@@ -59,7 +66,7 @@ class Chapitre
     /**
      * @var Collection<int, Quiz>
      */
-    #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'chapitre')]
+    #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'chapitre', orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $quizzes;
 
     public function __construct()
@@ -116,6 +123,30 @@ class Chapitre
     public function setRessources(?string $ressources): static
     {
         $this->ressources = $ressources;
+
+        return $this;
+    }
+
+    public function getRessourceType(): ?string
+    {
+        return $this->ressourceType;
+    }
+
+    public function setRessourceType(?string $ressourceType): static
+    {
+        $this->ressourceType = $ressourceType;
+
+        return $this;
+    }
+
+    public function getRessourceFichier(): ?string
+    {
+        return $this->ressourceFichier;
+    }
+
+    public function setRessourceFichier(?string $ressourceFichier): static
+    {
+        $this->ressourceFichier = $ressourceFichier;
 
         return $this;
     }

@@ -9,11 +9,7 @@
         <!-- Bootstrap -->
         <link rel="stylesheet" href="{{ asset('frontoffice/vendor/bootstrap/css/bootstrap.min.css') }}">
         <!-- FrontOffice CSS (Scholar) -->
-        <link rel="stylesheet" href="{{ asset('frontoffice/css/animate.css') }}">
-        <link rel="stylesheet" href="{{ asset('frontoffice/css/flex-slider.css') }}">
         <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
-        <link rel="stylesheet" href="{{ asset('frontoffice/css/owl.css') }}">
-        <link rel="stylesheet" href="{{ asset('frontoffice/css/templatemo-scholar.css') }}">
         <!-- Nouveau CSS moderne pour les chapitres -->
         <link rel="stylesheet" href="{{ asset('frontoffice/css/chapitres-style.css') }}">
         <!-- Animations avancées -->
@@ -25,6 +21,14 @@
 <body>
 
     <div class="container">
+        {# Bouton de retour #}
+        <div class="back-navigation">
+            <a href="{{ path('app_frontoffice') }}#cours" class="btn-back-to-courses">
+                <i class="fa fa-arrow-left"></i>
+                Retour aux cours
+            </a>
+        </div>
+
         <h1 class="page-title">📚 Découvrez nos chapitres</h1>
 
         <div class="row">
@@ -38,32 +42,43 @@
                 </div>
             {% else %}
                 {% for chapitre in chapitres %}
-                    <div class="col-lg-4 col-md-6 mb-4 d-flex align-items-stretch">
-                        <div class="chapter-card w-100">
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="chapter-card">
+                            {# Icône du chapitre #}
                             <div class="chapter-icon">
                                 📖
                             </div>
-                            <div class="flex-grow-1 d-flex flex-direction-column">
-                                <h4 class="chapter-title">{{ chapitre.titre }}</h4>
-                                <p class="chapter-excerpt">
-                                    {{ chapitre.contenu|slice(0, 150) ~ (chapitre.contenu|length > 150 ? '…' : '') }}
-                                </p>
-                                <div class="chapter-meta">
-                                    <span class="chapter-order">Chapitre {{ chapitre.ordre }}</span>
-                                    {% if chapitre.cours %}
-                                        <span class="chapter-course">{{ chapitre.cours.titre }}</span>
-                                    {% endif %}
-                                </div>
-                                <div class="chapter-actions">
-                                    <a href="{{ path('app_chapitre_show_front', {'id': chapitre.id}) }}" class="btn-modern">
-                                        <i class="fa fa-eye"></i>
-                                        Lire le chapitre
-                                    </a>
-                                    <a href="{{ path('app_frontoffice_quiz_list', {'chapitreId': chapitre.id}) }}" class="btn-modern btn-quiz">
-                                        <i class="fa fa-question-circle"></i>
-                                        Quiz
-                                    </a>
-                                </div>
+                            
+                            {# Titre du chapitre #}
+                            <h4 class="chapter-title">{{ chapitre.titre }}</h4>
+                            
+                            {# Description/Extrait du contenu #}
+                            <p class="chapter-excerpt">
+                                {{ chapitre.contenu|slice(0, 120) ~ (chapitre.contenu|length > 120 ? '...' : '') }}
+                            </p>
+                            
+                            {# Métadonnées #}
+                            <div class="chapter-meta">
+                                <span class="chapter-order">
+                                    <i class="fa fa-bookmark"></i> Chapitre {{ chapitre.ordre }}
+                                </span>
+                                {% if chapitre.cours %}
+                                    <span class="chapter-course">
+                                        <i class="fa fa-graduation-cap"></i> {{ chapitre.cours.titre }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                            
+                            {# Boutons d'action #}
+                            <div class="chapter-actions">
+                                <a href="{{ path('app_chapitre_show_front', {'id': chapitre.id}) }}" class="btn-modern">
+                                    <i class="fa fa-book-open"></i>
+                                    Lire le chapitre
+                                </a>
+                                <a href="{{ path('app_frontoffice_quiz_list', {'chapitreId': chapitre.id}) }}" class="btn-modern btn-quiz">
+                                    <i class="fa fa-question-circle"></i>
+                                    Passer le quiz
+                                </a>
                             </div>
                         </div>
                     </div>
