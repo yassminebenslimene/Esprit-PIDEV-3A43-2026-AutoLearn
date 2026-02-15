@@ -217,20 +217,15 @@
                     
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
-<<<<<<< HEAD
-<<<<<<< HEAD
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#top">Home</a></li>
-                        <li class="scroll-to-section"><a href="#Courses">Courses</a></li>
-=======
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#top">Acceuil</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#cours">Cours</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#courses">Courses</a></li>
->>>>>>> 304199c1a6478c96d731b9cc0e0a97bc2084faac
-                        <li class="scroll-to-section"><a href="#challenge">Challenge</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#events">Events</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}">Home</a></li>
+                        <li class="scroll-to-section"><a href="#services">Services</a></li>
+                        <li><a href="{{ path('app_events') }}">Events</a></li>
+                        <li><a href="{{ path('frontchallenge') }}">Challenges</a></li>
                         
                         {% if app.user %}
                             <!-- User Logged In - Profile Dropdown -->
+                            <li><a href="{{ path('app_mes_participations') }}">My Participations</a></li>
+
                             <li class="profile-dropdown-container">
                                 <a href="javascript:void(0);" onclick="toggleProfileDropdown(event)" class="profile-dropdown-btn">
                                     <i class="fa fa-user-circle"></i>
@@ -259,24 +254,9 @@
                     </ul> 
                     <!-- ***** Menu End ***** -->
                     
-=======
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}">Home</a></li>
-                        <li class="scroll-to-section"><a href="#services">Services</a></li>
-                        <li><a href="{{ path('app_events') }}">Events</a></li>
-                        <li><a href="{{ path('frontchallenge') }}">Challenges</a></li>
-                        {% if app.user %}
-                            <li><a href="{{ path('app_mes_participations') }}">My Participations</a></li>
-                            <li><a href="{{ path('app_profile') }}">Profile</a></li>
-                            <li><a href="{{ path('backoffice_logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-nav').submit();">Logout</a></li>
-                        {% else %}
-                            <li><a href="{{ path('backoffice_login') }}">Login</a></li>
-                            <li><a href="{{ path('backoffice_register') }}">Register</a></li>
-                        {% endif %}
-                    </ul>
                     <form id="logout-form-nav" action="{{ path('backoffice_logout') }}" method="POST" style="display: none;">
                         <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
                     </form>
->>>>>>> 401cf0655463466bc7ffa96bc5d9951a3d068425
                     <a class='menu-trigger'>
                         <span>Menu</span>
                     </a>
@@ -345,15 +325,11 @@
 </div>
 <!-- ***** Main Banner End ***** -->
 
-<<<<<<< HEAD
-<!-- ***** Services Section Start ***** -->
-<div class="services section" id="Courses">
-    <div class="container" id="Courses">
-=======
+
 <!-- ***** cours Section Start ***** -->
 <div class="services section" id="cours">
     <div class="container">
->>>>>>> 304199c1a6478c96d731b9cc0e0a97bc2084faac
+
         <div class="row">
             {% if cours is empty %}
                 <div class="col-12 text-center">
@@ -497,79 +473,8 @@
 </div>
 <!-- ***** Fun Facts Section End ***** -->
 
-<<<<<<< HEAD
-<!-- ***** Team Section Start ***** -->
-<div class="team section" id="team">
-    <div class="container">
-        <div class="row">
-            <!-- TEAM MEMBER 1 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="team-member">
-                    <div class="main-content">
-                        <img src="{{ asset('frontoffice/images/member-01.jpg') }}" alt="">
-                        <span class="category">UX Teacher</span>
-                        <h4>Sophia Rose</h4>
-                        <ul class="social-icons">
-                            <li><a href="#"><i class="fab fa-facebook"></i></a></li>
-                            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <!-- TEAM MEMBER 2 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="team-member">
-                    <div class="main-content">
-                        <img src="{{ asset('frontoffice/images/member-02.jpg') }}" alt="">
-                        <span class="category">Graphic Teacher</span>
-                        <h4>Cindy Walker</h4>
-                        <ul class="social-icons">
-                            <li><a href="#"><i class="fab fa-facebook"></i></a></li>
-                            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <!-- TEAM MEMBER 3 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="team-member">
-                    <div class="main-content">
-                        <img src="{{ asset('frontoffice/images/member-03.jpg') }}" alt="">
-                        <span class="category">Full Stack Master</span>
-                        <h4>David Hutson</h4>
-                        <ul class="social-icons">
-                            <li><a href="#"><i class="fab fa-facebook"></i></a></li>
-                            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <!-- TEAM MEMBER 4 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="team-member">
-                    <div class="main-content">
-                        <img src="{{ asset('frontoffice/images/member-04.jpg') }}" alt="">
-                        <span class="category">Digital Animator</span>
-                        <h4>Stella Blair</h4>
-                        <ul class="social-icons">
-                            <li><a href="#"><i class="fab fa-facebook"></i></a></li>
-                            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- ***** Team Section End ***** -->
-
 <!-- ***** Testimonials Section Start ***** -->
-=======
->>>>>>> 401cf0655463466bc7ffa96bc5d9951a3d068425
+
 <div class="section testimonials">
     <div class="container">
         <div class="row">
