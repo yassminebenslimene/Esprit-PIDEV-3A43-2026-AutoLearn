@@ -1,0 +1,44 @@
+{% extends 'backoffice/base.html.twig' %}
+
+{% block title %}Détails Équipe{% endblock %}
+{% block page_title %}Détails de l'Équipe{% endblock %}
+
+{% block body %}
+<div class="glass-card">
+    <h2 class="card-title">{{ equipe.nom }}</h2>
+    
+    <div style="margin-top: 20px;">
+        <div class="detail-row">
+            <strong>Événement:</strong> {{ equipe.evenement.titre }}
+        </div>
+        <div class="detail-row">
+            <strong>Nombre d'étudiants:</strong> {{ equipe.etudiants|length }}
+        </div>
+        <div class="detail-row">
+            <strong>Étudiants:</strong>
+            <ul style="margin-top: 10px; padding-left: 20px;">
+                {% for etudiant in equipe.etudiants %}
+                    <li>{{ etudiant.prenom }} {{ etudiant.nom }} ({{ etudiant.email }})</li>
+                {% else %}
+                    <li>Aucun étudiant</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; display: flex; gap: 10px;">
+        <a href="{{ path('backoffice_equipe_edit', {'id': equipe.id}) }}" class="btn btn-primary">Modifier</a>
+        <a href="{{ path('backoffice_equipes') }}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+</div>
+
+<style>
+.detail-row {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.detail-row:last-child {
+    border-bottom: none;
+}
+</style>
+{% endblock %}

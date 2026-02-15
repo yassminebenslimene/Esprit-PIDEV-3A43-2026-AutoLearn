@@ -1,11 +1,18 @@
 <?php
 
 namespace App\Controller;
+<<<<<<< HEAD
 
 use App\Repository\ChallengeRepository;
 use App\Repository\Cours\ChapitreRepository;
 use App\Repository\Cours\CoursRepository;
 use App\Entity\Admin;
+=======
+use App\Repository\ChallengeRepository;
+use App\Repository\EvenementRepository;
+use App\Repository\EquipeRepository;
+use  App\Entity\Admin;
+>>>>>>> 401cf0655463466bc7ffa96bc5d9951a3d068425
 use App\Entity\Etudiant;
 use App\Entity\User;
 use App\Repository\UserRepository;
@@ -20,8 +27,17 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class FrontofficeController extends AbstractController
 {
+<<<<<<< HEAD
     #[Route('/', name: 'app_frontoffice')]
     public function index(CoursRepository $coursRepository, ChallengeRepository $challengeRepository): Response
+=======
+     #[Route('/', name: 'app_frontoffice')]
+    public function index(
+        ChallengeRepository $challengeRepository,
+        EvenementRepository $evenementRepository,
+        EquipeRepository $equipeRepository
+    ): Response
+>>>>>>> 401cf0655463466bc7ffa96bc5d9951a3d068425
     {
         // Si l'utilisateur est connecté
         if ($this->getUser()) {
@@ -33,6 +49,7 @@ class FrontofficeController extends AbstractController
             }
         }
         
+<<<<<<< HEAD
         $cours = $coursRepository->findAll();
         $challenges = $challengeRepository->findAll();
 
@@ -51,6 +68,37 @@ class FrontofficeController extends AbstractController
         return $this->render('frontoffice/index.html.twig', [
             'cours' => $cours,
             'challenges' => $challenges,
+=======
+        // Récupérer les challenges, événements et équipes
+        $challenges = $challengeRepository->findAll();
+        $evenements = $evenementRepository->findAll();
+        $equipes = $equipeRepository->findAll();
+        
+        // Sinon, afficher le frontoffice normalement
+        return $this->render('frontoffice/index.html.twig', [
+            'challenges' => $challenges,
+            'evenements' => $evenements,
+            'equipes' => $equipes,
+        ]);
+    }
+
+      #[Route('/home', name: 'app_home')]
+    public function home(
+        ChallengeRepository $challengeRepository,
+        EvenementRepository $evenementRepository,
+        EquipeRepository $equipeRepository
+    ): Response
+    {
+        // Récupérer les challenges, événements et équipes
+        $challenges = $challengeRepository->findAll();
+        $evenements = $evenementRepository->findAll();
+        $equipes = $equipeRepository->findAll();
+        
+        return $this->render('frontoffice/index.html.twig', [
+            'challenges' => $challenges,
+            'evenements' => $evenements,
+            'equipes' => $equipes,
+>>>>>>> 401cf0655463466bc7ffa96bc5d9951a3d068425
         ]);
     }
 
