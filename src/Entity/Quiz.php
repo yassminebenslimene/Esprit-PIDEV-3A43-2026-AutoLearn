@@ -55,6 +55,9 @@ class Quiz
     #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz', orphanRemoval: true)]
     private Collection $questions;
 
+    #[ORM\ManyToOne(inversedBy: 'quizzes')]
+    private ?Challenge $challenge = null;
+
     public function __construct()
     {
         $this->questions = new ArrayCollection();
@@ -119,6 +122,18 @@ class Quiz
                 $question->setQuiz(null);
             }
         }
+        return $this;
+    }
+
+    public function getChallenge(): ?Challenge
+    {
+        return $this->challenge;
+    }
+
+    public function setChallenge(?Challenge $challenge): static
+    {
+        $this->challenge = $challenge;
+
         return $this;
     }
 }

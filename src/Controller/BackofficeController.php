@@ -4,6 +4,7 @@
 namespace App\Controller;
 use Symfony\Bundle\SecurityBundle\Security;
 use App\Entity\Exercice;
+use App\Repository\QuizRepository;
 use App\Form\ExerciceType;
 use App\Repository\ExerciceRepository;
 use App\Entity\Challenge;
@@ -432,17 +433,44 @@ public function editUser(User $user, Request $request, UserPasswordHasherInterfa
         ]);
     }
     #[Route('/backoffice/challenge/add', name: 'backoffice_challenge_add')]
-    public function addchall(Request $request, EntityManagerInterface $em, Security $security): Response
+public function addchall(
+    Request $request, 
+    EntityManagerInterface $em, 
+    Security $security,
+    ExerciceRepository $exerciceRepository,
+    QuizRepository $quizRepository
+): Response
 {
     $challenge = new Challenge();
     $form = $this->createForm(ChallengeType::class, $challenge);
     $form->handleRequest($request);
 
+    // Récupérer tous les exercices et quiz disponibles
+    $allExercices = $exerciceRepository->findAll();
+    $allQuizs = $quizRepository->findAll();
+
     if ($form->isSubmitted() && $form->isValid()) {
+        // Récupérer les exercices sélectionnés depuis la requête
+        $selectedExercices = $request->request->all('exercices') ?? [];
+        foreach ($selectedExercices as $exerciceId) {
+            $exercice = $exerciceRepository->find($exerciceId);
+            if ($exercice) {
+                $challenge->addExercice($exercice);
+            }
+        }
+        
+        // Récupérer les quiz sélectionnés depuis la requête
+        $selectedQuizs = $request->request->all('quizs') ?? [];
+        foreach ($selectedQuizs as $quizId) {
+            $quiz = $quizRepository->find($quizId);
+            if ($quiz) {
+                $challenge->addQuiz($quiz);
+            }
+        }
 
         // 🔥 Ici on affecte automatiquement l'utilisateur connecté
         $challenge->setCreatedBy($security->getUser());
-
+        
         $em->persist($challenge);
         $em->flush();
 
@@ -451,53 +479,116 @@ public function editUser(User $user, Request $request, UserPasswordHasherInterfa
 
     return $this->render('backoffice/challenge_form.html.twig', [
         'form' => $form->createView(),
+        'exercices' => $allExercices,
+        'quizs' => $allQuizs,
+        'title' => 'Ajouter un Challenge'
     ]);
 }
-    #[Route('/backoffice/challenge/edit/{id}', name: 'backoffice_challenge_edit')]
-    public function editchal(
-        $id,
-        ChallengeRepository $repository,
-        Request $request,
-        EntityManagerInterface $em
-    ): Response {
 
-        $challenge = $repository->find($id);
+#[Route('/backoffice/challenge/edit/{id}', name: 'backoffice_challenge_edit')]
+public function editchal(
+    $id,
+    ChallengeRepository $repository,
+    Request $request,
+    EntityManagerInterface $em,
+    ExerciceRepository $exerciceRepository,
+    QuizRepository $quizRepository
+): Response {
 
-        if (!$challenge) {
-            throw $this->createNotFoundException('Challenge non trouvé');
-        }
+    $challenge = $repository->find($id);
 
-        $form = $this->createForm(ChallengeType::class, $challenge);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            $em->flush();
-
-            return $this->redirectToRoute('backoffice_challenges');
-        }
-
-        return $this->render('backoffice/challenge_form.html.twig', [
-            'form' => $form->createView(),
-            'title' => 'Modifier le Challenge'
-        ]);
+    if (!$challenge) {
+        throw $this->createNotFoundException('Challenge non trouvé');
     }
-    #[Route('/backoffice/challenge/delete/{id}', name: 'backoffice_challenge_delete')]
-    public function deletechal(
-        $id,
-        ChallengeRepository $repository,
-        EntityManagerInterface $em
-    ): Response {
 
-        $challenge = $repository->find($id);
+    $form = $this->createForm(ChallengeType::class, $challenge);
+    $form->handleRequest($request);
 
-        if (!$challenge) {
-            throw $this->createNotFoundException('Challenge non trouvé');
+    // Récupérer tous les exercices et quiz disponibles
+    $allExercices = $exerciceRepository->findAll();
+    $allQuizs = $quizRepository->findAll();
+    
+    // Récupérer les IDs des exercices déjà associés
+    $exerciceIds = [];
+    foreach ($challenge->getExercices() as $exercice) {
+        $exerciceIds[] = $exercice->getId();
+    }
+    
+    // Récupérer les IDs des quiz déjà associés
+    $quizIds = [];
+    foreach ($challenge->getQuizzes() as $quiz) {
+        $quizIds[] = $quiz->getId();
+    }
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Récupérer les exercices sélectionnés depuis la requête
+        $selectedExerciceIds = $request->request->all('exercices') ?? [];
+        
+        // Supprimer les exercices qui ne sont plus sélectionnés
+        foreach ($challenge->getExercices() as $exercice) {
+            if (!in_array($exercice->getId(), $selectedExerciceIds)) {
+                $challenge->removeExercice($exercice);
+            }
+        }
+        
+        // Ajouter les nouveaux exercices sélectionnés
+        foreach ($selectedExerciceIds as $exerciceId) {
+            $exercice = $exerciceRepository->find($exerciceId);
+            if ($exercice && !$challenge->getExercices()->contains($exercice)) {
+                $challenge->addExercice($exercice);
+            }
+        }
+        
+        // Récupérer les quiz sélectionnés depuis la requête
+        $selectedQuizIds = $request->request->all('quizs') ?? [];
+        
+        // Supprimer les quiz qui ne sont plus sélectionnés
+        foreach ($challenge->getQuizzes() as $quiz) {
+            if (!in_array($quiz->getId(), $selectedQuizIds)) {
+                $challenge->removeQuiz($quiz);
+            }
+        }
+        
+        // Ajouter les nouveaux quiz sélectionnés
+        foreach ($selectedQuizIds as $quizId) {
+            $quiz = $quizRepository->find($quizId);
+            if ($quiz && !$challenge->getQuizzes()->contains($quiz)) {
+                $challenge->addQuiz($quiz);
+            }
         }
 
-        $em->remove($challenge);
         $em->flush();
 
         return $this->redirectToRoute('backoffice_challenges');
     }
+
+    return $this->render('backoffice/challenge_form.html.twig', [
+        'form' => $form->createView(),
+        'title' => 'Modifier le Challenge',
+        'exercices' => $allExercices,
+        'quizs' => $allQuizs,
+        'challenge' => $challenge,
+        'exerciceIds' => $exerciceIds,
+        'quizIds' => $quizIds
+    ]);
+}
+
+#[Route('/backoffice/challenge/delete/{id}', name: 'backoffice_challenge_delete')]
+public function deletechal(
+    $id,
+    ChallengeRepository $repository,
+    EntityManagerInterface $em
+): Response {
+
+    $challenge = $repository->find($id);
+
+    if (!$challenge) {
+        throw $this->createNotFoundException('Challenge non trouvé');
+    }
+
+    $em->remove($challenge);
+    $em->flush();
+
+    return $this->redirectToRoute('backoffice_challenges');
+}
 }

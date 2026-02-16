@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -19,7 +21,7 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'userId', type: 'integer')]
+    #[ORM\Column(name: 'userId', type: "integer")]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
@@ -95,10 +97,15 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: 'createdAt', type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
 
-
+    /**
+     * @var Collection<int, Challenge>
+     */
+    #[ORM\OneToMany(targetEntity: Challenge::class, mappedBy: 'createdby', orphanRemoval: true)]
+    private Collection $Challenges;
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+        $this->Challenges = new ArrayCollection();
     }
 
     public function getRoles(): array
@@ -209,6 +216,36 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 public function isEtudiant(): bool {
     return $this instanceof Etudiant;
+}
+
+/**
+ * @return Collection<int, Challenge>
+ */
+public function getChallenges(): Collection
+{
+    return $this->Challenges;
+}
+
+public function addChallenge(Challenge $challenge): static
+{
+    if (!$this->Challenges->contains($challenge)) {
+        $this->Challenges->add($challenge);
+        $challenge->setCreatedby($this);
+    }
+
+    return $this;
+}
+
+public function removeChallenge(Challenge $challenge): static
+{
+    if ($this->Challenges->removeElement($challenge)) {
+        // set the owning side to null (unless already changed)
+        if ($challenge->getCreatedby() === $this) {
+            $challenge->setCreatedby(null);
+        }
+    }
+
+    return $this;
 }
 
 }

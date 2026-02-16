@@ -17,10 +17,6 @@ class ExerciceType extends AbstractType
             ->add('question')
             ->add('reponse')
             ->add('points')
-            ->add('challenge', EntityType::class, [
-                'class' => Challenge::class,
-                'choice_label' => 'id',
-            ])
         ;
     }
 
