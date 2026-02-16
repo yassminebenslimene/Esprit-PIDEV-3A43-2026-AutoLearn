@@ -57,7 +57,7 @@ class SimpleResetPasswordController extends AbstractController
             }
         }
         
-        return $this->render('backoffice/request.html.twig', [
+        return $this->render('backoffice/cnx/request.html.twig', [
             'resetLink' => $resetLink,
         ]);
     }
@@ -144,7 +144,7 @@ class SimpleResetPasswordController extends AbstractController
             }
         }
         
-        return $this->render('backoffice/reset.html.twig', [
+        return $this->render('backoffice/cnx/reset.html.twig', [
             'token' => $token,
             'email' => $email,
             'errors' => $errors,
