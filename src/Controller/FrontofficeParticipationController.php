@@ -7,6 +7,7 @@ use App\Form\ParticipationFrontType;
 use App\Repository\ParticipationRepository;
 use App\Repository\EquipeRepository;
 use App\Repository\EvenementRepository;
+use App\Service\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,7 +62,7 @@ class FrontofficeParticipationController extends AbstractController
     }
 
     #[Route('/new', name: 'app_participation_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, EquipeRepository $equipeRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, EquipeRepository $equipeRepository, EmailService $emailService): Response
     {
         $participation = new Participation();
         
@@ -92,6 +93,24 @@ class FrontofficeParticipationController extends AbstractController
                 $entityManager->persist($participation);
                 $entityManager->flush();
                 $this->addFlash('success', $result['message']);
+                
+                // Envoyer email de confirmation à tous les membres de l'équipe
+                $evenement = $participation->getEvenement();
+                foreach ($participation->getEquipe()->getEtudiants() as $etudiant) {
+                    try {
+                        $emailService->sendParticipationConfirmation(
+                            $etudiant->getEmail(),
+                            $etudiant->getPrenom() . ' ' . $etudiant->getNom(),
+                            $evenement->getTitre(),
+                            $evenement->getDateDebut(),
+                            $evenement->getLieu(),
+                            $participation->getId()
+                        );
+                    } catch (\Exception $e) {
+                        // Log l'erreur mais ne pas bloquer le processus
+                        $this->addFlash('warning', 'Participation acceptée mais erreur d\'envoi d\'email à ' . $etudiant->getEmail());
+                    }
+                }
             } else {
                 // Ne pas créer la participation si refusée
                 $this->addFlash('error', $result['message']);
@@ -113,7 +132,8 @@ class FrontofficeParticipationController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         EquipeRepository $equipeRepository,
-        EvenementRepository $evenementRepository
+        EvenementRepository $evenementRepository,
+        EmailService $emailService
     ): Response
     {
         $equipe = $equipeRepository->find($equipeId);
@@ -140,6 +160,22 @@ class FrontofficeParticipationController extends AbstractController
             $entityManager->persist($participation);
             $entityManager->flush();
             $this->addFlash('success', $result['message']);
+            
+            // Envoyer email de confirmation à tous les membres de l'équipe
+            foreach ($equipe->getEtudiants() as $etudiant) {
+                try {
+                    $emailService->sendParticipationConfirmation(
+                        $etudiant->getEmail(),
+                        $etudiant->getPrenom() . ' ' . $etudiant->getNom(),
+                        $evenement->getTitre(),
+                        $evenement->getDateDebut(),
+                        $evenement->getLieu(),
+                        $participation->getId()
+                    );
+                } catch (\Exception $e) {
+                    // Log l'erreur mais ne pas bloquer le processus
+                }
+            }
         } else {
             // Ne pas créer la participation si refusée
             $this->addFlash('error', $result['message']);
