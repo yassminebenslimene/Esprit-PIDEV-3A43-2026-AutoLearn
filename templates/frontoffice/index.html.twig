@@ -329,43 +329,6 @@
 <!-- ***** Main Banner End ***** -->
 
 
-<!-- ***** cours Section Start ***** -->
-<div class="services section" id="cours">
-    <div class="container">
-
-        <div class="row">
-            {% if cours is empty %}
-                <div class="col-12 text-center">
-                    <p>Aucun cours disponible pour le moment.</p>
-                </div>
-            {% else %}
-                {% for cour in cours %}
-                    <div class="col-lg-4 col-md-6">
-                        <div class="service-item">
-                            <div class="icon">
-                                <img src="{{ asset('frontoffice/images/service-01.png') }}" alt="icône cours">
-                            </div>
-                            <div class="main-content">
-                                <h4>{{ cour.titre }}</h4>
-                                <p>{{ cour.description|slice(0, 100) ~ (cour.description|length > 100 ? '...' : '') }}</p>
-                                <div class="main-button">
-                                    <a href="{{ path('app_frontoffice_chapitre_by_cours', {'coursId': cour.id}) }}" class="btn">
-                                        Voir le cours
-                                    </a>
-                                    <a href="#" class="btn" style="background: linear-gradient(135deg, #6c5ce7, #4a69bd);">
-                                        <i class="fa fa-users me-1"></i> Communauté
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        </div>
-    </div>
-</div>
-<!-- ***** cours Section End ***** -->
-
 <!-- ***** About Us Section Start ***** -->
 <div class="section about-us">
     <div class="container">
