@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 use App\Repository\ChallengeRepository;
-
 use  App\Entity\Admin;
 use App\Entity\Etudiant;
 use App\Entity\User;
@@ -19,7 +18,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class FrontofficeController extends AbstractController
 {
      #[Route('/', name: 'app_frontoffice')]
-    public function index(): Response
+    public function index(ChallengeRepository $challengeRepository): Response
     {
         // Si l'utilisateur est connecté
         if ($this->getUser()) {
@@ -32,7 +31,12 @@ class FrontofficeController extends AbstractController
         }
         
         // Sinon, afficher le frontoffice normalement
-        return $this->render('frontoffice/index.html.twig');
+        $challenges = $challengeRepository->findAll();
+        
+        // Sinon, afficher le frontoffice normalement avec les challenges
+        return $this->render('frontoffice/index.html.twig', [
+            'challenges' => $challenges
+        ]);
     }
 
       #[Route('/home', name: 'app_home')]
@@ -125,5 +129,4 @@ class FrontofficeController extends AbstractController
             'isEtudiant' => $isEtudiant,
         ]);
     }
-
 }
