@@ -125,7 +125,12 @@ class BackofficeController extends AbstractController
 
     #[Route('/backoffice/users/new', name: 'backoffice_user_new')]
     #[IsGranted('ROLE_ADMIN')]
-    public function newUser(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
+    public function newUser(
+        Request $request, 
+        UserPasswordHasherInterface $passwordHasher, 
+        EntityManagerInterface $entityManager,
+        \App\Service\BrevoMailService $mailService
+    ): Response
     {
         $userDto = new UserCreateDTO();
         $userDto->role = 'ETUDIANT'; // Force role to ETUDIANT
@@ -136,6 +141,9 @@ class BackofficeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Store plain password before hashing
+            $plainPassword = $userDto->password;
+            
             // Always create Etudiant
             $user = new Etudiant();
             $user->setNom($userDto->nom);
@@ -148,7 +156,20 @@ class BackofficeController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Étudiant créé avec succès!');
+            // Send welcome email with credentials
+            try {
+                $loginUrl = $this->generateUrl('backoffice_login', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+                $mailService->sendWelcomeEmail(
+                    $user->getEmail(),
+                    $user->getPrenom() . ' ' . $user->getNom(),
+                    $plainPassword,
+                    $loginUrl
+                );
+                $this->addFlash('success', 'Étudiant créé avec succès! Les identifiants ont été envoyés par email.');
+            } catch (\Exception $e) {
+                $this->addFlash('warning', 'Étudiant créé mais l\'email n\'a pas pu être envoyé: ' . $e->getMessage());
+            }
+            
             return $this->redirectToRoute('backoffice_users');
         }
 

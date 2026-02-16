@@ -8,12 +8,14 @@ use App\Entity\Etudiant;
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Service\BrevoMailService; // 👈 USE BrevoMailService (WORKING)
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[Route('/backoffice/user')]
 class UserController extends AbstractController
@@ -30,7 +32,8 @@ class UserController extends AbstractController
     public function new(
         Request $request,
         EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher
+        UserPasswordHasherInterface $passwordHasher,
+        BrevoMailService $mailService // 👈 USE BrevoMailService (WORKING)
     ): Response {
         $dto = new UserCreateDTO();
 
@@ -40,8 +43,12 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Vérifier si l'email existe déjà (la contrainte UniqueEntity s'en charge)
-            // Créer l'utilisateur
+            $plainPassword = $dto->password;
+            if (empty($plainPassword)) {
+                $plainPassword = bin2hex(random_bytes(4));
+                $dto->password = $plainPassword;
+            }
+            
             if ($dto->role === 'ADMIN') {
                 $user = new Admin();
             } else {
@@ -53,21 +60,34 @@ class UserController extends AbstractController
             $user->setPrenom($dto->prenom);
             $user->setEmail($dto->email);
             $user->setRole($dto->role);
-
-            $user->setPassword(
-                $passwordHasher->hashPassword($user, $dto->password)
-            );
+            $user->setPassword($passwordHasher->hashPassword($user, $dto->password));
 
             $entityManager->persist($user);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Utilisateur créé avec succès');
+            if ($user instanceof Etudiant) {
+                try {
+                    $loginUrl = $this->generateUrl('backoffice_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $mailService->sendWelcomeEmail(
+                        $user->getEmail(),
+                        $user->getPrenom() . ' ' . $user->getNom(),
+                        $plainPassword,
+                        $loginUrl
+                    );
+                    $this->addFlash('success', 'Étudiant créé avec succès ! Les identifiants ont été envoyés par email.');
+                } catch (\Exception $e) {
+                    $this->addFlash('warning', 'Étudiant créé mais l\'email n\'a pas pu être envoyé: ' . $e->getMessage() . '. Mot de passe temporaire: ' . $plainPassword);
+                }
+            } else {
+                $this->addFlash('success', 'Administrateur créé avec succès');
+            }
+            
             return $this->redirectToRoute('app_user_index');
         }
 
         return $this->render('backoffice/user/new.html.twig', [
             'form' => $form->createView(),
-            'hide_role' => false, // 👈 SHOW role field (admin can choose between Admin/Student)
+            'hide_role' => false,
         ]);
     }
     
@@ -86,7 +106,6 @@ class UserController extends AbstractController
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher
     ): Response {
-        // Hydratation du DTO depuis l'entité
         $dto = new UserCreateDTO();
         $dto->nom = $user->getNom();
         $dto->prenom = $user->getPrenom();
@@ -103,7 +122,6 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Vérifier si l'email a changé et s'il est unique
             if ($dto->email !== $user->getEmail()) {
                 $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $dto->email]);
                 if ($existingUser && $existingUser->getId() !== $user->getId()) {
@@ -111,29 +129,25 @@ class UserController extends AbstractController
                     return $this->render('backoffice/user/edit.html.twig', [
                         'user' => $user,
                         'form' => $form->createView(),
-                        'hide_role' => false, // 👈 SHOW role field (admin can change role)
+                        'hide_role' => false,
                     ]);
                 }
             }
 
-            // Vérifier le niveau pour les étudiants
             if ($dto->role === 'ETUDIANT' && empty($dto->niveau)) {
                 $this->addFlash('error', 'Le niveau est requis pour un étudiant!');
                 return $this->render('backoffice/user/edit.html.twig', [
                     'user' => $user,
                     'form' => $form->createView(),
-                    'hide_role' => false, // 👈 SHOW role field (admin can change role)
+                    'hide_role' => false,
                 ]);
             }
 
-            // GESTION CRITIQUE : Changement de type d'utilisateur (Admin ↔ Étudiant)
             if (($user instanceof Admin && $dto->role === 'ETUDIANT') ||
                 ($user instanceof Etudiant && $dto->role === 'ADMIN')) {
                 
-                // Supprimer l'ancien utilisateur
                 $entityManager->remove($user);
                 
-                // Créer le nouveau type d'utilisateur
                 if ($dto->role === 'ADMIN') {
                     $newUser = new Admin();
                 } else {
@@ -145,24 +159,21 @@ class UserController extends AbstractController
                 $newUser->setPrenom($dto->prenom);
                 $newUser->setEmail($dto->email);
                 $newUser->setRole($dto->role);
-                $newUser->setPassword($user->getPassword()); // Garder le même mot de passe
+                $newUser->setPassword($user->getPassword());
                 $newUser->setCreatedAt($user->getCreatedAt());
                 
                 $user = $newUser;
             } else {
-                // Pas de changement de type, juste mettre à jour les propriétés
                 $user->setNom($dto->nom);
                 $user->setPrenom($dto->prenom);
                 $user->setEmail($dto->email);
                 $user->setRole($dto->role);
                 
-                // Mettre à jour le niveau si c'est un étudiant
                 if ($user instanceof Etudiant && $dto->role === 'ETUDIANT') {
                     $user->setNiveau($dto->niveau);
                 }
             }
 
-            // Mettre à jour le mot de passe seulement s'il est fourni
             if (!empty($dto->password)) {
                 $user->setPassword(
                     $passwordHasher->hashPassword($user, $dto->password)
@@ -183,7 +194,7 @@ class UserController extends AbstractController
         return $this->render('backoffice/user/edit.html.twig', [
             'user' => $user,
             'form' => $form->createView(),
-            'hide_role' => false, // 👈 SHOW role field (admin can change role)
+            'hide_role' => false,
         ]);
     }
 
