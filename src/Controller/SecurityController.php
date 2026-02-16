@@ -31,7 +31,7 @@ public function login(AuthenticationUtils $authUtils): Response
         return $this->redirectToRoute('app_frontoffice');
     }
 
-    return $this->render('backoffice/login.html.twig', [
+    return $this->render('backoffice/cnx/login.html.twig', [
         'last_username' => $authUtils->getLastUsername(),
         'error' => $authUtils->getLastAuthenticationError()
     ]);
@@ -133,7 +133,7 @@ public function login(AuthenticationUtils $authUtils): Response
             }
         }
 
-        return $this->render('backoffice/register.html.twig', [
+        return $this->render('backoffice/cnx/register.html.twig', [
             'form' => $form->createView(),
         ]);
     }
