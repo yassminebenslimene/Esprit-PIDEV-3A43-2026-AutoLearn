@@ -34,11 +34,7 @@ You need to remove the API keys from previous commits. Use BFG Repo-Cleaner or g
 #### Option A: Using BFG Repo-Cleaner (Recommended - Easier)
 
 1. Download BFG: https://rtyley.github.io/bfg-repo-cleaner/
-2. Create a file called `secrets.txt` with your API keys:
-```
-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
-xsmtpsib-e9e92b423829e267f9b18531bbe9b11990cf8e4ca91b75d4346ca0b838d3bfd7-Slr220HVZRbjzX8F
-```
+2. Create a file called `secrets.txt` with your API keys (the actual keys from your .env)
 3. Run BFG:
 ```bash
 java -jar bfg.jar --replace-text secrets.txt autolearn
