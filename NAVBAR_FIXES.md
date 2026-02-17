@@ -86,11 +86,19 @@ public function index(
    - Removed `scroll-to-section` class from external links
    - Updated links to use full path with anchors (e.g., `{{ path('app_frontoffice') }}#cours`)
 
-3. **autolearn/public/frontoffice/js/custom.js**
+3. **autolearn/templates/frontoffice/base.html.twig**
+   - Added profile dropdown with user icon
+   - Replaced separate Profile and Logout links with dropdown menu
+   - Added CSS styles for profile dropdown
+   - Added JavaScript for dropdown toggle functionality
+   - Added Events, Challenges, and Communauté links to navbar
+   - Changed logo from "Scholar" to "AutoLearn"
+
+4. **autolearn/public/frontoffice/js/custom.js**
    - Updated `onScroll()` function to skip external links
    - Added safety checks for element existence
 
-4. **autolearn/src/Controller/ChallengeController.php**
+5. **autolearn/src/Controller/ChallengeController.php**
    - Added `CoursRepository` injection
    - Added `cours` variable to template rendering
 
@@ -103,10 +111,20 @@ public function index(
 - Challenge → `#challenge` (scroll to challenge section)
 - Contact → `#contact` (scroll to contact section)
 - Communauté → External route (no scroll)
-- My Participations → External route (no scroll)
-- Profile Dropdown → External routes (no scroll)
+- My Participations → External route (logged in users only)
+- Profile Dropdown → Shows user name with icon, dropdown contains:
+  - Mon Profil → Profile page
+  - Déconnexion → Logout
 
-### On Other Pages (base_front.html.twig)
+### On Other Pages (frontoffice/base.html.twig - Events, Challenges, etc.)
+- Home → `{{ path('app_frontoffice') }}`
+- Events → `{{ path('app_events') }}`
+- Challenges → `{{ path('frontchallenge') }}`
+- Communauté → `{{ path('front_communaute') }}`
+- My Participations → External route (logged in users only)
+- Profile Dropdown → Same as homepage (user icon with dropdown)
+
+### On Pages Using base_front.html.twig (Communauté, Posts, etc.)
 - Home → `{{ path('app_frontoffice') }}#top`
 - Cours → `{{ path('app_frontoffice') }}#cours`
 - Events → `{{ path('app_frontoffice') }}#events`

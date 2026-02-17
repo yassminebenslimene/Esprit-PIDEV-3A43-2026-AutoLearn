@@ -21,6 +21,148 @@
         <!-- Swiper -->
         <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
     {% endblock %}
+    
+    <style>
+        /* Profile Dropdown Styles */
+        .main-nav {
+            display: flex !important;
+            align-items: center !important;
+            height: 80px !important;
+        }
+        
+        .main-nav .nav {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .main-nav .nav li {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            margin: 0 !important;
+        }
+        
+        .main-nav .nav li a {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            line-height: 1 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        
+        .main-nav .nav li.profile-dropdown-container {
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-btn {
+            background: none !important;
+            border: none !important;
+            padding: 0 15px !important;
+            color: #1e1e1e !important;
+            font-weight: 500 !important;
+            text-decoration: none !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            line-height: 1 !important;
+            gap: 5px !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-btn i {
+            display: flex !important;
+            align-items: center !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu {
+            display: none;
+            position: absolute !important;
+            top: 100% !important;
+            right: 0 !important;
+            z-index: 999999 !important;
+            min-width: 220px !important;
+            background: white !important;
+            border-radius: 8px !important;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.15) !important;
+            padding: 10px 0 !important;
+            margin-top: 0 !important;
+            list-style: none !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu.show {
+            display: block !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu li {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            display: block !important;
+            height: auto !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu a {
+            display: block !important;
+            padding: 12px 20px !important;
+            color: #333 !important;
+            text-decoration: none !important;
+            font-size: 15px !important;
+            transition: all 0.2s !important;
+            line-height: normal !important;
+            height: auto !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu a:hover {
+            background: linear-gradient(105deg, #7a6ad8 0%, #4e3b9c 100%) !important;
+            color: white !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu i {
+            margin-right: 10px !important;
+            width: 18px !important;
+            text-align: center !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-divider {
+            height: 1px !important;
+            background: #eeeeee !important;
+            margin: 8px 0 !important;
+        }
+        
+        @media (max-width: 992px) {
+            .main-nav,
+            .main-nav .nav,
+            .main-nav .nav li,
+            .main-nav .nav li a,
+            .main-nav .nav li.profile-dropdown-container,
+            .main-nav .nav .profile-dropdown-btn {
+                height: auto !important;
+                min-height: 50px !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-menu {
+                position: static !important;
+                width: 100% !important;
+                box-shadow: none !important;
+                background: transparent !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-menu a {
+                color: white !important;
+                padding-left: 30px !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-divider {
+                background: rgba(255,255,255,0.2) !important;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -45,7 +187,7 @@
                 <nav class="main-nav">
                     <!-- ***** Logo Start ***** -->
                     <a href="{{ path('app_frontoffice') }}" class="logo">
-                        <h1>Scholar</h1>
+                        <h1>AutoLearn</h1>
                     </a>
                     <!-- ***** Logo End ***** -->
                     <!-- ***** Search Start ***** -->
@@ -59,12 +201,32 @@
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
                         <li><a href="{{ path('app_frontoffice') }}">Home</a></li>
+                        <li><a href="{{ path('app_events') }}">Events</a></li>
+                        <li><a href="{{ path('frontchallenge') }}">Challenges</a></li>
+                        <li><a href="{{ path('front_communaute') }}">Communauté</a></li>
                         {% if app.user %}
-                            <li><a href="{{ path('app_events') }}">Events</a></li>
-                            <li><a href="{{ path('frontchallenge') }}">Challenges</a></li>
                             <li><a href="{{ path('app_mes_participations') }}">My Participations</a></li>
-                            <li><a href="{{ path('app_profile') }}">Profile</a></li>
-                            <li><a href="{{ path('backoffice_logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-nav').submit();">Logout</a></li>
+                            
+                            <li class="profile-dropdown-container">
+                                <a href="javascript:void(0);" onclick="toggleProfileDropdown(event)" class="profile-dropdown-btn">
+                                    <i class="fa fa-user-circle"></i>
+                                    {{ app.user.prenom }} {{ app.user.nom }}
+                                    <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                                </a>
+                                <ul class="profile-dropdown-menu" id="profileDropdown">
+                                    <li>
+                                        <a href="{{ path('app_profile') }}">
+                                            <i class="fa fa-id-card"></i> Mon Profil
+                                        </a>
+                                    </li>
+                                    <li class="profile-dropdown-divider"></li>
+                                    <li>
+                                        <a href="{{ path('backoffice_logout') }}">
+                                            <i class="fa fa-sign-out"></i> Déconnexion
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
                         {% else %}
                             <li><a href="{{ path('backoffice_login') }}">Login</a></li>
                             <li><a href="{{ path('backoffice_register') }}">Register</a></li>
@@ -94,6 +256,38 @@
     <script src="{{ asset('frontoffice/js/owl-carousel.js') }}"></script>
     <script src="{{ asset('frontoffice/js/counter.js') }}"></script>
     <script src="{{ asset('frontoffice/js/custom.js') }}"></script>
+    
+    <!-- Profile Dropdown Toggle Script -->
+    <script>
+        function toggleProfileDropdown(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            var dropdown = document.getElementById('profileDropdown');
+            var allDropdowns = document.querySelectorAll('.profile-dropdown-menu');
+            
+            allDropdowns.forEach(function(menu) {
+                if (menu.id !== 'profileDropdown') {
+                    menu.classList.remove('show');
+                }
+            });
+            
+            dropdown.classList.toggle('show');
+        }
+        
+        document.addEventListener('click', function(event) {
+            var dropdown = document.getElementById('profileDropdown');
+            var isClickInside = event.target.closest('.profile-dropdown-container');
+            
+            if (!isClickInside && dropdown) {
+                dropdown.classList.remove('show');
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Profile dropdown initialized');
+        });
+    </script>
 {% endblock %}
 
 </body>
