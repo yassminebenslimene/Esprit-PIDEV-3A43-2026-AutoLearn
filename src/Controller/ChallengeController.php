@@ -21,12 +21,16 @@ class ChallengeController extends AbstractController
     public function index(
         ChallengeRepository $challengeRepository,
         EvenementRepository $evenementRepository,
-        EquipeRepository $equipeRepository
+        EquipeRepository $equipeRepository,
+        \App\Repository\Cours\CoursRepository $coursRepository
     ): Response{
         $challenges = $challengeRepository->findAll();
         $evenements = $evenementRepository->findAll();
         $equipes = $equipeRepository->findAll();
+        $cours = $coursRepository->findAll();
+        
         return $this->render('frontoffice/index.html.twig', [
+            'cours' => $cours,
             'challenges' => $challenges,
             'evenements' => $evenements,
             'equipes' => $equipes,

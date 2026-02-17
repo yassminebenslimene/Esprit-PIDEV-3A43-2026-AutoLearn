@@ -219,12 +219,11 @@
                     <ul class="nav">
 
                         <li class="scroll-to-section"><a href="#top" class="active">Home</a></li>
-                        <li class="scroll-to-section"><a href="#services">Cours</a></li>
-                        <li class="scroll-to-section"><a href="#courses">Courses</a></li>
-                        <li class="scroll-to-section"><a href="#team">Team</a></li>
+                        <li class="scroll-to-section"><a href="#cours">Cours</a></li>
                         <li class="scroll-to-section"><a href="#events">Events</a></li>
                         <li class="scroll-to-section"><a href="#challenge">Challenge</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('front_communaute') }}">Communauté</a></li>
+                        <li class="scroll-to-section"><a href="#contact">Contact</a></li>
+                        <li><a href="{{ path('front_communaute') }}">Communauté</a></li>
                         {% if app.user %}
                             <!-- User Logged In - Profile Dropdown -->
                             <li><a href="{{ path('app_mes_participations') }}">My Participations</a></li>
@@ -251,8 +250,8 @@
                             </li>
                         {% else %}
                             <!-- User Not Logged In -->
-                            <li class="scroll-to-section"><a href="{{ path('backoffice_login') }}">Login</a></li>
-                            <li class="scroll-to-section"><a href="{{ path('backoffice_register') }}">Register</a></li>
+                            <li><a href="{{ path('backoffice_login') }}">Login</a></li>
+                            <li><a href="{{ path('backoffice_register') }}">Register</a></li>
                         {% endif %}
                     </ul> 
                     <!-- ***** Menu End ***** -->
