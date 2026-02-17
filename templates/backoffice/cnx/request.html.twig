@@ -70,15 +70,7 @@
                     {% endfor %}
                 {% endfor %}
                 
-                {% if resetLink %}
-                    <div class="debug-link">
-                        <strong>🔧 DEBUG MODE - Copy this link:</strong><br>
-                        <a href="{{ resetLink }}" target="_blank">{{ resetLink }}</a>
-                        <p style="margin-top: 10px; font-size: 12px; color: #666;">
-                            (In production, this link would be sent by email)
-                        </p>
-                    </div>
-                {% endif %}
+                
                 
                 {# Formulaire avec validation HTML5 désactivée #}
                 <form method="post" novalidate="novalidate">

@@ -137,9 +137,49 @@ class FrontofficeController extends AbstractController
         ]);
     }
     #[Route('/communaute', name: 'front_communaute')]
-public function communaute(): Response
-{
-    return $this->render('frontoffice/communaute/communaute.html.twig');
-}
+    public function communaute(): Response
+    {
+        return $this->render('frontoffice/communaute/communaute.html.twig');
+    }
+
+    #[Route('/contact', name: 'app_contact', methods: ['POST'])]
+    public function contact(
+        Request $request,
+        \App\Service\BrevoMailService $mailService
+    ): Response {
+        // Get form data
+        $name = $request->request->get('name');
+        $email = $request->request->get('email');
+        $subject = $request->request->get('subject');
+        $message = $request->request->get('message');
+        
+        // Validate required fields
+        if (empty($name) || empty($email) || empty($subject) || empty($message)) {
+            $this->addFlash('error', 'Tous les champs sont obligatoires.');
+            return $this->redirectToRoute('app_frontoffice', [], Response::HTTP_SEE_OTHER);
+        }
+        
+        // Validate email format
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->addFlash('error', 'Adresse email invalide.');
+            return $this->redirectToRoute('app_frontoffice', [], Response::HTTP_SEE_OTHER);
+        }
+        
+        try {
+            // Send email to AutoLearn support
+            $mailService->sendContactEmail(
+                $name,
+                $email,
+                $subject,
+                $message
+            );
+            
+            $this->addFlash('success', 'Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de l\'envoi du message : ' . $e->getMessage());
+        }
+        
+        return $this->redirectToRoute('app_frontoffice', [], Response::HTTP_SEE_OTHER);
+    }
 
 }

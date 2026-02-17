@@ -71,27 +71,26 @@
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
 
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}">Home</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#services">Cours</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#courses">Courses</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#team">Team</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#top">Home</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#cours">Cours</a></li>
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#events">Events</a></li>
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#challenge">Challenge</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_communaute_index') }}">Communauté</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#contact">Contact</a></li>
+                        <li><a href="{{ path('app_communaute_index') }}">Communauté</a></li>
                         {% if app.user %}
                             <li class="scroll-to-section nav-user-name">
                                 <span class="nav-account-label">Mon compte :</span>
                                 <strong>{{ app.user.prenom }} {{ app.user.nom }}</strong>
                             </li>
-                            <li class="scroll-to-section"><a href="{{ path('app_profile') }}">Mon profil</a></li>
-                            <li class="scroll-to-section">
+                            <li><a href="{{ path('app_profile') }}">Mon profil</a></li>
+                            <li>
                                 <a href="{{ path('backoffice_logout') }}" class="nav-logout-btn">
                                     <i class="fa fa-sign-out-alt"></i> Déconnexion
                                 </a>
                             </li>
                         {% else %}
-                            <li class="scroll-to-section"><a href="{{ path('backoffice_login') }}">Login</a></li>
-                            <li class="scroll-to-section"><a href="{{ path('backoffice_register') }}">Register</a></li>
+                            <li><a href="{{ path('backoffice_login') }}">Login</a></li>
+                            <li><a href="{{ path('backoffice_register') }}">Register</a></li>
                         {% endif %}
                     </ul>
                     <a class='menu-trigger'>

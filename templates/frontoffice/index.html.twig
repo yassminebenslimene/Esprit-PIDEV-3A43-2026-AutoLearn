@@ -219,12 +219,11 @@
                     <ul class="nav">
 
                         <li class="scroll-to-section"><a href="#top" class="active">Home</a></li>
-                        <li class="scroll-to-section"><a href="#services">Cours</a></li>
-                        <li class="scroll-to-section"><a href="#courses">Courses</a></li>
-                        <li class="scroll-to-section"><a href="#team">Team</a></li>
+                        <li class="scroll-to-section"><a href="#cours">Cours</a></li>
                         <li class="scroll-to-section"><a href="#events">Events</a></li>
                         <li class="scroll-to-section"><a href="#challenge">Challenge</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('front_communaute') }}">Communauté</a></li>
+                        <li class="scroll-to-section"><a href="#contact">Contact</a></li>
+                        <li><a href="{{ path('front_communaute') }}">Communauté</a></li>
                         {% if app.user %}
                             <!-- User Logged In - Profile Dropdown -->
                             <li><a href="{{ path('app_mes_participations') }}">My Participations</a></li>
@@ -251,8 +250,8 @@
                             </li>
                         {% else %}
                             <!-- User Not Logged In -->
-                            <li class="scroll-to-section"><a href="{{ path('backoffice_login') }}">Login</a></li>
-                            <li class="scroll-to-section"><a href="{{ path('backoffice_register') }}">Register</a></li>
+                            <li><a href="{{ path('backoffice_login') }}">Login</a></li>
+                            <li><a href="{{ path('backoffice_register') }}">Register</a></li>
                         {% endif %}
                     </ul> 
                     <!-- ***** Menu End ***** -->
@@ -269,6 +268,23 @@
     </div>
 </header>
 <!-- ***** Header Area End ***** -->
+
+<!-- Flash Messages -->
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert" style="position: fixed; top: 100px; right: 20px; z-index: 9999; min-width: 300px; max-width: 500px; box-shadow: 0 5px 25px rgba(0,0,0,0.2);">
+            {% if label == 'success' %}
+                <i class="fa fa-check-circle" style="margin-right: 10px;"></i>
+            {% elseif label == 'error' %}
+                <i class="fa fa-exclamation-circle" style="margin-right: 10px;"></i>
+            {% else %}
+                <i class="fa fa-info-circle" style="margin-right: 10px;"></i>
+            {% endif %}
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endfor %}
 
 <!-- ***** Main Banner Start ***** -->
 <div class="main-banner" id="top">
@@ -328,6 +344,45 @@
 </div>
 <!-- ***** Main Banner End ***** -->
 
+<!-- ***** Cours Section Start ***** -->
+<div class="services section" id="cours">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="section-heading">
+                    <h6>Nos Cours</h6>
+                    <h2>Découvrez Nos Cours de Programmation</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            {% if cours is empty %}
+                <div class="col-12 text-center">
+                    <p>Aucun cours disponible pour le moment.</p>
+                </div>
+            {% else %}
+                {% for cour in cours %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="service-item">
+                            <div class="icon">
+                                <img src="{{ asset('frontoffice/images/service-01.png') }}" alt="icône cours">
+                            </div>
+                            <div class="main-content">
+                                <h4>{{ cour.titre }}</h4>
+                                <p>{{ cour.description|length > 100 ? cour.description|slice(0, 100) ~ '...' : cour.description }}</p>
+                                <div class="main-button">
+                                    <a href="{{ path('app_frontoffice_chapitre_by_cours', {'coursId': cour.id}) }}">Voir le cours</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+<!-- ***** Cours Section End ***** -->
 
 <!-- ***** About Us Section Start ***** -->
 <div class="section about-us">
@@ -600,39 +655,73 @@
         <div class="row">
             <div class="col-lg-6 align-self-center">
                 <div class="section-heading">
-                    <h6>Contact Us</h6>
-                    <h2>Feel free to contact us anytime</h2>
-                    <p>Thank you for choosing our templates. We provide you best CSS templates at absolutely 100% free of charge. You may support us by sharing our website to your friends.</p>
-                    <div class="special-offer">
-                        <span class="offer">off<br><em>50%</em></span>
-                        <h6>Valide: <em>24 April 2036</em></h6>
-                        <h4>Special Offer <em>50%</em> OFF!</h4>
-                        <a href="#"><i class="fa fa-angle-right"></i></a>
+                    <h6>Contactez-nous</h6>
+                    <h2>Besoin d'aide ? Nous sommes là pour vous</h2>
+                    <p>Vous avez des questions sur nos cours de programmation, nos challenges ou nos événements ? Notre équipe AutoLearn est à votre disposition pour vous accompagner dans votre parcours d'apprentissage.</p>
+                    
+                    <div class="contact-info" style="margin-top: 30px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                <i class="fa fa-envelope" style="color: white; font-size: 20px;"></i>
+                            </div>
+                            <div>
+                                <h6 style="margin: 0; color: #667eea; font-weight: 600;">Email</h6>
+                                <p style="margin: 0; color: #4a5568;">autolearn66@gmail.com</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                <i class="fa fa-clock" style="color: white; font-size: 20px;"></i>
+                            </div>
+                            <div>
+                                <h6 style="margin: 0; color: #667eea; font-weight: 600;">Disponibilité</h6>
+                                <p style="margin: 0; color: #4a5568;">Lun - Ven: 9h00 - 18h00</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center;">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                <i class="fa fa-graduation-cap" style="color: white; font-size: 20px;"></i>
+                            </div>
+                            <div>
+                                <h6 style="margin: 0; color: #667eea; font-weight: 600;">Support</h6>
+                                <p style="margin: 0; color: #4a5568;">Assistance technique 24/7</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="contact-us-content">
-                    <form id="contact-form" action="" method="post">
+                    <form id="contact-form" action="{{ path('app_contact') }}" method="post">
                         <div class="row">
                             <div class="col-lg-12">
                                 <fieldset>
-                                    <input type="name" name="name" id="name" placeholder="Your Name..." autocomplete="on" required>
+                                    <input type="text" name="name" id="name" placeholder="Votre nom complet..." autocomplete="on" required>
                                 </fieldset>
                             </div>
                             <div class="col-lg-12">
                                 <fieldset>
-                                    <input type="text" name="email" id="email" pattern="[^ @]*@[^ @]*" placeholder="Your E-mail..." required="">
+                                    <input type="email" name="email" id="email" placeholder="Votre adresse email..." required>
                                 </fieldset>
                             </div>
                             <div class="col-lg-12">
                                 <fieldset>
-                                    <textarea name="message" id="message" placeholder="Your Message"></textarea>
+                                    <input type="text" name="subject" id="subject" placeholder="Sujet de votre message..." required>
                                 </fieldset>
                             </div>
                             <div class="col-lg-12">
                                 <fieldset>
-                                    <button type="submit" id="form-submit" class="orange-button">Send Message Now</button>
+                                    <textarea name="message" id="message" placeholder="Votre message..." rows="6" required></textarea>
+                                </fieldset>
+                            </div>
+                            <div class="col-lg-12">
+                                <fieldset>
+                                    <button type="submit" id="form-submit" class="orange-button">
+                                        <i class="fa fa-paper-plane" style="margin-right: 8px;"></i>
+                                        Envoyer le message
+                                    </button>
                                 </fieldset>
                             </div>
                         </div>
@@ -645,10 +734,117 @@
 <!-- ***** Contact Us Section End ***** -->
 
 <!-- ***** Footer Start ***** -->
-<footer>
+<footer style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 60px 0 20px; margin-top: 80px;">
     <div class="container">
-        <div class="col-lg-12">
-            <p>Copyright © 2036 Scholar Organization. All rights reserved. &nbsp;&nbsp;&nbsp; Design: <a href="https://templatemo.com" rel="nofollow" target="_blank">TemplateMo</a></p>
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h4 style="color: white; margin-bottom: 20px; font-weight: 700;">
+                        <i class="fa fa-graduation-cap" style="margin-right: 10px;"></i>
+                        AutoLearn
+                    </h4>
+                    <p style="color: rgba(255,255,255,0.9); line-height: 1.8; margin-bottom: 25px;">
+                        Plateforme d'apprentissage en ligne dédiée à la programmation et au développement de compétences techniques. Apprenez à votre rythme avec nos cours interactifs.
+                    </p>
+                    <div style="margin-top: 20px;">
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; text-align: center; line-height: 40px; color: white; margin-right: 10px; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; text-align: center; line-height: 40px; color: white; margin-right: 10px; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; text-align: center; line-height: 40px; color: white; margin-right: 10px; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fa fa-linkedin"></i>
+                        </a>
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; text-align: center; line-height: 40px; color: white; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h5 style="color: white; margin-bottom: 20px; font-weight: 600;">Navigation</h5>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 12px;">
+                            <a href="#top" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Accueil
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="#cours" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Cours
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="#events" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Événements
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="#challenge" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Challenges
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h5 style="color: white; margin-bottom: 20px; font-weight: 600;">Ressources</h5>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 12px;">
+                            <a href="{{ path('front_communaute') }}" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Communauté
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="{{ path('app_mes_participations') }}" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Mes Participations
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="{{ path('app_profile') }}" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Mon Profil
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="#contact" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Contact
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h5 style="color: white; margin-bottom: 20px; font-weight: 600;">Newsletter</h5>
+                    <p style="color: rgba(255,255,255,0.9); margin-bottom: 15px; font-size: 14px;">Restez informé de nos nouveaux cours et événements.</p>
+                    <form style="display: flex; margin-bottom: 20px;">
+                        <input type="email" placeholder="Votre email..." style="flex: 1; padding: 12px 15px; border: none; border-radius: 5px 0 0 5px; outline: none; font-size: 14px;">
+                        <button type="submit" style="padding: 12px 20px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 0 5px 5px 0; cursor: pointer; transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </form>
+                    <div style="color: rgba(255,255,255,0.9); font-size: 14px;">
+                        <i class="fa fa-envelope" style="margin-right: 8px;"></i>
+                        autolearn66@gmail.com
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row" style="margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.2);">
+            <div class="col-lg-12 text-center">
+                <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 14px;">
+                    Copyright © {{ "now"|date("Y") }} <strong style="color: white;">AutoLearn</strong>. Tous droits réservés. 
+                    <span style="margin: 0 10px;">|</span>
+                    Plateforme d'apprentissage en ligne
+                </p>
+            </div>
         </div>
     </div>
 </footer>
@@ -698,6 +894,22 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Profile dropdown initialized');
+            
+            // Auto-dismiss flash messages after 5 seconds
+            setTimeout(function() {
+                var alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+            
+            // Scroll to contact section if there's a hash
+            if (window.location.hash === '#contact') {
+                setTimeout(function() {
+                    document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            }
         });
     </script>
 {% endblock %}
