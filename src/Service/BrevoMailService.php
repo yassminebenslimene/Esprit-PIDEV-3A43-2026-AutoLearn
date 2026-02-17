@@ -70,6 +70,131 @@ class BrevoMailService
     }
 
     /**
+     * Send contact form email to AutoLearn support
+     */
+    public function sendContactEmail(string $senderName, string $senderEmail, string $subject, string $message): void
+    {
+        $this->logger->info('Attempting to send contact form email', [
+            'from' => $senderEmail,
+            'senderName' => $senderName,
+            'subject' => $subject
+        ]);
+
+        if (empty($this->apiKey)) {
+            $this->logger->error('Brevo API key is not configured');
+            throw new \Exception('Brevo API key is not configured');
+        }
+
+        $client = new Client();
+
+        // Create HTML email content
+        $htmlContent = "
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset='UTF-8'>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+                .info-box { background: white; border-left: 4px solid #667eea; padding: 15px; margin: 15px 0; border-radius: 5px; }
+                .label { font-weight: bold; color: #667eea; }
+                .message-box { background: white; padding: 20px; border-radius: 5px; margin-top: 20px; border: 1px solid #e2e8f0; }
+            </style>
+        </head>
+        <body>
+            <div class='container'>
+                <div class='header'>
+                    <h1>📧 Nouveau Message de Contact</h1>
+                    <p>AutoLearn Platform</p>
+                </div>
+                <div class='content'>
+                    <div class='info-box'>
+                        <p><span class='label'>De:</span> {$senderName}</p>
+                    </div>
+                    <div class='info-box'>
+                        <p><span class='label'>Email:</span> {$senderEmail}</p>
+                    </div>
+                    <div class='info-box'>
+                        <p><span class='label'>Sujet:</span> {$subject}</p>
+                    </div>
+                    <div class='message-box'>
+                        <p class='label'>Message:</p>
+                        <p>" . nl2br(htmlspecialchars($message)) . "</p>
+                    </div>
+                    <p style='margin-top: 30px; color: #718096; font-size: 14px;'>
+                        <strong>Note:</strong> Répondez directement à {$senderEmail} pour contacter l'expéditeur.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        ";
+
+        // Create text version
+        $textContent = "Nouveau Message de Contact - AutoLearn\n\n";
+        $textContent .= "De: {$senderName}\n";
+        $textContent .= "Email: {$senderEmail}\n";
+        $textContent .= "Sujet: {$subject}\n\n";
+        $textContent .= "Message:\n{$message}\n\n";
+        $textContent .= "---\n";
+        $textContent .= "Répondez directement à {$senderEmail} pour contacter l'expéditeur.";
+
+        $payload = [
+            'sender' => [
+                'name' => $senderName,
+                'email' => $this->fromEmail // Use platform email as sender
+            ],
+            'to' => [
+                [
+                    'email' => $this->fromEmail, // Send to AutoLearn support
+                    'name' => 'AutoLearn Support'
+                ]
+            ],
+            'subject' => "Contact Form: {$subject}",
+            'htmlContent' => $htmlContent,
+            'textContent' => $textContent,
+            'replyTo' => [
+                'email' => $senderEmail, // Reply goes to the person who filled the form
+                'name' => $senderName
+            ]
+        ];
+
+        $this->logger->info('Sending contact form email to Brevo', ['payload' => json_encode($payload)]);
+
+        try {
+            $response = $client->post('https://api.brevo.com/v3/smtp/email', [
+                'headers' => [
+                    'api-key' => $this->apiKey,
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ],
+                'json' => $payload,
+                'timeout' => 10
+            ]);
+
+            $statusCode = $response->getStatusCode();
+            $responseBody = $response->getBody()->getContents();
+            
+            $this->logger->info('Brevo API response for contact form', [
+                'status' => $statusCode,
+                'body' => $responseBody
+            ]);
+            
+            if ($statusCode !== 201) {
+                throw new \Exception("Brevo API returned status code: {$statusCode} - Response: {$responseBody}");
+            }
+            
+        } catch (\Exception $e) {
+            $this->logger->error('Brevo API error for contact form', [
+                'message' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
      * Generic method to send emails via Brevo API
      */
     private function sendBrevoEmail(
