@@ -205,6 +205,13 @@ All errors are:
 5. **Check for success message** (green alert at top-right)
 6. **Check autolearn66@gmail.com inbox** for the email
 
+### Test with Brevo API Test Script:
+
+```bash
+cd autolearn
+php test_brevo_api.php your-test-email@example.com
+```
+
 ### Test Validation:
 
 1. **Try submitting empty form** → Should show error
@@ -217,12 +224,18 @@ All errors are:
 
 ### Required Environment Variables:
 
-Already configured in `.env`:
+Configure in `.env` file (never commit this file!):
 ```
-BREVO_API_KEY=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
+BREVO_API_KEY=your_brevo_api_key_here
 MAIL_FROM_EMAIL=autolearn66@gmail.com
 MAIL_FROM_NAME=AutoLearn
 ```
+
+**IMPORTANT**: 
+- Never commit your `.env` file to Git
+- The `.env` file should be in `.gitignore`
+- Use `.env.example` for documentation
+- Get your Brevo API key from: https://app.brevo.com/settings/keys/api
 
 ### Brevo Account:
 - Sender email must be verified in Brevo dashboard
