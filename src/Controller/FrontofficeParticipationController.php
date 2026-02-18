@@ -96,20 +96,43 @@ class FrontofficeParticipationController extends AbstractController
                 
                 // Envoyer email de confirmation à tous les membres de l'équipe
                 $evenement = $participation->getEvenement();
+                $successCount = 0;
+                $failedEmails = [];
+                
                 foreach ($participation->getEquipe()->getEtudiants() as $etudiant) {
+                    $email = $etudiant->getEmail();
+                    $studentFullName = $etudiant->getPrenom() . ' ' . $etudiant->getNom();
+                    
+                    // Valider l'email avant d'envoyer
+                    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                        $failedEmails[] = $email . ' (' . $studentFullName . ') - Invalid email address';
+                        continue;
+                    }
+                    
                     try {
                         $emailService->sendParticipationConfirmation(
-                            $etudiant->getEmail(),
-                            $etudiant->getPrenom() . ' ' . $etudiant->getNom(),
+                            $email,
+                            $etudiant->getPrenom(),
+                            $etudiant->getNom(),
+                            $participation->getEquipe()->getNom(),
                             $evenement->getTitre(),
                             $evenement->getDateDebut(),
                             $evenement->getLieu(),
                             $participation->getId()
                         );
+                        $successCount++;
                     } catch (\Exception $e) {
                         // Log l'erreur mais ne pas bloquer le processus
-                        $this->addFlash('warning', 'Participation acceptée mais erreur d\'envoi d\'email à ' . $etudiant->getEmail());
+                        $failedEmails[] = $email . ' (' . $studentFullName . ') - Error: ' . $e->getMessage();
                     }
+                }
+                
+                // Afficher un message de confirmation
+                if ($successCount > 0) {
+                    $this->addFlash('success', '✅ Participation accepted! ' . $successCount . ' confirmation email(s) sent successfully.');
+                }
+                if (!empty($failedEmails)) {
+                    $this->addFlash('warning', '⚠️ Failed to send emails: ' . implode(' | ', $failedEmails));
                 }
             } else {
                 // Ne pas créer la participation si refusée
@@ -159,22 +182,62 @@ class FrontofficeParticipationController extends AbstractController
             // Seulement persister si acceptée
             $entityManager->persist($participation);
             $entityManager->flush();
-            $this->addFlash('success', $result['message']);
+            
+            // DEBUG: Afficher les informations
+            $debugInfo = [];
+            $debugInfo[] = 'Participation ID: ' . $participation->getId();
+            $debugInfo[] = 'Équipe: ' . $equipe->getNom();
+            $debugInfo[] = 'Nombre de membres: ' . count($equipe->getEtudiants());
             
             // Envoyer email de confirmation à tous les membres de l'équipe
+            $successCount = 0;
+            $failedEmails = [];
+            
             foreach ($equipe->getEtudiants() as $etudiant) {
+                $email = $etudiant->getEmail();
+                $studentFullName = $etudiant->getPrenom() . ' ' . $etudiant->getNom();
+                $debugInfo[] = 'Member: ' . $studentFullName . ' - Email: ' . $email;
+                
+                // Valider l'email avant d'envoyer
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $failedEmails[] = $email . ' (' . $studentFullName . ') - Invalid email address';
+                    $debugInfo[] = '  ❌ Invalid email address';
+                    continue;
+                }
+                
+                $debugInfo[] = '  ✓ Valid email, attempting to send...';
+                
                 try {
                     $emailService->sendParticipationConfirmation(
-                        $etudiant->getEmail(),
-                        $etudiant->getPrenom() . ' ' . $etudiant->getNom(),
+                        $email,
+                        $etudiant->getPrenom(),
+                        $etudiant->getNom(),
+                        $equipe->getNom(),
                         $evenement->getTitre(),
                         $evenement->getDateDebut(),
                         $evenement->getLieu(),
                         $participation->getId()
                     );
+                    $successCount++;
+                    $debugInfo[] = '  ✅ Email sent successfully to ' . $email;
                 } catch (\Exception $e) {
                     // Log l'erreur mais ne pas bloquer le processus
+                    $failedEmails[] = $email . ' (' . $studentFullName . ') - Error: ' . $e->getMessage();
+                    $debugInfo[] = '  ❌ Error: ' . $e->getMessage();
                 }
+            }
+            
+            // Afficher tous les messages de debug
+            $this->addFlash('info', implode(' | ', $debugInfo));
+            
+            // Afficher un message de confirmation
+            if ($successCount > 0) {
+                $this->addFlash('success', '✅ Participation accepted! ' . $successCount . ' confirmation email(s) sent successfully.');
+            } else {
+                $this->addFlash('success', $result['message']);
+            }
+            if (!empty($failedEmails)) {
+                $this->addFlash('warning', '⚠️ Failed to send emails: ' . implode(' | ', $failedEmails));
             }
         } else {
             // Ne pas créer la participation si refusée

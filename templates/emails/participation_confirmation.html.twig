@@ -67,11 +67,19 @@
         
         <p><strong>Important:</strong> Don't forget to bring your student ID.</p>
         
+        {% if qrCodeData %}
         <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
             <h3>📱 Your Check-in QR Code</h3>
             <p>Show this QR code at the event entrance for quick check-in:</p>
             <img src="data:image/png;base64,{{ qrCodeData }}" alt="QR Code" style="max-width: 200px; margin: 10px auto;">
             <p style="font-size: 12px; color: #666;">Save this email or take a screenshot</p>
+        </div>
+        {% endif %}
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+            <h3>🎫 Your Event Badge</h3>
+            <p>A PDF badge is attached to this email. Please <strong>print it and wear it</strong> during the event.</p>
+            <p style="font-size: 14px; color: #667eea; font-weight: bold;">📄 Attachment: event-badge.pdf</p>
         </div>
         
         <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
@@ -79,11 +87,9 @@
             <p>An .ics file is attached to this email. Click on it to add this event to your calendar (Google Calendar, Outlook, Apple Calendar, etc.)</p>
         </div>
         
-        <div style="text-align: center;">
-            <a href="http://localhost:8000/frontoffice/participation/mes-participations" class="button">
-                View My Participations
-            </a>
-        </div>
+        <p style="text-align: center; margin-top: 30px; font-size: 16px; color: #667eea; font-weight: bold;">
+            ⚠️ Important: Please wear your event badge on the day of the event!
+        </p>
     </div>
     
     <div class="footer">

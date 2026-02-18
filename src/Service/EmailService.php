@@ -15,17 +15,20 @@ class EmailService
     private MailerInterface $mailer;
     private Environment $twig;
     private CertificateService $certificateService;
+    private BadgeService $badgeService;
     private string $fromEmail;
     private string $fromName;
 
     public function __construct(
         MailerInterface $mailer, 
         Environment $twig,
-        CertificateService $certificateService
+        CertificateService $certificateService,
+        BadgeService $badgeService
     ) {
         $this->mailer = $mailer;
         $this->twig = $twig;
         $this->certificateService = $certificateService;
+        $this->badgeService = $badgeService;
         // L'email de ton sender identity SendGrid
         $this->fromEmail = 'autolearnplateforme@gmail.com';
         $this->fromName = 'Autolearn Platform';
@@ -50,27 +53,64 @@ class EmailService
      */
     public function sendParticipationConfirmation(
         string $toEmail,
-        string $studentName,
+        string $studentFirstName,
+        string $studentLastName,
+        string $teamName,
         string $eventName,
         \DateTimeInterface $eventDate,
         string $eventLocation,
         int $participationId
     ): void {
-        // Générer le QR code
-        $qrCode = QrCode::create('PARTICIPATION-' . $participationId);
-        $writer = new PngWriter();
-        $result = $writer->write($qrCode);
-        $qrCodeData = $result->getString();
+        $studentName = $studentFirstName . ' ' . $studentLastName;
+        
+        // Créer le contenu du QR code avec format professionnel
+        $qrContent = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+        $qrContent .= "   EVENT PARTICIPATION\n";
+        $qrContent .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+        $qrContent .= "PARTICIPANT:\n";
+        $qrContent .= "  " . strtoupper($studentName) . "\n\n";
+        $qrContent .= "TEAM:\n";
+        $qrContent .= "  " . $teamName . "\n\n";
+        $qrContent .= "EVENT:\n";
+        $qrContent .= "  " . $eventName . "\n\n";
+        $qrContent .= "DATE:\n";
+        $qrContent .= "  " . $eventDate->format('F d, Y - H:i') . "\n\n";
+        $qrContent .= "REGISTRATION ID:\n";
+        $qrContent .= "  #" . str_pad($participationId, 6, '0', STR_PAD_LEFT) . "\n\n";
+        $qrContent .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+        $qrContent .= "✓ Registration Confirmed\n";
+        $qrContent .= "   AUTOLEARN PLATFORM\n";
+        $qrContent .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+        
+        // Générer le QR code via API externe (pas besoin de GD)
+        $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($qrContent);
+        
+        // Télécharger l'image du QR code
+        $qrCodeData = @file_get_contents($qrCodeUrl);
+        if ($qrCodeData === false) {
+            // Si l'API externe échoue, continuer sans QR code
+            $qrCodeData = null;
+        }
+        
+        // Générer le badge PDF
+        $badgePdf = $this->badgeService->generateBadge(
+            $studentFirstName,
+            $studentLastName,
+            $teamName,
+            $eventName,
+            $eventDate
+        );
         
         // Générer le fichier .ics pour le calendrier
         $icsContent = $this->generateIcsFile($eventName, $eventDate, $eventLocation);
         
         $html = $this->twig->render('emails/participation_confirmation.html.twig', [
             'studentName' => $studentName,
+            'teamName' => $teamName,
             'eventName' => $eventName,
             'eventDate' => $eventDate,
             'eventLocation' => $eventLocation,
-            'qrCodeData' => base64_encode($qrCodeData),
+            'qrCodeData' => $qrCodeData ? base64_encode($qrCodeData) : null,
         ]);
 
         $email = (new Email())
@@ -78,8 +118,13 @@ class EmailService
             ->to($toEmail)
             ->subject('Participation Confirmed - ' . $eventName)
             ->html($html)
-            ->addPart(new DataPart($qrCodeData, 'qrcode.png', 'image/png'))
-            ->addPart(new DataPart($icsContent, 'event.ics', 'text/calendar'));
+            ->addPart(new DataPart($icsContent, 'event.ics', 'text/calendar'))
+            ->addPart(new DataPart($badgePdf, 'event-badge.pdf', 'application/pdf'));
+        
+        // Ajouter le QR code seulement s'il a été généré avec succès
+        if ($qrCodeData) {
+            $email->addPart(new DataPart($qrCodeData, 'qrcode.png', 'image/png'));
+        }
 
         $this->mailer->send($email);
     }
