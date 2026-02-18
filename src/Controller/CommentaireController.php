@@ -19,11 +19,16 @@ public function new(
     Request $request,
     EntityManagerInterface $em
 ): Response {
-    $data = $request->request->all('commentaire'); // 🔥 plus sûr
+    $communaute = $post->getCommunaute();
+    if (!$communaute || !$communaute->canPost($this->getUser())) {
+        throw $this->createAccessDeniedException('Vous devez être le créateur ou un membre invité pour commenter dans cette communauté.');
+    }
+
+    $data = $request->request->all('commentaire');
 
     if (!isset($data['contenu']) || trim($data['contenu']) === '') {
         return $this->redirectToRoute('app_communaute_show', [
-            'id' => $post->getCommunaute()->getId()
+            'id' => $communaute->getId()
         ]);
     }
 
@@ -32,6 +37,9 @@ public function new(
     $commentaire = new Commentaire();
     $commentaire->setPost($post);
     $commentaire->setContenu($data['contenu']);
+    if ($this->getUser()) {
+        $commentaire->setUser($this->getUser());
+    }
 
     $em->persist($commentaire);
     $em->flush();
@@ -47,6 +55,9 @@ public function edit(
     Request $request,
     EntityManagerInterface $em
 ): Response {
+    if ($commentaire->getUser() !== $this->getUser()) {
+        throw $this->createAccessDeniedException('Vous ne pouvez modifier que vos propres commentaires.');
+    }
     if ($request->isMethod('POST')) {
         $data = $request->request->all('commentaire');
 
@@ -71,6 +82,9 @@ public function delete(
     Request $request,
     EntityManagerInterface $em
 ): Response {
+    if ($commentaire->getUser() !== $this->getUser()) {
+        throw $this->createAccessDeniedException('Vous ne pouvez supprimer que vos propres commentaires.');
+    }
     if ($this->isCsrfTokenValid('delete'.$commentaire->getId(), $request->request->get('_token'))) {
         $communauteId = $commentaire->getPost()->getCommunaute()->getId();
         $em->remove($commentaire);

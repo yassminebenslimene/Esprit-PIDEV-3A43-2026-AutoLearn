@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultats - {{ quiz.titre }}</title>
+
+    <link rel="stylesheet" href="{{ asset('frontoffice/vendor/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .result-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .result-header {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .result-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+        .result-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounceIn 0.8s;
+        }
+        .result-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        .quiz-name {
+            font-size: 20px;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+        .score-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin: 30px 0;
+        }
+        .score-item {
+            text-align: center;
+        }
+        .score-value {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .score-label {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .percentage-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(#667eea 0% {{ percentage }}%, #e5e7eb {{ percentage }}% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .percentage-inner {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .percentage-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #667eea;
+        }
+        .percentage-text {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+        .performance-badge {
+            display: inline-block;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .badge-excellent {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        .badge-good {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+        .badge-average {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+        .badge-poor {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+        }
+        .result-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        .result-card.correct {
+            border-left-color: #10b981;
+        }
+        .result-card.incorrect {
+            border-left-color: #ef4444;
+        }
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .question-number {
+            font-size: 14px;
+            font-weight: 700;
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+        .question-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .status-correct {
+            color: #10b981;
+        }
+        .status-incorrect {
+            color: #ef4444;
+        }
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .answer-item {
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        .answer-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .answer-item.selected {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid #3b82f6;
+            font-weight: 600;
+        }
+        .answer-item.correct {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid #10b981;
+            font-weight: 600;
+        }
+        .answer-item.correct .answer-icon {
+            background: #10b981;
+            color: white;
+        }
+        .answer-item.incorrect {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
+            font-weight: 600;
+        }
+        .answer-item.incorrect .answer-icon {
+            background: #ef4444;
+            color: white;
+        }
+        .answer-item.neutral {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+        }
+        .answer-item.neutral .answer-icon {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+        .answer-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn-action {
+            padding: 15px 25px;
+            border-radius: 15px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        .btn-retry {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-back {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        .btn-home {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .result-card {
+            animation: fadeInUp 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+        {% for i in 1..results|length %}
+        .result-card:nth-child({{ i }}) {
+            animation-delay: {{ i * 0.1 }}s;
+        }
+        {% endfor %}
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        <div class="result-header">
+            <div class="result-icon">
+                {% if percentage >= 80 %}
+                    🎉
+                {% elseif percentage >= 60 %}
+                    😊
+                {% elseif percentage >= 40 %}
+                    🤔
+                {% else %}
+                    😔
+                {% endif %}
+            </div>
+            <h1 class="result-title">Résultats du Quiz</h1>
+            <p class="quiz-name">{{ quiz.titre }}</p>
+            
+            <div class="score-display">
+                <div class="score-item">
+                    <div class="score-value">{{ score }}</div>
+                    <div class="score-label">Points obtenus</div>
+                </div>
+                
+                <div class="percentage-circle">
+                    <div class="percentage-inner">
+                        <div class="percentage-value">{{ percentage|number_format(0) }}%</div>
+                        <div class="percentage-text">Réussite</div>
+                    </div>
+                </div>
+                
+                <div class="score-item">
+                    <div class="score-value">{{ totalPoints }}</div>
+                    <div class="score-label">Points total</div>
+                </div>
+            </div>
+
+            <div class="performance-badge 
+                {% if percentage >= 80 %}badge-excellent
+                {% elseif percentage >= 60 %}badge-good
+                {% elseif percentage >= 40 %}badge-average
+                {% else %}badge-poor
+                {% endif %}">
+                {% if percentage >= 80 %}
+                    🏆 Excellent !
+                {% elseif percentage >= 60 %}
+                    👍 Bien joué !
+                {% elseif percentage >= 40 %}
+                    💪 Peut mieux faire
+                {% else %}
+                    📚 Continuez à réviser
+                {% endif %}
+            </div>
+        </div>
+
+        <h2 class="section-title">
+            <i class="fa fa-list-alt"></i>
+            Détails des réponses
+        </h2>
+
+        {% for questionId, result in results %}
+            <div class="result-card {% if result.isCorrect %}correct{% else %}incorrect{% endif %}">
+                <div class="question-header">
+                    <span class="question-number">Question {{ loop.index }}</span>
+                    <span class="question-status {% if result.isCorrect %}status-correct{% else %}status-incorrect{% endif %}">
+                        {% if result.isCorrect %}
+                            <i class="fa fa-check-circle"></i> Correct
+                        {% else %}
+                            <i class="fa fa-times-circle"></i> Incorrect
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="question-text">{{ result.question.texteQuestion }}</div>
+
+                <div class="answers-list">
+                    {% for option in result.question.options %}
+                        <div class="answer-item 
+                            {% if option.id == result.selectedOptionId and option.isEstCorrecte %}correct
+                            {% elseif option.id == result.selectedOptionId and not option.isEstCorrecte %}incorrect
+                            {% elseif option.isEstCorrecte %}correct
+                            {% else %}neutral
+                            {% endif %}">
+                            <div class="answer-icon">
+                                {% if option.isEstCorrecte %}
+                                    ✓
+                                {% elseif option.id == result.selectedOptionId %}
+                                    ✗
+                                {% else %}
+                                    •
+                                {% endif %}
+                            </div>
+                            <span>{{ option.texteOption }}</span>
+                            {% if option.id == result.selectedOptionId %}
+                                <span class="answer-label">Votre réponse</span>
+                            {% elseif option.isEstCorrecte and option.id != result.selectedOptionId %}
+                                <span class="answer-label">Bonne réponse</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="action-buttons">
+            <a href="{{ path('app_frontoffice_quiz_show', {'chapitreId': chapitreId, 'id': quiz.id}) }}" class="btn-action btn-retry">
+                <i class="fa fa-redo"></i>
+                Refaire le quiz
+            </a>
+            <a href="{{ path('app_frontoffice_quiz_list', {'chapitreId': chapitreId}) }}" class="btn-action btn-back">
+                <i class="fa fa-arrow-left"></i>
+                Autres quiz
+            </a>
+            <a href="{{ path('app_chapitre_index_front') }}" class="btn-action btn-home">
+                <i class="fa fa-home"></i>
+                Chapitres
+            </a>
+        </div>
+    </div>
+
+    <script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
+</body>
+</html>

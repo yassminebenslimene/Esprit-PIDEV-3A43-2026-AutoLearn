@@ -1,0 +1,57 @@
+﻿{% extends 'backoffice/base.html.twig' %}
+
+{% block title %}Détails du Cours{% endblock %}
+{% block page_title %}Détails du Cours{% endblock %}
+
+{% block body %}
+    <section class="content-grid">
+        <div class="glass-card">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">{{ cour.titre }}</h2>
+                    <p class="card-subtitle">Informations détaillées du cours</p>
+                </div>
+                <div class="card-actions">
+                    <a href="{{ path('app_cours_edit', {'id': cour.id}) }}" class="card-btn" style="background: linear-gradient(135deg, var(--gold), var(--amber)); color: white;">
+                        <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                        Modifier
+                    </a>
+                    <a href="{{ path('app_cours_index') }}" class="card-btn">Retour</a>
+                </div>
+            </div>
+            <div style="padding: 24px;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tbody>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <th style="padding: 16px; text-align: left; width: 200px; color: var(--text-secondary);">ID</th>
+                            <td style="padding: 16px;">{{ cour.id }}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <th style="padding: 16px; text-align: left; color: var(--text-secondary);">Titre</th>
+                            <td style="padding: 16px; font-weight: 500;">{{ cour.titre }}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <th style="padding: 16px; text-align: left; color: var(--text-secondary);">Description</th>
+                            <td style="padding: 16px;">{{ cour.description }}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <th style="padding: 16px; text-align: left; color: var(--text-secondary);">Matière</th>
+                            <td style="padding: 16px;"><span class="status-badge completed">{{ cour.matiere }}</span></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <th style="padding: 16px; text-align: left; color: var(--text-secondary);">Niveau</th>
+                            <td style="padding: 16px;">{{ cour.niveau }}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding: 16px; text-align: left; color: var(--text-secondary);">Durée</th>
+                            <td style="padding: 16px;">{{ cour.duree }} heures</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+{% endblock %}

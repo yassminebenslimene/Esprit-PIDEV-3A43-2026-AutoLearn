@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ challenge.titre }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h1 class="h3 mb-0">{{ challenge.titre }}</h1>
+        </div>
+        <div class="card-body">
+            <p class="lead">{{ challenge.description }}</p>
+            
+            <hr>
+            
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Niveau</h5>
+                            <span class="badge badge-pill badge-{{ challenge.niveau == 'Facile' ? 'success' : (challenge.niveau == 'Intermédiaire' ? 'warning' : 'danger') }}" 
+                                  style="font-size: 1.2rem; padding: 8px 16px;">
+                                {{ challenge.niveau }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Date de début</h5>
+                            <p class="card-text font-weight-bold">{{ challenge.dateDebut|date('d/m/Y') }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Date de fin</h5>
+                            <p class="card-text font-weight-bold">{{ challenge.dateFin|date('d/m/Y') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-5 text-center">
+                <a href="{{ path('app_frontoffice') }}#challenge" class="btn btn-secondary">
+                    <i class="fa fa-arrow-left"></i> Retour aux challenges
+                </a>
+                <a href="#" class="btn btn-primary">
+                    <i class="fa fa-trophy"></i> Participer
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -36,6 +36,7 @@ class Challenge
     private Collection $exercices;
 
     #[ORM\ManyToOne]
+
     #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: true)]
     private ?User $created_by = null;
 

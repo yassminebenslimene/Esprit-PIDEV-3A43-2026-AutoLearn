@@ -10,56 +10,119 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Uid\Uuid;
+use GuzzleHttp\Client;
 
 class SimpleResetPasswordController extends AbstractController
 {
     // Page de demande de réinitialisation
     #[Route('/forgot-password', name: 'app_forgot_password')]
-    public function request(Request $request): Response
+    public function request(Request $request, EntityManagerInterface $em): Response
     {
-        $resetLink = null;
         $errors = [];
         
         if ($request->isMethod('POST')) {
             $email = trim($request->request->get('email', ''));
             
-            // VALIDATION COTÉ SERVEUR
             if (empty($email)) {
                 $errors[] = 'Email is required';
             } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $errors[] = 'Invalid email format';
             } else {
-                // Vérifier si l'email existe dans la base
-                // Dans une vraie application, vous devriez vérifier si l'email existe
-                // Mais pour la sécurité, on ne révèle pas si l'email existe ou non
+                $user = $em->getRepository(User::class)->findOneBy(['email' => $email]);
                 
-                // Générer un token
-                $token = Uuid::v4()->__toString();
-                
-                // Stocker en session (simplifié)
-                $request->getSession()->set('reset_email_' . $token, $email);
-                $request->getSession()->set('reset_token_expiry_' . $token, time() + 3600);
-                
-                // Générer le lien
-                $resetLink = $this->generateUrl('app_reset_password', 
-                    ['token' => $token], 
-                    \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL
-                );
-                
-                // Dans la réalité, vous enverriez cet email
-                // Pour le debug, on affiche le lien
-                $this->addFlash('info', 'DEBUG MODE: Here is your reset link (would be sent by email):');
+                if ($user) {
+                    $token = Uuid::v4()->__toString();
+                    
+                    $request->getSession()->set('reset_email_' . $token, $email);
+                    $request->getSession()->set('reset_token_expiry_' . $token, time() + 3600);
+                    
+                    $resetLink = $this->generateUrl('app_reset_password', 
+                        ['token' => $token], 
+                        \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL
+                    );
+                    
+                    try {
+                        $this->sendBrevoEmail($email, $user->getPrenom() . ' ' . $user->getNom(), $resetLink);
+                        $this->addFlash('success', 'If your email exists in our system, you will receive a password reset link.');
+                    } catch (\Exception $e) {
+                        error_log('Brevo email error: ' . $e->getMessage());
+                        $this->addFlash('success', 'If your email exists in our system, you will receive a password reset link.');
+                    }
+                } else {
+                    $this->addFlash('success', 'If your email exists in our system, you will receive a password reset link.');
+                }
             }
             
-            // Ajouter les erreurs en flash
             foreach ($errors as $error) {
                 $this->addFlash('error', $error);
             }
         }
         
-        return $this->render('backoffice/request.html.twig', [
-            'resetLink' => $resetLink,
+        return $this->render('backoffice/cnx/request.html.twig', [
+            'resetLink' => null,
         ]);
+    }
+    
+    /**
+     * Send email via Brevo API
+     */
+    private function sendBrevoEmail(string $toEmail, string $userName, string $resetLink): void
+    {
+        $client = new Client();
+        
+        $brevoApiKey = $_ENV['BREVO_API_KEY'] ?? '';
+        $fromEmail = $_ENV['MAIL_FROM_EMAIL'] ?? 'autolearn66@gmail.com';
+        $fromName = $_ENV['MAIL_FROM_NAME'] ?? 'AutoLearn';
+        
+        if (empty($brevoApiKey)) {
+            throw new \Exception('Brevo API key is not configured');
+        }
+        
+        $htmlContent = $this->renderView('backoffice/cnx/email_template.html.twig', [
+            'resetLink' => $resetLink,
+            'userName' => $userName
+        ]);
+        
+        $textContent = "Hello $userName,\n\n";
+        $textContent .= "We received a request to reset your password. Click the link below to create a new password:\n\n";
+        $textContent .= "$resetLink\n\n";
+        $textContent .= "This link will expire in 1 hour.\n\n";
+        $textContent .= "If you didn't request this, please ignore this email.\n";
+        $textContent .= "AutoLearn Team";
+        
+        $response = $client->post('https://api.brevo.com/v3/smtp/email', [
+            'headers' => [
+                'api-key' => $brevoApiKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'json' => [
+                'sender' => [
+                    'name' => $fromName,
+                    'email' => $fromEmail
+                ],
+                'to' => [
+                    [
+                        'email' => $toEmail,
+                        'name' => $userName
+                    ]
+                ],
+                'subject' => 'Password Reset Request - AutoLearn',
+                'htmlContent' => $htmlContent,
+                'textContent' => $textContent,
+                'replyTo' => [
+                    'email' => $fromEmail,
+                    'name' => $fromName
+                ]
+            ],
+            'timeout' => 10
+        ]);
+        
+        $statusCode = $response->getStatusCode();
+        
+        if ($statusCode !== 201) {
+            throw new \Exception("Brevo API returned status code: $statusCode");
+        }
     }
     
     // Page de réinitialisation avec token
@@ -70,7 +133,6 @@ class SimpleResetPasswordController extends AbstractController
         UserPasswordHasherInterface $hasher,
         string $token
     ): Response {
-        // Vérifier le token en session
         $email = $request->getSession()->get('reset_email_' . $token);
         $expiry = $request->getSession()->get('reset_token_expiry_' . $token);
         
@@ -96,10 +158,8 @@ class SimpleResetPasswordController extends AbstractController
             $password = $request->request->get('password', '');
             $confirm = $request->request->get('confirm_password', '');
             
-            // VALIDATION COTÉ SERVEUR UNIQUEMENT
             $isValid = true;
             
-            // Validation du mot de passe
             if (empty($password)) {
                 $errors['password'][] = 'Password is required';
                 $isValid = false;
@@ -120,7 +180,6 @@ class SimpleResetPasswordController extends AbstractController
                 $isValid = false;
             }
             
-            // Validation de la confirmation
             if (empty($confirm)) {
                 $errors['confirm_password'][] = 'Please confirm your password';
                 $isValid = false;
@@ -129,13 +188,10 @@ class SimpleResetPasswordController extends AbstractController
                 $isValid = false;
             }
             
-            // Si validation réussie
             if ($isValid) {
-                // Mettre à jour le mot de passe
                 $user->setPassword($hasher->hashPassword($user, $password));
                 $em->flush();
                 
-                // Nettoyer la session
                 $request->getSession()->remove('reset_email_' . $token);
                 $request->getSession()->remove('reset_token_expiry_' . $token);
                 
@@ -144,7 +200,7 @@ class SimpleResetPasswordController extends AbstractController
             }
         }
         
-        return $this->render('backoffice/reset.html.twig', [
+        return $this->render('backoffice/cnx/reset.html.twig', [
             'token' => $token,
             'email' => $email,
             'errors' => $errors,

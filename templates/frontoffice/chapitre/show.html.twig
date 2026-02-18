@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ chapitre.titre }} – Détail du chapitre</title>
+
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('frontoffice/vendor/bootstrap/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/animate.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/flex-slider.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/owl.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/templatemo-scholar.css') }}">
+        <!-- Nouveau CSS moderne pour les chapitres -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/chapitres-style.css') }}">
+        <!-- Animations avancées -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/chapitres-animations.css') }}">
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+
+    <div class="container">
+        <div class="chapter-detail-container">
+            <div class="chapter-detail-header">
+                <span class="chapter-detail-badge">Chapitre {{ chapitre.ordre }}</span>
+                <h1 class="chapter-detail-title">{{ chapitre.titre }}</h1>
+                
+                <div class="chapter-detail-meta">
+                    {% if chapitre.cours %}
+                        <span><i class="fa fa-book"></i> {{ chapitre.cours.titre }}</span>
+                    {% endif %}
+                    <span><i class="fa fa-clock"></i> Lecture estimée : 5 min</span>
+                    <span><i class="fa fa-user"></i> Niveau débutant</span>
+                </div>
+            </div>
+
+            <div class="chapter-detail-content">
+                {{ chapitre.contenu|nl2br }}
+            </div>
+
+            {% if chapitre.ressources %}
+                <div class="resources-section">
+                    <h3 class="resources-title">
+                        <i class="fa fa-link"></i> 
+                        Ressources complémentaires
+                    </h3>
+                    <ul class="resources-list">
+                        {% set ressources = chapitre.ressources|split(',') %}
+                        {% for ressource in ressources %}
+                            {% if ressource|trim %}
+                                <li>
+                                    <a href="{{ ressource|trim }}" target="_blank">
+                                        <i class="fa fa-external-link"></i> 
+                                        {{ ressource|trim }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li>
+                                <span style="color: var(--text-light);">
+                                    <i class="fa fa-info-circle"></i>
+                                    Aucune ressource supplémentaire pour ce chapitre.
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <div class="chapter-navigation">
+                <a href="{{ path('app_chapitre_index_front') }}" class="btn-modern btn-back">
+                    <i class="fa fa-arrow-left"></i> 
+                    Retour à la liste des chapitres
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('frontoffice/vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+    <!-- Interactions dynamiques -->
+    <script src="{{ asset('frontoffice/js/chapitres-interactions.js') }}"></script>
+</body>
+</html>

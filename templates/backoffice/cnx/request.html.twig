@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forgot Password - AutoLearn</title>
+    <link rel="stylesheet" href="{{ asset('backoffice/css/templatemo-glass-admin-style.css') }}">
+    <style>
+        .debug-link {
+            background: #e8f5e9;
+            border: 2px dashed #4caf50;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+        .debug-link a {
+            color: #2e7d32;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .debug-link a:hover {
+            text-decoration: underline;
+        }
+        .alert {
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .alert-info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #bbdefb;
+        }
+        .alert-error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        .input-error {
+            border-color: #c62828 !important;
+            box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.2) !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="login-page">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="login-logo">A</div>
+                    <h1 class="login-title">Forgot Password</h1>
+                    <p class="login-subtitle">Enter your email to get a reset link</p>
+                </div>
+                
+                {% for flash_type, flash_messages in app.flashes %}
+                    {% for flash_message in flash_messages %}
+                        <div class="alert alert-{{ flash_type }}">
+                            {{ flash_message }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+                
+                
+                
+                {# Formulaire avec validation HTML5 désactivée #}
+                <form method="post" novalidate="novalidate">
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        {# Pas de required HTML5, validation serveur seulement #}
+                        <input type="email" name="email" class="form-input" placeholder="Enter your email">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">
+                        Get Reset Link
+                    </button>
+                    
+                    <a href="{{ path('backoffice_login') }}" class="btn btn-secondary" style="width: 100%;">
+                        ← Back to Login
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

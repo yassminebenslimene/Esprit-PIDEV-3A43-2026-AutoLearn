@@ -21,16 +21,165 @@
         <!-- Swiper -->
         <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
     {% endblock %}
+    
+    <style>
+        /* Reset any conflicting styles - AVEC CENTRAGE VERTICAL */
+        .main-nav {
+            display: flex !important;
+            align-items: center !important;
+            height: 80px !important;  /* Ajuste si nécessaire */
+        }
+        
+        .main-nav .nav {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .main-nav .nav li {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            margin: 0 !important;
+        }
+        
+        .main-nav .nav li a {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            line-height: 1 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        
+        .main-nav .nav li.profile-dropdown-container {
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-btn {
+            background: none !important;
+            border: none !important;
+            padding: 0 15px !important;
+            color: #1e1e1e !important;
+            font-weight: 500 !important;
+            text-decoration: none !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            line-height: 1 !important;
+            gap: 5px !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-btn i {
+            display: flex !important;
+            align-items: center !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu {
+            display: none;
+            position: absolute !important;
+            top: 100% !important;
+            right: 0 !important;
+            z-index: 999999 !important;
+            min-width: 220px !important;
+            background: white !important;
+            border-radius: 8px !important;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.15) !important;
+            padding: 10px 0 !important;
+            margin-top: 0 !important;
+            list-style: none !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu.show {
+            display: block !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu li {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            display: block !important;
+            height: auto !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu a {
+            display: block !important;
+            padding: 12px 20px !important;
+            color: #333 !important;
+            text-decoration: none !important;
+            font-size: 15px !important;
+            transition: all 0.2s !important;
+            line-height: normal !important;
+            height: auto !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu a:hover {
+            background: linear-gradient(105deg, #7a6ad8 0%, #4e3b9c 100%) !important;
+            color: white !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu i {
+            margin-right: 10px !important;
+            width: 18px !important;
+            text-align: center !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-divider {
+            height: 1px !important;
+            background: #eeeeee !important;
+            margin: 8px 0 !important;
+        }
+        
+        /* Fix pour les autres liens de la navbar */
+        .main-nav .nav .scroll-to-section {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+        }
+        
+        .main-nav .nav .scroll-to-section a {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            padding: 0 15px !important;
+            line-height: 1 !important;
+        }
+        
+        @media (max-width: 992px) {
+            .main-nav,
+            .main-nav .nav,
+            .main-nav .nav li,
+            .main-nav .nav li a,
+            .main-nav .nav li.profile-dropdown-container,
+            .main-nav .nav .profile-dropdown-btn {
+                height: auto !important;
+                min-height: 50px !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-menu {
+                position: static !important;
+                width: 100% !important;
+                box-shadow: none !important;
+                background: transparent !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-menu a {
+                color: white !important;
+                padding-left: 30px !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-divider {
+                background: rgba(255,255,255,0.2) !important;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<!--
-
-TemplateMo 586 Scholar
-
-https://templatemo.com/tm-586-scholar
-
--->
 
 <!-- ***** Preloader Start ***** -->
 <div id="js-preloader" class="js-preloader">
@@ -53,9 +202,10 @@ https://templatemo.com/tm-586-scholar
                 <nav class="main-nav">
                     <!-- ***** Logo Start ***** -->
                     <a href="{{ path('app_frontoffice') }}" class="logo">
-                        <h1>Scholar</h1>
+                        <h1>AutoLearn</h1>
                     </a>
                     <!-- ***** Logo End ***** -->
+                    
                     <!-- ***** Search Start ***** -->
                     <div class="search-input">
                         <form id="search" action="#">
@@ -64,28 +214,54 @@ https://templatemo.com/tm-586-scholar
                         </form>
                     </div>
                     <!-- ***** Search End ***** -->
+                    
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}">Home</a></li>
-                        <li class="scroll-to-section"><a href="#services">Services</a></li>
-                        <li><a href="{{ path('app_events') }}">Events</a></li>
-                        <li><a href="{{ path('frontchallenge') }}">Challenges</a></li>
+
+                        <li class="scroll-to-section"><a href="#top" class="active">Home</a></li>
+                        <li class="scroll-to-section"><a href="#cours">Cours</a></li>
+                        <li class="scroll-to-section"><a href="#events">Events</a></li>
+                        <li class="scroll-to-section"><a href="#challenge">Challenge</a></li>
+                        <li class="scroll-to-section"><a href="#contact">Contact</a></li>
+                        <li><a href="{{ path('front_communaute') }}">Communauté</a></li>
                         {% if app.user %}
+                            <!-- User Logged In - Profile Dropdown -->
                             <li><a href="{{ path('app_mes_participations') }}">My Participations</a></li>
-                            <li><a href="{{ path('app_profile') }}">Profile</a></li>
-                            <li><a href="{{ path('backoffice_logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-nav').submit();">Logout</a></li>
+
+                            <li class="profile-dropdown-container">
+                                <a href="javascript:void(0);" onclick="toggleProfileDropdown(event)" class="profile-dropdown-btn">
+                                    <i class="fa fa-user-circle"></i>
+                                    {{ app.user.prenom }} {{ app.user.nom }}
+                                    <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                                </a>
+                                <ul class="profile-dropdown-menu" id="profileDropdown">
+                                    <li>
+                                        <a href="{{ path('app_profile') }}">
+                                            <i class="fa fa-id-card"></i> Mon Profil
+                                        </a>
+                                    </li>
+                                    <li class="profile-dropdown-divider"></li>
+                                    <li>
+                                        <a href="{{ path('backoffice_logout') }}">
+                                            <i class="fa fa-sign-out"></i> Déconnexion
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
                         {% else %}
+                            <!-- User Not Logged In -->
                             <li><a href="{{ path('backoffice_login') }}">Login</a></li>
                             <li><a href="{{ path('backoffice_register') }}">Register</a></li>
                         {% endif %}
-                    </ul>
+                    </ul> 
+                    <!-- ***** Menu End ***** -->
+                    
                     <form id="logout-form-nav" action="{{ path('backoffice_logout') }}" method="POST" style="display: none;">
                         <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
                     </form>
                     <a class='menu-trigger'>
                         <span>Menu</span>
                     </a>
-                    <!-- ***** Menu End ***** -->
                 </nav>
             </div>
         </div>
@@ -93,6 +269,24 @@ https://templatemo.com/tm-586-scholar
 </header>
 <!-- ***** Header Area End ***** -->
 
+<!-- Flash Messages -->
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert" style="position: fixed; top: 100px; right: 20px; z-index: 9999; min-width: 300px; max-width: 500px; box-shadow: 0 5px 25px rgba(0,0,0,0.2);">
+            {% if label == 'success' %}
+                <i class="fa fa-check-circle" style="margin-right: 10px;"></i>
+            {% elseif label == 'error' %}
+                <i class="fa fa-exclamation-circle" style="margin-right: 10px;"></i>
+            {% else %}
+                <i class="fa fa-info-circle" style="margin-right: 10px;"></i>
+            {% endif %}
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<!-- ***** Main Banner Start ***** -->
 <div class="main-banner" id="top">
     <div class="container">
         <div class="row">
@@ -100,45 +294,45 @@ https://templatemo.com/tm-586-scholar
                 <div class="owl-carousel owl-banner">
                     <div class="item item-1">
                         <div class="header-text">
-                            <span class="category">Our Courses</span>
-                            <h2>With Scholar Teachers, Everything Is Easier</h2>
-                            <p>Scholar is free CSS template designed by TemplateMo for online educational related websites. This layout is based on the famous Bootstrap v5.3.0 framework.</p>
+                            <span class="category">Nos Cours</span>
+                            <h2>Apprenez la Programmation avec des Experts</h2>
+                            <p>Découvrez nos cours de programmation conçus par des professionnels. Maîtrisez les langages modernes comme Python, JavaScript, Java et bien plus encore avec des projets pratiques et des défis stimulants.</p>
                             <div class="buttons">
                                 <div class="main-button">
-                                    <a href="#">Request Demo</a>
+                                    <a href="#cours">Voir les Cours</a>
                                 </div>
                                 <div class="icon-button">
-                                    <a href="#"><i class="fa fa-play"></i> What's Scholar?</a>
+                                    <a href="#courses"><i class="fa fa-play"></i> Commencer Maintenant</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="item item-2">
                         <div class="header-text">
-                            <span class="category">Best Result</span>
-                            <h2>Get the best result out of your effort</h2>
-                            <p>You are allowed to use this template for any educational or commercial purpose. You are not allowed to re-distribute the template ZIP file on any other website.</p>
+                            <span class="category">Meilleurs Résultats</span>
+                            <h2>Développez vos Compétences en Programmation</h2>
+                            <p>Progressez rapidement grâce à nos méthodes d'apprentissage interactives. Des exercices pratiques, des quiz et des projets réels pour transformer vos efforts en compétences concrètes et recherchées sur le marché.</p>
                             <div class="buttons">
                                 <div class="main-button">
-                                    <a href="#">Request Demo</a>
+                                    <a href="#challenge">Relever un Défi</a>
                                 </div>
                                 <div class="icon-button">
-                                    <a href="#"><i class="fa fa-play"></i> What's the best result?</a>
+                                    <a href="#courses"><i class="fa fa-play"></i> Explorer les Cours</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="item item-3">
                         <div class="header-text">
-                            <span class="category">Online Learning</span>
-                            <h2>Online Learning helps you save the time</h2>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod temporious incididunt ut labore et dolore magna aliqua suspendisse.</p>
+                            <span class="category">Apprentissage en Ligne</span>
+                            <h2>Apprenez à Coder à Votre Rythme</h2>
+                            <p>Accédez à nos cours de programmation 24/7 depuis n'importe où. Apprenez les technologies web, le développement mobile, l'intelligence artificielle et plus encore, avec un suivi personnalisé de votre progression.</p>
                             <div class="buttons">
                                 <div class="main-button">
-                                    <a href="#">Request Demo</a>
+                                    <a href="{{ path('backoffice_register') }}">S'inscrire Gratuitement</a>
                                 </div>
                                 <div class="icon-button">
-                                    <a href="#"><i class="fa fa-play"></i> What's Online Course?</a>
+                                    <a href="#cours"><i class="fa fa-play"></i> Découvrir AutoLearn</a>
                                 </div>
                             </div>
                         </div>
@@ -148,59 +342,47 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </div>
+<!-- ***** Main Banner End ***** -->
 
-<div class="services section" id="services">
+
+<!-- ***** cours Section Start ***** -->
+<div class="services section" id="cours">
     <div class="container">
+
         <div class="row">
-            <div class="col-lg-4 col-md-6">
-                <div class="service-item">
-                    <div class="icon">
-                        <!-- CORRECTION : Utiliser asset() -->
-                        <img src="{{ asset('frontoffice/images/service-01.png') }}" alt="online degrees">
-                    </div>
-                    <div class="main-content">
-                        <h4>Online Degrees</h4>
-                        <p>Whenever you need free templates in HTML CSS, you just remember TemplateMo website.</p>
-                        <div class="main-button">
-                            <a href="#">Read More</a>
+            {% if cours is empty %}
+                <div class="col-12 text-center">
+                    <p>Aucun cours disponible pour le moment.</p>
+                </div>
+            {% else %}
+                {% for cour in cours %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="service-item">
+                            <div class="icon">
+                                <img src="{{ asset('frontoffice/images/service-01.png') }}" alt="icône cours">
+                            </div>
+                            <div class="main-content">
+                                <h4>{{ cour.titre }}</h4>
+                                <p>{{ cour.description|slice(0, 100) ~ (cour.description|length > 100 ? '...' : '') }}</p>
+                                <div class="main-button">
+                                    <a href="{{ path('app_frontoffice_chapitre_by_cours', {'coursId': cour.id}) }}" class="btn">
+                                        Voir le cours
+                                    </a>
+                                    <a href="#" class="btn" style="background: linear-gradient(135deg, #6c5ce7, #4a69bd);">
+                                        <i class="fa fa-users me-1"></i> Communauté
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="service-item">
-                    <div class="icon">
-                        <!-- CORRECTION -->
-                        <img src="{{ asset('frontoffice/images/service-02.png') }}" alt="short courses">
-                    </div>
-                    <div class="main-content">
-                        <h4>Short Courses</h4>
-                        <p>You can browse free templates based on different tags such as digital marketing, etc.</p>
-                        <div class="main-button">
-                            <a href="#">Read More</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="service-item">
-                    <div class="icon">
-                        <!-- CORRECTION -->
-                        <img src="{{ asset('frontoffice/images/service-03.png') }}" alt="web experts">
-                    </div>
-                    <div class="main-content">
-                        <h4>Web Experts</h4>
-                        <p>You can start learning HTML CSS by modifying free templates from our website too.</p>
-                        <div class="main-button">
-                            <a href="#">Read More</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </div>
+<!-- ***** cours Section End ***** -->
 
+<!-- ***** About Us Section Start ***** -->
 <div class="section about-us">
     <div class="container">
         <div class="row">
@@ -269,120 +451,9 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </div>
+<!-- ***** About Us Section End ***** -->
 
-<section class="section courses" id="courses">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <div class="section-heading">
-                    <h6>Latest Courses</h6>
-                    <h2>Latest Courses</h2>
-                </div>
-            </div>
-        </div>
-        <ul class="event_filter">
-            <li>
-                <a class="is_active" href="#!" data-filter="*">Show All</a>
-            </li>
-            <li>
-                <a href="#!" data-filter=".design">Webdesign</a>
-            </li>
-            <li>
-                <a href="#!" data-filter=".development">Development</a>
-            </li>
-            <li>
-                <a href="#!" data-filter=".wordpress">Wordpress</a>
-            </li>
-        </ul>
-        <div class="row event_box">
-            <!-- COURSE 1 -->
-            <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 design">
-                <div class="events_item">
-                    <div class="thumb">
-                        <a href="#"><img src="{{ asset('frontoffice/images/course-01.jpg') }}" alt=""></a>
-                        <span class="category">Webdesign</span>
-                        <span class="price"><h6><em>$</em>160</h6></span>
-                    </div>
-                    <div class="down-content">
-                        <span class="author">Stella Blair</span>
-                        <h4>Learn Web Design</h4>
-                    </div>
-                </div>
-            </div>
-            <!-- COURSE 2 -->
-            <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 development">
-                <div class="events_item">
-                    <div class="thumb">
-                        <a href="#"><img src="{{ asset('frontoffice/images/course-02.jpg') }}" alt=""></a>
-                        <span class="category">Development</span>
-                        <span class="price"><h6><em>$</em>340</h6></span>
-                    </div>
-                    <div class="down-content">
-                        <span class="author">Cindy Walker</span>
-                        <h4>Web Development Tips</h4>
-                    </div>
-                </div>
-            </div>
-            <!-- COURSE 3 -->
-            <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 design wordpress">
-                <div class="events_item">
-                    <div class="thumb">
-                        <a href="#"><img src="{{ asset('frontoffice/images/course-03.jpg') }}" alt=""></a>
-                        <span class="category">Wordpress</span>
-                        <span class="price"><h6><em>$</em>640</h6></span>
-                    </div>
-                    <div class="down-content">
-                        <span class="author">David Hutson</span>
-                        <h4>Latest Web Trends</h4>
-                    </div>
-                </div>
-            </div>
-            <!-- COURSE 4 -->
-            <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 development">
-                <div class="events_item">
-                    <div class="thumb">
-                        <a href="#"><img src="{{ asset('frontoffice/images/course-04.jpg') }}" alt=""></a>
-                        <span class="category">Development</span>
-                        <span class="price"><h6><em>$</em>450</h6></span>
-                    </div>
-                    <div class="down-content">
-                        <span class="author">Stella Blair</span>
-                        <h4>Online Learning Steps</h4>
-                    </div>
-                </div>
-            </div>
-            <!-- COURSE 5 -->
-            <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 wordpress development">
-                <div class="events_item">
-                    <div class="thumb">
-                        <a href="#"><img src="{{ asset('frontoffice/images/course-05.jpg') }}" alt=""></a>
-                        <span class="category">Wordpress</span>
-                        <span class="price"><h6><em>$</em>320</h6></span>
-                    </div>
-                    <div class="down-content">
-                        <span class="author">Sophia Rose</span>
-                        <h4>Be a WordPress Master</h4>
-                    </div>
-                </div>
-            </div>
-            <!-- COURSE 6 -->
-            <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 wordpress design">
-                <div class="events_item">
-                    <div class="thumb">
-                        <a href="#"><img src="{{ asset('frontoffice/images/course-06.jpg') }}" alt=""></a>
-                        <span class="category">Webdesign</span>
-                        <span class="price"><h6><em>$</em>240</h6></span>
-                    </div>
-                    <div class="down-content">
-                        <span class="author">David Hutson</span>
-                        <h4>Full Stack Developer</h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
+<!-- ***** Fun Facts Section Start ***** -->
 <div class="section fun-facts">
     <div class="container">
         <div class="row">
@@ -419,6 +490,9 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </div>
+<!-- ***** Fun Facts Section End ***** -->
+
+<!-- ***** Testimonials Section Start ***** -->
 
 <div class="section testimonials">
     <div class="container">
@@ -461,7 +535,9 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </div>
+<!-- ***** Testimonials Section End ***** -->
 
+<!-- ***** Events Section Start ***** -->
 <div class="section events" id="events">
     <div class="container">
         <div class="row">
@@ -484,6 +560,9 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </div>
+<!-- ***** Events Section End ***** -->
+
+<!-- ***** Challenges Section Start ***** -->
 <section id="challenge" class="section events">
     <div class="container">
         <div class="row">
@@ -554,7 +633,7 @@ https://templatemo.com/tm-586-scholar
                                             </h6>
                                         </li>
                                     </ul>
-                                    <a href="{{ path('frontchallenge', {'id': challenge.id}) }}">
+<a href="{{ path('app_challenge_show', {'id': challenge.id}) }}">
                                         <i class="fa fa-angle-right"></i>
                                     </a>
                                 </div>
@@ -566,44 +645,81 @@ https://templatemo.com/tm-586-scholar
         {% endif %}
     </div>
 </section>
+<!-- ***** Challenges Section End ***** -->
+
+<!-- ***** Contact Us Section Start ***** -->
 <div class="contact-us section" id="contact">
     <div class="container">
         <div class="row">
             <div class="col-lg-6 align-self-center">
                 <div class="section-heading">
-                    <h6>Contact Us</h6>
-                    <h2>Feel free to contact us anytime</h2>
-                    <p>Thank you for choosing our templates. We provide you best CSS templates at absolutely 100% free of charge. You may support us by sharing our website to your friends.</p>
-                    <div class="special-offer">
-                        <span class="offer">off<br><em>50%</em></span>
-                        <h6>Valide: <em>24 April 2036</em></h6>
-                        <h4>Special Offer <em>50%</em> OFF!</h4>
-                        <a href="#"><i class="fa fa-angle-right"></i></a>
+                    <h6>Contactez-nous</h6>
+                    <h2>Besoin d'aide ? Nous sommes là pour vous</h2>
+                    <p>Vous avez des questions sur nos cours de programmation, nos challenges ou nos événements ? Notre équipe AutoLearn est à votre disposition pour vous accompagner dans votre parcours d'apprentissage.</p>
+                    
+                    <div class="contact-info" style="margin-top: 30px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                <i class="fa fa-envelope" style="color: white; font-size: 20px;"></i>
+                            </div>
+                            <div>
+                                <h6 style="margin: 0; color: #667eea; font-weight: 600;">Email</h6>
+                                <p style="margin: 0; color: #4a5568;">autolearn66@gmail.com</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                <i class="fa fa-clock" style="color: white; font-size: 20px;"></i>
+                            </div>
+                            <div>
+                                <h6 style="margin: 0; color: #667eea; font-weight: 600;">Disponibilité</h6>
+                                <p style="margin: 0; color: #4a5568;">Lun - Ven: 9h00 - 18h00</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center;">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                <i class="fa fa-graduation-cap" style="color: white; font-size: 20px;"></i>
+                            </div>
+                            <div>
+                                <h6 style="margin: 0; color: #667eea; font-weight: 600;">Support</h6>
+                                <p style="margin: 0; color: #4a5568;">Assistance technique 24/7</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="contact-us-content">
-                    <form id="contact-form" action="" method="post">
+                    <form id="contact-form" action="{{ path('app_contact') }}" method="post">
                         <div class="row">
                             <div class="col-lg-12">
                                 <fieldset>
-                                    <input type="name" name="name" id="name" placeholder="Your Name..." autocomplete="on" required>
+                                    <input type="text" name="name" id="name" placeholder="Votre nom complet..." autocomplete="on" required>
                                 </fieldset>
                             </div>
                             <div class="col-lg-12">
                                 <fieldset>
-                                    <input type="text" name="email" id="email" pattern="[^ @]*@[^ @]*" placeholder="Your E-mail..." required="">
+                                    <input type="email" name="email" id="email" placeholder="Votre adresse email..." required>
                                 </fieldset>
                             </div>
                             <div class="col-lg-12">
                                 <fieldset>
-                                    <textarea name="message" id="message" placeholder="Your Message"></textarea>
+                                    <input type="text" name="subject" id="subject" placeholder="Sujet de votre message..." required>
                                 </fieldset>
                             </div>
                             <div class="col-lg-12">
                                 <fieldset>
-                                    <button type="submit" id="form-submit" class="orange-button">Send Message Now</button>
+                                    <textarea name="message" id="message" placeholder="Votre message..." rows="6" required></textarea>
+                                </fieldset>
+                            </div>
+                            <div class="col-lg-12">
+                                <fieldset>
+                                    <button type="submit" id="form-submit" class="orange-button">
+                                        <i class="fa fa-paper-plane" style="margin-right: 8px;"></i>
+                                        Envoyer le message
+                                    </button>
                                 </fieldset>
                             </div>
                         </div>
@@ -613,14 +729,124 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </div>
+<!-- ***** Contact Us Section End ***** -->
 
-<footer>
+<!-- ***** Footer Start ***** -->
+<footer style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 60px 0 20px; margin-top: 80px;">
     <div class="container">
-        <div class="col-lg-12">
-            <p>Copyright © 2036 Scholar Organization. All rights reserved. &nbsp;&nbsp;&nbsp; Design: <a href="https://templatemo.com" rel="nofollow" target="_blank">TemplateMo</a></p>
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h4 style="color: white; margin-bottom: 20px; font-weight: 700;">
+                        <i class="fa fa-graduation-cap" style="margin-right: 10px;"></i>
+                        AutoLearn
+                    </h4>
+                    <p style="color: rgba(255,255,255,0.9); line-height: 1.8; margin-bottom: 25px;">
+                        Plateforme d'apprentissage en ligne dédiée à la programmation et au développement de compétences techniques. Apprenez à votre rythme avec nos cours interactifs.
+                    </p>
+                    <div style="margin-top: 20px;">
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; text-align: center; line-height: 40px; color: white; margin-right: 10px; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; text-align: center; line-height: 40px; color: white; margin-right: 10px; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; text-align: center; line-height: 40px; color: white; margin-right: 10px; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fa fa-linkedin"></i>
+                        </a>
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; text-align: center; line-height: 40px; color: white; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h5 style="color: white; margin-bottom: 20px; font-weight: 600;">Navigation</h5>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 12px;">
+                            <a href="#top" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Accueil
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="#cours" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Cours
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="#events" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Événements
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="#challenge" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Challenges
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h5 style="color: white; margin-bottom: 20px; font-weight: 600;">Ressources</h5>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 12px;">
+                            <a href="{{ path('front_communaute') }}" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Communauté
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="{{ path('app_mes_participations') }}" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Mes Participations
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="{{ path('app_profile') }}" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Mon Profil
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="#contact" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Contact
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h5 style="color: white; margin-bottom: 20px; font-weight: 600;">Newsletter</h5>
+                    <p style="color: rgba(255,255,255,0.9); margin-bottom: 15px; font-size: 14px;">Restez informé de nos nouveaux cours et événements.</p>
+                    <form style="display: flex; margin-bottom: 20px;">
+                        <input type="email" placeholder="Votre email..." style="flex: 1; padding: 12px 15px; border: none; border-radius: 5px 0 0 5px; outline: none; font-size: 14px;">
+                        <button type="submit" style="padding: 12px 20px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 0 5px 5px 0; cursor: pointer; transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </form>
+                    <div style="color: rgba(255,255,255,0.9); font-size: 14px;">
+                        <i class="fa fa-envelope" style="margin-right: 8px;"></i>
+                        autolearn66@gmail.com
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row" style="margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.2);">
+            <div class="col-lg-12 text-center">
+                <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 14px;">
+                    Copyright © {{ "now"|date("Y") }} <strong style="color: white;">AutoLearn</strong>. Tous droits réservés. 
+                    <span style="margin: 0 10px;">|</span>
+                    Plateforme d'apprentissage en ligne
+                </p>
+            </div>
         </div>
     </div>
 </footer>
+<!-- ***** Footer End ***** -->
 
 {% block javascripts %}
     <!-- jQuery -->
@@ -637,19 +863,52 @@ https://templatemo.com/tm-586-scholar
     <!-- Custom JS -->
     <script src="{{ asset('frontoffice/js/custom.js') }}"></script>
     
-    <!-- Script d'initialisation -->
+    <!-- Profile Dropdown Toggle Script -->
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('FrontOffice Scholar Template chargé');
+        function toggleProfileDropdown(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            var dropdown = document.getElementById('profileDropdown');
+            var allDropdowns = document.querySelectorAll('.profile-dropdown-menu');
+            
+            allDropdowns.forEach(function(menu) {
+                if (menu.id !== 'profileDropdown') {
+                    menu.classList.remove('show');
+                }
+            });
+            
+            dropdown.classList.toggle('show');
+        }
         
-        // Script de test pour vérifier que tout est chargé
-        var images = document.querySelectorAll('img');
-        images.forEach(function(img) {
-            img.onerror = function() {
-                console.error('Image non chargée:', this.src);
-            };
+        document.addEventListener('click', function(event) {
+            var dropdown = document.getElementById('profileDropdown');
+            var isClickInside = event.target.closest('.profile-dropdown-container');
+            
+            if (!isClickInside && dropdown) {
+                dropdown.classList.remove('show');
+            }
         });
-    });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Profile dropdown initialized');
+            
+            // Auto-dismiss flash messages after 5 seconds
+            setTimeout(function() {
+                var alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+            
+            // Scroll to contact section if there's a hash
+            if (window.location.hash === '#contact') {
+                setTimeout(function() {
+                    document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            }
+        });
     </script>
 {% endblock %}
 

@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Controller;
+
 use App\Repository\ChallengeRepository;
+use App\Repository\Cours\CoursRepository;
 use App\Repository\EvenementRepository;
 use App\Repository\EquipeRepository;
-use  App\Entity\Admin;
+use App\Entity\Admin;
 use App\Entity\Etudiant;
 use App\Entity\User;
-use App\Repository\UserRepository; // ← AJOUTEZ CET IMPORT
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,11 +20,12 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class FrontofficeController extends AbstractController
 {
-     #[Route('/', name: 'app_frontoffice')]
+    #[Route('/', name: 'app_frontoffice')]
     public function index(
         ChallengeRepository $challengeRepository,
         EvenementRepository $evenementRepository,
-        EquipeRepository $equipeRepository
+        EquipeRepository $equipeRepository,
+        CoursRepository $coursRepository
     ): Response
     {
         // Si l'utilisateur est connecté
@@ -31,37 +33,19 @@ class FrontofficeController extends AbstractController
             $user = $this->getUser();
             
             // Si c'est un admin, rediriger vers le backoffice
-            if ($user instanceof Admin || $user->getRoles() === 'ADMIN') {
+            if ($user instanceof Admin || in_array('ROLE_ADMIN', $user->getRoles())) {
                 return $this->redirectToRoute('app_backoffice');
             }
         }
         
-        // Récupérer les challenges, événements et équipes
-        $challenges = $challengeRepository->findAll();
-        $evenements = $evenementRepository->findAll();
-        $equipes = $equipeRepository->findAll();
-        
-        // Sinon, afficher le frontoffice normalement
-        return $this->render('frontoffice/index.html.twig', [
-            'challenges' => $challenges,
-            'evenements' => $evenements,
-            'equipes' => $equipes,
-        ]);
-    }
-
-      #[Route('/home', name: 'app_home')]
-    public function home(
-        ChallengeRepository $challengeRepository,
-        EvenementRepository $evenementRepository,
-        EquipeRepository $equipeRepository
-    ): Response
-    {
-        // Récupérer les challenges, événements et équipes
+        // Récupérer les données
+        $cours = $coursRepository->findAll();
         $challenges = $challengeRepository->findAll();
         $evenements = $evenementRepository->findAll();
         $equipes = $equipeRepository->findAll();
         
         return $this->render('frontoffice/index.html.twig', [
+            'cours' => $cours,
             'challenges' => $challenges,
             'evenements' => $evenements,
             'equipes' => $equipes,
@@ -82,7 +66,7 @@ class FrontofficeController extends AbstractController
         }
 
         // Si admin, rediriger vers backoffice settings
-        if ($user instanceof Admin || $user->getRoles() === 'ADMIN') {
+        if ($user instanceof Admin || in_array('ROLE_ADMIN', $user->getRoles())) {
             return $this->redirectToRoute('backoffice_settings');
         }
 
@@ -151,6 +135,51 @@ class FrontofficeController extends AbstractController
             'user' => $user,
             'isEtudiant' => $isEtudiant,
         ]);
+    }
+    #[Route('/communaute', name: 'front_communaute')]
+    public function communaute(): Response
+    {
+        return $this->render('frontoffice/communaute/communaute.html.twig');
+    }
+
+    #[Route('/contact', name: 'app_contact', methods: ['POST'])]
+    public function contact(
+        Request $request,
+        \App\Service\BrevoMailService $mailService
+    ): Response {
+        // Get form data
+        $name = $request->request->get('name');
+        $email = $request->request->get('email');
+        $subject = $request->request->get('subject');
+        $message = $request->request->get('message');
+        
+        // Validate required fields
+        if (empty($name) || empty($email) || empty($subject) || empty($message)) {
+            $this->addFlash('error', 'Tous les champs sont obligatoires.');
+            return $this->redirectToRoute('app_frontoffice', [], Response::HTTP_SEE_OTHER);
+        }
+        
+        // Validate email format
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->addFlash('error', 'Adresse email invalide.');
+            return $this->redirectToRoute('app_frontoffice', [], Response::HTTP_SEE_OTHER);
+        }
+        
+        try {
+            // Send email to AutoLearn support
+            $mailService->sendContactEmail(
+                $name,
+                $email,
+                $subject,
+                $message
+            );
+            
+            $this->addFlash('success', 'Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de l\'envoi du message : ' . $e->getMessage());
+        }
+        
+        return $this->redirectToRoute('app_frontoffice', [], Response::HTTP_SEE_OTHER);
     }
 
 }

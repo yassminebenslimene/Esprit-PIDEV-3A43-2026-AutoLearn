@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - 3D Glassmorphism Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('backoffice/css/templatemo-glass-admin-style.css') }}">
+    <style>
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            color: var(--text-light);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--emerald);
+            box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
+        }
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a0aec0' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 16px;
+        }
+        .form-help {
+            font-size: 0.85rem;
+            color: var(--text-lighter);
+            margin-top: 0.25rem;
+        }
+        .form-error {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+            color: white;
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Flash messages */
+        .flash-message {
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .flash-success {
+            background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+            color: white;
+        }
+        .flash-error {
+            background: linear-gradient(135deg, var(--danger), var(--coral));
+            color: white;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="background"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">G</div>
+                <span class="logo-text">AutoLearn</span>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-section">
+                    <span class="nav-section-title">Main Menu</span>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="{{ path('app_backoffice') }}" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                                    <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                                </svg>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ path('backoffice_analytics') }}" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                                </svg>
+                                Analytics
+                                <span class="nav-badge">New</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ path('backoffice_users') }}" class="nav-link active">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                                Users
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ path('backoffice_settings') }}" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                                </svg>
+                                Settings
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-section">
+                    <span class="nav-section-title">Account</span>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="{{ path('backoffice_logout') }}" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                                    <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                                </svg>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        {% if app.user %}
+                            {{ app.user.prenom|first|upper }}{{ app.user.nom|first|upper }}
+                        {% else %}
+                            TM
+                        {% endif %}
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">
+                            {% if app.user %}
+                                {{ app.user.prenom }} {{ app.user.nom }}
+                            {% else %}
+                                TemplateMo
+                            {% endif %}
+                        </div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <nav class="navbar">
+                <div class="page-header">
+                    <h1 class="page-title">{{ title }}</h1>
+                    <div class="page-breadcrumb">
+                        <a href="{{ path('app_backoffice') }}">Dashboard</a>
+                        <span>/</span>
+                        <a href="{{ path('backoffice_users') }}">Users</a>
+                        <span>/</span>
+                        <span>{{ title }}</span>
+                    </div>
+                </div>
+                <div class="navbar-right">
+                    <button class="nav-btn" id="theme-toggle" title="Toggle Light/Dark Mode">
+                        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/>
+                            <path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/>
+                            <path d="M2 12h2"/><path d="M20 12h2"/>
+                            <path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/>
+                        </svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Flash Messages -->
+            {% for message in app.flashes('success') %}
+            <div class="flash-message flash-success">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+            <div class="flash-message flash-error">
+                {{ message }}
+            </div>
+            {% endfor %}
+
+            <!-- Form Container -->
+            <section class="content-grid">
+                <div class="glass-card form-container">
+                    {{ form_start(form, {'attr': {'class': 'form'}}) }}
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            {{ form_label(form.prenom) }}
+                            {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.prenom) }}
+                        </div>
+                        
+                        <div class="form-group">
+                            {{ form_label(form.nom) }}
+                            {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.nom) }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.email) }}
+                        {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.email) }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.password) }}
+                        {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
+                        <div class="form-help">
+ 8 caractères min avec : majuscule, minuscule, chiffre, caractère spécial (@$!%*?&)                        </div>
+                        {{ form_errors(form.password) }}
+                    </div>
+
+                    {# ONLY SHOW ROLE FIELD IF IT EXISTS AND WE'RE NOT HIDING IT #}
+                    {% if form.role is defined and not hide_role|default(false) %}
+                        <div class="form-group">
+                            {{ form_label(form.role) }}
+                            {{ form_widget(form.role, {'attr': {'class': 'form-control form-select'}}) }}
+                            {{ form_errors(form.role) }}
+                        </div>
+                    {% endif %}
+
+                    {# ADMIN FORM - Niveau field disabled when role is not ETUDIANT #}
+<div class="form-group" id="niveau-field">
+    {{ form_label(form.niveau) }}
+    
+    {# Si le rôle est défini dans le formulaire (mode création admin) #}
+    {% if form.role is defined %}
+        {{ form_widget(form.niveau, {
+            'attr': {
+                'class': 'form-control form-select',
+                'id': 'user_niveau',
+                'disabled': form.role.vars.value != 'ETUDIANT'
+            }
+        }) }}
+    {% else %}
+        {# Mode édition - toujours activé car on ne modifie que des étudiants #}
+        {{ form_widget(form.niveau, {'attr': {'class': 'form-control form-select', 'id': 'user_niveau'}}) }}
+    {% endif %}
+    
+    {{ form_errors(form.niveau) }}
+</div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+                            </svg>
+                            {{ button_label|default('Save') }}
+                        </button>
+                        
+                        <a href="
+                            {% if hide_role|default(false) and app.user and app.user.isEtudiant() %}
+                                {{ path('backoffice_settings') }}
+                            {% else %}
+                                {{ path('backoffice_users') }}
+                            {% endif %}
+                        " class="btn btn-secondary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                            </svg>
+                            Cancel
+                        </a>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.querySelector('#{{ form.role is defined ? form.role.vars.id : '' }}');
+        const niveauField = document.getElementById('niveau-field');
+        
+        function toggleNiveauField() {
+            // If role field doesn't exist (edit mode), always show niveau
+            {% if form.role is not defined or hide_role|default(false) %}
+                niveauField.style.display = 'block';
+                const niveauSelect = niveauField.querySelector('select');
+                if (niveauSelect) niveauSelect.required = true;
+            {% else %}
+                // Role field exists, toggle based on value
+                if (roleSelect && roleSelect.value === 'ETUDIANT') {
+                    niveauField.style.display = 'block';
+                    niveauField.querySelector('select').required = true;
+                } else {
+                    niveauField.style.display = 'none';
+                    niveauField.querySelector('select').required = false;
+                    niveauField.querySelector('select').value = '';
+                }
+            {% endif %}
+        }
+        
+        // Initial toggle
+        toggleNiveauField();
+        
+        // Toggle on change - only if role field exists
+        {% if form.role is defined and not hide_role|default(false) %}
+            if (roleSelect) {
+                roleSelect.addEventListener('change', toggleNiveauField);
+            }
+        {% endif %}
+        
+        // Auto-hide flash messages
+        setTimeout(function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(message) {
+                message.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(function() {
+                    message.remove();
+                }, 300);
+            });
+        }, 5000);
+    });
+    </script>
+    
+    <script src="{{ asset('backoffice/js/templatemo-glass-admin-script.js') }}"></script>
+</body>
+</html>

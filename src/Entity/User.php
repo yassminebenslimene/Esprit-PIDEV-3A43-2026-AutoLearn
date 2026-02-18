@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Entity;
-
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -17,6 +18,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé!')]
 abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+
+#[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Challenge::class)]
+private Collection $challenges;
+
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'userId', type: 'integer')]
@@ -96,9 +102,13 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeInterface $createdAt = null;
 
 
+
+
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+    $this->challenges = new ArrayCollection(); 
     }
 
     public function getRoles(): array
@@ -209,6 +219,32 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 public function isEtudiant(): bool {
     return $this instanceof Etudiant;
+}
+
+
+
+public function getChallenges(): Collection
+{
+    return $this->challenges;
+}
+
+public function addChallenge(Challenge $challenge): static
+{
+    if (!$this->challenges->contains($challenge)) {
+        $this->challenges->add($challenge);
+        $challenge->setCreatedBy($this);
+    }
+    return $this;
+}
+
+public function removeChallenge(Challenge $challenge): static
+{
+    if ($this->challenges->removeElement($challenge)) {
+        if ($challenge->getCreatedBy() === $this) {
+            $challenge->setCreatedBy(null);
+        }
+    }
+    return $this;
 }
 
 }
