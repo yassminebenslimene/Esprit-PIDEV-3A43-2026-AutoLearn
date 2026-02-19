@@ -1,0 +1,146 @@
+# Traductions françaises
+nav:
+  home: Accueil
+  events: Événements
+  challenges: Défis
+  community: Communauté
+  courses: Cours
+  my_participations: Mes Participations
+  login: Connexion
+  register: Inscription
+  logout: Déconnexion
+  profile: Mon Profil
+  contact: Contact
+
+language:
+  french: Français
+  english: Anglais
+  arabic: Arabe
+  spanish: Espagnol
+  select: Choisir la langue
+
+frontoffice:
+  banner:
+    our_courses: Nos Cours
+    learn_programming: Apprenez la Programmation avec des Experts
+    discover_courses: Découvrez nos cours de programmation conçus par des professionnels. Maîtrisez les langages modernes comme Python, JavaScript, Java et bien plus encore avec des projets pratiques et des défis stimulants.
+    view_courses: Voir les Cours
+    start_now: Commencer Maintenant
+    best_results: Meilleurs Résultats
+    develop_skills: Développez vos Compétences en Programmation
+    progress_fast: Progressez rapidement grâce à nos méthodes d'apprentissage interactives. Des exercices pratiques, des quiz et des projets réels pour transformer vos efforts en compétences concrètes et recherchées sur le marché.
+    take_challenge: Relever un Défi
+    explore_courses: Explorer les Cours
+    online_learning: Apprentissage en Ligne
+    learn_at_pace: Apprenez à Coder à Votre Rythme
+    access_247: Accédez à nos cours de programmation 24/7 depuis n'importe où. Apprenez les technologies web, le développement mobile, l'intelligence artificielle et plus encore, avec un suivi personnalisé de votre progression.
+    register_free: S'inscrire Gratuitement
+    discover_autolearn: Découvrir AutoLearn
+  
+  chapter:
+    chapter: Chapitre
+    reading_time: Lecture estimée
+    minutes: min
+    level_beginner: Niveau débutant
+    level_intermediate: Niveau intermédiaire
+    level_advanced: Niveau avancé
+    additional_resources: Ressources complémentaires
+    no_resources: Aucune ressource supplémentaire pour ce chapitre
+    back_to_list: Retour à la liste des chapitres
+    discover_chapters: Découvrez nos chapitres
+    no_chapters: Aucun chapitre disponible
+    chapters_soon: Les chapitres seront bientôt disponibles. Revenez plus tard !
+    read_chapter: Lire le chapitre
+    take_quiz: Passer le quiz
+    back_to_courses: Retour aux cours
+
+dashboard:
+  title: Tableau de bord
+  analytics: Analytiques
+  management: Gestion
+  community: Communauté
+  system: Système
+  account: Compte
+
+courses:
+  title: Cours
+  list: Liste des cours
+  new: Nouveau cours
+  edit: Modifier le cours
+  delete: Supprimer le cours
+  view: Voir le cours
+  no_courses: Aucun cours disponible pour le moment
+  chapters: Chapitres
+  quizzes: Quiz
+  resources: Ressources
+
+chapters:
+  title: Chapitres
+  new: Nouveau chapitre
+  edit: Modifier le chapitre
+  delete: Supprimer le chapitre
+  view: Voir le chapitre
+  order: Ordre
+  content: Contenu
+  no_chapters: Aucun chapitre disponible
+
+quiz:
+  title: Quiz
+  new: Nouveau quiz
+  edit: Modifier le quiz
+  delete: Supprimer le quiz
+  view: Voir le quiz
+  management: Gestion Quiz
+  no_quizzes: Aucun quiz disponible
+
+events:
+  title: Événements
+  list: Liste des événements
+  upcoming: Événements à venir
+  past: Événements passés
+
+users:
+  title: Utilisateurs
+  list: Liste des utilisateurs
+  profile: Profil
+
+settings:
+  title: Paramètres
+  general: Général
+  preferences: Préférences
+
+actions:
+  create: Créer
+  edit: Modifier
+  delete: Supprimer
+  save: Enregistrer
+  cancel: Annuler
+  back: Retour
+  search: Rechercher
+  view: Voir
+  actions: Actions
+
+messages:
+  success:
+    created: Créé avec succès
+    updated: Modifié avec succès
+    deleted: Supprimé avec succès
+  error:
+    general: Une erreur s'est produite
+    not_found: Élément non trouvé
+
+search:
+  placeholder: Rechercher des cours, chapitres, quiz...
+  results: Résultats de recherche
+  results_for: Résultats de recherche pour
+  results_found: résultats trouvés
+  result_found: résultat trouvé
+  no_results: Aucun résultat trouvé
+  try_different: Essayez avec des mots-clés différents
+  view_details: Voir les détails
+  type:
+    cours: Cours
+    chapitre: Chapitre
+    quiz: Quiz
+    event: Événement
+    challenge: Défi

@@ -20,6 +20,11 @@ final class PostController extends AbstractController
         Request $request,
         EntityManagerInterface $em
     ): Response {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        if (!$communaute->canPost($this->getUser())) {
+            throw $this->createAccessDeniedException('Vous devez être le créateur ou un membre invité pour poster dans cette communauté.');
+        }
+
         $post = new Post();
         $post->setCommunaute($communaute);
 
@@ -28,25 +33,37 @@ final class PostController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            // Contenu obligatoire en base : éviter null si champ vide
+            $post->setContenu($post->getContenu() ?? '');
+            if ($this->getUser()) {
+                $post->setUser($this->getUser());
+            }
+
             // ===== IMAGE UPLOAD =====
             $imageFile = $form->get('imageFile')->getData();
             if ($imageFile) {
-                $imageName = uniqid('img_') . '.' . $imageFile->guessExtension();
-                $imageFile->move(
-                    $this->getParameter('uploads_dir'),
-                    $imageName
-                );
+                $uploadsDir = $this->getParameter('uploads_dir');
+                if (!is_dir($uploadsDir)) {
+                    mkdir($uploadsDir, 0755, true);
+                }
+                // Utiliser l'extension du fichier original
+                $ext = $imageFile->getClientOriginalExtension();
+                $imageName = uniqid('img_') . '.' . ($ext ?: 'jpg');
+                $imageFile->move($uploadsDir, $imageName);
                 $post->setImageFile($imageName);
             }
 
             // ===== VIDEO UPLOAD =====
             $videoFile = $form->get('videoFile')->getData();
             if ($videoFile) {
-                $videoName = uniqid('vid_') . '.' . $videoFile->guessExtension();
-                $videoFile->move(
-                    $this->getParameter('uploads_dir'),
-                    $videoName
-                );
+                $uploadsDir = $this->getParameter('uploads_dir');
+                if (!is_dir($uploadsDir)) {
+                    mkdir($uploadsDir, 0755, true);
+                }
+                // Utiliser l'extension du fichier original
+                $ext = $videoFile->getClientOriginalExtension();
+                $videoName = uniqid('vid_') . '.' . ($ext ?: 'mp4');
+                $videoFile->move($uploadsDir, $videoName);
                 $post->setVideoFile($videoName);
             }
 
@@ -64,36 +81,54 @@ final class PostController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_post_edit', methods: ['GET', 'POST'])]
+
+    #[Route('/{id}', name: 'app_post_show', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function show(Post $post): Response
+    {
+        return $this->render('frontoffice/post/show.html.twig', [
+            'post' => $post,
+        ]);
+    }
+
+    #[Route('/{id}/edit', name: 'app_post_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
         Post $post,
         EntityManagerInterface $em
     ): Response {
+        if ($post->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Vous ne pouvez modifier que vos propres posts.');
+        }
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            $post->setContenu($post->getContenu() ?? '');
+
             // ===== IMAGE UPLOAD =====
             $imageFile = $form->get('imageFile')->getData();
             if ($imageFile) {
-                $imageName = uniqid('img_') . '.' . $imageFile->guessExtension();
-                $imageFile->move(
-                    $this->getParameter('uploads_dir'),
-                    $imageName
-                );
+                $uploadsDir = $this->getParameter('uploads_dir');
+                if (!is_dir($uploadsDir)) {
+                    mkdir($uploadsDir, 0755, true);
+                }
+                $ext = $imageFile->guessExtension();
+                $imageName = uniqid('img_') . '.' . ($ext ?? 'bin');
+                $imageFile->move($uploadsDir, $imageName);
                 $post->setImageFile($imageName);
             }
 
             // ===== VIDEO UPLOAD =====
             $videoFile = $form->get('videoFile')->getData();
             if ($videoFile) {
-                $videoName = uniqid('vid_') . '.' . $videoFile->guessExtension();
-                $videoFile->move(
-                    $this->getParameter('uploads_dir'),
-                    $videoName
-                );
+                $uploadsDir = $this->getParameter('uploads_dir');
+                if (!is_dir($uploadsDir)) {
+                    mkdir($uploadsDir, 0755, true);
+                }
+                $ext = $videoFile->guessExtension();
+                $videoName = uniqid('vid_') . '.' . ($ext ?? 'bin');
+                $videoFile->move($uploadsDir, $videoName);
                 $post->setVideoFile($videoName);
             }
 
@@ -110,12 +145,15 @@ final class PostController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_post_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'app_post_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function delete(
         Request $request,
         Post $post,
         EntityManagerInterface $em
     ): Response {
+        if ($post->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Vous ne pouvez supprimer que vos propres posts.');
+        }
         if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->request->get('_token'))) {
 
             $communauteId = $post->getCommunaute()->getId();

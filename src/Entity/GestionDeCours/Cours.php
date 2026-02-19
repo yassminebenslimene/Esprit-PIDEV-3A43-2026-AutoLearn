@@ -69,10 +69,15 @@ class Cours
     #[ORM\OneToMany(targetEntity: Chapitre::class, mappedBy: 'cours', orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $chapitres;
 
+    #[ORM\OneToOne(targetEntity: \App\Entity\Communaute::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'communaute_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?\App\Entity\Communaute $communaute = null;
+
     public function __construct()
     {
         $this->chapitres = new ArrayCollection();
     }
+
 
     public function getId(): ?int
     {
@@ -178,6 +183,17 @@ class Cours
             }
         }
 
+        return $this;
+    }
+
+    public function getCommunaute(): ?\App\Entity\Communaute
+    {
+        return $this->communaute;
+    }
+
+    public function setCommunaute(?\App\Entity\Communaute $communaute): static
+    {
+        $this->communaute = $communaute;
         return $this;
     }
 }

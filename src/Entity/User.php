@@ -21,6 +21,8 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
 
 #[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Challenge::class)]
 private Collection $challenges;
+
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'userId', type: 'integer')]
@@ -106,7 +108,7 @@ private Collection $challenges;
     public function __construct()
     {
         $this->createdAt = new \DateTime();
-    $this->challenges = new ArrayCollection(); // ADD THIS LINE
+    $this->challenges = new ArrayCollection(); 
     }
 
     public function getRoles(): array
@@ -221,7 +223,6 @@ public function isEtudiant(): bool {
 
 
 
-// Add getter and setter methods
 public function getChallenges(): Collection
 {
     return $this->challenges;
@@ -239,7 +240,6 @@ public function addChallenge(Challenge $challenge): static
 public function removeChallenge(Challenge $challenge): static
 {
     if ($this->challenges->removeElement($challenge)) {
-        // set the owning side to null (unless already changed)
         if ($challenge->getCreatedBy() === $this) {
             $challenge->setCreatedBy(null);
         }

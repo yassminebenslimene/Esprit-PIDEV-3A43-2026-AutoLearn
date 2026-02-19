@@ -1,0 +1,146 @@
+# English translations
+nav:
+  home: Home
+  events: Events
+  challenges: Challenges
+  community: Community
+  courses: Courses
+  my_participations: My Participations
+  login: Login
+  register: Register
+  logout: Logout
+  profile: My Profile
+  contact: Contact
+
+language:
+  french: French
+  english: English
+  arabic: Arabic
+  spanish: Spanish
+  select: Select Language
+
+frontoffice:
+  banner:
+    our_courses: Our Courses
+    learn_programming: Learn Programming with Experts
+    discover_courses: Discover our programming courses designed by professionals. Master modern languages like Python, JavaScript, Java and much more with practical projects and stimulating challenges.
+    view_courses: View Courses
+    start_now: Start Now
+    best_results: Best Results
+    develop_skills: Develop Your Programming Skills
+    progress_fast: Progress quickly with our interactive learning methods. Practical exercises, quizzes and real projects to transform your efforts into concrete skills sought after in the market.
+    take_challenge: Take a Challenge
+    explore_courses: Explore Courses
+    online_learning: Online Learning
+    learn_at_pace: Learn to Code at Your Own Pace
+    access_247: Access our programming courses 24/7 from anywhere. Learn web technologies, mobile development, artificial intelligence and more, with personalized tracking of your progress.
+    register_free: Register for Free
+    discover_autolearn: Discover AutoLearn
+  
+  chapter:
+    chapter: Chapter
+    reading_time: Estimated reading
+    minutes: min
+    level_beginner: Beginner level
+    level_intermediate: Intermediate level
+    level_advanced: Advanced level
+    additional_resources: Additional resources
+    no_resources: No additional resources for this chapter
+    back_to_list: Back to chapter list
+    discover_chapters: Discover our chapters
+    no_chapters: No chapters available
+    chapters_soon: Chapters will be available soon. Come back later!
+    read_chapter: Read chapter
+    take_quiz: Take quiz
+    back_to_courses: Back to courses
+
+dashboard:
+  title: Dashboard
+  analytics: Analytics
+  management: Management
+  community: Community
+  system: System
+  account: Account
+
+courses:
+  title: Courses
+  list: Course List
+  new: New Course
+  edit: Edit Course
+  delete: Delete Course
+  view: View Course
+  no_courses: No courses available at the moment
+  chapters: Chapters
+  quizzes: Quizzes
+  resources: Resources
+
+chapters:
+  title: Chapters
+  new: New Chapter
+  edit: Edit Chapter
+  delete: Delete Chapter
+  view: View Chapter
+  order: Order
+  content: Content
+  no_chapters: No chapters available
+
+quiz:
+  title: Quiz
+  new: New Quiz
+  edit: Edit Quiz
+  delete: Delete Quiz
+  view: View Quiz
+  management: Quiz Management
+  no_quizzes: No quizzes available
+
+events:
+  title: Events
+  list: Event List
+  upcoming: Upcoming Events
+  past: Past Events
+
+users:
+  title: Users
+  list: User List
+  profile: Profile
+
+settings:
+  title: Settings
+  general: General
+  preferences: Preferences
+
+actions:
+  create: Create
+  edit: Edit
+  delete: Delete
+  save: Save
+  cancel: Cancel
+  back: Back
+  search: Search
+  view: View
+  actions: Actions
+
+messages:
+  success:
+    created: Successfully created
+    updated: Successfully updated
+    deleted: Successfully deleted
+  error:
+    general: An error occurred
+    not_found: Item not found
+
+search:
+  placeholder: Search for courses, chapters, quizzes...
+  results: Search Results
+  results_for: Search results for
+  results_found: results found
+  result_found: result found
+  no_results: No results found
+  try_different: Try with different keywords
+  view_details: View details
+  type:
+    cours: Course
+    chapitre: Chapter
+    quiz: Quiz
+    event: Event
+    challenge: Challenge

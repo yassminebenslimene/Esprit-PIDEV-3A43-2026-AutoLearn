@@ -113,7 +113,7 @@ class BackofficeController extends AbstractController
         $today->setTime(0, 0, 0);
         $newToday = array_filter($users, fn($user) => $user->getCreatedAt() >= $today);
         
-        return $this->render('backoffice/users.html.twig', [
+        return $this->render('backoffice/users/users.html.twig', [
             'users' => $users,
             'search' => $search,
             'totalUsers' => $totalUsers,
@@ -125,7 +125,12 @@ class BackofficeController extends AbstractController
 
     #[Route('/backoffice/users/new', name: 'backoffice_user_new')]
     #[IsGranted('ROLE_ADMIN')]
-    public function newUser(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
+    public function newUser(
+        Request $request, 
+        UserPasswordHasherInterface $passwordHasher, 
+        EntityManagerInterface $entityManager,
+        \App\Service\BrevoMailService $mailService
+    ): Response
     {
         $userDto = new UserCreateDTO();
         $userDto->role = 'ETUDIANT'; // Force role to ETUDIANT
@@ -136,6 +141,9 @@ class BackofficeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Store plain password before hashing
+            $plainPassword = $userDto->password;
+            
             // Always create Etudiant
             $user = new Etudiant();
             $user->setNom($userDto->nom);
@@ -148,11 +156,24 @@ class BackofficeController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Étudiant créé avec succès!');
+            // Send welcome email with credentials
+            try {
+                $loginUrl = $this->generateUrl('backoffice_login', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+                $mailService->sendWelcomeEmail(
+                    $user->getEmail(),
+                    $user->getPrenom() . ' ' . $user->getNom(),
+                    $plainPassword,
+                    $loginUrl
+                );
+                $this->addFlash('success', 'Étudiant créé avec succès! Les identifiants ont été envoyés par email.');
+            } catch (\Exception $e) {
+                $this->addFlash('warning', 'Étudiant créé mais l\'email n\'a pas pu être envoyé: ' . $e->getMessage());
+            }
+            
             return $this->redirectToRoute('backoffice_users');
         }
 
-        return $this->render('backoffice/user_form.html.twig', [
+        return $this->render('backoffice/users/user_form.html.twig', [
             'form' => $form->createView(),
             'title' => 'Créer un nouvel étudiant',
             'is_edit' => false,
@@ -202,7 +223,7 @@ class BackofficeController extends AbstractController
             return $this->redirectToRoute('backoffice_users');
         }
 
-        return $this->render('backoffice/user_form.html.twig', [
+        return $this->render('backoffice/users/user_form.html.twig', [
             'form' => $form->createView(),
             'title' => 'Modifier ' . $user->getPrenom() . ' ' . $user->getNom(),
             'user' => $user,
@@ -244,7 +265,7 @@ class BackofficeController extends AbstractController
     public function showUser(User $user): Response
     {
         
-        return $this->render('backoffice/user_show.html.twig', [
+        return $this->render('backoffice/users/user_show.html.twig', [
             'user' => $user,
         ]);
     }
@@ -308,7 +329,7 @@ class BackofficeController extends AbstractController
                     ->findOneBy(['email' => $dto->email]);
                 if ($existingUser && $existingUser->getId() !== $user->getId()) {
                     $this->addFlash('error', 'Cet email est déjà utilisé!');
-                    return $this->render('backoffice/settings.html.twig', [
+                    return $this->render('backoffice/users/settings.html.twig', [
                         'form' => $form->createView(),
                         'user' => $user,
                         'isEtudiant' => $user instanceof Etudiant,
@@ -345,7 +366,7 @@ class BackofficeController extends AbstractController
             }
         }
 
-        return $this->render('backoffice/settings.html.twig', [
+        return $this->render('backoffice/users/settings.html.twig', [
             'form' => $form->createView(),
             'user' => $user,
             'isEtudiant' => $user instanceof Etudiant,

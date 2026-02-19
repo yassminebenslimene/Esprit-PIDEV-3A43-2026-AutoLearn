@@ -37,5 +37,7 @@ final class Version20260210213106 extends AbstractMigration
         $this->addSql('DROP TABLE question');
         $this->addSql('DROP TABLE quiz');
         $this->addSql('ALTER TABLE user CHANGE niveau niveau VARCHAR(50) DEFAULT NULL');
+
+        
     }
 }

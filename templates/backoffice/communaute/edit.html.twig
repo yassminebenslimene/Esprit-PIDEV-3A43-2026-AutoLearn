@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier Communauté - GlassAdmin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('backoffice/css/templatemo-glass-admin-style.css') }}">
+    <link rel="stylesheet" href="{{ asset('backoffice/css/custom-forms.css') }}">
+    <style>
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: inherit;
+            font-family: inherit;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--cyan);
+            background: rgba(255,255,255,0.08);
+        }
+        textarea.form-control { min-height: 120px; resize: vertical; }
+        .btn-group { display: flex; gap: 1rem; margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="dashboard">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">G</div>
+                <span class="logo-text">AutoLearn</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-section">
+                    <span class="nav-section-title">Communauté</span>
+                    <ul>
+                        <li class="nav-item"><a href="{{ path('backoffice_communaute_index') }}" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                            </svg>Communautés</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <nav class="navbar">
+                <div class="page-header">
+                    <h1 class="page-title">Modifier la Communauté</h1>
+                    <div class="page-breadcrumb">
+                        <a href="{{ path('app_backoffice') }}">Dashboard</a><span>/</span>
+                        <a href="{{ path('backoffice_communaute_index') }}">Communautés</a><span>/</span>
+                        <span>Modifier</span>
+                    </div>
+                </div>
+            </nav>
+
+            <section class="content-grid" style="grid-template-columns: 1fr;">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Informations de la Communauté</h2>
+                    </div>
+                    {{ form_start(form) }}
+                        <div class="form-group">
+                            {{ form_label(form.nom, 'Nom de la communauté', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.nom) }}
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.description) }}
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" class="card-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                    <polyline points="17 21 17 13 7 13 7 21"/>
+                                    <polyline points="7 3 7 8 15 8"/>
+                                </svg>
+                                Enregistrer
+                            </button>
+                            <a href="{{ path('backoffice_communaute_index') }}" class="card-btn" style="background: rgba(255,255,255,0.05);">
+                                Annuler
+                            </a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="{{ asset('backoffice/js/templatemo-glass-admin-script.js') }}"></script>
+</body>
+</html>

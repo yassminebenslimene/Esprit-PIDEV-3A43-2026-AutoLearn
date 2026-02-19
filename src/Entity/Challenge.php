@@ -36,7 +36,8 @@ class Challenge
     private Collection $exercices;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'userId')]
+
+    #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: true)]
     private ?User $created_by = null;
 
     public function __construct()

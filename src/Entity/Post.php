@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Communaute;
+use App\Entity\User;
 use App\Repository\PostRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -40,6 +42,10 @@ class Post
     #[ORM\JoinColumn(nullable: false)]
     private ?Communaute $communaute = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(referencedColumnName: 'userId', nullable: true)]
+    private ?User $user = null;
+
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: Commentaire::class, orphanRemoval: true)]
     private Collection $commentaires;
 
@@ -59,9 +65,9 @@ class Post
         return $this->contenu;
     }
 
-    public function setContenu(string $contenu): self
+    public function setContenu(?string $contenu): self
     {
-        $this->contenu = $contenu;
+        $this->contenu = $contenu ?? '';
         return $this;
     }
 
@@ -78,6 +84,17 @@ class Post
     public function setCommunaute(?Communaute $communaute): self
     {
         $this->communaute = $communaute;
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
         return $this;
     }
 

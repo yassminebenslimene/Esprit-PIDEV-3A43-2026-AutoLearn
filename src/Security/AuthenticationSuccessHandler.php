@@ -27,7 +27,7 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
             return new RedirectResponse($this->router->generate('app_backoffice'));
         }
 
-        // Redirect Étudiant to frontoffice (or home)
-        return new RedirectResponse($this->router->generate('app_frontoffice')); // Change to your student page route
+        // Redirect Étudiant to frontoffice 
+        return new RedirectResponse($this->router->generate('app_frontoffice')); 
     }
 }
