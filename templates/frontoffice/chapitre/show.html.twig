@@ -25,19 +25,34 @@
     <div class="container">
         <div class="chapter-detail-container">
             <div class="chapter-detail-header">
-                <span class="chapter-detail-badge">Chapitre {{ chapitre.ordre }}</span>
-                <h1 class="chapter-detail-title">{{ chapitre.titre }}</h1>
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="chapter-detail-badge">{{ 'frontoffice.chapter.chapter'|trans }} {{ chapitre.ordre }}</span>
+                    </div>
+                    <div class="language-selector">
+                        <label for="langSelect" style="margin-right: 10px; font-weight: 500;">
+                            <i class="fa fa-language"></i> {{ 'language.select'|trans }}:
+                        </label>
+                        <select id="langSelect" class="form-select" style="width: auto; display: inline-block;">
+                            <option value="fr" {% if app.request.locale == 'fr' %}selected{% endif %}>{{ 'language.french'|trans }}</option>
+                            <option value="en" {% if app.request.locale == 'en' %}selected{% endif %}>{{ 'language.english'|trans }}</option>
+                            <option value="es" {% if app.request.locale == 'es' %}selected{% endif %}>{{ 'language.spanish'|trans }}</option>
+                            <option value="ar" {% if app.request.locale == 'ar' %}selected{% endif %}>{{ 'language.arabic'|trans }}</option>
+                        </select>
+                    </div>
+                </div>
+                <h1 class="chapter-detail-title" id="chapitreTitle">{{ chapitre.titre }}</h1>
                 
                 <div class="chapter-detail-meta">
                     {% if chapitre.cours %}
                         <span><i class="fa fa-book"></i> {{ chapitre.cours.titre }}</span>
                     {% endif %}
-                    <span><i class="fa fa-clock"></i> Lecture estimée : 5 min</span>
-                    <span><i class="fa fa-user"></i> Niveau débutant</span>
+                    <span><i class="fa fa-clock"></i> {{ 'frontoffice.chapter.reading_time'|trans }} : 5 {{ 'frontoffice.chapter.minutes'|trans }}</span>
+                    <span><i class="fa fa-user"></i> {{ 'frontoffice.chapter.level_beginner'|trans }}</span>
                 </div>
             </div>
 
-            <div class="chapter-detail-content">
+            <div class="chapter-detail-content" id="chapitreContent">
                 {{ chapitre.contenu|nl2br }}
             </div>
 
@@ -45,7 +60,7 @@
                 <div class="resources-section">
                     <h3 class="resources-title">
                         <i class="fa fa-link"></i> 
-                        Ressources complémentaires
+                        {{ 'frontoffice.chapter.additional_resources'|trans }}
                     </h3>
                     <ul class="resources-list">
                         {% set ressources = chapitre.ressources|split(',') %}
@@ -62,7 +77,7 @@
                             <li>
                                 <span style="color: var(--text-light);">
                                     <i class="fa fa-info-circle"></i>
-                                    Aucune ressource supplémentaire pour ce chapitre.
+                                    {{ 'frontoffice.chapter.no_resources'|trans }}
                                 </span>
                             </li>
                         {% endfor %}
@@ -73,7 +88,7 @@
             <div class="chapter-navigation">
                 <a href="{{ path('app_chapitre_index_front') }}" class="btn-modern btn-back">
                     <i class="fa fa-arrow-left"></i> 
-                    Retour à la liste des chapitres
+                    {{ 'frontoffice.chapter.back_to_list'|trans }}
                 </a>
             </div>
         </div>
@@ -83,5 +98,58 @@
     <script src="{{ asset('frontoffice/vendor/bootstrap/js/bootstrap.min.js') }}"></script>
     <!-- Interactions dynamiques -->
     <script src="{{ asset('frontoffice/js/chapitres-interactions.js') }}"></script>
+    
+    <!-- Script de traduction -->
+    <script>
+        const chapitreId = {{ chapitre.id }};
+        const originalTitre = {{ chapitre.titre|json_encode|raw }};
+        const originalContenu = {{ chapitre.contenu|json_encode|raw }};
+        
+        document.getElementById('langSelect').addEventListener('change', async function() {
+            const lang = this.value;
+            const titleEl = document.getElementById('chapitreTitle');
+            const contentEl = document.getElementById('chapitreContent');
+            
+            // Si français, restaurer contenu original
+            if (lang === 'fr') {
+                titleEl.textContent = originalTitre;
+                contentEl.innerHTML = originalContenu.replace(/\n/g, '<br>');
+                return;
+            }
+            
+            // Afficher indicateur de chargement
+            titleEl.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Traduction en cours...';
+            contentEl.innerHTML = '<div style="text-align: center; padding: 40px;"><i class="fa fa-spinner fa-spin fa-3x"></i><p style="margin-top: 20px;">Traduction en cours...</p></div>';
+            
+            try {
+                const response = await fetch(`/api/chapitres/${chapitreId}?lang=${lang}`);
+                const data = await response.json();
+                
+                if (data.status === 'error') {
+                    throw new Error(data.message);
+                }
+                
+                // Afficher contenu traduit
+                titleEl.textContent = data.titre;
+                contentEl.innerHTML = data.contenu.replace(/\n/g, '<br>');
+                
+                // Afficher badge si depuis cache
+                if (data.cached) {
+                    console.log('Traduction chargée depuis le cache');
+                }
+                
+            } catch (error) {
+                console.error('Erreur de traduction:', error);
+                titleEl.textContent = originalTitre;
+                contentEl.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fa fa-exclamation-triangle"></i>
+                        <strong>Erreur de traduction:</strong> ${error.message || 'Service temporairement indisponible'}
+                    </div>
+                    ${originalContenu.replace(/\n/g, '<br>')}
+                `;
+            }
+        });
+    </script>
 </body>
 </html>

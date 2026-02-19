@@ -27,7 +27,7 @@ class Communaute
     #[ORM\JoinColumn(
         name: "owner_id",
         referencedColumnName: "userId",
-        nullable: false
+        nullable: true
     )]
     private ?User $owner = null;
 

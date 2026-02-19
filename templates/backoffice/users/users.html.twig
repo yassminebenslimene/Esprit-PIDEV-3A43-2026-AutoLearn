@@ -336,7 +336,11 @@
                             <div class="stat-value">{{ totalUsers|default(0) }}</div>
                             <span class="stat-change positive">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
-                                +{{ ((totalUsers - totalUsers|default(0)) / totalUsers|default(1) * 100)|round(1) }}%
+                                {% if totalUsers > 0 %}
+                                    +{{ ((newTodayCount|default(0)) / totalUsers * 100)|round(1) }}%
+                                {% else %}
+                                    0%
+                                {% endif %}
                             </span>
                         </div>
                         <div class="stat-icon cyan">

@@ -159,7 +159,7 @@
     {% endif %}
 
     {# Bloc réservé au créateur : inviter des membres + liste des membres #}
-    {% if app.user and communaute.owner.id == app.user.id %}
+    {% if app.user and communaute.owner and communaute.owner.id == app.user.id %}
         <div class="invite-box">
             <strong>Inviter un ami (par email)</strong>
             <form method="post" action="/communaute/{{ communaute.id }}">

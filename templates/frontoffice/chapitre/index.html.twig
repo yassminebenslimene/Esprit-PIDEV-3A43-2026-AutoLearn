@@ -25,19 +25,19 @@
         <div class="back-navigation">
             <a href="{{ path('app_frontoffice') }}#cours" class="btn-back-to-courses">
                 <i class="fa fa-arrow-left"></i>
-                Retour aux cours
+                {{ 'frontoffice.chapter.back_to_courses'|trans }}
             </a>
         </div>
 
-        <h1 class="page-title">📚 Découvrez nos chapitres</h1>
+        <h1 class="page-title">📚 {{ 'frontoffice.chapter.discover_chapters'|trans }}</h1>
 
         <div class="row">
             {% if chapitres is empty %}
                 <div class="col-12">
                     <div class="empty-state">
                         <div class="empty-state-icon">📖</div>
-                        <h3 class="empty-state-title">Aucun chapitre disponible</h3>
-                        <p class="empty-state-text">Les chapitres seront bientôt disponibles. Revenez plus tard !</p>
+                        <h3 class="empty-state-title">{{ 'frontoffice.chapter.no_chapters'|trans }}</h3>
+                        <p class="empty-state-text">{{ 'frontoffice.chapter.chapters_soon'|trans }}</p>
                     </div>
                 </div>
             {% else %}
@@ -60,7 +60,7 @@
                             {# Métadonnées #}
                             <div class="chapter-meta">
                                 <span class="chapter-order">
-                                    <i class="fa fa-bookmark"></i> Chapitre {{ chapitre.ordre }}
+                                    <i class="fa fa-bookmark"></i> {{ 'frontoffice.chapter.chapter'|trans }} {{ chapitre.ordre }}
                                 </span>
                                 {% if chapitre.cours %}
                                     <span class="chapter-course">
@@ -73,11 +73,11 @@
                             <div class="chapter-actions">
                                 <a href="{{ path('app_chapitre_show_front', {'id': chapitre.id}) }}" class="btn-modern">
                                     <i class="fa fa-book-open"></i>
-                                    Lire le chapitre
+                                    {{ 'frontoffice.chapter.read_chapter'|trans }}
                                 </a>
                                 <a href="{{ path('app_frontoffice_quiz_list', {'chapitreId': chapitre.id}) }}" class="btn-modern btn-quiz">
                                     <i class="fa fa-question-circle"></i>
-                                    Passer le quiz
+                                    {{ 'frontoffice.chapter.take_quiz'|trans }}
                                 </a>
                             </div>
                         </div>
