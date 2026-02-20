@@ -414,16 +414,14 @@
                                 <h4>{{ cour.titre }}</h4>
                                 <p>{{ cour.description|length > 100 ? cour.description|slice(0, 100) ~ '...' : cour.description }}</p>
                                 <div class="main-button">
-<<<<<<< HEAD
-                                    <a href="{{ path('app_frontoffice_chapitre_by_cours', {'coursId': cour.id}) }}">Voir le cours</a>
-=======
+
                                     <a href="{{ path('app_frontoffice_chapitre_by_cours', {'coursId': cour.id}) }}" class="btn">
                                         {{ 'courses.view'|trans }}
                                     </a>
                                     <a href="{{ path('front_communaute_cours', {'coursId': cour.id}) }}" class="btn" style="background: linear-gradient(135deg, #6c5ce7, #4a69bd);">
                                         <i class="fa fa-users me-1"></i> {{ 'nav.community'|trans }}
                                     </a>
->>>>>>> d78514ecb3be0661e79674dcc5e76b4dd01a90db
+
                                 </div>
                             </div>
                         </div>

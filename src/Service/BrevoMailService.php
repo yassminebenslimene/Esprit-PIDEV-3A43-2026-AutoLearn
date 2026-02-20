@@ -195,6 +195,55 @@ class BrevoMailService
     }
 
     /**
+     * Send account suspension notification email
+     */
+    public function sendSuspensionEmail(string $toEmail, string $userName, string $reason): void
+    {
+        $this->logger->info('Attempting to send suspension notification', [
+            'to' => $toEmail,
+            'userName' => $userName
+        ]);
+
+        $this->sendBrevoEmail(
+            $toEmail,
+            $userName,
+            'Account Suspended - AutoLearn Platform',
+            'emails/suspension.html.twig',
+            'emails/suspension.txt.twig',
+            [
+                'userName' => $userName,
+                'email' => $toEmail,
+                'reason' => $reason,
+                'supportEmail' => $this->fromEmail
+            ]
+        );
+    }
+
+    /**
+     * Send account reactivation notification email
+     */
+    public function sendReactivationEmail(string $toEmail, string $userName, string $loginUrl): void
+    {
+        $this->logger->info('Attempting to send reactivation notification', [
+            'to' => $toEmail,
+            'userName' => $userName
+        ]);
+
+        $this->sendBrevoEmail(
+            $toEmail,
+            $userName,
+            'Account Reactivated - AutoLearn Platform',
+            'emails/reactivation.html.twig',
+            'emails/reactivation.txt.twig',
+            [
+                'userName' => $userName,
+                'email' => $toEmail,
+                'loginUrl' => $loginUrl
+            ]
+        );
+    }
+
+    /**
      * Generic method to send emails via Brevo API
      */
     private function sendBrevoEmail(

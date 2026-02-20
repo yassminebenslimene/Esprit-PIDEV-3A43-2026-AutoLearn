@@ -101,6 +101,18 @@ private Collection $challenges;
     #[ORM\Column(name: 'createdAt', type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $isSuspended = false;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $suspendedAt = null;
+
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
+    private ?string $suspensionReason = null;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $suspendedBy = null;
+
 
 
 
@@ -108,7 +120,8 @@ private Collection $challenges;
     public function __construct()
     {
         $this->createdAt = new \DateTime();
-    $this->challenges = new ArrayCollection(); 
+        $this->challenges = new ArrayCollection();
+        $this->isSuspended = false;
     }
 
     public function getRoles(): array
@@ -244,6 +257,50 @@ public function removeChallenge(Challenge $challenge): static
             $challenge->setCreatedBy(null);
         }
     }
+    return $this;
+}
+
+public function getIsSuspended(): bool
+{
+    return $this->isSuspended;
+}
+
+public function setIsSuspended(bool $isSuspended): static
+{
+    $this->isSuspended = $isSuspended;
+    return $this;
+}
+
+public function getSuspendedAt(): ?\DateTimeInterface
+{
+    return $this->suspendedAt;
+}
+
+public function setSuspendedAt(?\DateTimeInterface $suspendedAt): static
+{
+    $this->suspendedAt = $suspendedAt;
+    return $this;
+}
+
+public function getSuspensionReason(): ?string
+{
+    return $this->suspensionReason;
+}
+
+public function setSuspensionReason(?string $suspensionReason): static
+{
+    $this->suspensionReason = $suspensionReason;
+    return $this;
+}
+
+public function getSuspendedBy(): ?int
+{
+    return $this->suspendedBy;
+}
+
+public function setSuspendedBy(?int $suspendedBy): static
+{
+    $this->suspendedBy = $suspendedBy;
     return $this;
 }
 
