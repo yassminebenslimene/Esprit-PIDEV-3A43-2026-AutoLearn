@@ -3,6 +3,7 @@
 namespace App\Security;
 
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,12 +18,18 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
     private RouterInterface $router;
     private Security $security;
     private RequestStack $requestStack;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(RouterInterface $router, Security $security, RequestStack $requestStack)
-    {
+    public function __construct(
+        RouterInterface $router, 
+        Security $security, 
+        RequestStack $requestStack,
+        EntityManagerInterface $entityManager
+    ) {
         $this->router = $router;
         $this->security = $security;
         $this->requestStack = $requestStack;
+        $this->entityManager = $entityManager;
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): Response
@@ -43,6 +50,12 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
             
             // Redirect back to login
             return new RedirectResponse($this->router->generate('backoffice_login'));
+        }
+
+        // Update last login time
+        if ($user instanceof User) {
+            $user->setLastLoginAt(new \DateTime());
+            $this->entityManager->flush();
         }
 
         // Redirect Admin to backoffice

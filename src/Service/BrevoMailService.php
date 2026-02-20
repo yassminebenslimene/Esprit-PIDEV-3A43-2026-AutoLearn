@@ -244,6 +244,36 @@ class BrevoMailService
     }
 
     /**
+     * Send admin notification for automatic suspension due to inactivity
+     */
+    public function sendAdminNotificationInactiveSuspension(
+        string $adminEmail,
+        string $adminName,
+        string $studentName,
+        string $studentEmail,
+        int $inactiveDays
+    ): void {
+        $this->logger->info('Attempting to send admin notification for inactive suspension', [
+            'to' => $adminEmail,
+            'student' => $studentEmail
+        ]);
+
+        $this->sendBrevoEmail(
+            $adminEmail,
+            $adminName,
+            'Suspension Automatique - Étudiant Inactif - AutoLearn',
+            'emails/admin_inactive_notification.html.twig',
+            'emails/admin_inactive_notification.txt.twig',
+            [
+                'adminName' => $adminName,
+                'studentName' => $studentName,
+                'studentEmail' => $studentEmail,
+                'inactiveDays' => $inactiveDays
+            ]
+        );
+    }
+
+    /**
      * Generic method to send emails via Brevo API
      */
     private function sendBrevoEmail(

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f4f4f4; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 20px auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 30px; text-align: center; }
+        .header h1 { margin: 0; font-size: 28px; }
+        .content { padding: 40px 30px; }
+        .alert-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .info-box { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .student-info { background: white; border: 2px solid #e2e8f0; padding: 15px; margin: 15px 0; border-radius: 5px; }
+        .info-text { color: #666; font-size: 14px; line-height: 1.8; }
+        .footer { background: #f8f9fa; padding: 20px 30px; text-align: center; color: #666; font-size: 12px; }
+        .label { font-weight: bold; color: #667eea; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔔 Notification Admin</h1>
+            <p>Suspension Automatique</p>
+        </div>
+        <div class="content">
+            <p>Bonjour <strong>{{ adminName }}</strong>,</p>
+            
+            <div class="alert-box">
+                <p style="margin: 0; font-weight: bold; color: #856404;">
+                    Un étudiant a été automatiquement suspendu pour inactivité prolongée.
+                </p>
+            </div>
+            
+            <div class="student-info">
+                <p><span class="label">Étudiant:</span> {{ studentName }}</p>
+                <p><span class="label">Email:</span> {{ studentEmail }}</p>
+                <p><span class="label">Période d'inactivité:</span> {{ inactiveDays }} jours</p>
+                <p><span class="label">Date de suspension:</span> {{ "now"|date("d/m/Y H:i") }}</p>
+                <p><span class="label">Raison:</span> Compte inactif - Inactivité prolongée (suspension automatique)</p>
+            </div>
+            
+            <div class="info-box">
+                <p style="margin: 0 0 10px 0; font-weight: bold; color: #667eea;">Actions effectuées:</p>
+                <ul style="margin: 0; padding-left: 20px;">
+                    <li>Compte étudiant suspendu automatiquement</li>
+                    <li>Email de notification envoyé à l'étudiant</li>
+                    <li>Accès à la plateforme bloqué</li>
+                </ul>
+            </div>
+            
+            <p class="info-text">
+                <strong>Que faire maintenant?</strong><br>
+                Vous pouvez réactiver ce compte à tout moment depuis le backoffice si l'étudiant reprend contact ou si la suspension était inappropriée.
+            </p>
+            
+            <p class="info-text">
+                <strong>Accès backoffice:</strong><br>
+                <a href="http://localhost:8000/backoffice/users" style="color: #667eea; text-decoration: none;">
+                    Gérer les utilisateurs →
+                </a>
+            </p>
+        </div>
+        <div class="footer">
+            <p>© {{ "now"|date("Y") }} AutoLearn Platform. Tous droits réservés.</p>
+            <p>Cet email a été envoyé automatiquement par le système de gestion AutoLearn.</p>
+        </div>
+    </div>
+</body>
+</html>

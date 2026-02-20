@@ -113,15 +113,15 @@ private Collection $challenges;
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $suspendedBy = null;
 
-
-
-
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $lastLoginAt = null;
 
     public function __construct()
     {
         $this->createdAt = new \DateTime();
         $this->challenges = new ArrayCollection();
         $this->isSuspended = false;
+        $this->lastLoginAt = new \DateTime(); // Initialize with current time
     }
 
     public function getRoles(): array
@@ -301,6 +301,17 @@ public function getSuspendedBy(): ?int
 public function setSuspendedBy(?int $suspendedBy): static
 {
     $this->suspendedBy = $suspendedBy;
+    return $this;
+}
+
+public function getLastLoginAt(): ?\DateTimeInterface
+{
+    return $this->lastLoginAt;
+}
+
+public function setLastLoginAt(?\DateTimeInterface $lastLoginAt): static
+{
+    $this->lastLoginAt = $lastLoginAt;
     return $this;
 }
 
