@@ -9,6 +9,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use App\Bundle\UserActivityBundle\Entity\UserActivity;
+
+
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\InheritanceType('SINGLE_TABLE')]
@@ -22,6 +25,8 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
 #[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Challenge::class)]
 private Collection $challenges;
 
+#[ORM\OneToMany(mappedBy: 'user', targetEntity: UserActivity::class, cascade: ['persist', 'remove'])]
+private Collection $activities;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -70,7 +75,7 @@ private Collection $challenges;
     #[Assert\NotBlank(message: 'L\'email est obligatoire')]
     #[Assert\Email(message: 'L\'email "{{ value }}" n\'est pas valide')]
     #[Assert\Length(max: 255)]
-     #[Assert\Regex(
+    #[Assert\Regex(
         pattern: "/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/",
         message: 'Format d\'email invalide. Exemple : nom.prenom@domaine.com'
     )]
@@ -116,12 +121,14 @@ private Collection $challenges;
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $lastLoginAt = null;
 
+   
     public function __construct()
     {
         $this->createdAt = new \DateTime();
         $this->challenges = new ArrayCollection();
         $this->isSuspended = false;
         $this->lastLoginAt = new \DateTime(); // Initialize with current time
+        $this->activities = new ArrayCollection();
     }
 
     public function getRoles(): array
@@ -314,5 +321,38 @@ public function setLastLoginAt(?\DateTimeInterface $lastLoginAt): static
     $this->lastLoginAt = $lastLoginAt;
     return $this;
 }
+
+/**
+ * @return Collection<int, UserActivity>
+ */
+public function getActivities(): Collection
+{
+    return $this->activities;
+}
+
+public function addActivity(UserActivity $activity): static
+{
+    if (!$this->activities->contains($activity)) {
+        $this->activities->add($activity);
+        $activity->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removeActivity(UserActivity $activity): static
+{
+    if ($this->activities->removeElement($activity)) {
+        // set the owning side to null (unless already changed)
+        if ($activity->getUser() === $this) {
+            $activity->setUser(null);
+        }
+    }
+
+    return $this;
+}
+
+
+
 
 }
