@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Entity;
-
+use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\ExerciceRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,12 +14,16 @@ class Exercice
     private ?int $id = null;
 
     #[ORM\Column(length: 30)]
+    #[Assert\NotBlank(message: "La question ne peut pas être vide.")]
     private ?string $question = null;
 
     #[ORM\Column(length: 30)]
+    #[Assert\NotBlank(message: "La réponse ne peut pas être vide.")]
     private ?string $reponse = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Le nombre de points ne peut pas être vide.")]
+    #[Assert\Positive(message: "Le nombre de points doit être un entier positif.")]
     private ?int $points = null;
 
     #[ORM\ManyToOne(inversedBy: 'exercices')]

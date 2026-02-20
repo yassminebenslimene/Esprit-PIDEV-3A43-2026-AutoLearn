@@ -179,10 +179,7 @@ https://templatemo.com/tm-607-glass-admin
                     </div>
                     <h2 class="card-title" style="margin-bottom: 0;">{{ title }}</h2>
                 </div>
-
-                {{ form_start(form, {'attr': {'style': 'display: flex; flex-direction: column; gap: 20px;'}}) }}
-
-                {# Suppression du champ challengeId #}
+                {{ form_start(form,{'attr': {'novalidate': 'novalidate'}} ) }}
                 {# Seuls les champs question, reponse et points sont conservés #}
 
                 <div class="form-group">
@@ -192,6 +189,7 @@ https://templatemo.com/tm-607-glass-admin
                         'class': 'form-control',
                         'placeholder': 'Entrez la question...'
                     }}) }}
+                    {{form_errors(form.question) }}
                 </div>
 
                 <div class="form-group">
@@ -201,6 +199,7 @@ https://templatemo.com/tm-607-glass-admin
                         'class': 'form-control',
                         'placeholder': 'Entrez la réponse...'
                     }}) }}
+                    {{form_errors(form.reponse) }}
                 </div>
 
                 <div class="form-group">
@@ -208,10 +207,9 @@ https://templatemo.com/tm-607-glass-admin
                     {{ form_widget(form.points, {'attr': {
                         'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit; font-size: 14px;',
                         'class': 'form-control',
-                        'placeholder': 'Ex: 10',
-                        'min': '1',
-                        'step': '1'
+                        'placeholder': 'Ex: 10'
                     }}) }}
+                    {{form_errors(form.points) }}
                 </div>
 
                 <div style="display: flex; gap: 15px; margin-top: 30px;">
