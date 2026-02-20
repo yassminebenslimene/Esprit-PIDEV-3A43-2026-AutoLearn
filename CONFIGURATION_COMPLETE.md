@@ -15,10 +15,10 @@ Date: 20 février 2026
 
 ### Configuration .env
 - ✅ Fichier `.env` créé
-- ✅ BREVO_API_KEY configuré: `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`
+- ✅ BREVO_API_KEY configuré (voir fichier .env)
 - ✅ MAIL_FROM_EMAIL configuré: `autolearn66@gmail.com`
 - ✅ MAILER_DSN configuré avec clé SMTP
-- ✅ APP_SECRET configuré: `f0d74fedcadd6fc2b68cc9efea9945e3`
+- ✅ APP_SECRET configuré
 
 ### Base de Données
 - ✅ 22 migrations marquées comme exécutées

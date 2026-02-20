@@ -107,6 +107,7 @@ class AutoSuspendInactiveUsersCommand extends Command
                     $user->setSuspensionReason('Compte inactif - Inactivité prolongée (suspension automatique)');
                     $user->setSuspendedBy(null); // null = système automatique
 
+                    $this->entityManager->persist($user);
                     $this->entityManager->flush();
 
                     // Send email to student
