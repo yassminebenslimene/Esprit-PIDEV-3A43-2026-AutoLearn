@@ -1,0 +1,94 @@
+{% extends 'backoffice/base.html.twig' %}
+
+{% block title %}User Activities{% endblock %}
+
+{% block page_title %}User Activities{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{{ path('admin_user_activity_index') }}" class="btn btn-secondary mb-3">
+                <i class="fas fa-arrow-left"></i> Back to All Activities
+            </a>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">User Activity History</h3>
+                    <p class="text-muted">Last 50 activities for this user</p>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date/Time</th>
+                                    <th>Action</th>
+                                    <th>IP Address</th>
+                                    <th>User Agent</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for activity in activities %}
+                                <tr>
+                                    <td>{{ activity.createdAt|date('Y-m-d H:i:s') }}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ activity.action }}</span>
+                                    </td>
+                                    <td>{{ activity.ipAddress ?? 'N/A' }}</td>
+                                    <td>{{ activity.userAgent|slice(0, 50) }}...</td>
+                                    <td>{{ activity.location ?? 'N/A' }}</td>
+                                    <td>
+                                        {% if activity.success %}
+                                            <span class="badge bg-success">Success</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Failed</span>
+                                            {% if activity.errorMessage %}
+                                                <br><small class="text-danger">{{ activity.errorMessage }}</small>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if activity.metadata %}
+                                            <button class="btn btn-sm btn-outline-primary" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#metadataModal{{ activity.id }}">
+                                                View
+                                            </button>
+                                            
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="metadataModal{{ activity.id }}" tabindex="-1">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Activity Metadata</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <pre>{{ activity.metadata|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center">No activities recorded for this user</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
