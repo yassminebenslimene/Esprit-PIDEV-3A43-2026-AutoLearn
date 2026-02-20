@@ -1,57 +1,241 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-{% block title %}{{ challenge.titre }}{% endblock %}
+    <title>{{ challenge.titre }} - Scholar</title>
 
-{% block body %}
-<div class="container mt-5">
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h1 class="h3 mb-0">{{ challenge.titre }}</h1>
-        </div>
-        <div class="card-body">
-            <p class="lead">{{ challenge.description }}</p>
+    {% block stylesheets %}
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/vendor/bootstrap/css/bootstrap.min.css') }}">
+
+        <!-- FrontOffice CSS -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/animate.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/flex-slider.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/owl.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/templatemo-scholar.css') }}">
+
+        <!-- Swiper -->
+        <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
+        
+        <style>
+            .challenge-detail {
+                margin-top: 120px;
+                margin-bottom: 80px;
+            }
             
-            <hr>
+            .challenge-card {
+                background: white;
+                border-radius: 20px;
+                padding: 40px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+                max-width: 600px;
+                margin: 0 auto;
+            }
             
-            <div class="row mt-4">
-                <div class="col-md-4">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Niveau</h5>
-                            <span class="badge badge-pill badge-{{ challenge.niveau == 'Facile' ? 'success' : (challenge.niveau == 'Intermédiaire' ? 'warning' : 'danger') }}" 
-                                  style="font-size: 1.2rem; padding: 8px 16px;">
-                                {{ challenge.niveau }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Date de début</h5>
-                            <p class="card-text font-weight-bold">{{ challenge.dateDebut|date('d/m/Y') }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Date de fin</h5>
-                            <p class="card-text font-weight-bold">{{ challenge.dateFin|date('d/m/Y') }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            .challenge-title {
+                font-size: 32px;
+                font-weight: 700;
+                color: #2a2a2a;
+                margin-bottom: 30px;
+                text-align: center;
+            }
             
-            <div class="mt-5 text-center">
-                <a href="{{ path('app_frontoffice') }}#challenge" class="btn btn-secondary">
-                    <i class="fa fa-arrow-left"></i> Retour aux challenges
-                </a>
-                <a href="#" class="btn btn-primary">
-                    <i class="fa fa-trophy"></i> Participer
-                </a>
+            .info-item {
+                margin-bottom: 20px;
+                padding: 15px;
+                background: #f9f9f9;
+                border-radius: 10px;
+            }
+            
+            .info-label {
+                font-size: 14px;
+                color: #7a7a7a;
+                margin-bottom: 5px;
+            }
+            
+            .info-value {
+                font-size: 18px;
+                font-weight: 600;
+                color: #2a2a2a;
+            }
+            
+            .info-value i {
+                margin-right: 10px;
+                color: #7fb77e;
+            }
+            
+            .niveau-badge {
+                display: inline-block;
+                padding: 5px 15px;
+                border-radius: 20px;
+                font-size: 14px;
+                font-weight: 600;
+            }
+            
+            .niveau-facile {
+                background: #7fb77e;
+                color: white;
+            }
+            
+            .niveau-intermediaire {
+                background: #f3b562;
+                color: white;
+            }
+            
+            .niveau-difficile {
+                background: #f17b7b;
+                color: white;
+            }
+            
+            .btn-start {
+                display: inline-block;
+                background: #7fb77e;
+                color: white;
+                padding: 12px 40px;
+                border-radius: 25px;
+                font-size: 16px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: all 0.3s;
+                border: none;
+                cursor: pointer;
+                width: 100%;
+                text-align: center;
+                margin-top: 20px;
+            }
+            
+            .btn-start:hover {
+                background: #6da06c;
+                color: white;
+                transform: translateY(-2px);
+            }
+            
+            .btn-start i {
+                margin-left: 10px;
+            }
+        </style>
+    {% endblock %}
+</head>
+<body>
+
+<!-- ***** Header Area Start ***** -->
+<header class="header-area header-sticky">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                    <!-- ***** Logo Start ***** -->
+                    <a href="{{ path('app_frontoffice') }}" class="logo">
+                        <h1>Scholar</h1>
+                    </a>
+                    <!-- ***** Logo End ***** -->
+                    <!-- ***** Search Start ***** -->
+                    <div class="search-input">
+                        <form id="search" action="#">
+                            <input type="text" placeholder="Type Something" id='searchText' name="searchKeyword" />
+                            <i class="fa fa-search"></i>
+                        </form>
+                    </div>
+                    <!-- ***** Search End ***** -->
+                    <!-- ***** Menu Start ***** -->
+                    <ul class="nav">
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#top">Home</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#services">Services</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#courses">Courses</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#team">Team</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#events">Events</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#challenge" class="active">Challenge</a></li>
+                        {% if app.user %}
+                            <li class="scroll-to-section">
+                                <a href="{{ path('app_profile') }}">My Profil</a>
+                            </li>
+                            <li class="scroll-to-section">
+                                <a href="{{ path('backoffice_logout') }}">Logout ({{ app.user.prenom }})</a>
+                            </li>
+                        {% else %}
+                            <li class="scroll-to-section"><a href="{{ path('backoffice_login') }}">Login</a></li>
+                            <li class="scroll-to-section"><a href="{{ path('backoffice_register') }}">Register</a></li>
+                        {% endif %}
+                    </ul>   
+                    <a class='menu-trigger'>
+                        <span>Menu</span>
+                    </a>
+                    <!-- ***** Menu End ***** -->
+                </nav>
             </div>
         </div>
     </div>
+</header>
+<!-- ***** Header Area End ***** -->
+
+<div class="challenge-detail">
+    <div class="container">
+        <div class="challenge-card">
+            <h1 class="challenge-title">{{ challenge.titre }}</h1>
+            
+            <!-- Date de début -->
+            <div class="info-item">
+                <div class="info-label">Date de début</div>
+                <div class="info-value">
+                    <i class="fa fa-calendar"></i>
+                    {{ challenge.dateDebut|date('d M Y') }}
+                </div>
+            </div>
+            
+            <!-- Date de fin -->
+            <div class="info-item">
+                <div class="info-label">Date de fin</div>
+                <div class="info-value">
+                    <i class="fa fa-calendar-check-o"></i>
+                    {{ challenge.dateFin|date('d M Y') }}
+                </div>
+            </div>
+            
+            <!-- Niveau -->
+            <div class="info-item">
+                <div class="info-label">Niveau</div>
+                <div class="info-value">
+                    <i class="fa fa-signal"></i>
+                    <span class="niveau-badge 
+                        {% if challenge.niveau == 'Facile' %}niveau-facile
+                        {% elseif challenge.niveau == 'Intermédiaire' %}niveau-intermediaire
+                        {% else %}niveau-difficile
+                        {% endif %}">
+                        {{ challenge.niveau }}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Bouton commencer -->
+            <a href="{{ path('frontchallenge_play', {'id': challenge.id}) }}" class="btn-start">
+                Commencer <i class="fa fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
 </div>
+
+<footer>
+    <div class="container">
+        <div class="col-lg-12">
+            <p>Copyright © 2036 Scholar Organization. All rights reserved. &nbsp;&nbsp;&nbsp; Design: <a href="https://templatemo.com" rel="nofollow" target="_blank">TemplateMo</a></p>
+        </div>
+    </div>
+</footer>
+
+{% block javascripts %}
+    <!-- jQuery -->
+    <script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
+    
+    <!-- Bootstrap -->
+    <script src="{{ asset('frontoffice/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    
+    <!-- Custom JS -->
+    <script src="{{ asset('frontoffice/js/custom.js') }}"></script>
 {% endblock %}
+
+</body>
+</html>

@@ -29,22 +29,29 @@ class Challenge
 
     #[ORM\Column(length: 15)]
     private ?string $niveau = null;
+    
+    #[ORM\ManyToOne(inversedBy: 'challenges')]
+    #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: false, onDelete: "CASCADE")]
+    private ?User $created_by = null;
+
     /**
      * @var Collection<int, Exercice>
      */
-    #[ORM\OneToMany(targetEntity: Exercice::class, mappedBy: 'challenge')]
+    #[ORM\OneToMany(targetEntity: Exercice::class, mappedBy: 'challenge',    cascade: ['persist', 'remove'],
+    orphanRemoval: true)]
     private Collection $exercices;
 
-    #[ORM\ManyToOne]
-
-    #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: true)]
-    private ?User $created_by = null;
+    /**
+     * @var Collection<int, Quiz>
+     */
+    #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'challenge')]
+    private Collection $quizzes;
 
     public function __construct()
     {
         $this->exercices = new ArrayCollection();
+        $this->quizzes = new ArrayCollection();
     }
-
     public function getId(): ?int
     {
         return $this->id;
@@ -109,6 +116,17 @@ class Challenge
 
         return $this;
     }
+    public function getCreatedBy(): ?User
+    {
+        return $this->created_by;
+    }
+
+    public function setCreatedBy(?User $created_by): static
+    {
+        $this->created_by = $created_by;
+
+        return $this;
+    }
 
     /**
      * @return Collection<int, Exercice>
@@ -121,7 +139,7 @@ class Challenge
     public function addExercice(Exercice $exercice): static
     {
         if (!$this->exercices->contains($exercice)) {
-            $this->exercices->add($exercice);
+            $this->exercices[]= $exercice;
             $exercice->setChallenge($this);
         }
 
@@ -140,14 +158,32 @@ class Challenge
         return $this;
     }
 
-    public function getCreatedBy(): ?user
+    /**
+     * @return Collection<int, Quiz>
+     */
+    public function getQuizzes(): Collection
     {
-        return $this->created_by;
+        return $this->quizzes;
     }
 
-    public function setCreatedBy(?user $created_by): static
+    public function addQuiz(Quiz $quiz): static
     {
-        $this->created_by = $created_by;
+        if (!$this->quizzes->contains($quiz)) {
+            $this->quizzes->add($quiz);
+            $quiz->setChallenge($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuiz(Quiz $quiz): static
+    {
+        if ($this->quizzes->removeElement($quiz)) {
+            // set the owning side to null (unless already changed)
+            if ($quiz->getChallenge() === $this) {
+                $quiz->setChallenge(null);
+            }
+        }
 
         return $this;
     }

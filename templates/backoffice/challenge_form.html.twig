@@ -13,6 +13,149 @@
 TemplateMo 607 Glass Admin
 https://templatemo.com/tm-607-glass-admin
 -->
+    <style>
+        .selection-section {
+            margin-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 25px;
+        }
+        
+        .selection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .selection-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .selection-tab {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .selection-tab.active {
+            background: linear-gradient(135deg, var(--emerald-light), var(--emerald));
+            color: white;
+            border-color: transparent;
+        }
+        
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+        
+        .item-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .item-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-2px);
+        }
+        
+        .item-card.selected {
+            border-color: var(--emerald-light);
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+        }
+        
+        .item-card.selected::before {
+            content: "✓";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            background: var(--emerald-light);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+        
+        .item-details {
+            display: flex;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .item-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .selected-count {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .selected-count span {
+            color: var(--emerald-light);
+            font-weight: 700;
+            margin: 0 5px;
+        }
+        
+        .hidden-field {
+            display: none;
+        }
+        
+        /* Style pour les quiz et exercices */
+        .item-type {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .item-question {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .item-points {
+            font-weight: 600;
+            color: var(--emerald-light);
+        }
+    </style>
 </head>
 <body>
     <!-- Animated Background -->
@@ -216,6 +359,75 @@ https://templatemo.com/tm-607-glass-admin
                     </div>
                 </div>
 
+                <!-- Section de sélection des exercices et quiz -->
+                <div class="selection-section">
+                    <div class="selection-header">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Contenu du challenge</h3>
+                        <div class="selected-count">
+                            <span id="selectedCount">0</span> élément(s) sélectionné(s)
+                        </div>
+                    </div>
+                    
+                    <div class="selection-tabs">
+                        <div class="selection-tab active" data-type="exercices">Exercices</div>
+                        <div class="selection-tab" data-type="quiz">Quiz</div>
+                    </div>
+                    
+                    <!-- Liste des exercices -->
+                    <div id="exercicesList" class="items-grid">
+                        {% if exercices is defined and exercices|length > 0 %}
+                            {% for exercice in exercices %}
+                                <div class="item-card {% if exerciceIds is defined and exercice.id in exerciceIds %}selected{% endif %}" 
+                                     data-id="{{ exercice.id }}" 
+                                     data-type="exercice"
+                                     onclick="toggleSelection(this, 'exercice_{{ exercice.id }}')">
+                                    <div class="item-title">{{ exercice.question }}</div>
+                                    <div class="item-details">
+                                        <span class="item-badge">{{ exercice.points }} pts</span>
+                                        <span class="item-type">Exercice</span>
+                                    </div>
+                                    <div class="item-question">Réponse: {{ exercice.reponse }}</div>
+                                    <input type="checkbox" 
+                                           name="exercices[]" 
+                                           id="exercice_{{ exercice.id }}" 
+                                           value="{{ exercice.id }}" 
+                                           {% if exerciceIds is defined and exercice.id in exerciceIds %}checked{% endif %}
+                                           style="display: none;">
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p style="grid-column: 1/-1; text-align: center; padding: 30px; color: var(--text-muted);">Aucun exercice disponible</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Liste des quiz -->
+                    <div id="quizList" class="items-grid" style="display: none;">
+                        {% if quizs is defined and quizs|length > 0 %}
+                            {% for quiz in quizs %}
+                                <div class="item-card {% if quizIds is defined and quiz.id in quizIds %}selected{% endif %}" 
+                                     data-id="{{ quiz.id }}" 
+                                     data-type="quiz"
+                                     onclick="toggleSelection(this, 'quiz_{{ quiz.id }}')">
+                                    <div class="item-title">{{ quiz.titre }}</div>
+                                    <div class="item-details">
+                                        <span class="item-badge">{{ quiz.questions|length }} question(s)</span>
+                                        <span class="item-type">Quiz</span>
+                                    </div>
+                                    <div class="item-question">État: {{ quiz.etat }}</div>
+                                    <input type="checkbox" 
+                                           name="quizs[]" 
+                                           id="quiz_{{ quiz.id }}" 
+                                           value="{{ quiz.id }}" 
+                                           {% if quizIds is defined and quiz.id in quizIds %}checked{% endif %}
+                                           style="display: none;">
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p style="grid-column: 1/-1; text-align: center; padding: 30px; color: var(--text-muted);">Aucun quiz disponible</p>
+                        {% endif %}
+                    </div>
+                </div>
+
                 <div style="display: flex; gap: 15px; margin-top: 20px;">
                     <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, var(--emerald-light), var(--emerald)); color: white; padding: 12px 30px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -254,6 +466,46 @@ https://templatemo.com/tm-607-glass-admin
     </footer>
 
     <script src="{{ asset('backoffice/js/templatemo-glass-admin-script.js') }}"></script>
+    <script>
+        // Fonction pour basculer la sélection d'un élément
+        function toggleSelection(element, checkboxId) {
+            const checkbox = document.getElementById(checkboxId);
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                if (checkbox.checked) {
+                    element.classList.add('selected');
+                } else {
+                    element.classList.remove('selected');
+                }
+            }
+            updateSelectedCount();
+        }
+        
+        // Fonction pour mettre à jour le compteur d'éléments sélectionnés
+        function updateSelectedCount() {
+            const checkboxes = document.querySelectorAll('input[name="exercices[]"]:checked, input[name="quizs[]"]:checked');
+            document.getElementById('selectedCount').textContent = checkboxes.length;
+        }
+        
+        // Gestion des onglets
+        document.querySelectorAll('.selection-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Désactiver l'onglet actif
+                document.querySelectorAll('.selection-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Afficher la liste correspondante
+                const type = this.dataset.type;
+                document.getElementById('exercicesList').style.display = type === 'exercices' ? 'grid' : 'none';
+                document.getElementById('quizList').style.display = type === 'quiz' ? 'grid' : 'none';
+            });
+        });
+        
+        // Initialiser le compteur au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSelectedCount();
+        });
+    </script>
     <!-- TemplateMo 607 Glass Admin -->
 </body>
 </html>

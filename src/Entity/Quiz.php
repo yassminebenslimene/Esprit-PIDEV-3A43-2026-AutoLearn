@@ -54,6 +54,10 @@ class Quiz
     #[ORM\JoinColumn(nullable: true)]
     private ?Chapitre $chapitre = null;
 
+    #[ORM\ManyToOne(inversedBy: 'quizzes')]
+    #[ORM\JoinColumn(name: 'challenge_id', referencedColumnName: 'id', nullable: true)]
+    private ?Challenge $challenge = null;
+
     /**
      * @var Collection<int, Question>
      */
@@ -135,6 +139,17 @@ class Quiz
     public function setChapitre(?Chapitre $chapitre): static
     {
         $this->chapitre = $chapitre;
+        return $this;
+    }
+
+    public function getChallenge(): ?Challenge
+    {
+        return $this->challenge;
+    }
+
+    public function setChallenge(?Challenge $challenge): static
+    {
+        $this->challenge = $challenge;
         return $this;
     }
 }

@@ -3,6 +3,8 @@ namespace App\Form;
 
 use App\Entity\Challenge;
 use App\Entity\User;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use App\Form\ExerciceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -23,7 +25,13 @@ class ChallengeType extends AbstractType
             ->add('dateFin', DateType::class, [
                 'widget' => 'single_text'
             ])
-            ->add('niveau', TextType::class);
+            ->add('niveau', TextType::class)
+            ->add('exercices', CollectionType::class, [
+                'entry_type' => ExerciceType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
