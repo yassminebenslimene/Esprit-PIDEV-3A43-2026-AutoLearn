@@ -15,9 +15,9 @@ Date: 20 février 2026
 
 ### Configuration .env
 - ✅ Fichier `.env` créé
-- ✅ BREVO_API_KEY configuré (voir fichier .env)
+- ✅ BREVO_API_KEY configuré (voir fichier .env - ne pas commiter!)
 - ✅ MAIL_FROM_EMAIL configuré: `autolearn66@gmail.com`
-- ✅ MAILER_DSN configuré avec clé SMTP
+- ✅ MAILER_DSN configuré avec clé SMTP (voir fichier .env - ne pas commiter!)
 - ✅ APP_SECRET configuré
 
 ### Base de Données
