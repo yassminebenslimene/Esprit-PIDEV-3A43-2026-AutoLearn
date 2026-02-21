@@ -6,6 +6,7 @@ use App\Entity\Quiz;
 use App\Entity\Question;
 use App\Entity\Option;
 use App\Entity\Etudiant;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Service pour gérer la logique métier des quiz
@@ -13,6 +14,11 @@ use App\Entity\Etudiant;
  */
 class QuizManagementService
 {
+    /**
+     * Clé de session pour stocker les tentatives des étudiants
+     */
+    private const SESSION_TENTATIVES_KEY = 'quiz_tentatives';
+
     /**
      * Règle 1: Vérifie si un quiz peut être activé
      */
@@ -81,13 +87,29 @@ class QuizManagementService
     /**
      * Règle 4: Vérifie si un étudiant peut passer un quiz
      */
-    public function canStudentTakeQuiz(Etudiant $etudiant, Quiz $quiz): array
+    public function canStudentTakeQuiz(Etudiant $etudiant, Quiz $quiz, SessionInterface $session = null): array
     {
         $errors = [];
 
         // Vérifier si le quiz est actif
         if ($quiz->getEtat() !== 'actif') {
             $errors[] = "Ce quiz n'est pas actif.";
+        }
+
+        // Vérifier s'il y a une tentative en cours
+        if ($session) {
+            $tentativeKey = 'quiz_tentative_' . $quiz->getId() . '_' . $etudiant->getId();
+            if ($session->has($tentativeKey)) {
+                $errors[] = "Vous avez déjà une tentative en cours pour ce quiz.";
+            }
+
+            // Vérifier le nombre maximum de tentatives
+            if ($quiz->getMaxTentatives() !== null) {
+                $nombreTentatives = $this->getNombreTentatives($etudiant, $quiz, $session);
+                if ($nombreTentatives >= $quiz->getMaxTentatives()) {
+                    $errors[] = "Vous avez atteint le nombre maximum de tentatives ({$quiz->getMaxTentatives()}) pour ce quiz.";
+                }
+            }
         }
 
         return [
@@ -216,6 +238,87 @@ class QuizManagementService
             'nombreQuestions' => $totalQuestions,
             'pointsTotal' => $totalPoints,
             'moyennePointsParQuestion' => $totalQuestions > 0 ? round($totalPoints / $totalQuestions, 2) : 0
+        ];
+    }
+
+    /**
+     * Obtient le nombre de tentatives d'un étudiant pour un quiz
+     */
+    public function getNombreTentatives(Etudiant $etudiant, Quiz $quiz, SessionInterface $session): int
+    {
+        $tentativesKey = self::SESSION_TENTATIVES_KEY;
+        $tentatives = $session->get($tentativesKey, []);
+        
+        $key = $etudiant->getId() . '_' . $quiz->getId();
+        return $tentatives[$key] ?? 0;
+    }
+
+    /**
+     * Enregistre une nouvelle tentative
+     */
+    public function enregistrerTentative(Etudiant $etudiant, Quiz $quiz, SessionInterface $session, array $resultats = null): void
+    {
+        $tentativesKey = self::SESSION_TENTATIVES_KEY;
+        $tentatives = $session->get($tentativesKey, []);
+        
+        $key = $etudiant->getId() . '_' . $quiz->getId();
+        $tentatives[$key] = ($tentatives[$key] ?? 0) + 1;
+        
+        // Optionnel : stocker aussi les résultats de la dernière tentative
+        if ($resultats) {
+            $resultatsKey = 'quiz_resultats_' . $etudiant->getId() . '_' . $quiz->getId();
+            $session->set($resultatsKey, [
+                'score' => $resultats['score'],
+                'totalPoints' => $resultats['totalPoints'],
+                'percentage' => $resultats['percentage'],
+                'date' => (new \DateTime())->format('Y-m-d H:i:s'),
+                'tentative' => $tentatives[$key]
+            ]);
+        }
+        
+        $session->set($tentativesKey, $tentatives);
+    }
+
+    /**
+     * Obtient les résultats de la dernière tentative
+     */
+    public function getDerniersResultats(Etudiant $etudiant, Quiz $quiz, SessionInterface $session): ?array
+    {
+        $resultatsKey = 'quiz_resultats_' . $etudiant->getId() . '_' . $quiz->getId();
+        return $session->get($resultatsKey);
+    }
+
+    /**
+     * Vérifie si l'étudiant a réussi le quiz (basé sur la dernière tentative)
+     */
+    public function aReussiQuiz(Etudiant $etudiant, Quiz $quiz, SessionInterface $session): bool
+    {
+        $resultats = $this->getDerniersResultats($etudiant, $quiz, $session);
+        
+        if (!$resultats) {
+            return false;
+        }
+        
+        return $resultats['percentage'] >= $quiz->getSeuilReussite();
+    }
+
+    /**
+     * Obtient les statistiques d'un étudiant pour un quiz
+     */
+    public function getStatistiquesEtudiant(Etudiant $etudiant, Quiz $quiz, SessionInterface $session): array
+    {
+        $nombreTentatives = $this->getNombreTentatives($etudiant, $quiz, $session);
+        $derniersResultats = $this->getDerniersResultats($etudiant, $quiz, $session);
+        $aReussi = $this->aReussiQuiz($etudiant, $quiz, $session);
+        $peutRecommencer = $this->canStudentTakeQuiz($etudiant, $quiz, $session)['canTake'];
+
+        return [
+            'nombreTentatives' => $nombreTentatives,
+            'maxTentatives' => $quiz->getMaxTentatives(),
+            'derniersResultats' => $derniersResultats,
+            'aReussi' => $aReussi,
+            'peutRecommencer' => $peutRecommencer,
+            'seuilReussite' => $quiz->getSeuilReussite()
         ];
     }
 }

@@ -31,8 +31,8 @@ class QuizPassageController extends AbstractController
             return $this->redirectToRoute('app_frontoffice');
         }
 
-        // Vérifier si l'étudiant peut passer le quiz
-        $check = $this->quizService->canStudentTakeQuiz($etudiant, $quiz);
+        // Vérifier si l'étudiant peut passer le quiz (avec vérification des tentatives)
+        $check = $this->quizService->canStudentTakeQuiz($etudiant, $quiz, $session);
         if (!$check['canTake']) {
             foreach ($check['errors'] as $error) {
                 $this->addFlash('error', $error);
@@ -115,12 +115,18 @@ class QuizPassageController extends AbstractController
         // Calculer le score
         $result = $this->quizService->calculateScore($quiz, $reponses);
         
+        // Enregistrer la tentative
+        $this->quizService->enregistrerTentative($etudiant, $quiz, $session, $result);
+        
         // Déterminer le statut
         $seuilReussite = $quiz->getSeuilReussite() ?? 50;
         $statut = $result['percentage'] >= $seuilReussite ? 'VALIDÉ' : 'ÉCHEC';
         
         // Nettoyer la tentative en cours
         $session->remove($tentativeKey);
+        
+        // Obtenir les statistiques de l'étudiant
+        $statistiques = $this->quizService->getStatistiquesEtudiant($etudiant, $quiz, $session);
         
         return $this->render('frontoffice/quiz/result.html.twig', [
             'quiz' => $quiz,
@@ -129,7 +135,8 @@ class QuizPassageController extends AbstractController
             'seuilReussite' => $seuilReussite,
             'chapitre' => $quiz->getChapitre(),
             'dureeReelle' => $dureeReelleMinutes,
-            'tempsDepasse' => $tempsDepasse
+            'tempsDepasse' => $tempsDepasse,
+            'statistiques' => $statistiques
         ]);
     }
 

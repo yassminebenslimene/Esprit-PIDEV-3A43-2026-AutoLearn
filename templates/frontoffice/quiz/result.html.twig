@@ -522,6 +522,140 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        /* Statistiques des tentatives */
+        .attempts-summary {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.8s ease-out;
+            animation-delay: 0.4s;
+            animation-fill-mode: both;
+        }
+        
+        .attempts-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 28px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 30px;
+            text-align: center;
+            justify-content: center;
+        }
+        
+        .attempts-title i {
+            color: #46178f;
+            font-size: 32px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(70, 23, 143, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+            border-left: 4px solid #46178f;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(70, 23, 143, 0.2);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            background: linear-gradient(135deg, #46178f 0%, #6b21a8 100%);
+        }
+        
+        .stat-icon.success {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        }
+        
+        .stat-icon.warning {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+        
+        .stat-icon.info {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+        
+        .stat-icon.danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        
+        .stat-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1f2937;
+        }
+        
+        .stat-number.success {
+            color: #2ecc71;
+        }
+        
+        .stat-number.warning {
+            color: #f39c12;
+        }
+        
+        .stat-number.info {
+            color: #3498db;
+        }
+        
+        .stat-number.danger {
+            color: #e74c3c;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .success-message {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 8px 25px rgba(46, 204, 113, 0.3);
+        }
+        
+        .success-message i {
+            font-size: 24px;
+        }
     </style>
 </head>
 <body>
@@ -628,6 +762,65 @@
                 </div>
             </div>
         {% endfor %}
+
+        {% if statistiques is defined %}
+            <div class="attempts-summary">
+                <h3 class="attempts-title">
+                    <i class="fa fa-chart-line"></i>
+                    Vos statistiques pour ce quiz
+                </h3>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fa fa-play-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-number">{{ statistiques.nombreTentatives }}</span>
+                            <span class="stat-label">
+                                Tentative{{ statistiques.nombreTentatives > 1 ? 's' : '' }}
+                                {% if statistiques.maxTentatives %}
+                                    / {{ statistiques.maxTentatives }}
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    {% if statistiques.derniersResultats %}
+                        <div class="stat-card">
+                            <div class="stat-icon {{ statistiques.aReussi ? 'success' : 'warning' }}">
+                                <i class="fa {{ statistiques.aReussi ? 'fa-trophy' : 'fa-target' }}"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-number {{ statistiques.aReussi ? 'success' : 'warning' }}">
+                                    {{ statistiques.derniersResultats.percentage|round(1) }}%
+                                </span>
+                                <span class="stat-label">Meilleur score</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon {{ statistiques.peutRecommencer ? 'info' : 'danger' }}">
+                            <i class="fa {{ statistiques.peutRecommencer ? 'fa-redo' : 'fa-ban' }}"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-number {{ statistiques.peutRecommencer ? 'info' : 'danger' }}">
+                                {{ statistiques.peutRecommencer ? 'OUI' : 'NON' }}
+                            </span>
+                            <span class="stat-label">Peut recommencer</span>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if statistiques.aReussi %}
+                    <div class="success-message">
+                        <i class="fa fa-check-circle"></i>
+                        <span>Félicitations ! Vous avez réussi ce quiz avec {{ statistiques.derniersResultats.percentage|round(1) }}% (seuil: {{ statistiques.seuilReussite }}%)</span>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
 
         <div class="action-buttons">
             <a href="{{ path('app_quiz_start', {'id': quiz.id}) }}" class="btn-action btn-retry">
