@@ -102,10 +102,17 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\OneToMany(targetEntity: Challenge::class, mappedBy: 'createdby', orphanRemoval: true)]
     private Collection $Challenges;
+
+    /**
+     * @var Collection<int, UserChallenge>
+     */
+    #[ORM\OneToMany(targetEntity: UserChallenge::class, mappedBy: 'user')]
+    private Collection $userChallenges;
     public function __construct()
     {
         $this->createdAt = new \DateTime();
         $this->Challenges = new ArrayCollection();
+        $this->userChallenges = new ArrayCollection();
     }
 
     public function getRoles(): array
@@ -242,6 +249,36 @@ public function removeChallenge(Challenge $challenge): static
         // set the owning side to null (unless already changed)
         if ($challenge->getCreatedby() === $this) {
             $challenge->setCreatedby(null);
+        }
+    }
+
+    return $this;
+}
+
+/**
+ * @return Collection<int, UserChallenge>
+ */
+public function getUserChallenges(): Collection
+{
+    return $this->userChallenges;
+}
+
+public function addUserChallenge(UserChallenge $userChallenge): static
+{
+    if (!$this->userChallenges->contains($userChallenge)) {
+        $this->userChallenges->add($userChallenge);
+        $userChallenge->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removeUserChallenge(UserChallenge $userChallenge): static
+{
+    if ($this->userChallenges->removeElement($userChallenge)) {
+        // set the owning side to null (unless already changed)
+        if ($userChallenge->getUser() === $this) {
+            $userChallenge->setUser(null);
         }
     }
 

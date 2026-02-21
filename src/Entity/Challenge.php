@@ -52,10 +52,17 @@ class Challenge
     #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'challenge')]
     private Collection $quizzes;
 
+    /**
+     * @var Collection<int, UserChallenge>
+     */
+    #[ORM\OneToMany(targetEntity: UserChallenge::class, mappedBy: 'challenge')]
+    private Collection $userChallenges;
+
     public function __construct()
     {
         $this->exercices = new ArrayCollection();
         $this->quizzes = new ArrayCollection();
+        $this->userChallenges = new ArrayCollection();
     }
     public function getId(): ?int
     {
@@ -187,6 +194,36 @@ class Challenge
             // set the owning side to null (unless already changed)
             if ($quiz->getChallenge() === $this) {
                 $quiz->setChallenge(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserChallenge>
+     */
+    public function getUserChallenges(): Collection
+    {
+        return $this->userChallenges;
+    }
+
+    public function addUserChallenge(UserChallenge $userChallenge): static
+    {
+        if (!$this->userChallenges->contains($userChallenge)) {
+            $this->userChallenges->add($userChallenge);
+            $userChallenge->setChallenge($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserChallenge(UserChallenge $userChallenge): static
+    {
+        if ($this->userChallenges->removeElement($userChallenge)) {
+            // set the owning side to null (unless already changed)
+            if ($userChallenge->getChallenge() === $this) {
+                $userChallenge->setChallenge(null);
             }
         }
 
