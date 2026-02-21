@@ -4,6 +4,7 @@ namespace App\Bundle\UserActivityBundle\Controller\Admin;
 
 use App\Bundle\UserActivityBundle\Repository\UserActivityRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -31,5 +32,28 @@ class ActivityController extends AbstractController
             'activities' => $activities,
             'userId' => $id,
         ]);
+    }
+    
+    #[Route('/user/{id}/json', name: 'admin_user_activity_json')]
+    public function getUserActivitiesJson(int $id, UserActivityRepository $repository): JsonResponse
+    {
+        $activities = $repository->findBy(['user' => $id], ['createdAt' => 'DESC'], 50);
+        
+        $data = [];
+        foreach ($activities as $activity) {
+            $data[] = [
+                'id' => $activity->getId(),
+                'action' => $activity->getAction(),
+                'ipAddress' => $activity->getIpAddress(),
+                'userAgent' => $activity->getUserAgent(),
+                'location' => $activity->getLocation(),
+                'success' => $activity->isSuccess(),
+                'errorMessage' => $activity->getErrorMessage(),
+                'metadata' => $activity->getMetadata(),
+                'createdAt' => $activity->getCreatedAt()->format('Y-m-d H:i:s'),
+            ];
+        }
+        
+        return new JsonResponse(['activities' => $data]);
     }
 }
