@@ -75,6 +75,10 @@
                                     <i class="fa fa-book-open"></i>
                                     {{ 'frontoffice.chapter.read_chapter'|trans }}
                                 </a>
+                                <a href="{{ path('app_chapitre_pdf_download', {'id': chapitre.id}) }}" class="btn-modern" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                    <i class="fa fa-file-pdf"></i>
+                                    PDF
+                                </a>
                                 <a href="{{ path('app_frontoffice_quiz_list', {'chapitreId': chapitre.id}) }}" class="btn-modern btn-quiz">
                                     <i class="fa fa-question-circle"></i>
                                     {{ 'frontoffice.chapter.take_quiz'|trans }}
