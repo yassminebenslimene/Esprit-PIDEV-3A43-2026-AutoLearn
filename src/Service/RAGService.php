@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Repository\CoursRepository;
+use App\Repository\Cours\CoursRepository;
 use App\Repository\EvenementRepository;
 use App\Repository\UserRepository;
 use App\Bundle\UserActivityBundle\Repository\UserActivityRepository;
