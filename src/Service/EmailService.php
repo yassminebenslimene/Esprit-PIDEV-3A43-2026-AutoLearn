@@ -5,75 +5,421 @@ namespace App\Service;
 
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Address;
+use Psr\Log\LoggerInterface;
 
 class EmailService
 {
     private $mailer;
+    private $logger;
+    private $adminEmail;
 
-    public function __construct(MailerInterface $mailer)
+    public function __construct(MailerInterface $mailer, LoggerInterface $logger, string $adminEmail)
     {
         $this->mailer = $mailer;
+        $this->logger = $logger;
+        $this->adminEmail = $adminEmail;
     }
 
-    public function sendChallengeReceipt(string $to, string $challengeTitle, int $score, int $totalPoints, \DateTimeImmutable $completedAt): void
+    public function sendChallengeReceipt(
+        string $to, 
+        string $challengeTitle, 
+        int $score, 
+        int $totalPoints, 
+        \DateTimeImmutable $completedAt
+    ): void {
+        try {
+            $this->logger->info("Tentative d'envoi d'email à: " . $to);
+            
+            $percentage = round(($score / $totalPoints) * 100);
+            
+            $email = (new Email())
+                ->from(new Address($this->adminEmail, 'Scholar Platform'))
+                ->to($to)
+                ->subject($this->getSubject($score, $totalPoints, $percentage) . ' - ' . $challengeTitle)
+                ->html($this->getHtmlContent($challengeTitle, $score, $totalPoints, $percentage, $completedAt))
+                ->text($this->getTextContent($challengeTitle, $score, $totalPoints, $percentage, $completedAt));
+
+            $this->mailer->send($email);
+            
+            $this->logger->info('Email envoyé avec succès à ' . $to);
+            
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur EmailService: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Détermine le sujet de l'email en fonction du score
+     */
+    private function getSubject(int $score, int $totalPoints, int $percentage): string
     {
-        $percentage = round(($score / $totalPoints) * 100);
-        
-        $email = (new Email())
-            ->from('noreply@scholar.com')
-            ->to($to)
-            ->subject('Récapitulatif de votre challenge - ' . $challengeTitle)
-            ->html($this->getHtmlContent($challengeTitle, $score, $totalPoints, $percentage, $completedAt));
-
-        $this->mailer->send($email);
+        if ($percentage >= 80) {
+            return '🏆 Félicitations ! Excellent résultat';
+        } elseif ($percentage >= 50) {
+            return '👍 Bon travail ! Vous avez réussi';
+        } elseif ($percentage >= 30) {
+            return '📝 Challenge terminé - Vous pouvez mieux faire';
+        } else {
+            return '🔄 Challenge terminé - Essayez encore';
+        }
     }
 
+    /**
+     * Contenu HTML pour le récapitulatif de challenge
+     */
     private function getHtmlContent(string $challengeTitle, int $score, int $totalPoints, int $percentage, \DateTimeImmutable $completedAt): string
     {
+        $color = $this->getScoreColor($percentage);
+        $emoji = $this->getScoreEmoji($percentage);
+        $message = $this->getScoreMessage($percentage);
+        $advice = $this->getScoreAdvice($percentage);
+        
         return '
         <!DOCTYPE html>
         <html>
         <head>
+            <meta charset="UTF-8">
             <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: linear-gradient(105deg, #7fb77e 0%, #4a9b4a 100%); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
-                .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-                .score { font-size: 48px; font-weight: bold; color: #7fb77e; text-align: center; margin: 20px 0; }
-                .details { margin: 20px 0; }
-                .detail-item { margin: 10px 0; padding: 10px; background: white; border-radius: 5px; }
-                .footer { text-align: center; margin-top: 20px; color: #7a7a7a; font-size: 12px; }
+                body { 
+                    font-family: "Poppins", Arial, sans-serif; 
+                    line-height: 1.6; 
+                    color: #333; 
+                    margin: 0;
+                    padding: 0;
+                }
+                .container { 
+                    max-width: 600px; 
+                    margin: 20px auto; 
+                    border-radius: 15px;
+                    overflow: hidden;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                }
+                .header { 
+                    background: linear-gradient(105deg, ' . $this->getGradientStart($percentage) . ' 0%, ' . $this->getGradientEnd($percentage) . ' 100%); 
+                    color: white; 
+                    padding: 30px; 
+                    text-align: center; 
+                }
+                .header h1 {
+                    margin: 0;
+                    font-size: 32px;
+                    font-weight: 600;
+                }
+                .header .emoji {
+                    font-size: 48px;
+                    margin-bottom: 10px;
+                }
+                .content { 
+                    background: #f9f9f9; 
+                    padding: 40px; 
+                }
+                .score-circle {
+                    width: 150px;
+                    height: 150px;
+                    margin: 0 auto 20px;
+                    background: conic-gradient(' . $color . ' 0% ' . $percentage . '%, #e0e0e0 ' . $percentage . '% 100%);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                }
+                .score-circle::before {
+                    content: "";
+                    width: 120px;
+                    height: 120px;
+                    background: white;
+                    border-radius: 50%;
+                    position: absolute;
+                }
+                .score-text {
+                    position: relative;
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: ' . $color . ';
+                    z-index: 1;
+                }
+                .score { 
+                    font-size: 48px; 
+                    font-weight: bold; 
+                    color: ' . $color . '; 
+                    text-align: center; 
+                    margin: 20px 0; 
+                }
+                .message {
+                    font-size: 20px;
+                    text-align: center;
+                    margin: 20px 0;
+                    padding: 15px;
+                    background: white;
+                    border-radius: 10px;
+                    border-left: 4px solid ' . $color . ';
+                }
+                .advice {
+                    font-size: 16px;
+                    color: #7a7a7a;
+                    text-align: center;
+                    margin: 20px 0;
+                    padding: 15px;
+                    background: white;
+                    border-radius: 10px;
+                }
+                .details { 
+                    margin: 30px 0; 
+                }
+                .detail-item { 
+                    margin: 15px 0; 
+                    padding: 15px; 
+                    background: white; 
+                    border-radius: 10px; 
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                }
+                .detail-item strong {
+                    color: #2a2a2a;
+                    display: inline-block;
+                    width: 150px;
+                }
+                .footer { 
+                    text-align: center; 
+                    padding: 20px;
+                    background: white;
+                    border-top: 1px solid #eee;
+                    color: #7a7a7a; 
+                    font-size: 12px; 
+                }
+                .btn {
+                    display: inline-block;
+                    padding: 12px 30px;
+                    background: linear-gradient(105deg, #7fb77e 0%, #4a9b4a 100%);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 25px;
+                    margin-top: 20px;
+                    font-weight: 500;
+                }
+                .btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 15px rgba(127, 183, 126, 0.3);
+                }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>Félicitations !</h1>
+                    <div class="emoji">' . $emoji . '</div>
+                    <h1>' . $this->getHeaderTitle($percentage) . '</h1>
                 </div>
                 <div class="content">
-                    <p>Vous avez complété le challenge <strong>"' . $challengeTitle . '"</strong> avec succès.</p>
+                    <p style="font-size: 18px; text-align: center;">Challenge : <strong>"' . htmlspecialchars($challengeTitle) . '"</strong></p>
+                    
+                    <div class="score-circle">
+                        <div class="score-text">' . $percentage . '%</div>
+                    </div>
                     
                     <div class="score">
                         ' . $score . '/' . $totalPoints . '
                     </div>
                     
+                    <div class="message">
+                        ' . $emoji . ' ' . $message . '
+                    </div>
+                    
+                    <div class="advice">
+                        💡 ' . $advice . '
+                    </div>
+                    
                     <div class="details">
                         <div class="detail-item">
-                            <strong>Pourcentage de réussite :</strong> ' . $percentage . '%
+                            <strong>📊 Pourcentage :</strong> ' . $percentage . '%
                         </div>
                         <div class="detail-item">
-                            <strong>Date de complétion :</strong> ' . $completedAt->format('d/m/Y H:i') . '
+                            <strong>📅 Date :</strong> ' . $completedAt->format('d/m/Y H:i') . '
+                        </div>
+                        <div class="detail-item">
+                            <strong>🏆 Niveau :</strong> ' . $this->getLevelFromPercentage($percentage) . '
                         </div>
                     </div>
                     
-                    <p>Continuez à relever de nouveaux défis !</p>
+                    <div style="text-align: center;">
+                        <a href="http://127.0.0.1:8000/" class="btn">
+                            Voir plus de challenges
+                        </a>
+                    </div>
+                    
+                    <p style="text-align: center; margin-top: 30px; color: #7a7a7a;">
+                        ' . $this->getFooterMessage($percentage) . '
+                    </p>
                 </div>
                 <div class="footer">
                     <p>© ' . date('Y') . ' Scholar. Tous droits réservés.</p>
+                    <p style="font-size: 11px;">
+                        Cet email a été envoyé automatiquement, merci de ne pas y répondre.
+                    </p>
                 </div>
             </div>
         </body>
         </html>
         ';
+    }
+
+    /**
+     * Contenu texte pour le récapitulatif de challenge
+     */
+    private function getTextContent(string $challengeTitle, int $score, int $totalPoints, int $percentage, \DateTimeImmutable $completedAt): string
+    {
+        $emoji = $this->getScoreEmoji($percentage);
+        $message = $this->getScoreMessage($percentage);
+        $advice = $this->getScoreAdvice($percentage);
+        
+        return $emoji . " " . strtoupper($message) . " !\n\n" .
+               "Challenge : " . $challengeTitle . "\n" .
+               "Score : " . $score . "/" . $totalPoints . "\n" .
+               "Pourcentage : " . $percentage . "%\n" .
+               "Date : " . $completedAt->format('d/m/Y H:i') . "\n" .
+               "Niveau : " . $this->getLevelFromPercentage($percentage) . "\n\n" .
+               "Conseil : " . $advice . "\n\n" .
+               "Continuez à relever de nouveaux défis sur Scholar !\n\n" .
+               "---\n" .
+               "© " . date('Y') . " Scholar";
+    }
+
+    /**
+     * Détermine l'emoji selon le pourcentage
+     */
+    private function getScoreEmoji(int $percentage): string
+    {
+        if ($percentage >= 80) {
+            return '🏆';
+        } elseif ($percentage >= 50) {
+            return '👍';
+        } elseif ($percentage >= 30) {
+            return '📝';
+        } else {
+            return '🔄';
+        }
+    }
+
+    /**
+     * Détermine le message selon le pourcentage
+     */
+    private function getScoreMessage(int $percentage): string
+    {
+        if ($percentage >= 80) {
+            return 'Excellent travail ! Vous maîtrisez parfaitement ce challenge.';
+        } elseif ($percentage >= 50) {
+            return 'Bon travail ! Vous avez réussi, mais il y a encore de la marge de progression.';
+        } elseif ($percentage >= 30) {
+            return 'Challenge terminé. Avec un peu plus de pratique, vous ferez mieux !';
+        } else {
+            return 'Ce challenge était difficile. Ne lâchez rien, réessayez !';
+        }
+    }
+
+    /**
+     * Détermine le conseil selon le pourcentage
+     */
+    private function getScoreAdvice(int $percentage): string
+    {
+        if ($percentage >= 80) {
+            return 'Vous êtes un expert ! Essayez maintenant des challenges plus difficiles.';
+        } elseif ($percentage >= 50) {
+            return 'Vous êtes sur la bonne voie. Révisez les points où vous avez eu des difficultés.';
+        } elseif ($percentage >= 30) {
+            return 'Ne vous découragez pas. La pratique est la clé du succès.';
+        } else {
+            return 'Chaque erreur est une opportunité d\'apprendre. Réessayez ce challenge !';
+        }
+    }
+
+    /**
+     * Détermine le titre du header selon le pourcentage
+     */
+    private function getHeaderTitle(int $percentage): string
+    {
+        if ($percentage >= 80) {
+            return 'Félicitations !';
+        } elseif ($percentage >= 50) {
+            return 'Bravo !';
+        } elseif ($percentage >= 30) {
+            return 'Challenge terminé';
+        } else {
+            return 'À améliorer';
+        }
+    }
+
+    /**
+     * Détermine le message du footer selon le pourcentage
+     */
+    private function getFooterMessage(int $percentage): string
+    {
+        if ($percentage >= 80) {
+            return 'Continuez sur cette lancée !';
+        } elseif ($percentage >= 50) {
+            return 'Continuez à progresser !';
+        } elseif ($percentage >= 30) {
+            return 'La persévérance paie toujours !';
+        } else {
+            return 'Le succès est la somme de petits efforts répétés jour après jour.';
+        }
+    }
+
+    /**
+     * Détermine le dégradé de début selon le pourcentage
+     */
+    private function getGradientStart(int $percentage): string
+    {
+        if ($percentage >= 80) {
+            return '#7fb77e';
+        } elseif ($percentage >= 50) {
+            return '#f3b562';
+        } else {
+            return '#f17b7b';
+        }
+    }
+
+    /**
+     * Détermine le dégradé de fin selon le pourcentage
+     */
+    private function getGradientEnd(int $percentage): string
+    {
+        if ($percentage >= 80) {
+            return '#4a9b4a';
+        } elseif ($percentage >= 50) {
+            return '#f0a53b';
+        } else {
+            return '#e05a5a';
+        }
+    }
+
+    /**
+     * Détermine la couleur selon le pourcentage
+     */
+    private function getScoreColor(int $percentage): string
+    {
+        if ($percentage < 30) {
+            return '#f17b7b'; // Rouge
+        } elseif ($percentage < 50) {
+            return '#f3b562'; // Orange
+        } elseif ($percentage < 80) {
+            return '#7fb77e'; // Vert clair
+        } else {
+            return '#4a9b4a'; // Vert foncé
+        }
+    }
+
+    /**
+     * Détermine le niveau selon le pourcentage
+     */
+    private function getLevelFromPercentage(int $percentage): string
+    {
+        if ($percentage >= 80) {
+            return 'Expert';
+        } elseif ($percentage >= 50) {
+            return 'Intermédiaire';
+        } else {
+            return 'Débutant';
+        }
     }
 }

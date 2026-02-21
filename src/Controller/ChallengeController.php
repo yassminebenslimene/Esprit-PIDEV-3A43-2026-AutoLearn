@@ -1,8 +1,6 @@
 <?php
 
 namespace App\Controller;
-
-use App\Entity\Challenge;
 use App\Entity\UserChallenge;
 use App\Repository\ChallengeRepository;
 use App\Repository\UserChallengeRepository;
@@ -296,8 +294,12 @@ class ChallengeController extends AbstractController
         $entityManager->persist($userChallenge);
         $entityManager->flush();
         
-        // Envoyer l'email récapitulatif
+        // 🔥 ENVOYER L'EMAIL AVANT DE NETTOYER LA SESSION
         try {
+            error_log("=== ENVOI EMAIL CHALLENGE ===");
+            error_log("Destinataire: " . $user->getEmail());
+            error_log("Challenge: " . $challenge->getTitre());
+            
             $emailService->sendChallengeReceipt(
                 $user->getEmail(),
                 $challenge->getTitre(),
@@ -305,12 +307,16 @@ class ChallengeController extends AbstractController
                 $totalPoints,
                 new \DateTimeImmutable()
             );
+            
+            error_log("Email envoyé avec succès !");
+            $this->addFlash('success', 'Un récapitulatif vous a été envoyé par email.');
+            
         } catch (\Exception $e) {
-            // Log l'erreur mais ne pas bloquer l'utilisateur
-            error_log('Erreur envoi email: ' . $e->getMessage());
+            error_log("ERREUR ENVOI EMAIL: " . $e->getMessage());
+            $this->addFlash('warning', 'Le challenge est terminé mais l\'email n\'a pas pu être envoyé.');
         }
         
-        // Nettoyer la session
+        // Nettoyer la session APRÈS l'envoi de l'email
         $session->remove($sessionKey);
         
         return $this->render('frontoffice/challenge_complete.html.twig', [
@@ -319,7 +325,7 @@ class ChallengeController extends AbstractController
             'totalPoints' => $totalPoints
         ]);
     }
-
+    
     #[Route('/backoffice/challenges/filter', name: 'backoffice_challenges_filter', methods: ['POST'])]
     public function filterChallenges(Request $request, ChallengeRepository $challengeRepository): JsonResponse
     {
