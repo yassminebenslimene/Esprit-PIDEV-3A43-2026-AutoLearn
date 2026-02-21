@@ -242,7 +242,7 @@ class RAGService
         // Utilisateurs inactifs (plus de 7 jours)
         $sevenDaysAgo = new \DateTime('-7 days');
         $qb = $this->em->createQueryBuilder();
-        $inactiveCount = $qb->select('COUNT(u.userId)')
+        $inactiveCount = (int) $qb->select('COUNT(u.userId)')
             ->from('App\Entity\User', 'u')
             ->where('u.lastLoginAt < :date OR u.lastLoginAt IS NULL')
             ->setParameter('date', $sevenDaysAgo)
@@ -250,12 +250,12 @@ class RAGService
             ->getSingleScalarResult();
 
         return [
-            'total_users' => $totalUsers,
-            'total_students' => $totalStudents,
-            'total_admins' => $totalAdmins,
-            'suspended_users' => $suspendedUsers,
+            'total_users' => (int) $totalUsers,
+            'total_students' => (int) $totalStudents,
+            'total_admins' => (int) $totalAdmins,
+            'suspended_users' => (int) $suspendedUsers,
             'inactive_users_7days' => $inactiveCount,
-            'active_users' => $totalUsers - $suspendedUsers
+            'active_users' => (int) ($totalUsers - $suspendedUsers)
         ];
     }
 

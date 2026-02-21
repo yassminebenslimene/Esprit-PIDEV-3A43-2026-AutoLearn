@@ -118,22 +118,46 @@ class AIAssistantService
     {
         $question = strtolower($question);
 
-        // Réponses prédéfinies simples
-        if (preg_match('/(cours|apprendre)/i', $question)) {
-            $response = "🎓 Nous proposons des cours en Python, Java et Développement Web. Consultez notre catalogue de cours pour trouver celui qui vous convient!";
-        } elseif (preg_match('/(événement|event)/i', $question)) {
-            $response = "📅 Consultez notre page événements pour voir les prochains workshops et meetups!";
-        } elseif (preg_match('/(aide|help)/i', $question)) {
-            $response = "💡 Je peux vous aider à:\n- Trouver des cours adaptés à votre niveau\n- Découvrir les événements à venir\n- Suivre vos progrès\n- Naviguer sur la plateforme";
+        // Réponses prédéfinies simples basées sur les mots-clés
+        if (preg_match('/(cours|apprendre|python|java|web|programming|étudier)/i', $question)) {
+            $response = "🎓 **Nos cours disponibles:**\n\n" .
+                       "• **Python** - Idéal pour débuter en programmation\n" .
+                       "• **Java** - Pour la programmation orientée objet\n" .
+                       "• **Développement Web** - HTML, CSS, JavaScript\n\n" .
+                       "💡 Consultez notre catalogue de cours pour plus de détails!";
+        } elseif (preg_match('/(événement|event|semaine|mois|particip)/i', $question)) {
+            $response = "📅 **Événements à venir:**\n\n" .
+                       "Consultez notre page événements pour voir les prochains workshops et meetups!\n\n" .
+                       "🔔 Vous pouvez vous inscrire directement depuis la page événements.";
+        } elseif (preg_match('/(progrès|statistique|activité|historique|mes cours)/i', $question)) {
+            $response = "📊 **Votre progression:**\n\n" .
+                       "Consultez votre profil pour voir:\n" .
+                       "• Vos cours en cours\n" .
+                       "• Vos quiz complétés\n" .
+                       "• Votre historique d'activités\n\n" .
+                       "💪 Continuez comme ça!";
+        } elseif (preg_match('/(aide|help|comment|progresser)/i', $question)) {
+            $response = "💡 **Je peux vous aider à:**\n\n" .
+                       "• Trouver des cours adaptés à votre niveau\n" .
+                       "• Découvrir les événements à venir\n" .
+                       "• Suivre vos progrès\n" .
+                       "• Naviguer sur la plateforme\n\n" .
+                       "Posez-moi une question spécifique! 😊";
         } else {
-            $response = "Je suis votre assistant AutoLearn! Posez-moi des questions sur les cours, événements, ou votre progression. 😊";
+            $response = "👋 **Bienvenue sur AutoLearn!**\n\n" .
+                       "Je suis votre assistant, mais je fonctionne mieux avec Ollama activé.\n\n" .
+                       "**En attendant, je peux vous aider avec:**\n" .
+                       "• Informations sur les cours\n" .
+                       "• Événements à venir\n" .
+                       "• Navigation sur la plateforme\n\n" .
+                       "💡 **Astuce:** Pour activer l'IA complète, installez Ollama (voir documentation).";
         }
 
         return [
             'success' => true,
             'response' => $response,
             'fallback' => true,
-            'reason' => 'Ollama not available'
+            'reason' => 'Ollama not available - Using predefined responses'
         ];
     }
 
