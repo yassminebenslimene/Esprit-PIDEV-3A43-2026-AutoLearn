@@ -501,7 +501,8 @@
             View
         </a>
         
-        <!-- Activities - always visible for everyone -->
+        <!-- Activities - ONLY for students -->
+        {% if user.role == 'ETUDIANT' %}
         <button type="button" 
                 class="card-btn small-btn" 
                 style="background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;"
@@ -511,6 +512,7 @@
             </svg>
             Activities
         </button>
+        {% endif %}
         
         <!-- Edit - ONLY for students -->
         {% if user.role == 'ETUDIANT' %}
