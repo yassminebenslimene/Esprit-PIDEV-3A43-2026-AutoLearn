@@ -27,9 +27,22 @@ class AIAssistantController extends AbstractController
     public function ask(Request $request): JsonResponse
     {
         // Vérifier l'authentification
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        if (!$this->getUser()) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Authentification requise'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
 
         $data = json_decode($request->getContent(), true);
+        
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->json([
+                'success' => false,
+                'error' => 'JSON invalide'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         $question = $data['question'] ?? '';
 
         if (empty(trim($question))) {
@@ -53,10 +66,16 @@ class AIAssistantController extends AbstractController
             'model' => $data['model'] ?? null
         ];
 
-        // Générer la réponse
-        $result = $this->aiAssistant->ask($question, $options);
-
-        return $this->json($result);
+        try {
+            // Générer la réponse
+            $result = $this->aiAssistant->ask($question, $options);
+            return $this->json($result);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Erreur serveur: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -65,17 +84,29 @@ class AIAssistantController extends AbstractController
     #[Route('/suggestions', name: 'ai_assistant_suggestions', methods: ['GET'])]
     public function suggestions(): JsonResponse
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        if (!$this->getUser()) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Authentification requise'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
         
         $user = $this->getUser();
         $role = $user ? $user->getRole() : 'ETUDIANT';
 
-        $suggestions = $this->aiAssistant->getSuggestions($role);
+        try {
+            $suggestions = $this->aiAssistant->getSuggestions($role);
 
-        return $this->json([
-            'success' => true,
-            'suggestions' => $suggestions
-        ]);
+            return $this->json([
+                'success' => true,
+                'suggestions' => $suggestions
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Erreur serveur'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**

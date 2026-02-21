@@ -1,11 +1,30 @@
 {# Widget Chat IA - À inclure dans base.html.twig #}
 {% if app.user %}
 <div id="ai-chat-widget" class="ai-chat-widget">
+    <!-- Bulle de bienvenue animée -->
+    <div id="ai-welcome-bubble" class="ai-welcome-bubble">
+        <div class="ai-bubble-content">
+            <div class="ai-bubble-avatar">🤖</div>
+            <div class="ai-bubble-text">
+                <strong>Bonjour {{ app.user.prenom }}!</strong>
+                <p>Besoin d'aide? Je suis là pour vous! 💬</p>
+            </div>
+            <button class="ai-bubble-close" onclick="closeWelcomeBubble()">×</button>
+        </div>
+        <div class="ai-bubble-arrow"></div>
+    </div>
+
     <!-- Bouton flottant -->
     <button id="ai-chat-toggle" class="ai-chat-toggle" title="Assistant IA">
-        <svg class="ai-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
+        <div class="ai-toggle-icon">
+            <svg class="ai-icon ai-icon-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <svg class="ai-icon ai-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </div>
+        <span class="ai-pulse-ring"></span>
         <span class="ai-badge" id="ai-notification-badge" style="display: none;">1</span>
     </button>
 
@@ -86,84 +105,259 @@
 </div>
 
 <style>
-/* Widget Chat IA */
+/* Widget Chat IA - Design Moderne et Élégant */
 .ai-chat-widget {
     position: fixed;
     bottom: 20px;
     right: 20px;
     z-index: 9999;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* Bouton flottant */
+/* Bulle de bienvenue */
+.ai-welcome-bubble {
+    position: absolute;
+    bottom: 90px;
+    right: 0;
+    width: 320px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.25);
+    padding: 20px;
+    animation: bubbleSlideIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border: 2px solid rgba(102, 126, 234, 0.1);
+}
+
+@keyframes bubbleSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.ai-bubble-content {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    position: relative;
+}
+
+.ai-bubble-avatar {
+    font-size: 32px;
+    line-height: 1;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.ai-bubble-text {
+    flex: 1;
+}
+
+.ai-bubble-text strong {
+    display: block;
+    color: #667eea;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.ai-bubble-text p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.ai-bubble-close {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ef4444;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.ai-bubble-close:hover {
+    transform: scale(1.1);
+    background: #dc2626;
+}
+
+.ai-bubble-arrow {
+    position: absolute;
+    bottom: -10px;
+    right: 30px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid white;
+}
+
+.ai-bubble-arrow::before {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: -11px;
+    width: 0;
+    height: 0;
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
+    border-top: 11px solid rgba(102, 126, 234, 0.1);
+}
+
+/* Bouton flottant amélioré */
 .ai-chat-toggle {
-    width: 60px;
-    height: 60px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border: none;
-    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     position: relative;
+    overflow: visible;
 }
 
 .ai-chat-toggle:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 30px rgba(102, 126, 234, 0.6);
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 12px 32px rgba(102, 126, 234, 0.6);
 }
 
-.ai-chat-toggle .ai-icon {
-    width: 28px;
-    height: 28px;
+.ai-chat-toggle:active {
+    transform: scale(0.95);
+}
+
+.ai-toggle-icon {
+    position: relative;
+    width: 32px;
+    height: 32px;
+}
+
+.ai-icon {
+    width: 32px;
+    height: 32px;
     color: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s;
+}
+
+.ai-icon-chat {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+.ai-icon-close {
+    opacity: 0;
+    transform: rotate(90deg) scale(0);
+}
+
+.ai-chat-toggle.active .ai-icon-chat {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0);
+}
+
+.ai-chat-toggle.active .ai-icon-close {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+    display: block !important;
+}
+
+/* Animation de pulsation */
+.ai-pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid #667eea;
+    animation: pulse 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+    opacity: 0;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
 }
 
 .ai-badge {
     position: absolute;
     top: -5px;
     right: -5px;
-    background: #ef4444;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
     border-radius: 50%;
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 12px;
     font-weight: bold;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    animation: badgePop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-/* Fenêtre de chat */
+@keyframes badgePop {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Fenêtre de chat améliorée */
 .ai-chat-window {
     position: absolute;
-    bottom: 80px;
+    bottom: 90px;
     right: 0;
-    width: 400px;
+    width: 420px;
     max-width: calc(100vw - 40px);
-    height: 600px;
+    height: 650px;
     max-height: calc(100vh - 120px);
     background: white;
-    border-radius: 16px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    animation: slideUp 0.3s ease;
+    animation: chatSlideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border: 1px solid rgba(102, 126, 234, 0.1);
 }
 
-@keyframes slideUp {
+@keyframes chatSlideUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(30px) scale(0.9);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
@@ -438,40 +632,74 @@
 </style>
 
 <script>
-// AI Chat Widget JavaScript
+// AI Chat Widget JavaScript - Version Améliorée
 (function() {
     const widget = document.getElementById('ai-chat-widget');
     const toggle = document.getElementById('ai-chat-toggle');
-    const window = document.getElementById('ai-chat-window');
-    const close = document.getElementById('ai-chat-close');
+    const chatWindow = document.getElementById('ai-chat-window');
+    const closeBtn = document.getElementById('ai-chat-close');
     const messages = document.getElementById('ai-chat-messages');
     const textarea = document.getElementById('ai-chat-textarea');
     const sendBtn = document.getElementById('ai-chat-send');
     const typingIndicator = document.getElementById('ai-typing-indicator');
     const charCount = document.getElementById('ai-char-count');
     const suggestionsContainer = document.getElementById('ai-suggestions-buttons');
+    const welcomeBubble = document.getElementById('ai-welcome-bubble');
 
     let isOpen = false;
+
+    // Afficher la bulle de bienvenue après 2 secondes
+    setTimeout(() => {
+        if (welcomeBubble && !isOpen) {
+            welcomeBubble.style.display = 'block';
+            // Auto-fermer après 10 secondes
+            setTimeout(() => {
+                if (welcomeBubble && !isOpen) {
+                    welcomeBubble.style.animation = 'bubbleSlideOut 0.3s ease';
+                    setTimeout(() => {
+                        if (welcomeBubble) welcomeBubble.style.display = 'none';
+                    }, 300);
+                }
+            }, 10000);
+        }
+    }, 2000);
+
+    // Fermer la bulle de bienvenue
+    window.closeWelcomeBubble = function() {
+        if (welcomeBubble) {
+            welcomeBubble.style.animation = 'bubbleSlideOut 0.3s ease';
+            setTimeout(() => {
+                welcomeBubble.style.display = 'none';
+            }, 300);
+        }
+    };
 
     // Toggle chat window
     toggle.addEventListener('click', () => {
         isOpen = !isOpen;
-        window.style.display = isOpen ? 'flex' : 'none';
+        chatWindow.style.display = isOpen ? 'flex' : 'none';
+        toggle.classList.toggle('active', isOpen);
+        
         if (isOpen) {
             textarea.focus();
             loadSuggestions();
+            // Cacher la bulle de bienvenue
+            if (welcomeBubble) {
+                welcomeBubble.style.display = 'none';
+            }
         }
     });
 
-    close.addEventListener('click', () => {
+    closeBtn.addEventListener('click', () => {
         isOpen = false;
-        window.style.display = 'none';
+        chatWindow.style.display = 'none';
+        toggle.classList.remove('active');
     });
 
     // Auto-resize textarea
     textarea.addEventListener('input', () => {
         textarea.style.height = 'auto';
-        textarea.style.height = textarea.scrollHeight + 'px';
+        textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
         charCount.textContent = textarea.value.length;
     });
 
@@ -487,29 +715,44 @@
 
     // Load suggestions
     function loadSuggestions() {
-        fetch('/ai-assistant/suggestions')
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    suggestionsContainer.innerHTML = '';
-                    data.suggestions.forEach(suggestion => {
-                        const btn = document.createElement('button');
-                        btn.className = 'ai-suggestion-btn';
-                        btn.textContent = suggestion;
-                        btn.onclick = () => {
-                            textarea.value = suggestion;
-                            sendMessage();
-                        };
-                        suggestionsContainer.appendChild(btn);
-                    });
-                }
-            });
+        fetch('/ai-assistant/suggestions', {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('Network response was not ok');
+            return res.json();
+        })
+        .then(data => {
+            if (data.success && suggestionsContainer) {
+                suggestionsContainer.innerHTML = '';
+                data.suggestions.forEach(suggestion => {
+                    const btn = document.createElement('button');
+                    btn.className = 'ai-suggestion-btn';
+                    btn.textContent = suggestion;
+                    btn.onclick = () => {
+                        textarea.value = suggestion;
+                        sendMessage();
+                    };
+                    suggestionsContainer.appendChild(btn);
+                });
+            }
+        })
+        .catch(err => {
+            console.error('Error loading suggestions:', err);
+        });
     }
 
     // Send message
     function sendMessage() {
         const question = textarea.value.trim();
         if (!question) return;
+
+        // Disable input
+        textarea.disabled = true;
+        sendBtn.disabled = true;
 
         // Add user message
         addMessage(question, 'user');
@@ -526,21 +769,48 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
             },
             body: JSON.stringify({ question })
         })
-        .then(res => res.json())
+        .then(res => {
+            // Vérifier si la réponse est du JSON
+            const contentType = res.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('La réponse n\'est pas du JSON. Vérifiez que vous êtes connecté.');
+            }
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+        })
         .then(data => {
             typingIndicator.style.display = 'none';
+            textarea.disabled = false;
+            sendBtn.disabled = false;
+            textarea.focus();
+            
             if (data.success) {
                 addMessage(data.response, 'bot');
             } else {
-                addMessage('Désolé, une erreur est survenue. Veuillez réessayer.', 'bot');
+                addMessage('Désolé, une erreur est survenue: ' + (data.error || 'Erreur inconnue'), 'bot');
             }
         })
         .catch(err => {
+            console.error('Error:', err);
             typingIndicator.style.display = 'none';
-            addMessage('Erreur de connexion. Vérifiez votre connexion internet.', 'bot');
+            textarea.disabled = false;
+            sendBtn.disabled = false;
+            textarea.focus();
+            
+            let errorMsg = 'Erreur de connexion. ';
+            if (err.message.includes('JSON')) {
+                errorMsg += 'Veuillez vous reconnecter à la plateforme.';
+            } else {
+                errorMsg += 'Vérifiez votre connexion internet.';
+            }
+            addMessage(errorMsg, 'bot');
         });
     }
 
@@ -562,7 +832,32 @@
         
         messages.appendChild(messageDiv);
         messages.scrollTop = messages.scrollHeight;
+        
+        // Animation d'apparition
+        messageDiv.style.opacity = '0';
+        messageDiv.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+            messageDiv.style.transition = 'all 0.3s ease';
+            messageDiv.style.opacity = '1';
+            messageDiv.style.transform = 'translateY(0)';
+        }, 10);
     }
+
+    // Animation CSS pour la bulle
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes bubbleSlideOut {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(20px) scale(0.8);
+            }
+        }
+    `;
+    document.head.appendChild(style);
 })();
 </script>
 {% endif %}
