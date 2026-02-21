@@ -49,12 +49,12 @@ class CalendarSubscriber implements EventSubscriberInterface
         $start = $calendar->getStart();
         $end = $calendar->getEnd();
 
-        // Récupérer tous les événements de la base de données
+        // Récupérer tous les événements de la base de données dans la période
         $evenements = $this->evenementRepository->createQueryBuilder('e')
-            ->where('e.dateDebut BETWEEN :start and :end')
-            ->orWhere('e.dateFin BETWEEN :start and :end')
-            ->setParameter('start', $start->format('Y-m-d H:i:s'))
-            ->setParameter('end', $end->format('Y-m-d H:i:s'))
+            ->where('e.dateDebut <= :end')
+            ->andWhere('e.dateFin >= :start')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
             ->getQuery()
             ->getResult();
 
@@ -94,10 +94,10 @@ class CalendarSubscriber implements EventSubscriberInterface
             $calendarEvent->addOption('nbParticipations', count($evenement->getParticipations()));
             $calendarEvent->addOption('description', substr($evenement->getDescription(), 0, 100) . '...');
             
-            // URL vers la page de détails
+            // URL vers la page de participation (pas de page show, donc on utilise participate)
             $calendarEvent->addOption(
                 'url',
-                $this->router->generate('app_event_show', ['id' => $evenement->getId()])
+                $this->router->generate('app_event_participate', ['id' => $evenement->getId()])
             );
             
             // Ajouter l'événement au calendrier
