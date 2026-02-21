@@ -69,9 +69,16 @@ class Chapitre
     #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'chapitre', orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $quizzes;
 
+    /**
+     * @var Collection<int, Ressource>
+     */
+    #[ORM\OneToMany(targetEntity: Ressource::class, mappedBy: 'chapitre', orphanRemoval: true, cascade: ['persist', 'remove'])]
+    private Collection $ressourcesMultiples;
+
     public function __construct()
     {
         $this->quizzes = new ArrayCollection();
+        $this->ressourcesMultiples = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -182,6 +189,33 @@ class Chapitre
         if ($this->quizzes->removeElement($quiz)) {
             if ($quiz->getChapitre() === $this) {
                 $quiz->setChapitre(null);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ressource>
+     */
+    public function getRessourcesMultiples(): Collection
+    {
+        return $this->ressourcesMultiples;
+    }
+
+    public function addRessourcesMultiple(Ressource $ressource): static
+    {
+        if (!$this->ressourcesMultiples->contains($ressource)) {
+            $this->ressourcesMultiples->add($ressource);
+            $ressource->setChapitre($this);
+        }
+        return $this;
+    }
+
+    public function removeRessourcesMultiple(Ressource $ressource): static
+    {
+        if ($this->ressourcesMultiples->removeElement($ressource)) {
+            if ($ressource->getChapitre() === $this) {
+                $ressource->setChapitre(null);
             }
         }
         return $this;
