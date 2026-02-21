@@ -655,6 +655,38 @@ https://templatemo.com/tm-586-scholar
             </div>
         </div>
 
+        <!-- Bouton pour afficher le calendrier -->
+        <div class="row mb-4">
+            <div class="col-lg-12 text-center">
+                <button id="calendarToggleBtn" class="btn btn-primary" style="background: linear-gradient(105deg, #7fb77e 0%, #4a9b4a 100%); border: none; padding: 12px 30px; font-size: 16px; border-radius: 25px;">
+                    <i class="fa fa-calendar"></i> Voir le calendrier des challenges
+                </button>
+            </div>
+        </div>
+
+        <!-- Conteneur du calendrier (caché par défaut) -->
+        <div id="calendar-container" style="display: none; margin-bottom: 40px;">
+            <div style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                <div id="calendar-holder"></div>
+                
+                <!-- Légende des couleurs -->
+                <div class="legend mt-4 d-flex justify-content-center gap-4" style="margin-top: 20px;">
+                    <div>
+                        <span style="display: inline-block; width: 15px; height: 15px; background: #7fb77e; border-radius: 3px;"></span>
+                        <span style="margin-left: 5px;">Facile</span>
+                    </div>
+                    <div>
+                        <span style="display: inline-block; width: 15px; height: 15px; background: #f3b562; border-radius: 3px;"></span>
+                        <span style="margin-left: 5px;">Intermédiaire</span>
+                    </div>
+                    <div>
+                        <span style="display: inline-block; width: 15px; height: 15px; background: #f17b7b; border-radius: 3px;"></span>
+                        <span style="margin-left: 5px;">Avancé</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {% if challenges is empty %}
             <div class="row">
                 <div class="col-lg-12">
@@ -809,6 +841,92 @@ https://templatemo.com/tm-586-scholar
                 console.error('Image non chargée:', this.src);
             };
         });
+    });
+    function loadFullCalendar() {
+        return new Promise((resolve, reject) => {
+            // Charger le CSS
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css';
+            document.head.appendChild(link);
+            
+            // Charger le JS
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js';
+            script.onload = resolve;
+            script.onerror = reject;
+            document.body.appendChild(script);
+            
+            // Charger la locale française
+            const localeScript = document.createElement('script');
+            localeScript.src = 'https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales/fr.global.min.js';
+            document.body.appendChild(localeScript);
+        });
+    }
+
+    // Fonction pour initialiser le calendrier
+    function initCalendar() {
+        const calendarEl = document.getElementById('calendar-holder');
+        if (!calendarEl) return;
+        
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                start: 'prev,next today',
+                center: 'title',
+                end: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            locale: 'fr',
+            height: 'auto',
+            events: {
+                url: '{{ path('fc_load_events') }}',
+                method: 'POST',
+                failure: function(error) {
+                    console.error('Erreur chargement événements:', error);
+                }
+            },
+            eventClick: function(info) {
+                if (info.event.url) {
+                    window.location.href = info.event.url;
+                    return false;
+                }
+            }
+        });
+        
+        calendar.render();
+    }
+
+    // Gestion du bouton
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('calendarToggleBtn');
+        const container = document.getElementById('calendar-container');
+        
+        if (btn && container) {
+            btn.addEventListener('click', async function() {
+                if (container.style.display === 'none') {
+                    // Changer le texte du bouton
+                    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Chargement...';
+                    
+                    // Charger FullCalendar si nécessaire
+                    if (!window.fullCalendarLoaded) {
+                        await loadFullCalendar();
+                        window.fullCalendarLoaded = true;
+                    }
+                    
+                    // Afficher le conteneur
+                    container.style.display = 'block';
+                    btn.innerHTML = '<i class="fa fa-calendar"></i> Masquer le calendrier';
+                    
+                    // Initialiser le calendrier
+                    setTimeout(() => {
+                        initCalendar();
+                    }, 100);
+                } else {
+                    container.style.display = 'none';
+                    btn.innerHTML = '<i class="fa fa-calendar"></i> Voir le calendrier des challenges';
+                }
+            });
+        }
     });
     </script>
 {% endblock %}
