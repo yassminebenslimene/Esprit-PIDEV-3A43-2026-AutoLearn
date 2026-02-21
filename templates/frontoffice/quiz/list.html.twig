@@ -14,197 +14,383 @@
             padding: 0;
             box-sizing: border-box;
         }
+        
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #46178f;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.05) 35px, rgba(255,255,255,.05) 70px);
             min-height: 100vh;
-            padding: 20px;
+            overflow-x: hidden;
+            padding: 0;
         }
-        .quiz-list-container {
-            max-width: 1200px;
-            margin: 0 auto;
+        
+        /* Header avec retour */
+        .quiz-list-header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px 40px;
+            backdrop-filter: blur(10px);
         }
+        
         .back-link {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             color: white;
             text-decoration: none;
-            margin-bottom: 20px;
-            padding: 10px 20px;
+            padding: 12px 25px;
             background: rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
+            border-radius: 50px;
             transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 16px;
         }
+        
         .back-link:hover {
             background: rgba(255, 255, 255, 0.3);
             color: white;
             transform: translateX(-5px);
         }
-        .page-header {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            text-align: center;
+        
+        .quiz-list-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
-        .page-title {
-            font-size: 36px;
-            font-weight: 800;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-        .page-subtitle {
-            font-size: 18px;
-            color: #666;
-            font-weight: 500;
-        }
+        
+        /* Quiz Grid - Style Kahoot */
         .quiz-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 30px;
             margin-bottom: 30px;
         }
+        
         .quiz-card {
             background: white;
             border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            padding: 35px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transition: all 0.4s ease;
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
         }
+        
         .quiz-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 6px;
+            background: linear-gradient(90deg, #e74c3c 0%, #3498db 25%, #f39c12 50%, #2ecc71 75%, #e74c3c 100%);
         }
+        
         .quiz-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 45px rgba(0,0,0,0.3);
         }
-        .quiz-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
+        
+        {% for i in 1..20 %}
+        .quiz-card:nth-child({{ i }}) {
+            animation-delay: {{ i * 0.1 }}s;
         }
-        .quiz-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 15px;
-            line-height: 1.3;
-        }
-        .quiz-description {
-            color: #6b7280;
-            margin-bottom: 20px;
-            line-height: 1.6;
-            flex-grow: 1;
-        }
-        .quiz-meta {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-            padding-top: 20px;
-            border-top: 2px solid #f3f4f6;
-        }
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            color: #6b7280;
-            font-weight: 600;
-        }
-        .meta-item i {
-            color: #667eea;
-            font-size: 16px;
-        }
-        .btn-start-quiz {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 15px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            font-weight: 700;
-            font-size: 16px;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-        .btn-start-quiz:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
-            color: white;
-        }
-        .empty-state {
-            background: white;
-            border-radius: 20px;
-            padding: 60px 40px;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        .empty-state-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-        .empty-state-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 10px;
-        }
-        .empty-state-text {
-            font-size: 16px;
-            color: #6b7280;
-            line-height: 1.6;
-        }
+        {% endfor %}
+        
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(40px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        .quiz-card {
-            animation: fadeInUp 0.5s ease-out;
-            animation-fill-mode: both;
+        
+        .quiz-icon {
+            font-size: 56px;
+            margin-bottom: 20px;
+            text-align: center;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
-        {% for i in 1..quizzes|length %}
-        .quiz-card:nth-child({{ i }}) {
-            animation-delay: {{ i * 0.1 }}s;
+        
+        .quiz-icon i {
+            font-size: 40px;
         }
-        {% endfor %}
+        
+        /* Couleurs variées pour les icônes de quiz */
+        .quiz-card:nth-child(4n+1) .quiz-icon {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        
+        .quiz-card:nth-child(4n+2) .quiz-icon {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+        
+        .quiz-card:nth-child(4n+3) .quiz-icon {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+        
+        .quiz-card:nth-child(4n+4) .quiz-icon {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        }
+        
+        .quiz-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 15px;
+            line-height: 1.3;
+            text-align: center;
+        }
+        
+        .quiz-description {
+            color: #6b7280;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            flex-grow: 1;
+            text-align: center;
+            font-size: 15px;
+        }
+        
+        /* Meta Info - Style Kahoot */
+        .quiz-meta {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(70, 23, 143, 0.05);
+            border-radius: 15px;
+        }
+        
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .meta-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+        }
+        
+        .meta-item:nth-child(1) .meta-icon {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        
+        .meta-item:nth-child(2) .meta-icon {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+        
+        .meta-item:nth-child(3) .meta-icon {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+        
+        .meta-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1f2937;
+        }
+        
+        .meta-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Bouton Start - Style Kahoot */
+        .btn-start-quiz {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 18px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            font-weight: 800;
+            font-size: 18px;
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+            border: none;
+        }
+        
+        .btn-start-quiz:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.6);
+            color: white;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            background: white;
+            border-radius: 20px;
+            padding: 80px 40px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .empty-state-icon {
+            font-size: 100px;
+            margin-bottom: 25px;
+            opacity: 0.6;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+        }
+        
+        .empty-state-icon i {
+            font-size: 60px;
+        }
+        
+        .empty-state-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+        
+        .empty-state-text {
+            font-size: 18px;
+            color: #6b7280;
+            line-height: 1.8;
+        }
+        
+        /* Flash Messages */
+        .flash-message {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        .flash-message.error {
+            border-left: 6px solid #ef4444;
+            background: #fef2f2;
+        }
+        
+        .flash-message.warning {
+            border-left: 6px solid #f59e0b;
+            background: #fffbeb;
+        }
+        
+        .flash-message.success {
+            border-left: 6px solid #10b981;
+            background: #f0fdf4;
+        }
+        
+        .flash-message i {
+            font-size: 28px;
+        }
+        
+        .flash-message.error i {
+            color: #ef4444;
+        }
+        
+        .flash-message.warning i {
+            color: #f59e0b;
+        }
+        
+        .flash-message.success i {
+            color: #10b981;
+        }
+        
+        .flash-message-text {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .quiz-list-header {
+                padding: 15px 20px;
+            }
+            
+            .page-header {
+                padding: 40px 30px;
+            }
+            
+            .page-title {
+                font-size: 32px;
+            }
+            
+            .quiz-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quiz-meta {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="quiz-list-container">
+    <div class="quiz-list-header">
         <a href="{{ path('app_chapitre_index_front') }}" class="back-link">
             <i class="fa fa-arrow-left"></i>
             <span>Retour aux chapitres</span>
         </a>
+    </div>
 
-        <div class="page-header">
-            <h1 class="page-title">📝 Quiz disponibles</h1>
-            <p class="page-subtitle">Chapitre : {{ chapitre.titre }}</p>
-        </div>
+    <div class="quiz-list-container">
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="flash-message {{ type }}">
+                    <i class="fa 
+                        {% if type == 'error' %}fa-exclamation-circle
+                        {% elseif type == 'warning' %}fa-exclamation-triangle
+                        {% elseif type == 'success' %}fa-check-circle
+                        {% else %}fa-info-circle
+                        {% endif %}"></i>
+                    <span class="flash-message-text">{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endfor %}
 
         {% if quizzes is empty %}
             <div class="empty-state">
-                <div class="empty-state-icon">📝</div>
+                <div class="empty-state-icon">
+                    <i class="fa fa-inbox"></i>
+                </div>
                 <h3 class="empty-state-title">Aucun quiz disponible</h3>
                 <p class="empty-state-text">
                     Il n'y a pas encore de quiz actif pour ce chapitre.<br>
@@ -215,28 +401,62 @@
             <div class="quiz-grid">
                 {% for quiz in quizzes %}
                     <div class="quiz-card">
-                        <div class="quiz-icon">📋</div>
+                        <div class="quiz-icon">
+                            {% set iconIndex = loop.index % 8 %}
+                            {% if iconIndex == 1 %}
+                                <i class="fa fa-brain"></i>
+                            {% elseif iconIndex == 2 %}
+                                <i class="fa fa-lightbulb"></i>
+                            {% elseif iconIndex == 3 %}
+                                <i class="fa fa-graduation-cap"></i>
+                            {% elseif iconIndex == 4 %}
+                                <i class="fa fa-book"></i>
+                            {% elseif iconIndex == 5 %}
+                                <i class="fa fa-pencil-alt"></i>
+                            {% elseif iconIndex == 6 %}
+                                <i class="fa fa-certificate"></i>
+                            {% elseif iconIndex == 7 %}
+                                <i class="fa fa-award"></i>
+                            {% else %}
+                                <i class="fa fa-star"></i>
+                            {% endif %}
+                        </div>
                         <h2 class="quiz-title">{{ quiz.titre }}</h2>
                         <p class="quiz-description">{{ quiz.description }}</p>
                         
                         <div class="quiz-meta">
                             <div class="meta-item">
-                                <i class="fa fa-question-circle"></i>
-                                <span>{{ quiz.questions|length }} question(s)</span>
+                                <div class="meta-icon">
+                                    <i class="fa fa-question-circle"></i>
+                                </div>
+                                <span class="meta-value">{{ quiz.questions|length }}</span>
+                                <span class="meta-label">Questions</span>
                             </div>
                             <div class="meta-item">
-                                <i class="fa fa-star"></i>
-                                <span>
+                                <div class="meta-icon">
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <span class="meta-value">
                                     {% set totalPoints = 0 %}
                                     {% for question in quiz.questions %}
                                         {% set totalPoints = totalPoints + question.point %}
                                     {% endfor %}
-                                    {{ totalPoints }} point(s)
+                                    {{ totalPoints }}
                                 </span>
+                                <span class="meta-label">Points</span>
                             </div>
+                            {% if quiz.dureeMaxMinutes %}
+                            <div class="meta-item">
+                                <div class="meta-icon">
+                                    <i class="fa fa-clock"></i>
+                                </div>
+                                <span class="meta-value">{{ quiz.dureeMaxMinutes }}</span>
+                                <span class="meta-label">Minutes</span>
+                            </div>
+                            {% endif %}
                         </div>
                         
-                        <a href="{{ path('app_frontoffice_quiz_show', {'chapitreId': chapitre.id, 'id': quiz.id}) }}" class="btn-start-quiz">
+                        <a href="{{ path('app_quiz_start', {'id': quiz.id}) }}" class="btn-start-quiz">
                             <i class="fa fa-play-circle"></i>
                             <span>Commencer le quiz</span>
                         </a>
@@ -247,5 +467,66 @@
     </div>
 
     <script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
+    <script>
+        // Système de sons
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        // Son de démarrage du quiz (montée joyeuse)
+        function playStartQuizSound() {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+            oscillator.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+            oscillator.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+            
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.4);
+        }
+
+        // Son de hover sur les cartes
+        function playHoverSound() {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+            
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.08);
+        }
+
+        // Ajouter son sur les boutons "Commencer le quiz"
+        document.querySelectorAll('.btn-start-quiz').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                playStartQuizSound();
+            });
+            
+            btn.addEventListener('mouseenter', function() {
+                playHoverSound();
+            });
+        });
+
+        // Ajouter son sur les cartes de quiz
+        document.querySelectorAll('.quiz-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                playHoverSound();
+            });
+        });
+    </script>
 </body>
 </html>
