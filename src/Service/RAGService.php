@@ -123,26 +123,40 @@ class RAGService
     {
         $niveau = $user && method_exists($user, 'getNiveau') ? $user->getNiveau() : null;
         
-        $cours = $this->coursRepository->findAll();
-        
-        $coursData = [];
-        foreach ($cours as $c) {
-            $coursData[] = [
-                'id' => $c->getId(),
-                'titre' => $c->getTitre(),
-                'matiere' => $c->getMatiere(),
-                'niveau' => $c->getNiveau(),
-                'duree' => $c->getDuree(),
-                'chapitres_count' => $c->getChapitres()->count(),
-                'description' => substr($c->getDescription(), 0, 150) . '...'
+        try {
+            $cours = $this->coursRepository->findAll();
+            
+            // Vérification de sécurité
+            if (!is_array($cours) && !($cours instanceof \Traversable)) {
+                $cours = [];
+            }
+            
+            $coursData = [];
+            foreach ($cours as $c) {
+                $coursData[] = [
+                    'id' => $c->getId(),
+                    'titre' => $c->getTitre(),
+                    'matiere' => $c->getMatiere(),
+                    'niveau' => $c->getNiveau(),
+                    'duree' => $c->getDuree(),
+                    'chapitres_count' => $c->getChapitres()->count(),
+                    'description' => substr($c->getDescription(), 0, 150) . '...'
+                ];
+            }
+
+            return [
+                'user_level' => $niveau,
+                'available_courses' => $coursData,
+                'total_courses' => count($coursData)
+            ];
+        } catch (\Exception $e) {
+            return [
+                'user_level' => $niveau,
+                'available_courses' => [],
+                'total_courses' => 0,
+                'error' => 'Erreur lors de la récupération des cours'
             ];
         }
-
-        return [
-            'user_level' => $niveau,
-            'available_courses' => $coursData,
-            'total_courses' => count($coursData)
-        ];
     }
 
     /**
@@ -150,37 +164,51 @@ class RAGService
      */
     private function getEventsContext(): array
     {
-        $now = new \DateTime();
-        $nextWeek = (clone $now)->modify('+7 days');
-        
-        $qb = $this->em->createQueryBuilder();
-        $events = $qb->select('e')
-            ->from('App\Entity\Evenement', 'e')
-            ->where('e.dateDebut >= :now')
-            ->andWhere('e.dateDebut <= :nextWeek')
-            ->setParameter('now', $now)
-            ->setParameter('nextWeek', $nextWeek)
-            ->orderBy('e.dateDebut', 'ASC')
-            ->getQuery()
-            ->getResult();
+        try {
+            $now = new \DateTime();
+            $nextWeek = (clone $now)->modify('+7 days');
+            
+            $qb = $this->em->createQueryBuilder();
+            $events = $qb->select('e')
+                ->from('App\Entity\Evenement', 'e')
+                ->where('e.dateDebut >= :now')
+                ->andWhere('e.dateDebut <= :nextWeek')
+                ->setParameter('now', $now)
+                ->setParameter('nextWeek', $nextWeek)
+                ->orderBy('e.dateDebut', 'ASC')
+                ->getQuery()
+                ->getResult();
 
-        $eventsData = [];
-        foreach ($events as $event) {
-            $eventsData[] = [
-                'id' => $event->getId(),
-                'titre' => $event->getTitre(),
-                'date' => $event->getDateDebut()->format('d/m/Y H:i'),
-                'lieu' => $event->getLieu(),
-                'places_disponibles' => $event->getCapaciteMax() - $event->getParticipations()->count(),
-                'description' => substr($event->getDescription(), 0, 100) . '...'
+            // Vérification de sécurité
+            if (!is_array($events) && !($events instanceof \Traversable)) {
+                $events = [];
+            }
+
+            $eventsData = [];
+            foreach ($events as $event) {
+                $eventsData[] = [
+                    'id' => $event->getId(),
+                    'titre' => $event->getTitre(),
+                    'date' => $event->getDateDebut()->format('d/m/Y H:i'),
+                    'lieu' => $event->getLieu(),
+                    'places_disponibles' => $event->getCapaciteMax() - $event->getParticipations()->count(),
+                    'description' => substr($event->getDescription(), 0, 100) . '...'
+                ];
+            }
+
+            return [
+                'upcoming_events' => $eventsData,
+                'total_events' => count($eventsData),
+                'period' => '7 prochains jours'
+            ];
+        } catch (\Exception $e) {
+            return [
+                'upcoming_events' => [],
+                'total_events' => 0,
+                'period' => '7 prochains jours',
+                'error' => 'Erreur lors de la récupération des événements'
             ];
         }
-
-        return [
-            'upcoming_events' => $eventsData,
-            'total_events' => count($eventsData),
-            'period' => '7 prochains jours'
-        ];
     }
 
     /**
