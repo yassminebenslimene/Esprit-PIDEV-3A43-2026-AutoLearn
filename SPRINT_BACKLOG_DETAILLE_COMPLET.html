@@ -1,0 +1,2142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Backlog Détaillé - Gestion de Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 20px;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        .epic-section {
+            margin-bottom: 60px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+
+        .epic-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 35px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .epic-content {
+            padding: 35px;
+            background: #f8f9fa;
+        }
+
+        .user-story {
+            background: white;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .us-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px 30px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .us-id {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-right: 15px;
+            font-weight: 700;
+        }
+
+        .tasks-container {
+            padding: 25px 30px;
+        }
+
+        .task-item {
+            background: #f8f9ff;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .task-id {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 16px;
+        }
+
+        .task-time {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .task-description {
+            color: #333;
+            font-size: 15px;
+            line-height: 1.8;
+            margin-bottom: 12px;
+        }
+
+        .task-team {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .team-backend {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .team-frontend {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .team-uxui {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .team-qa {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+
+        .explanation-box {
+            background: #fff9e6;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .explanation-box h4 {
+            color: #f57c00;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .explanation-box p {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .summary-card h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            opacity: 0.95;
+        }
+
+        .summary-card .value {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+
+        .summary-card .label {
+            font-size: 15px;
+            opacity: 0.9;
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .footer p {
+            margin: 10px 0;
+            font-size: 15px;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 25px;
+            }
+            .header h1 {
+                font-size: 28px;
+            }
+            .task-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .task-time {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 SPRINT BACKLOG DÉTAILLÉ</h1>
+            <h2 style="margin-top: 15px;">Système de Gestion de Quiz</h2>
+            <p style="margin-top: 20px;">Documentation Complète des Fonctionnalités</p>
+            <p>14 User Stories • 95 Tâches • 113 Heures</p>
+        </div>
+
+
+        <div class="content">
+            <!-- RÉSUMÉ GLOBAL -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h3>User Stories</h3>
+                    <div class="value">14</div>
+                    <div class="label">Fonctionnalités principales</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Tâches</h3>
+                    <div class="value">95</div>
+                    <div class="label">Tâches détaillées</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Temps</h3>
+                    <div class="value">113h</div>
+                    <div class="label">Heures de développement</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Epics</h3>
+                    <div class="value">7</div>
+                    <div class="label">Grandes fonctionnalités</div>
+                </div>
+            </div>
+
+            <div class="explanation-box">
+                <h4>📖 Comment lire ce document ?</h4>
+                <p>
+                    Ce document présente toutes les fonctionnalités du système de gestion de quiz. 
+                    Chaque <strong>Epic</strong> représente une grande fonctionnalité. 
+                    Chaque <strong>User Story (US)</strong> décrit ce qu'un utilisateur peut faire. 
+                    Chaque <strong>Tâche</strong> détaille le travail technique à réaliser.
+                </p>
+            </div>
+
+
+            <!-- ========================================== -->
+            <!-- EPIC 1: GESTION ADMINISTRATIVE DES QUIZ -->
+            <!-- ========================================== -->
+            <div class="epic-section">
+                <div class="epic-header">
+                    🎯 EPIC 1 : GESTION ADMINISTRATIVE DES QUIZ (29 heures)
+                </div>
+                <div class="epic-content">
+                    <div class="explanation-box">
+                        <h4>🎯 Objectif de cet Epic</h4>
+                        <p>
+                            Permettre aux administrateurs de créer, modifier, supprimer et visualiser les quiz. 
+                            C'est la partie "backoffice" où les enseignants gèrent le contenu des évaluations.
+                        </p>
+                    </div>
+
+                    <!-- US-1.1 -->
+                    <div class="user-story">
+                        <div class="us-header">
+                            <span class="us-id">US-1.1</span>
+                            En tant qu'administrateur, je veux créer un nouveau quiz afin de proposer des évaluations aux étudiants
+                        </div>
+                        <div class="tasks-container">
+                            <div class="explanation-box">
+                                <h4>💡 Explication de cette User Story</h4>
+                                <p>
+                                    Cette fonctionnalité permet à un enseignant de créer un nouveau quiz avec un titre, 
+                                    une description, une durée maximale, un seuil de réussite (par exemple 50%), 
+                                    et un nombre maximum de tentatives. Le quiz doit être associé à un chapitre de cours.
+                                </p>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.1.1</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> En tant que concepteur, je dois préparer le diagramme de classe de conception pour l'entité Quiz
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails de la tâche</h4>
+                                    <p>
+                                        Créer un schéma qui montre la structure de la table Quiz dans la base de données. 
+                                        Ce schéma inclut toutes les colonnes : id, titre, description, état, durée maximale, 
+                                        seuil de réussite, nombre maximum de tentatives, et la relation avec le chapitre.
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.1.2</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> En tant qu'Admin BD, je dois créer la table quiz avec les colonnes: id, titre, description, etat, duree_max_minutes, seuil_reussite, max_tentatives, chapitre_id
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails de la tâche</h4>
+                                    <p>
+                                        Créer physiquement la table dans la base de données MySQL/PostgreSQL avec toutes les colonnes nécessaires. 
+                                        Définir les types de données (VARCHAR pour le titre, INT pour la durée, etc.) et les contraintes 
+                                        (NOT NULL pour les champs obligatoires, clé étrangère vers la table chapitre).
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.1.3</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> En tant que développeur, je dois créer l'entité Quiz.php avec toutes les propriétés et annotations de validation
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails de la tâche</h4>
+                                    <p>
+                                        Créer la classe PHP Quiz.php dans Symfony qui représente la table quiz. 
+                                        Ajouter toutes les propriétés (titre, description, état, etc.) avec les annotations Doctrine 
+                                        pour la base de données et les annotations de validation (NotBlank, Length, Range) 
+                                        pour vérifier que les données sont correctes avant l'enregistrement.
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.1.4</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> En tant que développeur, je dois créer le formulaire QuizType avec EntityType pour la relation chapitre
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails de la tâche</h4>
+                                    <p>
+                                        Créer le formulaire Symfony qui permet de saisir les informations du quiz. 
+                                        Le formulaire contient des champs texte pour le titre et la description, 
+                                        un menu déroulant pour sélectionner le chapitre, des champs numériques pour la durée 
+                                        et le seuil de réussite. Utiliser EntityType pour afficher la liste des chapitres disponibles.
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.1.5</span>
+                                    <span class="task-time">⏱️ 45 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> En tant que développeur, je dois créer l'action new() dans QuizController pour gérer la création
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails de la tâche</h4>
+                                    <p>
+                                        Créer la méthode new() dans le contrôleur QuizController qui affiche le formulaire de création. 
+                                        Quand l'utilisateur soumet le formulaire, cette méthode valide les données, 
+                                        enregistre le nouveau quiz dans la base de données, et affiche un message de confirmation. 
+                                        En cas d'erreur, elle réaffiche le formulaire avec les messages d'erreur.
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.1.6</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> En tant que développeur frontend, je dois créer le template new.html.twig avec design glass morphism
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails de la tâche</h4>
+                                    <p>
+                                        Créer la page HTML/Twig qui affiche le formulaire de création de quiz. 
+                                        Appliquer un design moderne "glass morphism" (effet de verre transparent avec flou). 
+                                        Styliser les champs du formulaire avec des couleurs attrayantes, des bordures arrondies, 
+                                        et des effets au survol. Rendre le formulaire responsive pour mobile et tablette.
+                                    </p>
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.1.7</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> En tant que développeur, je dois implémenter la validation métier dans QuizManagementService
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails de la tâche</h4>
+                                    <p>
+                                        Créer un service QuizManagementService qui contient les règles métier. 
+                                        Par exemple : vérifier qu'un quiz a bien un chapitre associé, que le seuil de réussite 
+                                        est entre 0% et 100%, que la durée est positive. Ce service centralise toute la logique 
+                                        de validation pour éviter de dupliquer le code dans les contrôleurs.
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.1.8</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> En tant que testeur, je dois préparer les cas de test pour la création de quiz
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails de la tâche</h4>
+                                    <p>
+                                        Préparer un document qui liste tous les scénarios de test à vérifier : 
+                                        création réussie avec données valides, erreur si le titre est vide, 
+                                        erreur si aucun chapitre n'est sélectionné, erreur si le seuil de réussite est négatif, etc. 
+                                        Définir les données de test et les résultats attendus pour chaque scénario.
+                                    </p>
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.1.9</span>
+                                    <span class="task-time">⏱️ 45 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> En tant que testeur, je dois exécuter les tests de validation (champs obligatoires, formats, contraintes)
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails de la tâche</h4>
+                                    <p>
+                                        Exécuter manuellement tous les cas de test préparés précédemment. 
+                                        Vérifier que le système affiche bien les messages d'erreur appropriés quand les données 
+                                        sont invalides, et que le quiz est créé correctement quand les données sont valides. 
+                                        Documenter les résultats et signaler les bugs éventuels.
+                                    </p>
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- US-1.2 -->
+                    <div class="user-story">
+                        <div class="us-header">
+                            <span class="us-id">US-1.2</span>
+                            En tant qu'administrateur, je veux modifier un quiz existant afin de corriger ou améliorer le contenu
+                        </div>
+                        <div class="tasks-container">
+                            <div class="explanation-box">
+                                <h4>💡 Explication de cette User Story</h4>
+                                <p>
+                                    Cette fonctionnalité permet à un enseignant de modifier les informations d'un quiz déjà créé. 
+                                    Par exemple, changer le titre, ajuster la durée, modifier le seuil de réussite, 
+                                    ou changer le chapitre associé. Le formulaire est pré-rempli avec les données actuelles du quiz.
+                                </p>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.2.1</span>
+                                    <span class="task-time">⏱️ 45 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> En tant que développeur, je dois créer l'action edit() dans QuizController
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails de la tâche</h4>
+                                    <p>
+                                        Créer la méthode edit() qui récupère le quiz à modifier depuis la base de données, 
+                                        affiche le formulaire pré-rempli avec ses données actuelles, 
+                                        et enregistre les modifications quand l'utilisateur soumet le formulaire. 
+                                        Gérer les erreurs de validation et afficher des messages de confirmation.
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.2.2</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> En tant que développeur frontend, je dois créer le template edit.html.twig avec formulaire pré-rempli
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails de la tâche</h4>
+                                    <p>
+                                        Créer la page de modification qui affiche le même formulaire que la création, 
+                                        mais avec les champs pré-remplis avec les valeurs actuelles du quiz. 
+                                        Ajouter un titre "Modifier le quiz" et un bouton "Enregistrer les modifications". 
+                                        Appliquer le même design moderne que la page de création.
+                                    </p>
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.2.3</span>
+                                    <span class="task-time">⏱️ 45 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> En tant que développeur, je dois implémenter la validation des modifications
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails de la tâche</h4>
+                                    <p>
+                                        S'assurer que toutes les validations sont appliquées lors de la modification, 
+                                        exactement comme lors de la création. Vérifier que les champs obligatoires sont remplis, 
+                                        que les valeurs numériques sont dans les bonnes plages, et que le chapitre existe toujours. 
+                                        Utiliser le même service de validation que pour la création.
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.2.4</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> En tant que développeur, je dois ajouter les messages flash de confirmation
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails de la tâche</h4>
+                                    <p>
+                                        Ajouter des messages de notification qui s'affichent en haut de la page après une action. 
+                                        Par exemple : "Le quiz a été modifié avec succès" en vert si tout s'est bien passé, 
+                                        ou "Erreur lors de la modification" en rouge en cas de problème. 
+                                        Ces messages disparaissent automatiquement après quelques secondes.
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.2.5</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> En tant que testeur, je dois tester les modifications avec différents scénarios
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails de la tâche</h4>
+                                    <p>
+                                        Tester plusieurs scénarios : modifier uniquement le titre, modifier tous les champs, 
+                                        essayer de vider un champ obligatoire, modifier avec des valeurs invalides, 
+                                        modifier un quiz qui a déjà des questions. Vérifier que les modifications sont bien 
+                                        enregistrées dans la base de données et que les messages de confirmation s'affichent correctement.
+                                    </p>
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- US-1.3 -->
+                    <div class="user-story">
+                        <div class="us-header">
+                            <span class="us-id">US-1.3</span>
+                            En tant qu'administrateur, je veux supprimer un quiz afin de nettoyer les contenus obsolètes
+                        </div>
+                        <div class="tasks-container">
+                            <div class="explanation-box">
+                                <h4>💡 Explication de cette User Story</h4>
+                                <p>
+                                    Permet de supprimer définitivement un quiz qui n'est plus nécessaire. 
+                                    La suppression doit être sécurisée avec une confirmation pour éviter les suppressions accidentelles. 
+                                    Toutes les questions et options associées au quiz sont également supprimées automatiquement.
+                                </p>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.3.1</span>
+                                    <span class="task-time">⏱️ 45 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer l'action delete() avec protection CSRF
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Implémenter la méthode de suppression avec un token CSRF pour empêcher les attaques. 
+                                        Le token garantit que la suppression provient bien d'une action volontaire de l'utilisateur 
+                                        et non d'un site malveillant.
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.3.2</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Implémenter la confirmation JavaScript (modal)
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Créer une fenêtre popup élégante qui demande "Êtes-vous sûr de vouloir supprimer ce quiz ?" 
+                                        avec deux boutons : "Annuler" et "Supprimer". La suppression ne s'effectue que si l'utilisateur 
+                                        clique sur "Supprimer".
+                                    </p>
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.3.3</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Configurer la suppression en cascade (orphanRemoval)
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Configurer Doctrine pour que la suppression d'un quiz supprime automatiquement 
+                                        toutes ses questions et options associées. Cela évite d'avoir des données orphelines 
+                                        dans la base de données.
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.3.4</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Ajouter les messages de retour utilisateur
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.3.5</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Tester la suppression et la cascade sur questions/options
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- US-1.4 -->
+                    <div class="user-story">
+                        <div class="us-header">
+                            <span class="us-id">US-1.4</span>
+                            En tant qu'administrateur, je veux voir la liste de tous les quiz avec leurs questions et options afin d'avoir une vue d'ensemble
+                        </div>
+                        <div class="tasks-container">
+                            <div class="explanation-box">
+                                <h4>💡 Explication de cette User Story</h4>
+                                <p>
+                                    Créer une interface qui affiche tous les quiz sous forme de liste hiérarchique. 
+                                    Chaque quiz peut être déplié pour voir ses questions, et chaque question peut être dépliée 
+                                    pour voir ses options de réponse. C'est comme un explorateur de fichiers pour les quiz.
+                                </p>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.4.1</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Concevoir l'interface hiérarchique Quiz > Questions > Options
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Créer des maquettes (wireframes) montrant comment organiser visuellement la hiérarchie. 
+                                        Définir les icônes (flèches pour déplier/replier), les couleurs pour différencier 
+                                        les niveaux, et l'espacement pour une lecture facile.
+                                    </p>
+                                </div>
+                                <span class="task-team team-uxui">🎨 Équipe UX/UI</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.4.2</span>
+                                    <span class="task-time">⏱️ 3h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer le template quiz_management.html.twig avec structure hiérarchique
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Développer la page HTML avec une structure en accordéon ou arbre. 
+                                        Chaque quiz est une ligne cliquable qui révèle ses questions. 
+                                        Chaque question est cliquable pour révéler ses options. 
+                                        Ajouter des boutons d'action (modifier, supprimer) à chaque niveau.
+                                    </p>
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.4.3</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer l'API endpoint GET /api/quiz/{id}/questions
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Créer une route API qui retourne toutes les questions d'un quiz au format JSON. 
+                                        Quand l'utilisateur clique sur un quiz, JavaScript appelle cette API pour charger 
+                                        les questions sans recharger toute la page (chargement dynamique).
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.4.4</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer l'API endpoint GET /api/question/{id}/options
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.4.5</span>
+                                    <span class="task-time">⏱️ 3h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Implémenter le JavaScript pour chargement AJAX
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Écrire le code JavaScript qui gère les clics sur les quiz et questions. 
+                                        Quand on clique, le code appelle l'API, récupère les données, 
+                                        et les affiche dynamiquement dans la page avec des animations de dépliage.
+                                    </p>
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.4.6</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Rendre l'interface responsive (mobile/tablette)
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T1.4.7</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Tester sur différents navigateurs (Chrome, Firefox, Safari)
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ========================================== -->
+            <!-- EPIC 2: GESTION DES QUESTIONS ET OPTIONS -->
+            <!-- ========================================== -->
+            <div class="epic-section">
+                <div class="epic-header">
+                    📝 EPIC 2 : GESTION DES QUESTIONS ET OPTIONS (16 heures)
+                </div>
+                <div class="epic-content">
+                    <div class="explanation-box">
+                        <h4>🎯 Objectif de cet Epic</h4>
+                        <p>
+                            Permettre aux administrateurs d'ajouter des questions à un quiz et de définir 
+                            les options de réponse pour chaque question. Chaque question a un texte et un nombre de points. 
+                            Chaque option a un texte et un indicateur "est correcte" (vrai/faux).
+                        </p>
+                    </div>
+
+                    <!-- US-2.1 -->
+                    <div class="user-story">
+                        <div class="us-header">
+                            <span class="us-id">US-2.1</span>
+                            En tant qu'administrateur, je veux ajouter des questions à un quiz afin de construire le contenu évaluatif
+                        </div>
+                        <div class="tasks-container">
+                            <div class="explanation-box">
+                                <h4>💡 Explication</h4>
+                                <p>
+                                    Créer l'entité Question avec ses propriétés (texte, points, relation avec quiz), 
+                                    le formulaire de saisie, le contrôleur CRUD complet, et les templates d'affichage. 
+                                    8 tâches couvrant conception, base de données, backend, frontend et tests.
+                                </p>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T2.1.1</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Préparer le diagramme de classe pour l'entité Question
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T2.1.2</span>
+                                    <span class="task-time">⏱️ 45 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer la table question (id, texte_question, point, quiz_id)
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T2.1.3</span>
+                                    <span class="task-time">⏱️ 45 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer l'entité Question.php avec validation (NotBlank, Length, Range)
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T2.1.4</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer le formulaire QuestionType
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T2.1.5</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer QuestionController avec CRUD complet (index, new, show, edit, delete)
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T2.1.6</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer les templates (new, edit, show, index)
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T2.1.7</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer l'API endpoint GET /api/question/{id}/options
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T2.1.8</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Tester la création et modification de questions
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- US-2.2 -->
+                    <div class="user-story">
+                        <div class="us-header">
+                            <span class="us-id">US-2.2</span>
+                            En tant qu'administrateur, je veux définir les options de réponse afin de créer des QCM complets
+                        </div>
+                        <div class="tasks-container">
+                            <div class="explanation-box">
+                                <h4>💡 Explication</h4>
+                                <p>
+                                    Créer l'entité Option avec texte et indicateur "est_correcte". 
+                                    Développer le CRUD complet avec formulaire incluant une checkbox pour marquer la bonne réponse. 
+                                    Les templates affichent un indicateur visuel (icône verte) pour les bonnes réponses.
+                                </p>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T2.2.1</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Préparer le diagramme de classe pour l'entité Option
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T2.2.2</span>
+                                    <span class="task-time">⏱️ 45 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer la table option (id, texte_option, est_correcte, question_id)
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T2.2.3</span>
+                                    <span class="task-time">⏱️ 45 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer l'entité Option.php avec validation
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T2.2.4</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer le formulaire OptionType avec CheckboxType pour est_correcte
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T2.2.5</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer OptionController avec CRUD complet
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T2.2.6</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer les templates avec indicateur visuel pour bonne réponse
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T2.2.7</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Tester la création et modification d'options
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ========================================== -->
+            <!-- EPIC 3: PASSAGE DE QUIZ (FRONTOFFICE) -->
+            <!-- ========================================== -->
+            <div class="epic-section">
+                <div class="epic-header">
+                    🎓 EPIC 3 : PASSAGE DE QUIZ PAR LES ÉTUDIANTS (32 heures)
+                </div>
+                <div class="epic-content">
+                    <div class="explanation-box">
+                        <h4>🎯 Objectif de cet Epic</h4>
+                        <p>
+                            Créer l'interface frontoffice où les étudiants peuvent voir les quiz disponibles, 
+                            passer les quiz en répondant aux questions, et voir leurs résultats avec un design 
+                            style Kahoot (coloré, animé, interactif). C'est la partie la plus visible du système.
+                        </p>
+                    </div>
+
+                    <!-- US-3.1 -->
+                    <div class="user-story">
+                        <div class="us-header">
+                            <span class="us-id">US-3.1</span>
+                            En tant qu'étudiant, je veux voir les quiz disponibles pour mon chapitre afin de choisir lesquels passer
+                        </div>
+                        <div class="tasks-container">
+                            <div class="explanation-box">
+                                <h4>💡 Explication</h4>
+                                <p>
+                                    Afficher une liste de cartes colorées (style Kahoot) montrant tous les quiz actifs. 
+                                    Chaque carte affiche le titre, la description, le nombre de questions, la durée, 
+                                    et les statistiques de l'étudiant (tentatives restantes, meilleur score). 
+                                    Un bouton "Commencer" permet de démarrer le quiz.
+                                </p>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.1.1</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Concevoir l'interface de liste des quiz style Kahoot
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Créer des maquettes avec des cartes colorées (violet, bleu, orange) disposées en grille. 
+                                        Chaque carte a un fond dégradé, des icônes, et des badges pour les informations clés. 
+                                        Design moderne avec ombres et effets de survol.
+                                    </p>
+                                </div>
+                                <span class="task-team team-uxui">🎨 Équipe UX/UI</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.1.2</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer QuizController dans namespace FrontOffice
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.1.3</span>
+                                    <span class="task-time">⏱️ 3h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer le template list.html.twig avec design Kahoot
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Développer la page avec grille de cartes responsive. Chaque carte affiche : 
+                                        titre en gros, description, icône horloge + durée, icône étoile + points, 
+                                        badge "X tentatives restantes", bouton "Commencer" avec effet hover. 
+                                        Utiliser CSS Grid et animations.
+                                    </p>
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.1.4</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Implémenter la logique des tentatives dans QuizManagementService
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.1.5</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer les méthodes getStatistiquesEtudiant() et canStudentTakeQuiz()
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.1.6</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Tester l'affichage des quiz et des statistiques
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- US-3.2 -->
+                    <div class="user-story">
+                        <div class="us-header">
+                            <span class="us-id">US-3.2</span>
+                            En tant qu'étudiant, je veux répondre aux questions d'un quiz afin d'être évalué sur mes connaissances
+                        </div>
+                        <div class="tasks-container">
+                            <div class="explanation-box">
+                                <h4>💡 Explication</h4>
+                                <p>
+                                    Interface de passage de quiz avec affichage question par question ou toutes les questions 
+                                    sur une page. Timer visible avec compte à rebours. Options de réponse sous forme de boutons 
+                                    colorés. Validation avant soumission. Randomisation optionnelle des questions et options.
+                                </p>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.2.1</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Concevoir l'interface de passage de quiz
+                                </div>
+                                <span class="task-team team-uxui">🎨 Équipe UX/UI</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.2.2</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer QuizPassageController avec actions start(), submit(), checkTime()
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        start() : Initialise la tentative en session, randomise si nécessaire, démarre le timer. 
+                                        submit() : Récupère les réponses, calcule le score, enregistre la tentative. 
+                                        checkTime() : API appelée par JavaScript pour vérifier si le temps est écoulé.
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.2.3</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Implémenter la gestion des sessions pour stocker la tentative en cours
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.2.4</span>
+                                    <span class="task-time">⏱️ 4h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer le template passage.html.twig style Kahoot
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Page avec fond coloré dégradé. En haut : timer circulaire animé. 
+                                        Au centre : question en gros avec numéro. En bas : 4 boutons colorés pour les options 
+                                        (rouge, bleu, jaune, vert). Effets hover et animations de sélection. 
+                                        Barre de progression montrant la question actuelle.
+                                    </p>
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.2.5</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Implémenter le timer JavaScript avec compte à rebours
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Timer qui affiche minutes:secondes et se met à jour chaque seconde. 
+                                        Quand il reste moins de 5 minutes, le timer devient orange. 
+                                        Moins d'1 minute : rouge avec pulsation. À 0, soumission automatique du quiz.
+                                    </p>
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.2.6</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Implémenter la randomisation dans prepareQuizForDisplay()
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.2.7</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Ajouter la validation avant soumission
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.2.8</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Tester le passage de quiz avec et sans timer
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- US-3.3 -->
+                    <div class="user-story">
+                        <div class="us-header">
+                            <span class="us-id">US-3.3</span>
+                            En tant qu'étudiant, je veux voir mes résultats après un quiz afin de connaître ma performance
+                        </div>
+                        <div class="tasks-container">
+                            <div class="explanation-box">
+                                <h4>💡 Explication</h4>
+                                <p>
+                                    Page de résultats spectaculaire style Kahoot avec animations. Affiche le score total, 
+                                    le pourcentage, un message de félicitations ou d'encouragement, et le détail question par question 
+                                    (réponse donnée vs bonne réponse). Sons de victoire ou défaite. Confettis si réussite.
+                                </p>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.3.1</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Concevoir l'interface de résultats style Kahoot
+                                </div>
+                                <span class="task-team team-uxui">🎨 Équipe UX/UI</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.3.2</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Implémenter calculateScore() dans QuizManagementService
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Méthode qui prend le quiz et les réponses de l'étudiant. 
+                                        Pour chaque question, compare la réponse donnée avec la bonne réponse. 
+                                        Calcule le score total, le pourcentage, et retourne un tableau détaillé 
+                                        avec isCorrect pour chaque question.
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.3.3</span>
+                                    <span class="task-time">⏱️ 5h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer le template result.html.twig avec animations
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Page avec grand cercle de score animé qui se remplit progressivement. 
+                                        Message dynamique selon le score ("Excellent !", "Bien joué !", "Continue tes efforts"). 
+                                        Liste des questions avec icône ✓ verte ou ✗ rouge. 
+                                        Bouton "Recommencer" si tentatives restantes.
+                                    </p>
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.3.4</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Implémenter la logique de réussite (comparaison avec seuil)
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.3.5</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Implémenter enregistrerTentative() pour stocker les résultats
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.3.6</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Ajouter les sons JavaScript (Web Audio API)
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Jouer un son de victoire (fanfare) si le score dépasse le seuil de réussite. 
+                                        Son d'encouragement si échec. Utiliser Web Audio API ou balises audio HTML5 
+                                        avec fichiers MP3/OGG.
+                                    </p>
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.3.7</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Ajouter les animations CSS (fadeIn, slideDown, pulse)
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T3.3.8</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Tester l'affichage des résultats avec différents scores
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ========================================== -->
+            <!-- EPIC 4: SYSTÈME DE TENTATIVES -->
+            <!-- ========================================== -->
+            <div class="epic-section">
+                <div class="epic-header">
+                    🔄 EPIC 4 : SYSTÈME DE TENTATIVES (9 heures)
+                </div>
+                <div class="epic-content">
+                    <div class="explanation-box">
+                        <h4>🎯 Objectif de cet Epic</h4>
+                        <p>
+                            Gérer le nombre de tentatives autorisées par quiz et afficher l'historique des tentatives 
+                            de l'étudiant avec ses scores précédents. Empêcher un étudiant de passer un quiz 
+                            s'il a atteint le nombre maximum de tentatives.
+                        </p>
+                    </div>
+
+                    <!-- US-4.1 -->
+                    <div class="user-story">
+                        <div class="us-header">
+                            <span class="us-id">US-4.1</span>
+                            En tant qu'administrateur, je veux limiter le nombre de tentatives par quiz
+                        </div>
+                        <div class="tasks-container">
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T4.1.1</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Ajouter la propriété maxTentatives dans Quiz.php
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T4.1.2</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Implémenter canStudentTakeQuiz() avec vérification de la limite
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T4.1.3</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Ajouter la validation côté contrôleur avant démarrage
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T4.1.4</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Mettre à jour l'interface avec affichage des tentatives restantes
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T4.1.5</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Tester la limitation des tentatives
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- US-4.2 -->
+                    <div class="user-story">
+                        <div class="us-header">
+                            <span class="us-id">US-4.2</span>
+                            En tant qu'étudiant, je veux voir l'historique de mes tentatives
+                        </div>
+                        <div class="tasks-container">
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T4.2.1</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer getStatistiquesEtudiant() dans QuizManagementService
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T4.2.2</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Implémenter le stockage des résultats en session
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T4.2.3</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer l'affichage des statistiques dans result.html.twig
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T4.2.4</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Tester l'historique et les statistiques
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ========================================== -->
+            <!-- EPIC 5: RELATION QUIZ-CHAPITRE -->
+            <!-- ========================================== -->
+            <div class="epic-section">
+                <div class="epic-header">
+                    🔗 EPIC 5 : RELATION QUIZ-CHAPITRE OBLIGATOIRE (3 heures)
+                </div>
+                <div class="epic-content">
+                    <div class="explanation-box">
+                        <h4>🎯 Objectif de cet Epic</h4>
+                        <p>
+                            S'assurer qu'un quiz appartient toujours à un chapitre. C'est une règle métier obligatoire 
+                            pour maintenir la cohérence pédagogique. Validation à tous les niveaux : base de données, 
+                            entité, formulaire, contrôleur, et service métier.
+                        </p>
+                    </div>
+
+                    <!-- US-5.1 -->
+                    <div class="user-story">
+                        <div class="us-header">
+                            <span class="us-id">US-5.1</span>
+                            En tant que système, je veux qu'un quiz appartienne obligatoirement à un chapitre
+                        </div>
+                        <div class="tasks-container">
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T5.1.1</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Ajouter la contrainte NOT NULL sur chapitre_id
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T5.1.2</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Ajouter l'annotation NotNull dans Quiz.php
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T5.1.3</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Configurer la validation dans QuizType (required)
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T5.1.4</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Ajouter la validation côté contrôleur
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T5.1.5</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Implémenter validateQuiz() dans QuizManagementService
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T5.1.6</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Tester la validation de la relation obligatoire
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ========================================== -->
+            <!-- EPIC 6: INTERFACE UTILISATEUR MODERNE -->
+            <!-- ========================================== -->
+            <div class="epic-section">
+                <div class="epic-header">
+                    🎨 EPIC 6 : INTERFACE UTILISATEUR MODERNE (16 heures)
+                </div>
+                <div class="epic-content">
+                    <div class="explanation-box">
+                        <h4>🎯 Objectif de cet Epic</h4>
+                        <p>
+                            Créer une expérience utilisateur moderne et attractive avec design glass morphism 
+                            (effet de verre transparent), style Kahoot (couleurs vives, animations), 
+                            et interface responsive qui s'adapte à tous les appareils (mobile, tablette, desktop).
+                        </p>
+                    </div>
+
+                    <!-- US-6.1 -->
+                    <div class="user-story">
+                        <div class="us-header">
+                            <span class="us-id">US-6.1</span>
+                            En tant qu'utilisateur, je veux une interface moderne et attractive
+                        </div>
+                        <div class="tasks-container">
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T6.1.1</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer la charte graphique glass morphism
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Définir la palette de couleurs (dégradés bleu/violet), la typographie (Inter, Poppins), 
+                                        les espacements, les bordures arrondies, les ombres, et les effets de transparence. 
+                                        Créer un guide de style avec exemples de boutons, cartes, formulaires.
+                                    </p>
+                                </div>
+                                <span class="task-team team-uxui">🎨 Équipe UX/UI</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T6.1.2</span>
+                                    <span class="task-time">⏱️ 3h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer le CSS glass morphism (backdrop-filter)
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Implémenter les classes CSS réutilisables : .glass-card (fond semi-transparent avec flou), 
+                                        .glass-button (bouton avec effet de verre), .glass-input (champs de formulaire transparents). 
+                                        Utiliser backdrop-filter: blur() et background: rgba().
+                                    </p>
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T6.1.3</span>
+                                    <span class="task-time">⏱️ 4h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Implémenter le style Kahoot (couleurs vives, typographie Inter)
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T6.1.4</span>
+                                    <span class="task-time">⏱️ 3h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Ajouter les animations CSS/JS
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Créer des animations : fadeIn (apparition en fondu), slideDown (glissement vers le bas), 
+                                        pulse (pulsation), bounce (rebond), rotate (rotation). Utiliser CSS @keyframes 
+                                        et JavaScript pour déclencher les animations au bon moment.
+                                    </p>
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T6.1.5</span>
+                                    <span class="task-time">⏱️ 3h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Rendre l'interface responsive avec media queries
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Adapter l'interface pour mobile (< 768px), tablette (768px-1024px), et desktop (> 1024px). 
+                                        Sur mobile : grille 1 colonne, boutons pleine largeur, texte plus gros. 
+                                        Sur tablette : grille 2 colonnes. Sur desktop : grille 3-4 colonnes.
+                                    </p>
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T6.1.6</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Tester sur différents appareils (mobile, tablette, desktop)
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ========================================== -->
+            <!-- EPIC 7: SÉCURITÉ -->
+            <!-- ========================================== -->
+            <div class="epic-section">
+                <div class="epic-header">
+                    🔒 EPIC 7 : SÉCURITÉ DU SYSTÈME (8 heures)
+                </div>
+                <div class="epic-content">
+                    <div class="explanation-box">
+                        <h4>🎯 Objectif de cet Epic</h4>
+                        <p>
+                            Sécuriser l'application contre les attaques courantes (CSRF, XSS, injection SQL) 
+                            et contrôler l'accès aux fonctionnalités selon les rôles utilisateurs 
+                            (ROLE_ADMIN pour le backoffice, ROLE_ETUDIANT pour le frontoffice).
+                        </p>
+                    </div>
+
+                    <!-- US-7.1 -->
+                    <div class="user-story">
+                        <div class="us-header">
+                            <span class="us-id">US-7.1</span>
+                            En tant que système, je veux protéger les formulaires contre les attaques
+                        </div>
+                        <div class="tasks-container">
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T7.1.1</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Activer la protection CSRF dans security.yaml
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        CSRF (Cross-Site Request Forgery) : attaque où un site malveillant force l'utilisateur 
+                                        à effectuer des actions non désirées. La protection CSRF ajoute un token unique 
+                                        à chaque formulaire qui doit être validé lors de la soumission.
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T7.1.2</span>
+                                    <span class="task-time">⏱️ 2h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Implémenter la validation serveur avec Symfony Validator
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T7.1.3</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Sécuriser l'affichage avec Twig auto-escape
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Auto-escape protège contre les attaques XSS (Cross-Site Scripting) en échappant 
+                                        automatiquement les caractères HTML spéciaux. Par exemple, &lt;script&gt; devient 
+                                        &amp;lt;script&amp;gt; et ne s'exécute pas.
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T7.1.4</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Ajouter la validation des permissions (IsGranted)
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T7.1.5</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Tester la sécurité des formulaires
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- US-7.2 -->
+                    <div class="user-story">
+                        <div class="us-header">
+                            <span class="us-id">US-7.2</span>
+                            En tant que système, je veux contrôler l'accès aux fonctionnalités selon les rôles
+                        </div>
+                        <div class="tasks-container">
+                            <div class="explanation-box">
+                                <h4>💡 Explication</h4>
+                                <p>
+                                    Seuls les administrateurs (ROLE_ADMIN) peuvent accéder au backoffice pour créer/modifier/supprimer 
+                                    les quiz. Les étudiants (ROLE_ETUDIANT) ne peuvent que passer les quiz dans le frontoffice. 
+                                    Toute tentative d'accès non autorisé affiche une page 403 (Accès refusé).
+                                </p>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T7.2.1</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Configurer les rôles ROLE_ADMIN et ROLE_ETUDIANT
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T7.2.2</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Ajouter les annotations IsGranted sur les contrôleurs
+                                </div>
+                                <div class="explanation-box">
+                                    <h4>📝 Détails</h4>
+                                    <p>
+                                        Ajouter @IsGranted("ROLE_ADMIN") sur tous les contrôleurs du backoffice. 
+                                        Ajouter @IsGranted("ROLE_ETUDIANT") sur les contrôleurs du frontoffice. 
+                                        Symfony vérifie automatiquement les permissions avant d'exécuter les actions.
+                                    </p>
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T7.2.3</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Implémenter les vérifications métier dans les contrôleurs
+                                </div>
+                                <span class="task-team team-backend">👨‍💻 Équipe Backend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T7.2.4</span>
+                                    <span class="task-time">⏱️ 30 min</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Créer la page 403 personnalisée
+                                </div>
+                                <span class="task-team team-frontend">🎨 Équipe Frontend</span>
+                            </div>
+
+                            <div class="task-item">
+                                <div class="task-header">
+                                    <span class="task-id">T7.2.5</span>
+                                    <span class="task-time">⏱️ 1h</span>
+                                </div>
+                                <div class="task-description">
+                                    <strong>Tâche :</strong> Tester le contrôle d'accès avec différents rôles
+                                </div>
+                                <span class="task-team team-qa">✅ Équipe QA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- RÉCAPITULATIF FINAL -->
+            <div style="margin-top: 60px; padding: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
+                <h2 style="text-align: center; font-size: 32px; margin-bottom: 30px;">📊 RÉCAPITULATIF COMPLET DU SPRINT</h2>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 48px; font-weight: 700;">7</div>
+                        <div style="font-size: 16px;">Epics</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 48px; font-weight: 700;">14</div>
+                        <div style="font-size: 16px;">User Stories</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 48px; font-weight: 700;">95</div>
+                        <div style="font-size: 16px;">Tâches</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 48px; font-weight: 700;">113h</div>
+                        <div style="font-size: 16px;">Heures</div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.15); padding: 25px; border-radius: 10px; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px; font-size: 20px;">📋 Répartition par Epic</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <strong>EPIC 1:</strong> Gestion Administrative Quiz - 27 tâches - 29h
+                        </li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <strong>EPIC 2:</strong> Gestion Questions et Options - 15 tâches - 16h
+                        </li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <strong>EPIC 3:</strong> Passage de Quiz (Frontoffice) - 22 tâches - 32h
+                        </li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <strong>EPIC 4:</strong> Système de Tentatives - 9 tâches - 9h
+                        </li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <strong>EPIC 5:</strong> Relation Quiz-Chapitre - 6 tâches - 3h
+                        </li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <strong>EPIC 6:</strong> Interface Utilisateur - 6 tâches - 16h
+                        </li>
+                        <li style="padding: 8px 0;">
+                            <strong>EPIC 7:</strong> Sécurité - 10 tâches - 8h
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.15); padding: 25px; border-radius: 10px;">
+                    <h3 style="margin-bottom: 15px; font-size: 20px;">👥 Répartition par Équipe</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <strong>👨‍💻 Équipe Backend:</strong> 45 tâches - 52h (46%)
+                        </li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <strong>🎨 Équipe Frontend:</strong> 32 tâches - 45h (40%)
+                        </li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <strong>🎨 Équipe UX/UI:</strong> 5 tâches - 6h (5%)
+                        </li>
+                        <li style="padding: 8px 0;">
+                            <strong>✅ Équipe QA:</strong> 13 tâches - 13h (12%)
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- DÉFINITION OF DONE -->
+            <div style="margin-top: 40px; padding: 30px; background: #f8f9fa; border-radius: 15px; border-left: 5px solid #667eea;">
+                <h2 style="color: #1e3c72; margin-bottom: 20px; font-size: 28px;">✅ DÉFINITION OF DONE</h2>
+                <p style="color: #555; margin-bottom: 20px; font-size: 16px;">
+                    Pour qu'une tâche soit considérée comme <strong>TERMINÉE</strong>, elle doit respecter tous ces critères :
+                </p>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 10px 0; color: #333; font-size: 15px;">✅ Code écrit et fonctionnel</li>
+                    <li style="padding: 10px 0; color: #333; font-size: 15px;">✅ Validation côté serveur et client implémentée</li>
+                    <li style="padding: 10px 0; color: #333; font-size: 15px;">✅ Tests effectués et passés avec succès</li>
+                    <li style="padding: 10px 0; color: #333; font-size: 15px;">✅ Code review effectué par un pair</li>
+                    <li style="padding: 10px 0; color: #333; font-size: 15px;">✅ Documentation technique ajoutée</li>
+                    <li style="padding: 10px 0; color: #333; font-size: 15px;">✅ Aucune erreur ou warning dans les logs</li>
+                    <li style="padding: 10px 0; color: #333; font-size: 15px;">✅ Interface responsive (si frontend)</li>
+                    <li style="padding: 10px 0; color: #333; font-size: 15px;">✅ Sécurité vérifiée (CSRF, validation, permissions)</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <h3 style="margin-bottom: 15px; font-size: 24px;">📚 Système de Gestion de Quiz</h3>
+            <p style="margin: 10px 0;">Sprint 1 - Documentation Complète</p>
+            <p style="margin: 10px 0;">Équipes : Backend • Frontend • UX/UI • QA</p>
+            <p style="margin: 20px 0; font-size: 13px; opacity: 0.8;">
+                Product Owner : [À compléter] | Scrum Master : [À compléter]
+            </p>
+            <p style="margin: 20px 0; font-size: 12px; opacity: 0.7;">
+                Document généré pour Madame - Toutes les 95 tâches détaillées avec explications complètes
+            </p>
+            <p style="margin: 10px 0; font-size: 12px; opacity: 0.6;">
+                © 2024 - Système de Gestion de Quiz - Tous droits réservés
+            </p>
+        </div>
+    </div>
+</body>
+</html>

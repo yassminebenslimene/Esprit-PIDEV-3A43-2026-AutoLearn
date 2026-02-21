@@ -67,7 +67,8 @@ class Quiz
     private ?int $maxTentatives = null;
 
     #[ORM\ManyToOne(inversedBy: 'quizzes')]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: "Le chapitre est obligatoire. Un quiz doit appartenir à un chapitre.")]
     private ?Chapitre $chapitre = null;
 
     /**

@@ -5,6 +5,7 @@ namespace App\Controller\Backoffice;
 use App\Entity\Quiz;
 use App\Form\QuizType;
 use App\Repository\QuizRepository;
+use App\Service\QuizManagementService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,16 +42,30 @@ final class QuizController extends AbstractController
     }
 
     #[Route('/new', name: 'app_quiz_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, QuizManagementService $quizService): Response
     {
         $quiz = new Quiz();
         $form = $this->createForm(QuizType::class, $quiz);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Validation métier supplémentaire
+            $validation = $quizService->validateQuizBusinessRules($quiz);
+            
+            if (!$validation['valid']) {
+                foreach ($validation['errors'] as $error) {
+                    $this->addFlash('error', $error);
+                }
+                return $this->render('backoffice/quiz/new.html.twig', [
+                    'quiz' => $quiz,
+                    'form' => $form,
+                ]);
+            }
+
             $entityManager->persist($quiz);
             $entityManager->flush();
 
+            $this->addFlash('success', '✅ Quiz créé avec succès et lié au chapitre "' . $quiz->getChapitre()->getTitre() . '"');
             return $this->redirectToRoute('backoffice_quiz_management', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -69,14 +84,28 @@ final class QuizController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_quiz_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Quiz $quiz, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Quiz $quiz, EntityManagerInterface $entityManager, QuizManagementService $quizService): Response
     {
         $form = $this->createForm(QuizType::class, $quiz);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Validation métier supplémentaire
+            $validation = $quizService->validateQuizBusinessRules($quiz);
+            
+            if (!$validation['valid']) {
+                foreach ($validation['errors'] as $error) {
+                    $this->addFlash('error', $error);
+                }
+                return $this->render('backoffice/quiz/edit.html.twig', [
+                    'quiz' => $quiz,
+                    'form' => $form,
+                ]);
+            }
+
             $entityManager->flush();
 
+            $this->addFlash('success', '✅ Quiz modifié avec succès et lié au chapitre "' . $quiz->getChapitre()->getTitre() . '"');
             return $this->redirectToRoute('backoffice_quiz_management', [], Response::HTTP_SEE_OTHER);
         }
 

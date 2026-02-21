@@ -735,7 +735,7 @@
 
                 <div class="answers-list">
                     {% for option in detail.question.options %}
-                        {% set selectedId = detail.selectedOption ?? detail.selectedOptionId %}
+                        {% set selectedId = detail.selectedOption %}
                         <div class="answer-item 
                             {% if option.id == selectedId and option.isEstCorrecte %}correct
                             {% elseif option.id == selectedId and not option.isEstCorrecte %}incorrect

@@ -51,10 +51,13 @@ class QuizType extends AbstractType
             ->add('chapitre', EntityType::class, [
                 'class' => Chapitre::class,
                 'choice_label' => 'titre',
-                'label' => 'Chapitre',
-                'placeholder' => 'Sélectionnez un chapitre',
-                'required' => false,
-                'help' => 'Associez ce quiz à un chapitre spécifique'
+                'label' => 'Chapitre *',
+                'placeholder' => 'Sélectionnez un chapitre obligatoirement',
+                'required' => true,
+                'help' => '🔒 OBLIGATOIRE : Chaque quiz doit appartenir à un chapitre',
+                'attr' => [
+                    'class' => 'required-field'
+                ]
             ])
             ->add('dureeMaxMinutes', IntegerType::class, [
                 'label' => 'Durée maximale (minutes)',

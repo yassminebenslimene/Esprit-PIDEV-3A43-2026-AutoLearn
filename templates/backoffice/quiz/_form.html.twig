@@ -18,9 +18,12 @@
             {{ form_help(form.etat) }}
             {{ form_errors(form.etat) }}
         </div>
-        <div>
-            {{ form_label(form.chapitre) }}
-            {{ form_widget(form.chapitre, {'attr': {'style': 'width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; color: var(--text-primary);'}}) }}
+        <div style="border: 2px solid #ff6b6b; border-radius: 0.5rem; padding: 1rem; background: rgba(255, 107, 107, 0.1);">
+            {{ form_label(form.chapitre, null, {'label_attr': {'style': 'color: #ff6b6b; font-weight: bold; display: flex; align-items: center; gap: 0.5rem;'}}) }}
+            <div style="color: #ff6b6b; font-size: 0.875rem; margin-bottom: 0.5rem;">
+                🔒 OBLIGATOIRE : Chaque quiz doit appartenir à un chapitre
+            </div>
+            {{ form_widget(form.chapitre, {'attr': {'style': 'width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 2px solid #ff6b6b; border-radius: 0.5rem; color: var(--text-primary);', 'required': 'required'}}) }}
             {{ form_help(form.chapitre) }}
             {{ form_errors(form.chapitre) }}
         </div>

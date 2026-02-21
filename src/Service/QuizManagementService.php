@@ -321,4 +321,46 @@ class QuizManagementService
             'seuilReussite' => $quiz->getSeuilReussite()
         ];
     }
+
+    /**
+     * Valide qu'un quiz respecte les règles métier obligatoires
+     * 
+     * @param Quiz $quiz Le quiz à valider
+     * @return array Tableau avec 'valid' (bool) et 'errors' (array)
+     */
+    public function validateQuizBusinessRules(Quiz $quiz): array
+    {
+        $errors = [];
+        
+        // Règle obligatoire : Un quiz doit appartenir à un chapitre
+        if ($quiz->getChapitre() === null) {
+            $errors[] = '🔒 Un quiz doit obligatoirement appartenir à un chapitre.';
+        }
+        
+        // Validation du titre
+        if (empty($quiz->getTitre()) || strlen(trim($quiz->getTitre())) < 3) {
+            $errors[] = 'Le titre du quiz doit contenir au moins 3 caractères.';
+        }
+        
+        // Validation de l'état
+        $etatsValides = ['actif', 'inactif', 'brouillon', 'archive'];
+        if (!in_array($quiz->getEtat(), $etatsValides)) {
+            $errors[] = 'L\'état du quiz doit être: actif, inactif, brouillon ou archive.';
+        }
+        
+        // Validation des tentatives
+        if ($quiz->getMaxTentatives() !== null && $quiz->getMaxTentatives() <= 0) {
+            $errors[] = 'Le nombre maximum de tentatives doit être positif.';
+        }
+        
+        // Validation du seuil de réussite
+        if ($quiz->getSeuilReussite() !== null && ($quiz->getSeuilReussite() < 0 || $quiz->getSeuilReussite() > 100)) {
+            $errors[] = 'Le seuil de réussite doit être entre 0% et 100%.';
+        }
+        
+        return [
+            'valid' => empty($errors),
+            'errors' => $errors
+        ];
+    }
 }
