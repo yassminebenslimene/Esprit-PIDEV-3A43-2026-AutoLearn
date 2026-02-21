@@ -156,7 +156,7 @@ function closeReport() {
                     <td>{{ evenement.dateDebut|date('d/m/Y H:i') }}</td>
                     <td>{{ evenement.dateFin|date('d/m/Y H:i') }}</td>
                     <td>
-                        <span class="status-badge {% if evenement.status.value == 'En cours' %}processing{% elseif evenement.status.value == 'Annulé' %}pending{% else %}completed{% endif %}">
+                        <span class="status-badge {% if evenement.status.value == 'En cours' %}processing{% elseif evenement.status.value == 'Annulé' %}pending{% elseif evenement.status.value == 'Passé' %}completed{% else %}completed{% endif %}">
                             {{ evenement.status.value }}
                         </span>
                     </td>
