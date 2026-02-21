@@ -16,4 +16,5 @@ return [
     SymfonyCasts\Bundle\ResetPassword\SymfonyCastsResetPasswordBundle::class => ['all' => true],
     Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['dev' => true, 'test' => true],
     CalendarBundle\CalendarBundle::class => ['all' => true],
+    OpenAI\Symfony\OpenAIBundle::class => ['all' => true],
 ];

@@ -2,8 +2,10 @@
 // src/Controller/BackofficeController.php
 
 namespace App\Controller;
-use Symfony\Bundle\SecurityBundle\Security;
 use App\Entity\Exercice;
+use App\Service\AIExerciseGenerator;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\SecurityBundle\Security;
 use App\Repository\QuizRepository;
 use App\Form\ExerciceType;
 use App\Repository\ExerciceRepository;
@@ -590,5 +592,197 @@ public function deletechal(
     $em->flush();
 
     return $this->redirectToRoute('backoffice_challenges');
+}
+#[Route('/backoffice/exercice/ai-generate', name: 'backoffice_exercice_ai_generate', methods: ['POST'])]
+public function aiGenerate(Request $request, AIExerciseGenerator $aiGenerator): JsonResponse
+{
+    // Vérifier l'authentification
+    if (!$this->getUser()) {
+        error_log('AI Generate: Utilisateur non authentifié');
+        return $this->json([
+            'success' => false,
+            'error' => 'Vous devez être connecté pour utiliser cette fonctionnalité'
+        ], 401);
+    }
+
+    try {
+        // Récupérer et décoder les données JSON
+        $content = $request->getContent();
+        error_log('AI Generate - Raw content: ' . $content);
+        
+        $data = json_decode($content, true);
+        
+        if (!$data) {
+            error_log('AI Generate - JSON invalide: ' . json_last_error_msg());
+            return $this->json([
+                'success' => false,
+                'error' => 'Données JSON invalides: ' . json_last_error_msg()
+            ], 400);
+        }
+        
+        // Valider les données
+        $theme = $data['theme'] ?? '';
+        $niveau = $data['niveau'] ?? 'Intermédiaire';
+        $type = $data['type'] ?? 'open';
+        
+        error_log("AI Generate - Theme: $theme, Niveau: $niveau, Type: $type");
+        
+        if (empty($theme)) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Le thème est requis'
+            ], 400);
+        }
+        
+        // Générer selon le type
+        try {
+            if ($type === 'qcm') {
+                $exercise = $aiGenerator->generateQCM($theme, $niveau);
+                $exercise['type'] = 'qcm';
+            } else {
+                $exercise = $aiGenerator->generateExercise($theme, $niveau);
+                $exercise['type'] = 'open';
+            }
+        } catch (\Exception $e) {
+            error_log('AI Generate - Erreur du générateur: ' . $e->getMessage());
+            
+            // Fallback: retourner un exercice par défaut
+            $exercise = [
+                'question' => "Question par défaut sur le thème '$theme'",
+                'reponse' => "Réponse par défaut",
+                'points' => 5,
+                'type' => $type
+            ];
+            
+            if ($type === 'qcm') {
+                $exercise['options'] = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
+                $exercise['bonneReponse'] = 0;
+            }
+        }
+        
+        error_log('AI Generate - Exercice généré: ' . print_r($exercise, true));
+        
+        return $this->json([
+            'success' => true,
+            'exercise' => $exercise
+        ]);
+        
+    } catch (\Exception $e) {
+        error_log('AI Generate - ERREUR CRITIQUE: ' . $e->getMessage());
+        error_log('Fichier: ' . $e->getFile() . ' Ligne: ' . $e->getLine());
+        
+        return $this->json([
+            'success' => false,
+            'error' => 'Erreur serveur: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+#[Route('/backoffice/exercice/ai-save', name: 'backoffice_exercice_ai_save', methods: ['POST'])]
+public function aiSave(Request $request, EntityManagerInterface $entityManager): JsonResponse
+{
+    try {
+        $data = json_decode($request->getContent(), true);
+        
+        if (!$data) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Données invalides'
+            ], 400);
+        }
+        
+        // Créer un nouvel exercice
+        $exercice = new Exercice();
+        
+        // Définir la question
+        if (isset($data['question'])) {
+            $exercice->setQuestion($data['question']);
+        } else {
+            return $this->json([
+                'success' => false,
+                'error' => 'Question manquante'
+            ], 400);
+        }
+        
+        // Définir la réponse selon le type
+        if (isset($data['type']) && $data['type'] === 'qcm') {
+            // Pour QCM, stocker les options et la bonne réponse
+            if (isset($data['options']) && isset($data['bonneReponse'])) {
+                $options = implode('|', $data['options']);
+                $exercice->setReponse($options . '||' . $data['bonneReponse']);
+            } else {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Options du QCM manquantes'
+                ], 400);
+            }
+        } else {
+            // Pour question ouverte
+            if (isset($data['reponse'])) {
+                $exercice->setReponse($data['reponse']);
+            } else {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Réponse manquante'
+                ], 400);
+            }
+        }
+        
+        // Définir les points
+        $exercice->setPoints($data['points'] ?? 5);
+        
+        // Sauvegarder
+        $entityManager->persist($exercice);
+        $entityManager->flush();
+        
+        error_log('Exercice sauvegardé avec ID : ' . $exercice->getId());
+        
+        return $this->json([
+            'success' => true,
+            'id' => $exercice->getId()
+        ]);
+        
+    } catch (\Exception $e) {
+        error_log('Erreur AI save : ' . $e->getMessage());
+        return $this->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+/**
+ * Optionnel : Route pour générer plusieurs exercices à la fois
+ */
+#[Route('/backoffice/exercice/ai-generate-multiple', name: 'backoffice_exercice_ai_generate_multiple', methods: ['POST'])]
+public function aiGenerateMultiple(Request $request, AIExerciseGenerator $aiGenerator): JsonResponse
+{
+    try {
+        $data = json_decode($request->getContent(), true);
+        
+        $theme = $data['theme'] ?? '';
+        $niveau = $data['niveau'] ?? 'Intermédiaire';
+        $count = min($data['count'] ?? 3, 10); // Maximum 10 exercices
+        
+        if (empty($theme)) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Le thème est requis'
+            ], 400);
+        }
+        
+        $exercises = $aiGenerator->generateMultipleExercises($theme, $niveau, $count);
+        
+        return $this->json([
+            'success' => true,
+            'exercises' => $exercises
+        ]);
+        
+    } catch (\Exception $e) {
+        return $this->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
 }
 }
