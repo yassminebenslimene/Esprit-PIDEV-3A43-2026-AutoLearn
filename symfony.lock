@@ -91,6 +91,9 @@
             "./tests/bootstrap.php"
         ]
     },
+    "sbyaute/star-rating-bundle": {
+        "version": "v1.3"
+    },
     "stof/doctrine-extensions-bundle": {
         "version": "1.15",
         "recipe": {

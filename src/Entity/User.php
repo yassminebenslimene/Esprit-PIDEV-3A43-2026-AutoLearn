@@ -108,11 +108,18 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\OneToMany(targetEntity: UserChallenge::class, mappedBy: 'user')]
     private Collection $userChallenges;
+
+    /**
+     * @var Collection<int, Vote>
+     */
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'user')]
+    private Collection $votes;
     public function __construct()
     {
         $this->createdAt = new \DateTime();
         $this->Challenges = new ArrayCollection();
         $this->userChallenges = new ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
 
     public function getRoles(): array
@@ -279,6 +286,36 @@ public function removeUserChallenge(UserChallenge $userChallenge): static
         // set the owning side to null (unless already changed)
         if ($userChallenge->getUser() === $this) {
             $userChallenge->setUser(null);
+        }
+    }
+
+    return $this;
+}
+
+/**
+ * @return Collection<int, Vote>
+ */
+public function getVotes(): Collection
+{
+    return $this->votes;
+}
+
+public function addVote(Vote $vote): static
+{
+    if (!$this->votes->contains($vote)) {
+        $this->votes->add($vote);
+        $vote->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removeVote(Vote $vote): static
+{
+    if ($this->votes->removeElement($vote)) {
+        // set the owning side to null (unless already changed)
+        if ($vote->getUser() === $this) {
+            $vote->setUser(null);
         }
     }
 

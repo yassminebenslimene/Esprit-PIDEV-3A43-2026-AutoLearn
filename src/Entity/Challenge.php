@@ -58,11 +58,18 @@ class Challenge
     #[ORM\OneToMany(targetEntity: UserChallenge::class, mappedBy: 'challenge')]
     private Collection $userChallenges;
 
+    /**
+     * @var Collection<int, Vote>
+     */
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'challenge', cascade: ["persist", "remove"])]
+    private Collection $votes;
+
     public function __construct()
     {
         $this->exercices = new ArrayCollection();
         $this->quizzes = new ArrayCollection();
         $this->userChallenges = new ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
     public function getId(): ?int
     {
@@ -229,4 +236,55 @@ class Challenge
 
         return $this;
     }
+    public function getNoteMoyenne(): float
+{
+    // Calcule la moyenne des votes
+    $votes = $this->getVotes();
+    if ($votes->count() === 0) {
+        return 0;
+    }
+    
+    $total = 0;
+    foreach ($votes as $vote) {
+        $total += $vote->getValeur();
+    }
+    
+    return round($total / $votes->count(), 1);
+}
+
+public function getNombreVotes(): int
+{
+    return $this->votes->count();
+}
+
+/**
+ * @return Collection<int, Vote>
+ */
+public function getVotes(): Collection
+{
+    return $this->votes;
+}
+
+public function addVote(Vote $vote): static
+{
+    if (!$this->votes->contains($vote)) {
+        $this->votes->add($vote);
+        $vote->setChallenge($this);
+    }
+
+    return $this;
+}
+
+public function removeVote(Vote $vote): static
+{
+    if ($this->votes->removeElement($vote)) {
+        // set the owning side to null (unless already changed)
+        if ($vote->getChallenge() === $this) {
+            $vote->setChallenge(null);
+        }
+    }
+
+    return $this;
+}
+
 }

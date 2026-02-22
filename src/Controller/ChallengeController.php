@@ -12,9 +12,84 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Entity\Vote;
 
 class ChallengeController extends AbstractController
 {
+    #[Route('/challenge/vote', name: 'frontchallenge_vote', methods: ['POST'])]
+    public function voteChallenge(Request $request, EntityManagerInterface $entityManager, ChallengeRepository $challengeRepository): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+            
+            $challengeId = $data['challengeId'] ?? null;
+            $valeur = $data['valeur'] ?? null;
+            
+            if (!$challengeId || !$valeur) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Paramètres manquants'
+                ], 400);
+            }
+            
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Vous devez être connecté pour voter'
+                ], 401);
+            }
+            
+            $challenge = $challengeRepository->find($challengeId);
+            if (!$challenge) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Challenge non trouvé'
+                ], 404);
+            }
+            
+            // Vérifier si l'utilisateur a déjà voté
+            $existingVote = $entityManager->getRepository(Vote::class)->findOneBy([
+                'user' => $user,
+                'challenge' => $challenge
+            ]);
+            
+            if ($existingVote) {
+                // Mettre à jour le vote existant
+                $existingVote->setValeur($valeur);
+                $entityManager->flush();
+                
+                return $this->json([
+                    'success' => true,
+                    'message' => 'Votre note a été mise à jour !',
+                    'note' => $challenge->getNoteMoyenne(),
+                    'nbVotes' => $challenge->getNombreVotes()
+                ]);
+            }
+            
+            // Créer un nouveau vote
+            $vote = new Vote();
+            $vote->setUser($user);
+            $vote->setChallenge($challenge);
+            $vote->setValeur($valeur);
+            
+            $entityManager->persist($vote);
+            $entityManager->flush();
+            
+            return $this->json([
+                'success' => true,
+                'message' => 'Merci pour votre vote !',
+                'note' => $challenge->getNoteMoyenne(),
+                'nbVotes' => $challenge->getNombreVotes()
+            ]);
+            
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Erreur: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     // ⚠️ IMPORTANT: La route spécifique DOIT être avant la route générique
     #[Route('/challenge/save-answer', name: 'frontchallenge_save_answer', methods: ['POST'])]
     public function saveAnswer(

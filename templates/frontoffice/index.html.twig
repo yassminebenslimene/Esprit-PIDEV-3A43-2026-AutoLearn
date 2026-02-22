@@ -745,6 +745,29 @@ https://templatemo.com/tm-586-scholar
                                                 {{ challenge.niveau }}
                                             </h6>
                                         </li>
+                                        <!-- Rating Stars -->
+                                        <li style="margin-top: 10px;">
+                                            <div class="rating-stars">
+                                                {% set note = challenge.noteMoyenne|default(0) %}
+                                                {% set fullStars = note|round %}
+                                                {% set hasHalf = (note - fullStars) >= 0.5 %}
+                                                
+                                                <div class="stars-display" style="color: #ffc107;">
+                                                    {% for i in 1..5 %}
+                                                        {% if i <= fullStars %}
+                                                            <i class="fa fa-star"></i>
+                                                        {% elseif i == fullStars + 1 and hasHalf %}
+                                                            <i class="fa fa-star-half-o"></i>
+                                                        {% else %}
+                                                            <i class="fa fa-star-o"></i>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    <span style="margin-left: 8px; color: #7a7a7a; font-size: 14px;">
+                                                        {{ note|number_format(1) }} ({{ challenge.nombreVotes|default(0) }})
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </li>
                                     </ul>
                                     <a href="{{ path('frontchallenge', {'id': challenge.id}) }}">
                                         <i class="fa fa-angle-right"></i>
