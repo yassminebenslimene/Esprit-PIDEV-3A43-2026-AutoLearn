@@ -1,0 +1,267 @@
+{% extends 'backoffice/base.html.twig' %}
+
+{% block title %}Revision #{{ revision.id }} Details{% endblock %}
+{% block page_title %}📋 Revision #{{ revision.id }} Details{% endblock %}
+
+{% block body %}
+<div class="audit-container">
+    <!-- Back Button -->
+    <div style="margin-bottom: 20px;">
+        <a href="{{ path('backoffice_audit_index') }}" class="btn btn-secondary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"/>
+                <polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Back to Audit Trail
+        </a>
+    </div>
+
+    <!-- Revision Info -->
+    <div class="glass-card">
+        <div class="card-header">
+            <h3>📝 Revision Information</h3>
+            <span class="badge badge-primary">#{{ revision.id }}</span>
+        </div>
+        <div class="revision-info">
+            <div class="info-row">
+                <span class="label">Revision ID:</span>
+                <span class="value">#{{ revision.id }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Timestamp:</span>
+                <span class="value">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    {{ revision.timestamp|date('Y-m-d H:i:s') }}
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="label">User:</span>
+                <span class="value">
+                    {% if revision.username %}
+                        <span class="user-badge">{{ revision.username }}</span>
+                    {% else %}
+                        <span class="text-muted">System</span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="label">Total Changes:</span>
+                <span class="value">
+                    <span class="badge badge-info">{{ changes|length }} changes</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Changes Details -->
+    <div class="glass-card" style="margin-top: 30px;">
+        <div class="card-header">
+            <h3>🔄 Changes in This Revision</h3>
+        </div>
+
+        {% if changes is empty %}
+            <div class="empty-state">
+                <p>No changes recorded in this revision.</p>
+            </div>
+        {% else %}
+            {% for change in changes %}
+                <div class="change-item">
+                    <div class="change-header">
+                        <div>
+                            <h4>User ID: {{ change.userId }}</h4>
+                            <span class="change-type change-type-{{ change.revtype|lower }}">
+                                {% if change.revtype == 'INS' %}
+                                    ➕ INSERT - Student Created
+                                {% elseif change.revtype == 'UPD' %}
+                                    ✏️ UPDATE - Student Modified
+                                {% elseif change.revtype == 'DEL' %}
+                                    🗑️ DELETE - Student Deleted
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="change-details">
+                        <div class="detail-grid">
+                            {% if change.nom %}
+                                <div class="detail-item">
+                                    <span class="detail-label">Nom:</span>
+                                    <span class="detail-value">{{ change.nom }}</span>
+                                </div>
+                            {% endif %}
+                            {% if change.prenom %}
+                                <div class="detail-item">
+                                    <span class="detail-label">Prénom:</span>
+                                    <span class="detail-value">{{ change.prenom }}</span>
+                                </div>
+                            {% endif %}
+                            {% if change.email %}
+                                <div class="detail-item">
+                                    <span class="detail-label">Email:</span>
+                                    <span class="detail-value">{{ change.email }}</span>
+                                </div>
+                            {% endif %}
+                            {% if change.role %}
+                                <div class="detail-item">
+                                    <span class="detail-label">Role:</span>
+                                    <span class="detail-value">
+                                        <span class="badge">{{ change.role }}</span>
+                                    </span>
+                                </div>
+                            {% endif %}
+                            {% if change.discr %}
+                                <div class="detail-item">
+                                    <span class="detail-label">Type:</span>
+                                    <span class="detail-value">
+                                        <span class="badge badge-info">{{ change.discr }}</span>
+                                    </span>
+                                </div>
+                            {% endif %}
+                            {% if change.niveau is defined and change.niveau %}
+                                <div class="detail-item">
+                                    <span class="detail-label">Niveau:</span>
+                                    <span class="detail-value">{{ change.niveau }}</span>
+                                </div>
+                            {% endif %}
+                            {% if change.is_suspended is defined %}
+                                <div class="detail-item">
+                                    <span class="detail-label">Suspended:</span>
+                                    <span class="detail-value">
+                                        {% if change.is_suspended %}
+                                            <span class="badge badge-danger">Yes</span>
+                                        {% else %}
+                                            <span class="badge badge-success">No</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            {% endif %}
+                            {% if change.last_login_at %}
+                                <div class="detail-item">
+                                    <span class="detail-label">Last Login:</span>
+                                    <span class="detail-value">{{ change.last_login_at|date('Y-m-d H:i:s') }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="change-footer">
+                        <a href="{{ path('backoffice_audit_user_history', {userId: change.userId}) }}" class="btn btn-sm btn-secondary">
+                            View Full Student History
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.revision-info {
+    padding: 24px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row .label {
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.info-row .value {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.change-item {
+    margin: 20px;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+}
+
+.change-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.change-header h4 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.change-type {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.change-type-ins {
+    background: linear-gradient(135deg, #22c55e, #4ade80);
+}
+
+.change-type-upd {
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+}
+
+.change-type-del {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.detail-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-value {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.change-footer {
+    padding-top: 15px;
+    border-top: 1px solid var(--glass-border);
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 13px;
+}
+</style>
+{% endblock %}

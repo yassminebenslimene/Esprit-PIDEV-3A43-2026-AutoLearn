@@ -239,6 +239,21 @@
                                 <a href="{{ path('app_participation_show', {'id': participation.id}) }}" class="btn btn-primary">
                                     👁️ View Details
                                 </a>
+                                
+                                {# Bouton Feedback - visible uniquement si événement terminé #}
+                                {% set now = date() %}
+                                {% if participation.evenement.dateFin < now and participation.statut.value == 'Accepté' %}
+                                    {% set hasFeedback = participation.hasFeedbackFromEtudiant(app.user.id) %}
+                                    <a href="{{ path('app_feedback_form', {'id': participation.id}) }}" 
+                                       class="btn" 
+                                       style="background: {% if hasFeedback %}#48bb78{% else %}#f6ad55{% endif %}; color: white; margin-left: 10px; padding: 12px 25px; border-radius: 10px; text-decoration: none; font-weight: 600;">
+                                        {% if hasFeedback %}
+                                            ✅ Modifier mon feedback
+                                        {% else %}
+                                            📝 Donner mon feedback
+                                        {% endif %}
+                                    </a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

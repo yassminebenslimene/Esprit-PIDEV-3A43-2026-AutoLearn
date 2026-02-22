@@ -4,8 +4,10 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use SimpleThings\EntityAudit\Mapping\Annotation as Audit;
 
 #[ORM\Entity]
+#[Audit\Auditable]
 class Etudiant extends User
 {
     #[ORM\Column(length: 20)]

@@ -53,13 +53,23 @@
                 <div class="ai-message-avatar">🤖</div>
                 <div class="ai-message-content">
                     <p>Bonjour {{ app.user.prenom }}! 👋</p>
-                    <p>Je suis votre assistant intelligent. Je peux vous aider à:</p>
-                    <ul>
-                        <li>🎓 Trouver des cours adaptés</li>
-                        <li>📅 Découvrir les événements</li>
-                        <li>📊 Suivre vos progrès</li>
-                        <li>💡 Naviguer sur la plateforme</li>
-                    </ul>
+                    {% if app.user.role == 'ADMIN' %}
+                        <p>Je suis votre assistant administrateur. Je peux vous aider à:</p>
+                        <ul>
+                            <li>👥 Gérer les étudiants (créer, suspendre)</li>
+                            <li>📊 Consulter les statistiques</li>
+                            <li>📋 Voir les utilisateurs inactifs</li>
+                            <li>🎯 Gérer les cours et événements</li>
+                        </ul>
+                    {% else %}
+                        <p>Je suis votre assistant intelligent. Je peux vous aider à:</p>
+                        <ul>
+                            <li>🎓 Trouver des cours adaptés</li>
+                            <li>📅 Découvrir les événements</li>
+                            <li>👥 Créer ou rejoindre une équipe</li>
+                            <li>📊 Suivre vos progrès</li>
+                        </ul>
+                    {% endif %}
                     <p>Posez-moi une question!</p>
                 </div>
             </div>
@@ -447,6 +457,7 @@
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     max-width: 80%;
+    color: #1f2937; /* Couleur noire pour le texte */
 }
 
 .ai-message-user {
@@ -460,6 +471,7 @@
 
 .ai-message-content p {
     margin: 0 0 8px 0;
+    color: #1f2937; /* Couleur noire pour les paragraphes */
 }
 
 .ai-message-content p:last-child {
@@ -469,10 +481,12 @@
 .ai-message-content ul {
     margin: 8px 0 0 0;
     padding-left: 20px;
+    color: #1f2937; /* Couleur noire pour les listes */
 }
 
 .ai-message-content li {
     margin: 4px 0;
+    color: #1f2937; /* Couleur noire pour les items de liste */
 }
 
 .ai-link {

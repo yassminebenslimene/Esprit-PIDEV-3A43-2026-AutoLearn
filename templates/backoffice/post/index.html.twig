@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Posts - GlassAdmin Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('backoffice/css/templatemo-glass-admin-style.css') }}">
+{% extends 'backoffice/base.html.twig' %}
+
+{% block title %}Posts - GlassAdmin Dashboard{% endblock %}
+{% block page_title %}Posts{% endblock %}
+
+{% block body %}
     <style>
         .badge {
             padding: 4px 10px;
@@ -30,186 +26,108 @@
         .danger { background: var(--danger) !important; color: white !important; }
         .post-content { max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     </style>
-</head>
-<body>
-    <div class="background"></div>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
 
-    <div class="dashboard">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">G</div>
-                <span class="logo-text">AutoLearn</span>
+    <section class="stats-grid">
+        <div class="glass-card glass-card-3d stat-card">
+            <div class="stat-card-inner">
+                <div class="stat-info">
+                    <h3>Total Posts</h3>
+                    <div class="stat-value">{{ posts|length }}</div>
+                </div>
+                <div class="stat-icon magenta">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                </div>
             </div>
-            <ul class="nav-menu">
-                <li class="nav-section">
-                    <span class="nav-section-title">Main Menu</span>
-                    <ul>
-                        <li class="nav-item"><a href="{{ path('app_backoffice') }}" class="nav-link">
-                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-                            </svg>Dashboard</a></li>
-                    </ul>
-                </li>
-                <li class="nav-section">
-                    <span class="nav-section-title">Communauté</span>
-                    <ul>
-                        <li class="nav-item"><a href="{{ path('backoffice_communaute_index') }}" class="nav-link">
-                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                            </svg>Communautés</a></li>
-                        <li class="nav-item"><a href="{{ path('backoffice_post_index') }}" class="nav-link active">
-                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                            </svg>Posts</a></li>
-                        <li class="nav-item"><a href="{{ path('backoffice_commentaire_index') }}" class="nav-link">
-                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                            </svg>Commentaires</a></li>
-                    </ul>
-                </li>
-                <li class="nav-section">
-                    <span class="nav-section-title">Système</span>
-                    <ul>
-                        <li class="nav-item"><a href="{{ path('backoffice_users') }}" class="nav-link">
-                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                            </svg>Users</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </aside>
+        </div>
+    </section>
 
-        <main class="main-content">
-            <nav class="navbar">
-                <div class="page-header">
-                    <h1 class="page-title">Posts</h1>
-                    <div class="page-breadcrumb">
-                        <a href="{{ path('app_backoffice') }}">Dashboard</a><span>/</span><span>Posts</span>
-                    </div>
+    <section class="content-grid" style="grid-template-columns: 1fr;">
+        <div class="glass-card table-card">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Tous les Posts</h2>
+                    <p class="card-subtitle">Gérer les publications</p>
                 </div>
-                <div class="navbar-right">
-                    <div class="search-box">
-                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                        </svg>
-                        <form method="get" style="display:inline;">
-                            <input type="text" name="search" class="search-input" placeholder="Rechercher..." value="{{ search|default('') }}">
-                        </form>
-                    </div>
-                </div>
-            </nav>
-
-            <section class="stats-grid">
-                <div class="glass-card glass-card-3d stat-card">
-                    <div class="stat-card-inner">
-                        <div class="stat-info">
-                            <h3>Total Posts</h3>
-                            <div class="stat-value">{{ posts|length }}</div>
-                        </div>
-                        <div class="stat-icon magenta">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="content-grid" style="grid-template-columns: 1fr;">
-                <div class="glass-card table-card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="card-title">Tous les Posts</h2>
-                            <p class="card-subtitle">Gérer les publications</p>
-                        </div>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Auteur</th>
-                                    <th>Contenu</th>
-                                    <th>Communauté</th>
-                                    <th>Commentaires</th>
-                                    <th>Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for post in posts %}
-                                <tr>
-                                    <td>
-                                        {% if post.user %}
-                                            <div class="table-user">
-                                                <div class="table-avatar" style="background: linear-gradient(135deg, var(--emerald-light), var(--emerald));">
-                                                    {{ post.user.prenom|first|upper }}{{ post.user.nom|first|upper }}
-                                                </div>
-                                                <div class="table-user-info">
-                                                    <span class="table-user-name">{{ post.user.prenom }} {{ post.user.nom }}</span>
-                                                </div>
-                                            </div>
-                                        {% else %}
-                                            <span style="opacity:0.5">Anonyme</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <div class="post-content">{{ post.contenu }}</div>
-                                        {% if post.imageFile or post.imageUrl %}
-                                            <span style="display: inline-block; margin-top: 0.5rem; padding: 2px 8px; background: rgba(108, 99, 255, 0.1); color: #6c63ff; border-radius: 4px; font-size: 11px;">
-                                                📷 Image
-                                            </span>
-                                        {% endif %}
-                                        {% if post.videoFile or post.videoUrl %}
-                                            <span style="display: inline-block; margin-top: 0.5rem; padding: 2px 8px; background: rgba(255, 99, 132, 0.1); color: #ff6384; border-radius: 4px; font-size: 11px;">
-                                                🎥 Vidéo
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if post.communaute %}
-                                            {{ post.communaute.nom }}
-                                        {% else %}
-                                            <span style="opacity:0.5">-</span>
-                                        {% endif %}
-                                    </td>
-                                    <td><span class="badge badge-primary">{{ post.commentaires|length }}</span></td>
-                                    <td>{{ post.createdAt|date('d/m/Y H:i') }}</td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <a href="{{ path('backoffice_post_show', {id: post.id}) }}" class="card-btn small-btn">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                                                </svg>Voir
-                                            </a>
-                                            <form method="post" action="{{ path('backoffice_post_delete', {id: post.id}) }}" 
-                                                  onsubmit="return confirm('Supprimer ce post ?');" style="display:inline;">
-                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
-                                                <button type="submit" class="card-btn small-btn danger">
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                                                    </svg>Supprimer
-                                                </button>
-                                            </form>
+            </div>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Auteur</th>
+                            <th>Contenu</th>
+                            <th>Communauté</th>
+                            <th>Commentaires</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in posts %}
+                        <tr>
+                            <td>
+                                {% if post.user %}
+                                    <div class="table-user">
+                                        <div class="table-avatar" style="background: linear-gradient(135deg, var(--emerald-light), var(--emerald));">
+                                            {{ post.user.prenom|first|upper }}{{ post.user.nom|first|upper }}
                                         </div>
-                                    </td>
-                                </tr>
+                                        <div class="table-user-info">
+                                            <span class="table-user-name">{{ post.user.prenom }} {{ post.user.nom }}</span>
+                                        </div>
+                                    </div>
                                 {% else %}
-                                <tr><td colspan="6" style="text-align:center;padding:2rem;">Aucun post trouvé</td></tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-    <script src="{{ asset('backoffice/js/templatemo-glass-admin-script.js') }}"></script>
-</body>
-</html>
+                                    <span style="opacity:0.5">Anonyme</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="post-content">{{ post.contenu }}</div>
+                                {% if post.imageFile or post.imageUrl %}
+                                    <span style="display: inline-block; margin-top: 0.5rem; padding: 2px 8px; background: rgba(108, 99, 255, 0.1); color: #6c63ff; border-radius: 4px; font-size: 11px;">
+                                        📷 Image
+                                    </span>
+                                {% endif %}
+                                {% if post.videoFile or post.videoUrl %}
+                                    <span style="display: inline-block; margin-top: 0.5rem; padding: 2px 8px; background: rgba(255, 99, 132, 0.1); color: #ff6384; border-radius: 4px; font-size: 11px;">
+                                        🎥 Vidéo
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if post.communaute %}
+                                    {{ post.communaute.nom }}
+                                {% else %}
+                                    <span style="opacity:0.5">-</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge badge-primary">{{ post.commentaires|length }}</span></td>
+                            <td>{{ post.createdAt|date('d/m/Y H:i') }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ path('backoffice_post_show', {id: post.id}) }}" class="card-btn small-btn">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                                        </svg>Voir
+                                    </a>
+                                    <form method="post" action="{{ path('backoffice_post_delete', {id: post.id}) }}" 
+                                          onsubmit="return confirm('Supprimer ce post ?');" style="display:inline;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                                        <button type="submit" class="card-btn small-btn danger">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                            </svg>Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="6" style="text-align:center;padding:2rem;">Aucun post trouvé</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+{% endblock %}

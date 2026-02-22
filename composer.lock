@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e95d78f165e9f99006456b69c94a6ba2",
+    "content-hash": "e9adb1edc8caf376f627bac5fdcce718",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2887,6 +2887,106 @@
                 "source": "https://github.com/MyIntervals/PHP-CSS-Parser/tree/v9.1.0"
             },
             "time": "2025-09-14T07:37:21+00:00"
+        },
+        {
+            "name": "sonata-project/entity-audit-bundle",
+            "version": "1.22.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sonata-project/EntityAuditBundle.git",
+                "reference": "e6a07310199a5c9d2dfa925a96e44892fb86859f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sonata-project/EntityAuditBundle/zipball/e6a07310199a5c9d2dfa925a96e44892fb86859f",
+                "reference": "e6a07310199a5c9d2dfa925a96e44892fb86859f",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/collections": "^1.8 || ^2.0",
+                "doctrine/dbal": "^3.6 || ^4.0",
+                "doctrine/event-manager": "^1.2 || ^2.0",
+                "doctrine/orm": "^2.14 || ^3.0",
+                "doctrine/persistence": "^3.0 || ^4.0",
+                "php": "^8.1",
+                "psr/clock": "^1.0",
+                "symfony/config": "^6.4 || ^7.1",
+                "symfony/dependency-injection": "^6.4 || ^7.1",
+                "symfony/http-kernel": "^6.4 || ^7.1",
+                "symfony/security-core": "^6.4 || ^7.1",
+                "twig/twig": "^3.0"
+            },
+            "conflict": {
+                "doctrine/doctrine-bundle": "<2.7",
+                "gedmo/doctrine-extensions": "<3.7",
+                "symfony/framework-bundle": "<5.4",
+                "symfony/string": "5.4.0-BETA1 || 5.4.0-RC1"
+            },
+            "require-dev": {
+                "doctrine/doctrine-bundle": "^2.17 || ^3.0",
+                "doctrine/doctrine-fixtures-bundle": "^4.2",
+                "friendsofphp/php-cs-fixer": "^3.4",
+                "gedmo/doctrine-extensions": "^3.15",
+                "matthiasnoback/symfony-dependency-injection-test": "^6.1",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^1.0 || ^2.0",
+                "phpstan/phpstan-doctrine": "^1.3.12 || ^2.0",
+                "phpstan/phpstan-phpunit": "^1.0 || ^2.0",
+                "phpstan/phpstan-strict-rules": "^1.0 || ^2.0",
+                "phpstan/phpstan-symfony": "^1.0 || ^2.0",
+                "phpunit/phpunit": "^10.5.54 || ^11.5.38 || ^12.3.10",
+                "psalm/plugin-phpunit": "^0.18 || ^0.19",
+                "psalm/plugin-symfony": "^5.0",
+                "rector/rector": "^1.1 || ^2.0",
+                "symfony/browser-kit": "^6.4 || ^7.1",
+                "symfony/cache": "^6.4 || ^7.1",
+                "symfony/filesystem": "^6.4 || ^7.1",
+                "symfony/framework-bundle": "^6.4 || ^7.1",
+                "symfony/http-foundation": "^6.4 || ^7.1",
+                "symfony/security-bundle": "^6.4 || ^7.1",
+                "symfony/twig-bundle": "^6.4 || ^7.1",
+                "symfony/var-dumper": "^6.4 || ^7.1",
+                "vimeo/psalm": "^5.7 || ^6.10"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "SimpleThings\\EntityAudit\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Audit for Doctrine Entities",
+            "keywords": [
+                "Audit",
+                "database",
+                "persistence"
+            ],
+            "support": {
+                "issues": "https://github.com/sonata-project/EntityAuditBundle/issues",
+                "source": "https://github.com/sonata-project/EntityAuditBundle/tree/1.22.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/VincentLanglet",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/jordisala1991",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/phansys",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/wbloszyk",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-10-18T10:40:30+00:00"
         },
         {
             "name": "symfony/asset",

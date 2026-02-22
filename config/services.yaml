@@ -27,3 +27,12 @@ services:
     App\Service\WeatherService:
         arguments:
             $weatherApiKey: '%env(WEATHER_API_KEY)%'
+
+    # Configuration des services AI avec Hugging Face
+    App\Service\AIReportService:
+        arguments:
+            $huggingfaceApiKey: '%env(HUGGINGFACE_API_KEY)%'
+            $huggingfaceModel: '%env(HUGGINGFACE_MODEL)%'
+    
+    App\Service\FeedbackAnalyticsService:
+        arguments: []

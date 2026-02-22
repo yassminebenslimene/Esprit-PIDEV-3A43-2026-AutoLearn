@@ -30,6 +30,29 @@ class Participation
     private StatutParticipation $statut = StatutParticipation::EN_ATTENTE;
 
     /**
+     * Feedbacks des étudiants de l'équipe (JSON)
+     * Structure: [
+     *   {
+     *     "etudiant_id": 123,
+     *     "etudiant_name": "Ahmed Ben Ali",
+     *     "rating_global": 5,                    // Rating global (1-5 étoiles)
+     *     "rating_categories": {                 // Ratings par catégorie
+     *       "organisation": 5,
+     *       "contenu": 4,
+     *       "lieu": 3,
+     *       "animation": 5
+     *     },
+     *     "sentiment": "tres_satisfait",         // Sentiment choisi
+     *     "emoji": "😍",                         // Emoji correspondant
+     *     "comment": "Super événement!",         // Commentaire libre
+     *     "created_at": "2026-02-20 14:30:00"
+     *   }
+     * ]
+     */
+    #[ORM\Column(type: "json", nullable: true)]
+    private ?array $feedbacks = null;
+
+    /**
      * Validation automatique de la participation
      * Retourne un tableau avec 'accepted' (bool) et 'message' (string)
      */
@@ -111,4 +134,156 @@ class Participation
 
     public function getStatut(): StatutParticipation { return $this->statut; }
     public function setStatut(StatutParticipation $statut): self { $this->statut = $statut; return $this; }
+
+    // ===== Gestion des Feedbacks =====
+    
+    public function getFeedbacks(): ?array { return $this->feedbacks; }
+    public function setFeedbacks(?array $feedbacks): self { $this->feedbacks = $feedbacks; return $this; }
+
+    /**
+     * Ajoute un feedback d'un étudiant avec tous les détails
+     */
+    public function addFeedback(
+        int $etudiantId,
+        string $etudiantName,
+        int $ratingGlobal,              // Rating global (1-5)
+        array $ratingCategories,        // ['organisation' => 5, 'contenu' => 4, ...]
+        string $sentiment,              // 'tres_satisfait', 'satisfait', etc.
+        string $emoji,                  // '😍', '😊', etc.
+        ?string $comment = null
+    ): self {
+        if ($this->feedbacks === null) {
+            $this->feedbacks = [];
+        }
+
+        // Vérifier si l'étudiant a déjà donné un feedback
+        foreach ($this->feedbacks as $key => $feedback) {
+            if ($feedback['etudiant_id'] === $etudiantId) {
+                // Remplacer le feedback existant
+                $this->feedbacks[$key] = [
+                    'etudiant_id' => $etudiantId,
+                    'etudiant_name' => $etudiantName,
+                    'rating_global' => $ratingGlobal,
+                    'rating_categories' => $ratingCategories,
+                    'sentiment' => $sentiment,
+                    'emoji' => $emoji,
+                    'comment' => $comment,
+                    'created_at' => (new \DateTime())->format('Y-m-d H:i:s'),
+                ];
+                return $this;
+            }
+        }
+
+        // Ajouter un nouveau feedback
+        $this->feedbacks[] = [
+            'etudiant_id' => $etudiantId,
+            'etudiant_name' => $etudiantName,
+            'rating_global' => $ratingGlobal,
+            'rating_categories' => $ratingCategories,
+            'sentiment' => $sentiment,
+            'emoji' => $emoji,
+            'comment' => $comment,
+            'created_at' => (new \DateTime())->format('Y-m-d H:i:s'),
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Récupère le feedback d'un étudiant spécifique
+     */
+    public function getFeedbackByEtudiant(int $etudiantId): ?array
+    {
+        if ($this->feedbacks === null) {
+            return null;
+        }
+
+        foreach ($this->feedbacks as $feedback) {
+            if ($feedback['etudiant_id'] === $etudiantId) {
+                return $feedback;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Vérifie si un étudiant a déjà donné un feedback
+     */
+    public function hasFeedbackFromEtudiant(int $etudiantId): bool
+    {
+        return $this->getFeedbackByEtudiant($etudiantId) !== null;
+    }
+
+    /**
+     * Compte le nombre de feedbacks reçus
+     */
+    public function getFeedbackCount(): int
+    {
+        return $this->feedbacks ? count($this->feedbacks) : 0;
+    }
+
+    /**
+     * Calcule le score moyen des feedbacks (1-5)
+     */
+    public function getAverageFeedbackScore(): ?float
+    {
+        if (!$this->feedbacks || count($this->feedbacks) === 0) {
+            return null;
+        }
+
+        $totalScore = 0;
+        foreach ($this->feedbacks as $feedback) {
+            // Convertir le sentiment en score
+            $score = match($feedback['sentiment']) {
+                'tres_satisfait' => 5,
+                'satisfait' => 4,
+                'neutre' => 3,
+                'decu' => 2,
+                'tres_decu' => 1,
+                default => 3,
+            };
+            $totalScore += $score;
+        }
+
+        return round($totalScore / count($this->feedbacks), 2);
+    }
+
+    /**
+     * Retourne la distribution des sentiments
+     */
+    public function getSentimentDistribution(): array
+    {
+        $distribution = [
+            'tres_satisfait' => 0,
+            'satisfait' => 0,
+            'neutre' => 0,
+            'decu' => 0,
+            'tres_decu' => 0,
+        ];
+
+        if (!$this->feedbacks) {
+            return $distribution;
+        }
+
+        foreach ($this->feedbacks as $feedback) {
+            $sentiment = $feedback['sentiment'] ?? 'neutre';
+            if (isset($distribution[$sentiment])) {
+                $distribution[$sentiment]++;
+            }
+        }
+
+        return $distribution;
+    }
+
+    /**
+     * Vérifie si tous les membres de l'équipe ont donné leur feedback
+     */
+    public function hasAllFeedbacks(): bool
+    {
+        $nbEtudiants = $this->getEquipe()->getEtudiants()->count();
+        $nbFeedbacks = $this->getFeedbackCount();
+        
+        return $nbFeedbacks >= $nbEtudiants;
+    }
 }
