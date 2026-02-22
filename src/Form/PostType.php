@@ -43,6 +43,7 @@ class PostType extends AbstractType
 
             // ✅ IMAGE PAR LIEN
             ->add('imageUrl', null, [
+                'mapped' => false,
                 'required' => false,
                 'label' => 'Lien image',
             ])
@@ -66,6 +67,7 @@ class PostType extends AbstractType
 
             // ✅ VIDEO PAR LIEN
             ->add('videoUrl', null, [
+                'mapped' => false,
                 'required' => false,
                 'label' => 'Lien vidéo (YouTube)',
             ])

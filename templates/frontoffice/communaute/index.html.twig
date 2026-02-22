@@ -19,95 +19,344 @@
 </div>
 
 <style>
+/* Container principal */
 .community-container {
-    max-width: 900px;
-    margin: 140px auto 80px;
-    padding-top: 20px;
+    max-width: 1100px;
+    margin: 40px auto 80px;
+    padding: 0 20px;
 }
 
+/* Section header avec bouton */
+.communities-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.communities-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+.communities-stats {
+    color: #999;
+    font-size: 0.95rem;
+}
+
+/* Bouton nouvelle communauté */
+.btn-main {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+}
+
+.btn-main:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    color: white;
+    text-decoration: none;
+}
+
+/* Grille de communautés */
+.communities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+/* Carte de communauté */
 .community-card {
     background: white;
-    border-radius: 14px;
-    padding: 20px;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.community-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.community-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+}
+
+.community-card:hover::before {
+    transform: scaleX(1);
+}
+
+/* Icône de la communauté */
+.community-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
     margin-bottom: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
+/* Titre de la communauté */
 .community-title {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 12px;
+    line-height: 1.3;
 }
 
+/* Description */
 .community-desc {
     color: #666;
-    margin-top: 8px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
+/* Métadonnées */
+.community-meta {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #999;
+    font-size: 0.85rem;
+}
+
+.meta-item i {
+    color: #667eea;
+}
+
+/* Actions */
 .community-actions {
-    margin-top: 15px;
-}
-
-.btn-main {
-    background: linear-gradient(135deg, #7a6ad8, #6c63ff);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 999px;
-    text-decoration: none;
-    font-size: 14px;
-    display: inline-block;
-    position: relative;
-    z-index: 10;
-    cursor: pointer;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .btn-outline {
-    background: #f1f3ff;
-    color: #333;
-    padding: 8px 18px;
-    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f8f9ff;
+    color: #667eea;
+    padding: 10px 20px;
+    border-radius: 20px;
     text-decoration: none;
-    font-size: 14px;
-    margin-left: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.btn-outline:hover {
+    background: #667eea;
+    color: white;
+    text-decoration: none;
+    border-color: #667eea;
+}
+
+.btn-edit {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.btn-edit:hover {
+    background: #ffc107;
+    color: white;
+    border-color: #ffc107;
+}
+
+.btn-delete {
+    background: #f8d7da;
+    color: #721c24;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+/* Message vide */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: #999;
+    font-size: 1rem;
+    margin-bottom: 30px;
+}
+
+/* Badge propriétaire */
+.owner-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .communities-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .communities-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .community-card {
+        padding: 20px;
+    }
 }
 </style>
 
 <div class="community-container">
 
-    <a href="/communaute/new" class="btn-main">
-        ➕ Nouvelle communauté
-    </a>
+    <div class="communities-header">
+        <div>
+            <h2>Mes Communautés</h2>
+            <p class="communities-stats">{{ communautes|length }} communauté(s) disponible(s)</p>
+        </div>
+        <a href="/communaute/new" class="btn-main">
+            ➕ Nouvelle communauté
+        </a>
+    </div>
 
-    <br><br>
+    {% if communautes|length > 0 %}
+        <div class="communities-grid">
+            {% for communaute in communautes %}
+                <div class="community-card">
+                    
+                    {% if app.user and communaute.owner and communaute.owner.id == app.user.id %}
+                        <div class="owner-badge">
+                            👑 Propriétaire
+                        </div>
+                    {% endif %}
 
-    {% for communaute in communautes %}
-        <div class="community-card">
+                    <div class="community-icon">
+                        {{ communaute.nom|first|upper }}
+                    </div>
 
-            <div class="community-title">
-                {{ communaute.nom }}
-            </div>
+                    <div class="community-title">
+                        {{ communaute.nom }}
+                    </div>
 
-            <div class="community-desc">
-                {{ communaute.description }}
-            </div>
+                    <div class="community-desc">
+                        {{ communaute.description }}
+                    </div>
 
-            <div class="community-actions">
-                <a href="/communaute/{{ communaute.id }}"
-                   class="btn-outline">
-                    Voir
-                </a>
+                    <div class="community-meta">
+                        <div class="meta-item">
+                            <i>👥</i>
+                            <span>{{ communaute.members|length }} membres</span>
+                        </div>
+                        <div class="meta-item">
+                            <i>💬</i>
+                            <span>{{ communaute.posts|length }} posts</span>
+                        </div>
+                    </div>
 
-                {% if app.user and communaute.owner and communaute.owner.id == app.user.id %}
-                <a href="/communaute/{{ communaute.id }}/edit"
-                   class="btn-outline">
-                    Modifier
-                </a>
-                {% endif %}
-            </div>
+                    <div class="community-actions">
+                        <a href="/communaute/{{ communaute.id }}" class="btn-outline">
+                            👁️ Voir
+                        </a>
 
+                        {% if app.user and communaute.owner and communaute.owner.id == app.user.id %}
+                            <a href="/communaute/{{ communaute.id }}/edit" class="btn-outline btn-edit">
+                                ✏️ Modifier
+                            </a>
+                            
+                            <form method="post" action="/communaute/{{ communaute.id }}" style="display: inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette communauté ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ communaute.id) }}">
+                                <button type="submit" class="btn-outline btn-delete">
+                                    🗑️ Supprimer
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+
+                </div>
+            {% endfor %}
         </div>
     {% else %}
-        <p>Aucune communauté trouvée.</p>
-    {% endfor %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <h3>Aucune communauté pour le moment</h3>
+            <p>Créez votre première communauté pour commencer à échanger avec d'autres membres</p>
+            <a href="/communaute/new" class="btn-main">
+                ➕ Créer ma première communauté
+            </a>
+        </div>
+    {% endif %}
 
 </div>
 
