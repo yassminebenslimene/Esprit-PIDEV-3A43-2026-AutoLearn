@@ -97,7 +97,10 @@ final class PostController extends AbstractController
         EntityManagerInterface $em
     ): Response {
         if ($post->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('Vous ne pouvez modifier que vos propres posts.');
+            $this->addFlash('error', 'Vous ne pouvez modifier que vos propres posts.');
+            return $this->redirectToRoute('app_communaute_show', [
+                'id' => $post->getCommunaute()->getId()
+            ]);
         }
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
@@ -152,7 +155,10 @@ final class PostController extends AbstractController
         EntityManagerInterface $em
     ): Response {
         if ($post->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('Vous ne pouvez supprimer que vos propres posts.');
+            $this->addFlash('error', 'Vous ne pouvez supprimer que vos propres posts.');
+            return $this->redirectToRoute('app_communaute_show', [
+                'id' => $post->getCommunaute()->getId()
+            ]);
         }
         if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->request->get('_token'))) {
 
