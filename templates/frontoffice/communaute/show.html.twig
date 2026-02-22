@@ -250,9 +250,6 @@
                     {{ commentaire.contenu }}<br>
                     <small>
                         {{ commentaire.createdAt|date('d/m/Y H:i') }}
-                        {% if commentaire.user %}
-                            par {{ commentaire.user.prenom }}
-                        {% endif %}
                     </small>
                 </div>
             {% else %}
