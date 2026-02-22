@@ -36,16 +36,25 @@
     gap: 20px;
 }
 
+.communities-header-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
 .communities-header h2 {
     font-size: 2rem;
     font-weight: 700;
     color: #333;
-    margin: 0;
+    margin: 0 0 10px 0;
 }
 
 .communities-stats {
     color: #999;
     font-size: 0.95rem;
+    margin-bottom: 25px;
 }
 
 /* Bouton nouvelle communauté */
@@ -281,11 +290,9 @@
 
 <div class="community-container">
 
-    <div class="communities-header">
-        <div>
-            <h2>Mes Communautés</h2>
-            <p class="communities-stats">{{ communautes|length }} communauté(s) disponible(s)</p>
-        </div>
+    <div class="communities-header-center">
+        <h2>Mes Communautés</h2>
+        <p class="communities-stats">{{ communautes|length }} communauté(s) disponible(s)</p>
         <a href="/communaute/new" class="btn-main">
             ➕ Nouvelle communauté
         </a>
