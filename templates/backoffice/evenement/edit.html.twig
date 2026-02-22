@@ -58,7 +58,16 @@
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Enregistrer</button>
-            <a href="{{ path('backoffice_evenements') }}" class="btn btn-secondary">Annuler</a>
+            <a href="{{ path('backoffice_evenements') }}" class="btn btn-secondary">Retour</a>
+            
+            {# Bouton Annuler l'événement (Workflow) #}
+            {% if can_annuler %}
+            <form method="post" action="{{ path('backoffice_evenement_annuler', {'id': evenement.id}) }}" style="display: inline; margin-left: 10px;" onsubmit="return confirm('⚠️ Êtes-vous sûr de vouloir annuler cet événement? Tous les participants recevront un email d\'annulation.')">
+                <button type="submit" class="btn" style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white;">
+                    ❌ Annuler l'événement
+                </button>
+            </form>
+            {% endif %}
         </div>
     {{ form_end(form) }}
 </div>

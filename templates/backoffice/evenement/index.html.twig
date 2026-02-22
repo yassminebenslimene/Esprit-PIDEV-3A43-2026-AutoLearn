@@ -162,7 +162,7 @@ function closeReport() {
                     </td>
                     <td>{{ evenement.nbMax }}</td>
                     <td>
-                        <div style="display: flex; gap: 8px;">
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                             <a href="{{ path('backoffice_evenement_show', {'id': evenement.id}) }}" 
                                class="btn btn-sm" 
                                style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px;">
@@ -173,6 +173,17 @@ function closeReport() {
                                style="background: linear-gradient(135deg, var(--gold), var(--amber)); color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px;">
                                 ✏ Modifier
                             </a>
+                            
+                            {# Bouton Annuler (Workflow) - Visible seulement si l'événement n'est pas déjà annulé ou terminé #}
+                            {% if evenement.workflowStatus in ['planifie', 'en_cours'] %}
+                            <form method="post" action="{{ path('backoffice_evenement_annuler', {'id': evenement.id}) }}" style="display: inline;" onsubmit="return confirm('⚠️ Êtes-vous sûr de vouloir annuler cet événement? Tous les participants recevront un email d\'annulation.')">
+                                <button type="submit" class="btn btn-sm" 
+                                        style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white; padding: 6px 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 12px;">
+                                    ❌ Annuler
+                                </button>
+                            </form>
+                            {% endif %}
+                            
                             <a href="{{ path('backoffice_evenement_delete', {'id': evenement.id}) }}" 
                                class="btn btn-danger btn-sm" 
                                onclick="return confirm('Confirmer la suppression ?')"
