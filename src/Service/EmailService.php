@@ -135,17 +135,51 @@ class EmailService
     public function sendEventCancellation(
         string $toEmail,
         string $studentName,
-        string $eventName
+        string $teamName,
+        string $eventName,
+        \DateTimeInterface $eventDate,
+        string $eventLocation
     ): void {
         $html = $this->twig->render('emails/event_cancelled.html.twig', [
             'studentName' => $studentName,
+            'teamName' => $teamName,
             'eventName' => $eventName,
+            'eventDate' => $eventDate,
+            'eventLocation' => $eventLocation,
         ]);
 
         $email = (new Email())
             ->from(new Address($this->fromEmail, $this->fromName))
             ->to($toEmail)
-            ->subject('Event Cancelled - ' . $eventName)
+            ->subject('⚠️ Event Cancelled - ' . $eventName)
+            ->html($html);
+
+        $this->mailer->send($email);
+    }
+    
+    /**
+     * Envoie un email de démarrage d'événement à tous les participants
+     */
+    public function sendEventStarted(
+        string $toEmail,
+        string $studentName,
+        string $teamName,
+        string $eventName,
+        \DateTimeInterface $eventDate,
+        string $eventLocation
+    ): void {
+        $html = $this->twig->render('emails/event_started.html.twig', [
+            'studentName' => $studentName,
+            'teamName' => $teamName,
+            'eventName' => $eventName,
+            'eventDate' => $eventDate,
+            'eventLocation' => $eventLocation,
+        ]);
+
+        $email = (new Email())
+            ->from(new Address($this->fromEmail, $this->fromName))
+            ->to($toEmail)
+            ->subject('🚀 Event Started - ' . $eventName)
             ->html($html);
 
         $this->mailer->send($email);

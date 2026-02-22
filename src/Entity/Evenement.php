@@ -72,6 +72,10 @@ class Evenement
 
     #[ORM\Column(type:"boolean")]
     private bool $isCanceled = false;
+    
+    // Propriété pour le Workflow Component
+    #[ORM\Column(type:"string", length: 50)]
+    private string $workflowStatus = 'planifie';
 
     #[ORM\Column(type:"integer")]
     #[Assert\NotBlank(message: "Le nombre maximum d'équipes est obligatoire")]
@@ -144,6 +148,26 @@ class Evenement
 
     public function getIsCanceled(): bool { return $this->isCanceled; }
     public function setIsCanceled(bool $isCanceled): self { $this->isCanceled = $isCanceled; return $this; }
+    
+    public function getWorkflowStatus(): string { return $this->workflowStatus; }
+    public function setWorkflowStatus(string $workflowStatus): self { 
+        $this->workflowStatus = $workflowStatus;
+        // Synchroniser avec l'enum StatutEvenement
+        $this->syncStatusFromWorkflow();
+        return $this;
+    }
+    
+    // Synchronise le status (enum) avec le workflowStatus (string)
+    private function syncStatusFromWorkflow(): void
+    {
+        match($this->workflowStatus) {
+            'planifie' => $this->status = StatutEvenement::PLANIFIE,
+            'en_cours' => $this->status = StatutEvenement::EN_COURS,
+            'termine' => $this->status = StatutEvenement::PASSE,
+            'annule' => $this->status = StatutEvenement::ANNULE,
+            default => $this->status = StatutEvenement::PLANIFIE,
+        };
+    }
 
     public function getNbMax(): int { return $this->nbMax; }
     public function setNbMax(int $nbMax): self { $this->nbMax = $nbMax; return $this; }

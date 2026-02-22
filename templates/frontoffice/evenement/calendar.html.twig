@@ -2,8 +2,51 @@
 
 {% block title %}Calendrier des Événements{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Styles spécifiques pour la page calendrier */
+        
+        /* Navbar transparente au chargement */
+        .header-area {
+            background-color: transparent !important;
+            box-shadow: none !important;
+            position: absolute !important;
+        }
+        
+        /* Navbar avec fond violet au scroll (classe ajoutée par JS) */
+        .header-area.background-header {
+            background-color: rgba(122, 106, 216, 0.95) !important;
+            box-shadow: 0 2px 28px 0 rgba(0, 0, 0, 0.15) !important;
+            position: fixed !important;
+        }
+        
+        /* Assurer que le logo et les liens restent visibles */
+        .header-area .main-nav .logo h1,
+        .header-area .main-nav .nav li a {
+            color: white !important;
+        }
+        
+        /* Responsive - garder le fond violet sur mobile */
+        @media (max-width: 767px) {
+            .header-area .main-nav .nav {
+                background-color: rgba(122, 106, 216, 0.98) !important;
+            }
+            
+            .header-area .main-nav .nav li {
+                background-color: rgba(122, 106, 216, 0.98) !important;
+                border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+            }
+            
+            .header-area .main-nav .nav li a {
+                color: white !important;
+            }
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
-<div class="page-heading" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 80px 0 40px; margin-top: 80px;">
+<div class="page-heading" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 120px 0 50px; margin-top: 0;">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">

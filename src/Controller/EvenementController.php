@@ -14,10 +14,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Workflow\WorkflowInterface;
 
 #[Route('/backoffice/evenement')]
 final class EvenementController extends AbstractController
 {
+    public function __construct(
+        private WorkflowInterface $evenementPublishingStateMachine
+    ) {}
+    
     #[Route('/', name: 'backoffice_evenements', methods: ['GET'])]
     public function index(
         EvenementRepository $evenementRepository, 
@@ -74,7 +79,8 @@ final class EvenementController extends AbstractController
     #[Route('/{id}/edit', name: 'backoffice_evenement_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Evenement $evenement, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(EvenementType::class, $evenement, ['is_edit' => true]);
+        // Ne pas afficher le checkbox isCanceled, on utilise le bouton "Annuler" à la place
+        $form = $this->createForm(EvenementType::class, $evenement, ['is_edit' => false]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -88,6 +94,7 @@ final class EvenementController extends AbstractController
         return $this->render('backoffice/evenement/edit.html.twig', [
             'evenement' => $evenement,
             'form' => $form,
+            'can_annuler' => $this->evenementPublishingStateMachine->can($evenement, 'annuler'),
         ]);
     }
 
@@ -124,6 +131,36 @@ final class EvenementController extends AbstractController
 
         $this->addFlash('success', 'Événement, équipes et participations supprimés avec succès');
         return $this->redirectToRoute('backoffice_evenements', [], Response::HTTP_SEE_OTHER);
+    }
+    
+    /**
+     * Route pour annuler manuellement un événement via le Workflow
+     */
+    #[Route('/{id}/annuler', name: 'backoffice_evenement_annuler', methods: ['POST'])]
+    public function annuler(Evenement $evenement, EntityManagerInterface $entityManager): Response
+    {
+        // Vérifier si la transition est possible
+        if (!$this->evenementPublishingStateMachine->can($evenement, 'annuler')) {
+            $this->addFlash('error', 'Impossible d\'annuler cet événement (déjà annulé ou terminé)');
+            return $this->redirectToRoute('backoffice_evenements');
+        }
+        
+        try {
+            // Appliquer la transition via le workflow
+            $this->evenementPublishingStateMachine->apply($evenement, 'annuler');
+            
+            // Marquer comme annulé
+            $evenement->setIsCanceled(true);
+            
+            // Sauvegarder
+            $entityManager->flush();
+            
+            $this->addFlash('success', sprintf('L\'événement "%s" a été annulé avec succès', $evenement->getTitre()));
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de l\'annulation: ' . $e->getMessage());
+        }
+        
+        return $this->redirectToRoute('backoffice_evenements');
     }
     
     // ===== ROUTES POUR LES RAPPORTS AI =====
