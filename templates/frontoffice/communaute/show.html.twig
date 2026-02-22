@@ -579,7 +579,7 @@
             {% for commentaire in post.commentaires %}
                 <div class="comment">
 
-                    {% if commentaire.user == app.user %}
+                    {% if commentaire.user and app.user and commentaire.user.id == app.user.id %}
                     <div class="comment-menu">
                         <button class="menu-btn">⋮</button>
                         <div class="comment-dropdown">
