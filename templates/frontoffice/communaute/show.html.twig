@@ -510,10 +510,17 @@
                 <button type="submit">Inviter</button>
             </form>
         </div>
-        {% if communaute.members|length > 0 %}
         <div class="members-box">
-            <strong>Membres ({{ communaute.members|length }})</strong>
+            <strong>Membres ({{ (communaute.members|length) + 1 }})</strong>
             <ul class="members-list">
+                {# Afficher le propriétaire en premier #}
+                {% if communaute.owner %}
+                <li>
+                    <span>{{ communaute.owner.prenom }} {{ communaute.owner.nom }} <span style="color: #667eea; font-weight: 600;">(Créateur)</span></span>
+                </li>
+                {% endif %}
+                
+                {# Afficher les autres membres #}
                 {% for member in communaute.members %}
                 <li>
                     <span>{{ member.prenom }} {{ member.nom }}</span>
@@ -526,7 +533,6 @@
                 {% endfor %}
             </ul>
         </div>
-        {% endif %}
     {% endif %}
 
     {% for post in communaute.posts %}
