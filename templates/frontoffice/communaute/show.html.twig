@@ -553,10 +553,10 @@
             {% endif %}
 
             {% if post.imageFile %}
-                <div class="post-media">
-                    <img src="{{ asset('uploads/' ~ post.imageFile) }}">
-                </div>
-            {% endif %}
+    <div class="post-media">
+        <img src="{{ asset('uploads/images/' ~ post.imageFile) }}" alt="Image du post">
+    </div>
+{% endif %}
 
             <small>
                 Posté le {{ post.createdAt|date('d/m/Y H:i') }}
