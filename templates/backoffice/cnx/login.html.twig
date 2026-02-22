@@ -27,14 +27,29 @@
 
                 {# Messages de succès #}
                 {% for flash_success in app.flashes('success') %}
-                    <div class="alert alert-success" style="color: green; background: rgba(0,255,0,0.1); padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    <div class="alert alert-success" style="color: #28a745; background: rgba(40,167,69,0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #28a745;">
                         {{ flash_success }}
+                    </div>
+                {% endfor %}
+
+                {# Messages d'erreur (suspension, etc.) #}
+                {% for flash_error in app.flashes('error') %}
+                    <div class="alert alert-danger" style="color: #dc3545; background: rgba(220,53,69,0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #dc3545;">
+                        <strong>⚠️ Accès refusé</strong><br>
+                        {{ flash_error }}
+                    </div>
+                {% endfor %}
+
+                {# Messages d'avertissement #}
+                {% for flash_warning in app.flashes('warning') %}
+                    <div class="alert alert-warning" style="color: #ffc107; background: rgba(255,193,7,0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ffc107;">
+                        {{ flash_warning }}
                     </div>
                 {% endfor %}
 
                 {# Erreurs d'authentification #}
                 {% if error %}
-                    <div class="alert alert-danger" style="color: red; background: rgba(255,0,0,0.1); padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    <div class="alert alert-danger" style="color: #dc3545; background: rgba(220,53,69,0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #dc3545;">
                         {% if error.messageKey == 'Invalid credentials.' %}
                             Email ou mot de passe incorrect
                         {% else %}

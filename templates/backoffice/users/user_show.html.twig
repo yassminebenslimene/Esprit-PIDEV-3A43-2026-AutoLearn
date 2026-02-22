@@ -271,12 +271,29 @@
                         <div class="info-item">
                             <div class="info-label">Status</div>
                             <div class="info-value">
-                                <span style="color: var(--emerald); font-weight: 600;">● Active</span>
+                                {% if user.isSuspended %}
+                                    <span style="color: #dc3545; font-weight: 600;">● Suspendu</span>
+                                {% else %}
+                                    <span style="color: var(--emerald); font-weight: 600;">● Actif</span>
+                                {% endif %}
                             </div>
                         </div>
+                        
+                        {% if user.isSuspended %}
+                        <div class="info-item">
+                            <div class="info-label">Raison de suspension</div>
+                            <div class="info-value">{{ user.suspensionReason }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">Date de suspension</div>
+                            <div class="info-value">{{ user.suspendedAt|date('d/m/Y H:i') }}</div>
+                        </div>
+                        {% endif %}
                     </div>
 
                     <div class="action-buttons">
+                        {% if user.role == 'ETUDIANT' %}
                         <a href="{{ path('backoffice_user_edit', {'id': user.id}) }}" class="btn btn-edit">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -284,18 +301,37 @@
                             </svg>
                             Edit User
                         </a>
+                        {% endif %}
                         
-                        <form method="post" action="{{ path('backoffice_user_delete', {'id': user.id}) }}" 
-                              onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');"
-                              style="display: inline;">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-                            <button type="submit" class="btn btn-delete">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
-                                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                                </svg>
-                                Delete User
-                            </button>
-                        </form>
+                        {% if user.role == 'ETUDIANT' %}
+                            {% if user.isSuspended %}
+                                <!-- Reactivate Button -->
+                                <form method="post" action="{{ path('backoffice_user_reactivate', {'id': user.id}) }}" 
+                                      onsubmit="return confirm('Réactiver le compte de {{ user.prenom }} {{ user.nom }}?');"
+                                      style="display: inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('reactivate' ~ user.id) }}">
+                                    <button type="submit" class="btn btn-edit" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                            <polyline points="22 4 12 14.01 9 11.01"/>
+                                        </svg>
+                                        Réactiver
+                                    </button>
+                                </form>
+                            {% else %}
+                                <!-- Suspend Button -->
+                                <button type="button" class="btn btn-delete" 
+                                        style="background: linear-gradient(135deg, #ffc107, #ff9800);"
+                                        onclick="showSuspendModal({{ user.id }}, '{{ user.prenom }} {{ user.nom }}')">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="15" y1="9" x2="9" y2="15"/>
+                                        <line x1="9" y1="9" x2="15" y2="15"/>
+                                    </svg>
+                                    Suspendre
+                                </button>
+                            {% endif %}
+                        {% endif %}
                         
                         <a href="{{ path('backoffice_users') }}" class="btn btn-back">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
@@ -309,6 +345,70 @@
         </main>
     </div>
 
+    <!-- Suspension Modal -->
+    <div id="suspendModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 15px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+            <h2 style="margin: 0 0 20px 0; color: #333;">Suspendre le compte</h2>
+            <p style="color: #666; margin-bottom: 20px;">Étudiant: <strong id="suspendUserName"></strong></p>
+            
+            <form id="suspendForm" method="post" action="">
+                <input type="hidden" name="_token" id="suspendToken" value="{{ csrf_token('suspend' ~ user.id) }}">
+                
+                <label style="display: block; margin-bottom: 10px; color: #333; font-weight: bold;">Raison de la suspension:</label>
+                <select name="reason" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 20px; font-size: 14px;">
+                    <option value="Compte inactif - Inactivité prolongée">Compte inactif - Inactivité prolongée</option>
+                    <option value="Violation des règles de la plateforme">Violation des règles de la plateforme</option>
+                    <option value="Comportement inapproprié envers d'autres utilisateurs">Comportement inapproprié envers d'autres utilisateurs</option>
+                    <option value="Activité suspecte détectée sur le compte">Activité suspecte détectée sur le compte</option>
+                    <option value="Non-paiement ou problème de facturation">Non-paiement ou problème de facturation</option>
+                    <option value="Demande de suspension par l'étudiant">Demande de suspension par l'étudiant</option>
+                    <option value="Vérification d'identité requise">Vérification d'identité requise</option>
+                    <option value="Suspension temporaire pour enquête">Suspension temporaire pour enquête</option>
+                </select>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" onclick="closeSuspendModal()" style="padding: 12px 24px; border: 2px solid #e2e8f0; background: white; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                        Annuler
+                    </button>
+                    <button type="submit" style="padding: 12px 24px; border: none; background: linear-gradient(135deg, #ffc107, #ff9800); color: white; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                        Confirmer la suspension
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="{{ asset('backoffice/js/templatemo-glass-admin-script.js') }}"></script>
+    <script>
+    // Suspension Modal Functions
+    function showSuspendModal(userId, userName) {
+        const modal = document.getElementById('suspendModal');
+        const form = document.getElementById('suspendForm');
+        const userNameSpan = document.getElementById('suspendUserName');
+        const tokenInput = document.getElementById('suspendToken');
+        
+        // Set form action
+        form.action = '/backoffice/users/' + userId + '/suspend';
+        
+        // Set user name
+        userNameSpan.textContent = userName;
+        
+        // Show modal
+        modal.style.display = 'flex';
+    }
+    
+    function closeSuspendModal() {
+        const modal = document.getElementById('suspendModal');
+        modal.style.display = 'none';
+    }
+    
+    // Close modal on outside click
+    document.getElementById('suspendModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeSuspendModal();
+        }
+    });
+    </script>
+
 </body>
 </html>

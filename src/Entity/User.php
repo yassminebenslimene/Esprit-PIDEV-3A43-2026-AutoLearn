@@ -9,6 +9,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use App\Bundle\UserActivityBundle\Entity\UserActivity;
+
+
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\InheritanceType('SINGLE_TABLE')]
@@ -22,6 +25,8 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
 #[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Challenge::class)]
 private Collection $challenges;
 
+#[ORM\OneToMany(mappedBy: 'user', targetEntity: UserActivity::class, cascade: ['persist', 'remove'])]
+private Collection $activities;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -70,7 +75,7 @@ private Collection $challenges;
     #[Assert\NotBlank(message: 'L\'email est obligatoire')]
     #[Assert\Email(message: 'L\'email "{{ value }}" n\'est pas valide')]
     #[Assert\Length(max: 255)]
-     #[Assert\Regex(
+    #[Assert\Regex(
         pattern: "/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/",
         message: 'Format d\'email invalide. Exemple : nom.prenom@domaine.com'
     )]
@@ -101,14 +106,29 @@ private Collection $challenges;
     #[ORM\Column(name: 'createdAt', type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
 
+    #[ORM\Column(name: 'isSuspended', type: 'boolean', options: ['default' => false])]
+    private bool $isSuspended = false;
 
+    #[ORM\Column(name: 'suspendedAt', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $suspendedAt = null;
 
+    #[ORM\Column(name: 'suspensionReason', type: 'string', length: 500, nullable: true)]
+    private ?string $suspensionReason = null;
 
+    #[ORM\Column(name: 'suspendedBy', type: 'integer', nullable: true)]
+    private ?int $suspendedBy = null;
 
+    #[ORM\Column(name: 'lastLoginAt', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $lastLoginAt = null;
+
+   
     public function __construct()
     {
         $this->createdAt = new \DateTime();
-    $this->challenges = new ArrayCollection(); 
+        $this->challenges = new ArrayCollection();
+        $this->isSuspended = false;
+        $this->lastLoginAt = new \DateTime(); // Initialize with current time
+        $this->activities = new ArrayCollection();
     }
 
     public function getRoles(): array
@@ -246,5 +266,93 @@ public function removeChallenge(Challenge $challenge): static
     }
     return $this;
 }
+
+public function getIsSuspended(): bool
+{
+    return $this->isSuspended;
+}
+
+public function setIsSuspended(bool $isSuspended): static
+{
+    $this->isSuspended = $isSuspended;
+    return $this;
+}
+
+public function getSuspendedAt(): ?\DateTimeInterface
+{
+    return $this->suspendedAt;
+}
+
+public function setSuspendedAt(?\DateTimeInterface $suspendedAt): static
+{
+    $this->suspendedAt = $suspendedAt;
+    return $this;
+}
+
+public function getSuspensionReason(): ?string
+{
+    return $this->suspensionReason;
+}
+
+public function setSuspensionReason(?string $suspensionReason): static
+{
+    $this->suspensionReason = $suspensionReason;
+    return $this;
+}
+
+public function getSuspendedBy(): ?int
+{
+    return $this->suspendedBy;
+}
+
+public function setSuspendedBy(?int $suspendedBy): static
+{
+    $this->suspendedBy = $suspendedBy;
+    return $this;
+}
+
+public function getLastLoginAt(): ?\DateTimeInterface
+{
+    return $this->lastLoginAt;
+}
+
+public function setLastLoginAt(?\DateTimeInterface $lastLoginAt): static
+{
+    $this->lastLoginAt = $lastLoginAt;
+    return $this;
+}
+
+/**
+ * @return Collection<int, UserActivity>
+ */
+public function getActivities(): Collection
+{
+    return $this->activities;
+}
+
+public function addActivity(UserActivity $activity): static
+{
+    if (!$this->activities->contains($activity)) {
+        $this->activities->add($activity);
+        $activity->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removeActivity(UserActivity $activity): static
+{
+    if ($this->activities->removeElement($activity)) {
+        // set the owning side to null (unless already changed)
+        if ($activity->getUser() === $this) {
+            $activity->setUser(null);
+        }
+    }
+
+    return $this;
+}
+
+
+
 
 }

@@ -129,7 +129,8 @@ class BackofficeController extends AbstractController
         Request $request, 
         UserPasswordHasherInterface $passwordHasher, 
         EntityManagerInterface $entityManager,
-        \App\Service\BrevoMailService $mailService
+        \App\Service\BrevoMailService $mailService,
+        \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
     ): Response
     {
         $userDto = new UserCreateDTO();
@@ -155,6 +156,9 @@ class BackofficeController extends AbstractController
 
             $entityManager->persist($user);
             $entityManager->flush();
+
+            // Log the user creation activity
+            $activityLogger->logCreate($user);
 
             // Send welcome email with credentials
             try {
@@ -183,7 +187,13 @@ class BackofficeController extends AbstractController
 
     #[Route('/backoffice/users/{id}/edit', name: 'backoffice_user_edit')]
     #[IsGranted('ROLE_ADMIN')]
-    public function editUser(User $user, Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
+    public function editUser(
+        User $user, 
+        Request $request, 
+        UserPasswordHasherInterface $passwordHasher, 
+        EntityManagerInterface $entityManager,
+        \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
+    ): Response
     {
         // SIMPLE CHECK: Only allow editing ETUDIANT users
         if ($user->getRole() !== 'ETUDIANT') {
@@ -206,6 +216,24 @@ class BackofficeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $changes = [];
+            
+            if ($user->getNom() !== $userDto->nom) {
+                $changes['nom'] = ['old' => $user->getNom(), 'new' => $userDto->nom];
+            }
+            if ($user->getPrenom() !== $userDto->prenom) {
+                $changes['prenom'] = ['old' => $user->getPrenom(), 'new' => $userDto->prenom];
+            }
+            if ($user->getEmail() !== $userDto->email) {
+                $changes['email'] = ['old' => $user->getEmail(), 'new' => $userDto->email];
+            }
+            if ($user instanceof Etudiant && $user->getNiveau() !== $userDto->niveau) {
+                $changes['niveau'] = ['old' => $user->getNiveau(), 'new' => $userDto->niveau];
+            }
+            if ($userDto->password) {
+                $changes['password'] = 'changed';
+            }
+            
             $user->setNom($userDto->nom);
             $user->setPrenom($userDto->prenom);
             $user->setEmail($userDto->email);
@@ -219,6 +247,10 @@ class BackofficeController extends AbstractController
             }
 
             $entityManager->flush();
+            
+            // Log the update activity
+            $activityLogger->logUpdate($user, $changes);
+            
             $this->addFlash('success', 'Étudiant modifié avec succès!');
             return $this->redirectToRoute('backoffice_users');
         }
@@ -262,28 +294,128 @@ class BackofficeController extends AbstractController
 
     #[Route('/backoffice/users/{id}', name: 'backoffice_user_show')]
     #[IsGranted('ROLE_ADMIN')]
-    public function showUser(User $user): Response
+    public function showUser(
+        User $user,
+        Request $request,
+        \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
+    ): Response
     {
+        // Log the view activity
+        $activityLogger->logView($user);
         
         return $this->render('backoffice/users/user_show.html.twig', [
             'user' => $user,
         ]);
     }
 
-    #[Route('/backoffice/users/{id}/delete', name: 'backoffice_user_delete', methods: ['POST'])]
+    #[Route('/backoffice/users/{id}/suspend', name: 'backoffice_user_suspend', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function deleteUser(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    public function suspendUser(
+        Request $request, 
+        User $user, 
+        EntityManagerInterface $entityManager,
+        \App\Service\BrevoMailService $mailService,
+        \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
+    ): Response
     {
-        // SIMPLE CHECK: Only allow deleting ETUDIANT users
+        // Only allow suspending ETUDIANT users
         if ($user->getRole() !== 'ETUDIANT') {
-            $this->addFlash('error', 'Vous ne pouvez supprimer que les étudiants.');
+            $this->addFlash('error', 'Vous ne pouvez suspendre que les étudiants.');
             return $this->redirectToRoute('backoffice_users');
         }
 
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($user);
+        // Check if already suspended
+        if ($user->getIsSuspended()) {
+            $this->addFlash('warning', 'Cet étudiant est déjà suspendu.');
+            return $this->redirectToRoute('backoffice_users');
+        }
+
+        if ($this->isCsrfTokenValid('suspend'.$user->getId(), $request->request->get('_token'))) {
+            $reason = $request->request->get('reason', 'Compte inactif - Inactivité prolongée');
+            
+            // Suspend the user
+            $user->setIsSuspended(true);
+            $user->setSuspendedAt(new \DateTime());
+            $user->setSuspensionReason($reason);
+            $user->setSuspendedBy($this->getUser()->getId());
+            
             $entityManager->flush();
-            $this->addFlash('success', 'Étudiant supprimé avec succès!');
+            
+            // Log the suspension activity
+            $activityLogger->logSuspend($user, $reason);
+            
+            // Send suspension email
+            try {
+                $mailService->sendSuspensionEmail(
+                    $user->getEmail(),
+                    $user->getPrenom() . ' ' . $user->getNom(),
+                    $reason
+                );
+                $this->addFlash('success', 'Étudiant suspendu avec succès! Un email de notification a été envoyé à ' . $user->getEmail());
+            } catch (\Exception $e) {
+                // Log the full error
+                error_log('Suspension email error: ' . $e->getMessage());
+                error_log('Stack trace: ' . $e->getTraceAsString());
+                $this->addFlash('warning', 'Étudiant suspendu mais l\'email n\'a pas pu être envoyé: ' . $e->getMessage());
+            }
+        } else {
+            $this->addFlash('error', 'Token CSRF invalide.');
+        }
+
+        return $this->redirectToRoute('backoffice_users');
+    }
+
+    #[Route('/backoffice/users/{id}/reactivate', name: 'backoffice_user_reactivate', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function reactivateUser(
+        Request $request, 
+        User $user, 
+        EntityManagerInterface $entityManager,
+        \App\Service\BrevoMailService $mailService,
+        \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
+    ): Response
+    {
+        // Only allow reactivating ETUDIANT users
+        if ($user->getRole() !== 'ETUDIANT') {
+            $this->addFlash('error', 'Vous ne pouvez réactiver que les étudiants.');
+            return $this->redirectToRoute('backoffice_users');
+        }
+
+        // Check if not suspended
+        if (!$user->getIsSuspended()) {
+            $this->addFlash('warning', 'Cet étudiant n\'est pas suspendu.');
+            return $this->redirectToRoute('backoffice_users');
+        }
+
+        if ($this->isCsrfTokenValid('reactivate'.$user->getId(), $request->request->get('_token'))) {
+            // Reactivate the user
+            $user->setIsSuspended(false);
+            $user->setSuspendedAt(null);
+            $user->setSuspensionReason(null);
+            $user->setSuspendedBy(null);
+            
+            $entityManager->flush();
+            
+            // Log the reactivation activity
+            $activityLogger->logReactivate($user);
+            
+            // Send reactivation email
+            try {
+                $loginUrl = $this->generateUrl('backoffice_login', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+                $mailService->sendReactivationEmail(
+                    $user->getEmail(),
+                    $user->getPrenom() . ' ' . $user->getNom(),
+                    $loginUrl
+                );
+                $this->addFlash('success', 'Étudiant réactivé avec succès! Un email de notification a été envoyé à ' . $user->getEmail());
+            } catch (\Exception $e) {
+                // Log the full error
+                error_log('Reactivation email error: ' . $e->getMessage());
+                error_log('Stack trace: ' . $e->getTraceAsString());
+                $this->addFlash('warning', 'Étudiant réactivé mais l\'email n\'a pas pu être envoyé: ' . $e->getMessage());
+            }
+        } else {
+            $this->addFlash('error', 'Token CSRF invalide.');
         }
 
         return $this->redirectToRoute('backoffice_users');

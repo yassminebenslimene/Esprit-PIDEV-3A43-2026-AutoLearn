@@ -1,0 +1,26 @@
+NOTIFICATION ADMIN - Suspension Automatique - AutoLearn Platform
+
+Bonjour {{ adminName }},
+
+Un étudiant a été automatiquement suspendu pour inactivité prolongée.
+
+INFORMATIONS ÉTUDIANT:
+- Nom: {{ studentName }}
+- Email: {{ studentEmail }}
+- Période d'inactivité: {{ inactiveDays }} jours
+- Date de suspension: {{ "now"|date("d/m/Y H:i") }}
+- Raison: Compte inactif - Inactivité prolongée (suspension automatique)
+
+ACTIONS EFFECTUÉES:
+- Compte étudiant suspendu automatiquement
+- Email de notification envoyé à l'étudiant
+- Accès à la plateforme bloqué
+
+QUE FAIRE MAINTENANT?
+Vous pouvez réactiver ce compte à tout moment depuis le backoffice si l'étudiant reprend contact ou si la suspension était inappropriée.
+
+Accès backoffice: http://localhost:8000/backoffice/users
+
+---
+© {{ "now"|date("Y") }} AutoLearn Platform
+Cet email a été envoyé automatiquement par le système de gestion AutoLearn.

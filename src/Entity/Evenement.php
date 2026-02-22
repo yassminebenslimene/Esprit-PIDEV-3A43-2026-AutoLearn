@@ -22,29 +22,48 @@ class Evenement
 
     #[ORM\Column(length:255)]
     #[Assert\NotBlank(message: "Le titre est obligatoire")]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: "Le titre doit contenir au moins {{ limit }} caractères",
+        maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères"
+    )]
     private string $titre;
 
     #[ORM\Column(length:255)]
     #[Assert\NotBlank(message: "Le lieu est obligatoire")]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+        minMessage: "Le lieu doit contenir au moins {{ limit }} caractères",
+        maxMessage: "Le lieu ne peut pas dépasser {{ limit }} caractères"
+    )]
     private string $lieu;
 
     #[ORM\Column(type:"text")]
     #[Assert\NotBlank(message: "La description est obligatoire")]
+    #[Assert\Length(
+        min: 10,
+        max: 2000,
+        minMessage: "La description doit contenir au moins {{ limit }} caractères",
+        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères"
+    )]
     private string $description;
 
     #[ORM\Column(type:"string", enumType: TypeEvenement::class)]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: "Le type d'événement est obligatoire")]
     private TypeEvenement $type;
 
     #[ORM\Column(type:"datetime")]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: "La date de début est obligatoire")]
+    #[Assert\GreaterThan("today", message: "La date de début doit être dans le futur")]
     private \DateTimeInterface $dateDebut;
 
     #[ORM\Column(type:"datetime")]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: "La date de fin est obligatoire")]
     #[Assert\Expression(
         "this.getDateFin() >= this.getDateDebut()",
-        message: "La date de fin doit être après la date de début"
+        message: "La date de fin doit être après ou égale à la date de début"
     )]
     private \DateTimeInterface $dateFin;
 
@@ -55,7 +74,13 @@ class Evenement
     private bool $isCanceled = false;
 
     #[ORM\Column(type:"integer")]
-    #[Assert\Positive(message: "Le nombre maximum de participants doit être positif")]
+    #[Assert\NotBlank(message: "Le nombre maximum d'équipes est obligatoire")]
+    #[Assert\Positive(message: "Le nombre maximum d'équipes doit être positif")]
+    #[Assert\Range(
+        min: 1,
+        max: 100,
+        notInRangeMessage: "Le nombre d'équipes doit être entre {{ min }} et {{ max }}"
+    )]
     private int $nbMax;
 
     #[ORM\OneToMany(mappedBy: "evenement", targetEntity: Equipe::class)]
