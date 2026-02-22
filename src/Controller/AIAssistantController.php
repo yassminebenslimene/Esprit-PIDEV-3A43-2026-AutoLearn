@@ -14,14 +14,10 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 class AIAssistantController extends AbstractController
 {
     private AIAssistantService $aiAssistant;
-    private \App\Service\ActionExecutorService $actionExecutor;
 
-    public function __construct(
-        AIAssistantService $aiAssistant,
-        \App\Service\ActionExecutorService $actionExecutor
-    ) {
+    public function __construct(AIAssistantService $aiAssistant)
+    {
         $this->aiAssistant = $aiAssistant;
-        $this->actionExecutor = $actionExecutor;
     }
 
     /**
@@ -125,77 +121,6 @@ class AIAssistantController extends AbstractController
         $status = $this->aiAssistant->getStatus();
 
         return $this->json($status);
-    }
-
-    /**
-     * Exécute une action demandée par l'IA
-     */
-    #[Route('/action', name: 'ai_assistant_action', methods: ['POST'])]
-    public function executeAction(Request $request): JsonResponse
-    {
-        // Vérifier l'authentification
-        if (!$this->getUser()) {
-            return $this->json([
-                'success' => false,
-                'error' => 'Authentification requise'
-            ], Response::HTTP_UNAUTHORIZED);
-        }
-
-        $data = json_decode($request->getContent(), true);
-        
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return $this->json([
-                'success' => false,
-                'error' => 'JSON invalide'
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        $action = $data['action'] ?? '';
-        $params = $data['params'] ?? [];
-
-        if (empty($action)) {
-            return $this->json([
-                'success' => false,
-                'error' => 'Action non spécifiée'
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        try {
-            $result = $this->actionExecutor->executeAction($action, $params, $this->getUser());
-            return $this->json($result);
-        } catch (\Exception $e) {
-            return $this->json([
-                'success' => false,
-                'error' => 'Erreur serveur: ' . $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    /**
-     * Liste les actions disponibles pour l'utilisateur
-     */
-    #[Route('/actions', name: 'ai_assistant_actions', methods: ['GET'])]
-    public function listActions(): JsonResponse
-    {
-        if (!$this->getUser()) {
-            return $this->json([
-                'success' => false,
-                'error' => 'Authentification requise'
-            ], Response::HTTP_UNAUTHORIZED);
-        }
-
-        try {
-            $actions = $this->actionExecutor->getAvailableActions($this->getUser());
-            return $this->json([
-                'success' => true,
-                'actions' => $actions
-            ]);
-        } catch (\Exception $e) {
-            return $this->json([
-                'success' => false,
-                'error' => 'Erreur serveur'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
     }
 
     /**
