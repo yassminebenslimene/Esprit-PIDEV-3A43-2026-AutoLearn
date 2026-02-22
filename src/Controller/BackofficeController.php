@@ -381,7 +381,6 @@ class BackofficeController extends AbstractController
     {
         return $this->render('backoffice/about-templatemo.html.twig');
     }
-   
 
     #[Route('/backoffice/exercices', name: 'backoffice_exercices')]
     public function listExercices(ExerciceRepository $repo): Response

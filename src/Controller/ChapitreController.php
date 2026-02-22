@@ -6,6 +6,7 @@ use App\Entity\GestionDeCours\Chapitre;
 use App\Form\GestionCours\ChapitreType;
 use App\Repository\Cours\ChapitreRepository;
 use App\Service\PdfGeneratorService;
+use App\Service\CourseProgressService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,10 +25,27 @@ class ChapitreController extends AbstractController
     }
 
     #[Route('/front', name: 'app_chapitre_index_front', methods: ['GET'])]
-    public function indexFront(ChapitreRepository $chapitreRepository): Response
+    public function indexFront(
+        ChapitreRepository $chapitreRepository,
+        CourseProgressService $progressService
+    ): Response
     {
+        $chapitres = $chapitreRepository->findAll();
+        $user = $this->getUser();
+        $progressStats = null;
+        
+        // Si l'utilisateur est connecté et qu'il y a des chapitres
+        if ($user && !empty($chapitres)) {
+            // Prendre le cours du premier chapitre pour afficher la progression globale
+            $cours = $chapitres[0]->getCours();
+            if ($cours) {
+                $progressStats = $progressService->getCourseProgressStats($user, $cours);
+            }
+        }
+        
         return $this->render('frontoffice/chapitre/index.html.twig', [
-            'chapitres' => $chapitreRepository->findAll(),
+            'chapitres' => $chapitres,
+            'progress_stats' => $progressStats,
         ]);
     }
 
@@ -91,10 +109,22 @@ class ChapitreController extends AbstractController
 
     // ==================== FRONTOFFICE ====================
     #[Route('/front/{id}', name: 'app_chapitre_show_front', methods: ['GET'])]
-    public function showFront(Chapitre $chapitre): Response
+    public function showFront(
+        Chapitre $chapitre,
+        CourseProgressService $progressService
+    ): Response
     {
+        $user = $this->getUser();
+        $progressStats = null;
+        
+        // Si l'utilisateur est connecté, calculer la progression du cours
+        if ($user && $chapitre->getCours()) {
+            $progressStats = $progressService->getCourseProgressStats($user, $chapitre->getCours());
+        }
+        
         return $this->render('frontoffice/chapitre/show.html.twig', [
             'chapitre' => $chapitre,
+            'progress_stats' => $progressStats,
         ]);
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Backoffice;
 
 use App\Entity\Quiz;
 use App\Form\QuizType;
@@ -17,7 +17,7 @@ final class QuizController extends AbstractController
     #[Route(name: 'app_quiz_index', methods: ['GET'])]
     public function index(QuizRepository $quizRepository): Response
     {
-        return $this->render('quiz/index.html.twig', [
+        return $this->render('backoffice/quiz/index.html.twig', [
             'quizzes' => $quizRepository->findAll(),
         ]);
     }
@@ -32,7 +32,7 @@ final class QuizController extends AbstractController
             $data[] = [
                 'id' => $question->getId(),
                 'texte' => $question->getTexteQuestion(),
-                'type' => 'Standard', // Vous pouvez ajouter un champ type si nécessaire
+                'type' => 'Standard',
                 'points' => $question->getPoint(),
             ];
         }
@@ -54,7 +54,7 @@ final class QuizController extends AbstractController
             return $this->redirectToRoute('backoffice_quiz_management', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('quiz/new.html.twig', [
+        return $this->render('backoffice/quiz/new.html.twig', [
             'quiz' => $quiz,
             'form' => $form,
         ]);
@@ -63,7 +63,7 @@ final class QuizController extends AbstractController
     #[Route('/{id}', name: 'app_quiz_show', methods: ['GET'])]
     public function show(Quiz $quiz): Response
     {
-        return $this->render('quiz/show.html.twig', [
+        return $this->render('backoffice/quiz/show.html.twig', [
             'quiz' => $quiz,
         ]);
     }
@@ -80,7 +80,7 @@ final class QuizController extends AbstractController
             return $this->redirectToRoute('backoffice_quiz_management', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('quiz/edit.html.twig', [
+        return $this->render('backoffice/quiz/edit.html.twig', [
             'quiz' => $quiz,
             'form' => $form,
         ]);
