@@ -268,32 +268,20 @@
                         <div class="info-value" style="white-space: pre-wrap;">{{ post.contenu }}</div>
                     </div>
 
-                    {% if post.imageFile or post.imageUrl %}
+                    {% if post.imageFile %}
                     <div style="margin-top: 1.5rem;">
                         <div class="info-label">Image</div>
-                        {% if post.imageFile %}
-                            <img src="{{ asset('uploads/' ~ post.imageFile) }}" alt="Image du post" style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
-                        {% elseif post.imageUrl %}
-                            <img src="{{ post.imageUrl }}" alt="Image du post" style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
-                        {% endif %}
+                        <img src="{{ asset('uploads/images/' ~ post.imageFile) }}" alt="Image du post" style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
                     </div>
                     {% endif %}
 
-                    {% if post.videoFile or post.videoUrl %}
+                    {% if post.videoFile %}
                     <div style="margin-top: 1.5rem;">
                         <div class="info-label">Vidéo</div>
-                        {% if post.videoFile %}
-                            <video controls style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
-                                <source src="{{ asset('uploads/' ~ post.videoFile) }}" type="video/mp4">
-                                Votre navigateur ne supporte pas la lecture de vidéos.
-                            </video>
-                        {% elseif post.videoUrl %}
-                            {% set videoId = post.videoUrl|split('v=')[1]|split('&')[0] %}
-                            <iframe width="100%" height="400" style="border-radius: 12px; margin-top: 0.5rem;"
-                                src="https://www.youtube.com/embed/{{ videoId }}" 
-                                frameborder="0" allowfullscreen>
-                            </iframe>
-                        {% endif %}
+                        <video controls style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
+                            <source src="{{ asset('uploads/videos/' ~ post.videoFile) }}" type="video/mp4">
+                            Votre navigateur ne supporte pas la lecture de vidéos.
+                        </video>
                     </div>
                     {% endif %}
                 </div>

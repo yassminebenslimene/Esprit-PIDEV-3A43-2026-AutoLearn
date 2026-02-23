@@ -4,34 +4,55 @@ namespace App\Service;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Security;
+use App\Repository\UserRepository;
+use App\Repository\Cours\CoursRepository;
+use App\Repository\EvenementRepository;
+use App\Repository\CommunauteRepository;
+use App\Bundle\UserActivityBundle\Repository\UserActivityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Service principal de l'assistant IA
- * Orchestre RAG, Groq et détection de langue pour générer des réponses intelligentes
+ * Groq a un accès direct à toutes les données de la base de données
  */
 class AIAssistantService
 {
     private GroqService $groqService;
-    private RAGService $ragService;
     private LanguageDetectorService $languageDetector;
     private ActionExecutorService $actionExecutor;
     private LoggerInterface $logger;
     private Security $security;
+    private EntityManagerInterface $em;
+    private UserRepository $userRepository;
+    private CoursRepository $coursRepository;
+    private EvenementRepository $evenementRepository;
+    private CommunauteRepository $communauteRepository;
+    private ?UserActivityRepository $activityRepository;
 
     public function __construct(
         GroqService $groqService,
-        RAGService $ragService,
         LanguageDetectorService $languageDetector,
         ActionExecutorService $actionExecutor,
         LoggerInterface $logger,
-        Security $security
+        Security $security,
+        EntityManagerInterface $em,
+        UserRepository $userRepository,
+        CoursRepository $coursRepository,
+        EvenementRepository $evenementRepository,
+        CommunauteRepository $communauteRepository,
+        ?UserActivityRepository $activityRepository = null
     ) {
         $this->groqService = $groqService;
-        $this->ragService = $ragService;
         $this->languageDetector = $languageDetector;
         $this->actionExecutor = $actionExecutor;
         $this->logger = $logger;
         $this->security = $security;
+        $this->em = $em;
+        $this->userRepository = $userRepository;
+        $this->coursRepository = $coursRepository;
+        $this->evenementRepository = $evenementRepository;
+        $this->communauteRepository = $communauteRepository;
+        $this->activityRepository = $activityRepository;
     }
 
     /**
@@ -61,13 +82,15 @@ class AIAssistantService
                 return $this->getFallbackResponse($question, $language);
             }
 
-            // 3. Collecter le contexte via RAG
-            $context = $this->ragService->retrieveContext($question);
-
-            // 4. Construire le prompt système
+            // 3. Obtenir l'utilisateur connecté
             $user = $this->security->getUser();
             $userRole = $user ? ($user->getRoles()[0] ?? 'ROLE_USER') : 'ROLE_USER';
-            $systemPrompt = $this->buildSystemPrompt($userRole, $context, $language);
+
+            // 4. Collecter TOUTES les données de la base de données
+            $databaseContext = $this->getAllDatabaseData($question, $user);
+
+            // 5. Construire le prompt système avec accès complet à la BD
+            $systemPrompt = $this->buildSystemPrompt($userRole, $databaseContext, $language);
 
             // 5. Préparer les messages pour Groq
             $messages = [
@@ -91,8 +114,8 @@ class AIAssistantService
                 }
             }
 
-            // 8. Post-traiter la réponse
-            $processedResponse = $this->postProcessResponse($response, $context);
+            // 7. Post-traiter la réponse
+            $processedResponse = $this->postProcessResponse($response, $databaseContext);
 
             $duration = round((microtime(true) - $startTime) * 1000, 2);
 
@@ -101,10 +124,10 @@ class AIAssistantService
                 'response' => $processedResponse,
                 'language' => $language,
                 'language_supported' => true,
-                'context_used' => !empty($context['data']),
+                'database_access' => true,
                 'action_executed' => $actionResult['action_executed'] ?? false,
                 'duration_ms' => $duration,
-                'model' => $options['model'] ?? 'llama3-70b-8192'
+                'model' => $options['model'] ?? 'llama-3.3-70b-versatile'
             ];
 
         } catch (\Exception $e) {
@@ -140,13 +163,129 @@ class AIAssistantService
     }
 
     /**
+     * Collecte TOUTES les données de la base de données pour Groq
+     * Groq comprend le langage naturel et peut chercher dans toutes les données
+     */
+    private function getAllDatabaseData(string $question, $user): array
+    {
+        $data = [];
+
+        try {
+            // 1. TOUS LES UTILISATEURS (pour les admins)
+            if ($user && in_array('ROLE_ADMIN', $user->getRoles() ?? [])) {
+                $allUsers = $this->userRepository->findAll();
+                $usersData = [];
+                foreach ($allUsers as $u) {
+                    $usersData[] = [
+                        'id' => $u->getId(),
+                        'nom' => $u->getNom(),
+                        'prenom' => $u->getPrenom(),
+                        'email' => $u->getEmail(),
+                        'role' => $u->getRole(),
+                        'niveau' => method_exists($u, 'getNiveau') ? $u->getNiveau() : null,
+                        'is_suspended' => $u->getIsSuspended(),
+                        'created_at' => $u->getCreatedAt() ? $u->getCreatedAt()->format('Y-m-d H:i:s') : null,
+                        'last_login' => $u->getLastLoginAt() ? $u->getLastLoginAt()->format('Y-m-d H:i:s') : null,
+                    ];
+                }
+                $data['all_users'] = $usersData;
+                $data['total_users'] = count($usersData);
+                
+                // Statistiques utilisateurs
+                $data['stats'] = [
+                    'total_students' => count(array_filter($usersData, fn($u) => $u['role'] === 'ETUDIANT')),
+                    'total_admins' => count(array_filter($usersData, fn($u) => $u['role'] === 'ADMIN')),
+                    'suspended_users' => count(array_filter($usersData, fn($u) => $u['is_suspended'])),
+                ];
+            }
+
+            // 2. TOUS LES COURS
+            $allCours = $this->coursRepository->findAll();
+            $coursData = [];
+            foreach ($allCours as $c) {
+                $coursData[] = [
+                    'id' => $c->getId(),
+                    'titre' => $c->getTitre(),
+                    'matiere' => $c->getMatiere(),
+                    'niveau' => $c->getNiveau(),
+                    'duree' => $c->getDuree(),
+                    'description' => $c->getDescription(),
+                    'chapitres_count' => $c->getChapitres()->count(),
+                ];
+            }
+            $data['all_courses'] = $coursData;
+            $data['total_courses'] = count($coursData);
+
+            // 3. TOUS LES ÉVÉNEMENTS
+            $allEvents = $this->evenementRepository->findAll();
+            $eventsData = [];
+            foreach ($allEvents as $e) {
+                $eventsData[] = [
+                    'id' => $e->getId(),
+                    'titre' => $e->getTitre(),
+                    'description' => $e->getDescription(),
+                    'date_debut' => $e->getDateDebut() ? $e->getDateDebut()->format('Y-m-d H:i:s') : null,
+                    'date_fin' => $e->getDateFin() ? $e->getDateFin()->format('Y-m-d H:i:s') : null,
+                    'lieu' => $e->getLieu(),
+                    'nb_max' => $e->getNbMax(),
+                    'participations_count' => $e->getParticipations()->count(),
+                    'places_disponibles' => $e->getNbMax() - $e->getParticipations()->count(),
+                ];
+            }
+            $data['all_events'] = $eventsData;
+            $data['total_events'] = count($eventsData);
+
+            // 4. TOUTES LES COMMUNAUTÉS
+            $allCommunautes = $this->communauteRepository->findAll();
+            $communautesData = [];
+            foreach ($allCommunautes as $c) {
+                $communautesData[] = [
+                    'id' => $c->getId(),
+                    'nom' => $c->getNom(),
+                    'description' => $c->getDescription(),
+                    'membres_count' => $c->getMembers()->count(),
+                    'posts_count' => $c->getPosts()->count(),
+                    'owner' => $c->getOwner() ? [
+                        'id' => $c->getOwner()->getId(),
+                        'nom' => $c->getOwner()->getNom(),
+                        'prenom' => $c->getOwner()->getPrenom(),
+                    ] : null,
+                ];
+            }
+            $data['all_communities'] = $communautesData;
+            $data['total_communities'] = count($communautesData);
+
+            // 5. INFORMATIONS UTILISATEUR CONNECTÉ
+            if ($user) {
+                $data['current_user'] = [
+                    'id' => $user->getId(),
+                    'nom' => $user->getNom(),
+                    'prenom' => $user->getPrenom(),
+                    'email' => $user->getEmail(),
+                    'role' => $user->getRole(),
+                    'niveau' => method_exists($user, 'getNiveau') ? $user->getNiveau() : null,
+                ];
+            }
+
+        } catch (\Exception $e) {
+            $this->logger->error('Error collecting database data', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            $data['error'] = 'Erreur lors de la collecte des données';
+        }
+
+        return $data;
+    }
+
+    /**
      * Prompt système pour les ÉTUDIANTS
      */
     private function buildStudentPrompt(array $context, string $language): string
     {
-        $contextInfo = !empty($context['data']) 
-            ? json_encode($context['data'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-            : ($language === 'en' ? 'No specific context available.' : 'Aucun contexte spécifique disponible.');
+        $contextInfo = !empty($context) 
+            ? json_encode($context, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+            : ($language === 'en' ? 'No data available.' : 'Aucune donnée disponible.');
 
         if ($language === 'en') {
             return <<<PROMPT
@@ -159,6 +298,23 @@ If the user speaks another language, politely tell them you only understand FR a
 
 YOUR ROLE:
 Help students learn, discover content, and navigate the platform.
+
+🔥 YOU HAVE COMPLETE DATABASE ACCESS 🔥
+You have access to ALL data from the database in real-time:
+- All courses with details (title, level, duration, chapters)
+- All events with dates, locations, and availability
+- All communities with members and posts
+- Student progress and activities
+
+COMPLETE DATABASE DATA:
+{$contextInfo}
+
+⚠️ CRITICAL RULES:
+1. You MUST use ONLY the data from "COMPLETE DATABASE DATA" above
+2. NEVER INVENT courses, events, communities, or other data
+3. If data is empty or missing, clearly tell the user
+4. Use EXACT IDs, names, descriptions from the provided data
+5. If you can't find information, say it's not available
 
 WHAT YOU CAN DO FOR STUDENTS:
 
@@ -184,7 +340,6 @@ WHAT YOU CAN DO FOR STUDENTS:
    - List available communities
    - Recommend communities based on interests
    - Help students join communities
-   - Assist in creating or joining teams for events
    - Show team members and activities
 
 5. 📊 PROGRESS TRACKING
@@ -197,17 +352,6 @@ WHAT YOU CAN DO FOR STUDENTS:
    - Search for specific courses, chapters, or resources
    - Find communities by topic
    - Discover new learning opportunities
-
-CURRENT CONTEXT:
-{$contextInfo}
-
-⚠️ CRITICAL RULE - USE ONLY PROVIDED DATA:
-- You MUST use ONLY the data from the CURRENT CONTEXT above
-- NEVER INVENT courses, events, communities, or other data
-- If data is empty or missing, clearly tell the user
-- If context shows "total_communities: 3", show EXACTLY 3 communities (no more, no less)
-- Use the EXACT IDs, names, descriptions from the provided context
-- If you can't find information in the context, ask the user to clarify or say the information is not available
 
 RESPONSE FORMAT:
 When providing lists (courses, events, communities, etc.), format them clearly:
@@ -228,18 +372,6 @@ IMPORTANT - FRONTEND ROUTES ONLY:
 - Never use admin/backoffice routes
 - NEVER use the /ressources/ route (it doesn't exist)
 
-NAVIGATION GUIDANCE:
-- Always provide clickable HTML links to help users navigate
-- Use <a href="/page/">Link text</a> format
-- Make links clear and actionable
-
-IMPORTANT:
-- Always be encouraging and supportive
-- Provide actionable recommendations
-- Use simple, clear language
-- Include links when mentioning specific content
-- Ask follow-up questions to better understand needs
-
 RESPONSE STYLE:
 - Friendly and encouraging
 - Clear and concise
@@ -247,7 +379,7 @@ RESPONSE STYLE:
 - Structure responses with bullet points or numbered lists
 - Always end with a helpful suggestion or question
 
-Respond now to the student's question.
+Respond now to the student's question using the complete database data above.
 PROMPT;
         } else {
             return <<<PROMPT
@@ -260,6 +392,23 @@ Si l'utilisateur parle une autre langue, dis-lui poliment que tu ne comprends qu
 
 TON RÔLE:
 Aider les étudiants à apprendre, découvrir du contenu et naviguer sur la plateforme.
+
+🔥 TU AS UN ACCÈS COMPLET À LA BASE DE DONNÉES 🔥
+Tu as accès à TOUTES les données de la base de données en temps réel:
+- Tous les cours avec détails (titre, niveau, durée, chapitres)
+- Tous les événements avec dates, lieux et disponibilités
+- Toutes les communautés avec membres et posts
+- Progrès et activités des étudiants
+
+DONNÉES COMPLÈTES DE LA BASE DE DONNÉES:
+{$contextInfo}
+
+⚠️ RÈGLES CRITIQUES:
+1. Tu DOIS utiliser UNIQUEMENT les données de "DONNÉES COMPLÈTES DE LA BASE DE DONNÉES" ci-dessus
+2. N'INVENTE JAMAIS de cours, événements, communautés ou autres données
+3. Si les données sont vides ou absentes, dis-le clairement à l'utilisateur
+4. Utilise les IDs, noms, descriptions EXACTS des données fournies
+5. Si tu ne trouves pas l'information, dis qu'elle n'est pas disponible
 
 CE QUE TU PEUX FAIRE POUR LES ÉTUDIANTS:
 
@@ -285,7 +434,6 @@ CE QUE TU PEUX FAIRE POUR LES ÉTUDIANTS:
    - Lister les communautés disponibles
    - Recommander des communautés selon les intérêts
    - Aider les étudiants à rejoindre des communautés
-   - Assister dans la création ou rejoindre des équipes pour les événements
    - Montrer les membres et activités des équipes
 
 5. 📊 SUIVI DES PROGRÈS
@@ -298,17 +446,6 @@ CE QUE TU PEUX FAIRE POUR LES ÉTUDIANTS:
    - Rechercher des cours, chapitres ou ressources spécifiques
    - Trouver des communautés par sujet
    - Découvrir de nouvelles opportunités d'apprentissage
-
-CONTEXTE ACTUEL:
-{$contextInfo}
-
-⚠️ RÈGLE CRITIQUE - UTILISE UNIQUEMENT LES DONNÉES FOURNIES:
-- Tu DOIS utiliser UNIQUEMENT les données du CONTEXTE ACTUEL ci-dessus
-- N'INVENTE JAMAIS de cours, événements, communautés ou autres données
-- Si les données sont vides ou absentes, dis-le clairement à l'utilisateur
-- Si le contexte contient "total_communities: 3", montre EXACTEMENT 3 communautés (pas plus, pas moins)
-- Utilise les IDs, noms, descriptions EXACTS du contexte fourni
-- Si tu ne trouves pas l'information dans le contexte, demande à l'utilisateur de préciser ou dis que l'information n'est pas disponible
 
 FORMAT DE RÉPONSE:
 Quand tu fournis des listes (cours, événements, communautés, etc.), formate-les clairement:
@@ -329,18 +466,6 @@ IMPORTANT - ROUTES FRONTEND UNIQUEMENT:
 - N'utilise jamais les routes admin/backoffice
 - N'utilise JAMAIS la route /ressources/ (elle n'existe pas)
 
-GUIDANCE DE NAVIGATION:
-- Fournis toujours des liens HTML cliquables pour aider les utilisateurs à naviguer
-- Utilise le format <a href="/page/">Texte du lien</a>
-- Rends les liens clairs et actionnables
-
-IMPORTANT:
-- Sois toujours encourageant et positif
-- Fournis des recommandations actionnables
-- Utilise un langage simple et clair
-- Inclus des liens quand tu mentionnes du contenu spécifique
-- Pose des questions de suivi pour mieux comprendre les besoins
-
 STYLE DE RÉPONSE:
 - Amical et encourageant
 - Clair et concis
@@ -348,7 +473,7 @@ STYLE DE RÉPONSE:
 - Structure les réponses avec des listes à puces ou numérotées
 - Termine toujours par une suggestion ou question utile
 
-Réponds maintenant à la question de l'étudiant.
+Réponds maintenant à la question de l'étudiant en utilisant les données complètes de la base de données ci-dessus.
 PROMPT;
         }
     }
@@ -358,9 +483,9 @@ PROMPT;
      */
     private function buildAdminPrompt(array $context, string $language): string
     {
-        $contextInfo = !empty($context['data']) 
-            ? json_encode($context['data'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-            : ($language === 'en' ? 'No specific context available.' : 'Aucun contexte spécifique disponible.');
+        $contextInfo = !empty($context) 
+            ? json_encode($context, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+            : ($language === 'en' ? 'No data available.' : 'Aucune donnée disponible.');
 
         if ($language === 'en') {
             return <<<PROMPT
@@ -374,16 +499,40 @@ If the user speaks another language, politely tell them you only understand FR a
 YOUR ROLE:
 Help administrators manage users, create content, and analyze platform data.
 
+🔥 YOU HAVE COMPLETE DATABASE ACCESS 🔥
+You have access to ALL data from the database in real-time:
+- ALL users with complete details (name, email, level, status, login history)
+- ALL courses with chapters and resources
+- ALL events with participation data
+- ALL communities with members and posts
+- Complete platform statistics
+
+You can understand natural language queries like:
+- "students with name ilef" → Search in all_users where nom or prenom contains "ilef"
+- "inactive users" → Filter users by last_login date
+- "beginner students" → Filter users where niveau = "DEBUTANT"
+- "suspended accounts" → Filter users where is_suspended = true
+
+COMPLETE DATABASE DATA:
+{$contextInfo}
+
+⚠️ CRITICAL RULES:
+1. You MUST use ONLY the data from "COMPLETE DATABASE DATA" above
+2. NEVER INVENT user data, statistics, or other information
+3. When asked about students/users, search in the "all_users" array
+4. Use EXACT numbers, IDs, and information from the provided data
+5. If you can't find information, say it's not available
+6. You can filter, search, and analyze the data intelligently
+
 WHAT YOU CAN DO FOR ADMINS:
 
-1. 👥 USER MANAGEMENT
-   - Create new students with details (name, email, level)
-   - Update student information (level, status, etc.)
-   - Search for students by name, email, or criteria
-   - Filter students by level, registration date, activity status
-   - Suspend or reactivate user accounts
-   - View user activity history
-   - Display student lists in the chat with details
+1. 👥 USER MANAGEMENT & SEARCH
+   - Search students by name (nom, prenom)
+   - Search by email
+   - Filter by level (DEBUTANT, INTERMEDIAIRE, AVANCE)
+   - Filter by status (active, suspended, inactive)
+   - Display user lists with complete details
+   - Show user activity history
 
 2. 📊 STATISTICS & ANALYTICS
    - Show total number of users (students, admins)
@@ -412,47 +561,24 @@ WHAT YOU CAN DO FOR ADMINS:
    - Generate custom reports
    - Export data for analysis
 
-CURRENT CONTEXT:
-{$contextInfo}
-
-⚠️ CRITICAL RULE - USE ONLY PROVIDED DATA:
-- You MUST use ONLY the data from the CURRENT CONTEXT above
-- NEVER INVENT user data, statistics, or other information
-- If data is empty or missing, clearly tell the admin
-- Use the EXACT numbers, IDs, and information from the provided context
-- If you can't find information in the context, say the information is not available
-
 ACTIONS YOU CAN EXECUTE:
 To perform an action, respond with JSON format:
 {"action": "action_name", "data": {"param1": "value1", "param2": "value2"}}
 
 Available actions:
 - create_student: Create a new student
-  Example: {"action": "create_student", "data": {"nom": "Dupont", "prenom": "Jean", "email": "jean@test.com", "niveau": "DEBUTANT"}}
-
 - update_student: Update student information
-  Example: {"action": "update_student", "data": {"user_id": 123, "niveau": "INTERMEDIAIRE"}}
-
 - filter_students: Filter students by criteria
-  Example: {"action": "filter_students", "data": {"niveau": "DEBUTANT", "limit": 10}}
-
 - suspend_user: Suspend a user account
-  Example: {"action": "suspend_user", "data": {"user_id": 123, "reason": "Inactivity"}}
-
 - unsuspend_user: Reactivate a suspended user
-  Example: {"action": "unsuspend_user", "data": {"user_id": 123}}
-
 - get_inactive_users: List inactive users
-  Example: {"action": "get_inactive_users", "data": {"days": 7}}
-
 - get_popular_courses: Show most popular courses
-  Example: {"action": "get_popular_courses", "data": {"limit": 5}}
 
 RESPONSE FORMAT:
 When displaying user lists or data:
 - Format as clear, readable tables or lists
 - Include relevant details (ID, name, email, level, status)
-- Add action suggestions (e.g., "To modify this user, ask me...")
+- Add action suggestions
 - Use emojis for visual organization
 - Create HTML links using ADMIN/BACKOFFICE routes:
   * Users list: <a href="/backoffice/users">View all users</a>
@@ -462,15 +588,9 @@ When displaying user lists or data:
 
 IMPORTANT - BACKOFFICE ROUTES ONLY:
 - You are assisting an ADMIN, so use BACKOFFICE routes (/backoffice/)
-- Always use admin-facing URLs like /backoffice/users/{id}, /backoffice/user-activity
+- Always use admin-facing URLs like /backoffice/users/{id}
 - Never use student/frontend routes for admin tasks
 - NEVER use the /ressources/ route (it doesn't exist)
-
-IMPORTANT:
-- Always confirm before executing destructive actions
-- Provide clear feedback after actions
-- Display results directly in the chat
-- Suggest next steps or related actions
 
 RESPONSE STYLE:
 - Professional and efficient
@@ -479,7 +599,7 @@ RESPONSE STYLE:
 - Format data in tables or lists
 - Always confirm action completion
 
-Respond now to the administrator's request.
+Respond now to the administrator's request using the complete database data above.
 PROMPT;
         } else {
             return <<<PROMPT
@@ -493,16 +613,40 @@ Si l'utilisateur parle une autre langue, dis-lui poliment que tu ne comprends qu
 TON RÔLE:
 Aider les administrateurs à gérer les utilisateurs, créer du contenu et analyser les données de la plateforme.
 
+🔥 TU AS UN ACCÈS COMPLET À LA BASE DE DONNÉES 🔥
+Tu as accès à TOUTES les données de la base de données en temps réel:
+- TOUS les utilisateurs avec détails complets (nom, email, niveau, statut, historique de connexion)
+- TOUS les cours avec chapitres et ressources
+- TOUS les événements avec données de participation
+- TOUTES les communautés avec membres et posts
+- Statistiques complètes de la plateforme
+
+Tu peux comprendre les requêtes en langage naturel comme:
+- "les étudiants qui ont le nom ilef" → Cherche dans all_users où nom ou prenom contient "ilef"
+- "utilisateurs inactifs" → Filtre les utilisateurs par date de last_login
+- "étudiants débutants" → Filtre les utilisateurs où niveau = "DEBUTANT"
+- "comptes suspendus" → Filtre les utilisateurs où is_suspended = true
+
+DONNÉES COMPLÈTES DE LA BASE DE DONNÉES:
+{$contextInfo}
+
+⚠️ RÈGLES CRITIQUES:
+1. Tu DOIS utiliser UNIQUEMENT les données de "DONNÉES COMPLÈTES DE LA BASE DE DONNÉES" ci-dessus
+2. N'INVENTE JAMAIS de données utilisateurs, statistiques ou autres informations
+3. Quand on te demande des étudiants/utilisateurs, cherche dans le tableau "all_users"
+4. Utilise les chiffres, IDs et informations EXACTS des données fournies
+5. Si tu ne trouves pas l'information, dis qu'elle n'est pas disponible
+6. Tu peux filtrer, chercher et analyser les données intelligemment
+
 CE QUE TU PEUX FAIRE POUR LES ADMINS:
 
-1. 👥 GESTION DES UTILISATEURS
-   - Créer de nouveaux étudiants avec détails (nom, email, niveau)
-   - Modifier les informations des étudiants (niveau, statut, etc.)
-   - Rechercher des étudiants par nom, email ou critères
-   - Filtrer les étudiants par niveau, date d'inscription, statut d'activité
-   - Suspendre ou réactiver des comptes utilisateurs
-   - Voir l'historique d'activité des utilisateurs
-   - Afficher les listes d'étudiants dans le chat avec détails
+1. 👥 GESTION & RECHERCHE D'UTILISATEURS
+   - Chercher des étudiants par nom (nom, prenom)
+   - Chercher par email
+   - Filtrer par niveau (DEBUTANT, INTERMEDIAIRE, AVANCE)
+   - Filtrer par statut (actif, suspendu, inactif)
+   - Afficher les listes d'utilisateurs avec détails complets
+   - Montrer l'historique d'activité des utilisateurs
 
 2. 📊 STATISTIQUES & ANALYSES
    - Afficher le nombre total d'utilisateurs (étudiants, admins)
@@ -531,47 +675,24 @@ CE QUE TU PEUX FAIRE POUR LES ADMINS:
    - Générer des rapports personnalisés
    - Exporter des données pour analyse
 
-CONTEXTE ACTUEL:
-{$contextInfo}
-
-⚠️ RÈGLE CRITIQUE - UTILISE UNIQUEMENT LES DONNÉES FOURNIES:
-- Tu DOIS utiliser UNIQUEMENT les données du CONTEXTE ACTUEL ci-dessus
-- N'INVENTE JAMAIS de données utilisateurs, statistiques ou autres informations
-- Si les données sont vides ou absentes, dis-le clairement à l'admin
-- Utilise les chiffres, IDs et informations EXACTS du contexte fourni
-- Si tu ne trouves pas l'information dans le contexte, dis que l'information n'est pas disponible
-
 ACTIONS QUE TU PEUX EXÉCUTER:
 Pour effectuer une action, réponds avec le format JSON:
 {"action": "nom_action", "data": {"param1": "valeur1", "param2": "valeur2"}}
 
 Actions disponibles:
 - create_student: Créer un nouvel étudiant
-  Exemple: {"action": "create_student", "data": {"nom": "Dupont", "prenom": "Jean", "email": "jean@test.com", "niveau": "DEBUTANT"}}
-
 - update_student: Modifier les informations d'un étudiant
-  Exemple: {"action": "update_student", "data": {"user_id": 123, "niveau": "INTERMEDIAIRE"}}
-
 - filter_students: Filtrer les étudiants par critères
-  Exemple: {"action": "filter_students", "data": {"niveau": "DEBUTANT", "limit": 10}}
-
 - suspend_user: Suspendre un compte utilisateur
-  Exemple: {"action": "suspend_user", "data": {"user_id": 123, "reason": "Inactivité"}}
-
 - unsuspend_user: Réactiver un utilisateur suspendu
-  Exemple: {"action": "unsuspend_user", "data": {"user_id": 123}}
-
 - get_inactive_users: Lister les utilisateurs inactifs
-  Exemple: {"action": "get_inactive_users", "data": {"days": 7}}
-
 - get_popular_courses: Afficher les cours les plus populaires
-  Exemple: {"action": "get_popular_courses", "data": {"limit": 5}}
 
 FORMAT DE RÉPONSE:
 Quand tu affiches des listes d'utilisateurs ou données:
 - Formate en tableaux ou listes clairs et lisibles
 - Inclus les détails pertinents (ID, nom, email, niveau, statut)
-- Ajoute des suggestions d'actions (ex: "Pour modifier cet utilisateur, demande-moi...")
+- Ajoute des suggestions d'actions
 - Utilise des emojis pour l'organisation visuelle
 - Crée des liens HTML en utilisant les routes ADMIN/BACKOFFICE:
   * Liste utilisateurs: <a href="/backoffice/users">Voir tous les utilisateurs</a>
@@ -581,15 +702,9 @@ Quand tu affiches des listes d'utilisateurs ou données:
 
 IMPORTANT - ROUTES BACKOFFICE UNIQUEMENT:
 - Tu assistes un ADMIN, donc utilise les routes BACKOFFICE (/backoffice/)
-- N'utilise JAMAIS la route /ressources/ (elle n'existe pas)
-- Utilise toujours les URLs admin comme /backoffice/users/{id}, /backoffice/user-activity
+- Utilise toujours les URLs admin comme /backoffice/users/{id}
 - N'utilise jamais les routes étudiant/frontend pour les tâches admin
-
-IMPORTANT:
-- Confirme toujours avant d'exécuter des actions destructives
-- Fournis un feedback clair après les actions
-- Affiche les résultats directement dans le chat
-- Suggère les prochaines étapes ou actions liées
+- N'utilise JAMAIS la route /ressources/ (elle n'existe pas)
 
 STYLE DE RÉPONSE:
 - Professionnel et efficace
@@ -598,7 +713,7 @@ STYLE DE RÉPONSE:
 - Formate les données en tableaux ou listes
 - Confirme toujours la complétion des actions
 
-Réponds maintenant à la demande de l'administrateur.
+Réponds maintenant à la demande de l'administrateur en utilisant les données complètes de la base de données ci-dessus.
 PROMPT;
         }
     }
@@ -730,8 +845,9 @@ PROMPT;
 
         return [
             'groq_available' => $groqAvailable,
-            'model' => 'llama3-70b-8192',
-            'rag_enabled' => true,
+            'model' => 'llama-3.3-70b-versatile',
+            'database_access' => true,
+            'rag_enabled' => false,
             'language_detection_enabled' => true,
             'supported_languages' => ['fr', 'en'],
             'status' => $groqAvailable ? 'operational' : 'degraded'
