@@ -92,8 +92,12 @@ class UserController extends AbstractController
     }
     
     #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
-    public function show(User $user): Response
+    public function show(?User $user): Response
     {
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur non trouvé');
+        }
+        
         return $this->render('backoffice/user/show.html.twig', [
             'user' => $user,
         ]);
@@ -102,10 +106,14 @@ class UserController extends AbstractController
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
-        User $user,
+        ?User $user,
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher
     ): Response {
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur non trouvé');
+        }
+        
         $dto = new UserCreateDTO();
         $dto->nom = $user->getNom();
         $dto->prenom = $user->getPrenom();
@@ -201,9 +209,14 @@ class UserController extends AbstractController
     #[Route('/{id}', name: 'app_user_delete', methods: ['POST'])]
     public function delete(
         Request $request,
-        User $user,
+        ?User $user,
         EntityManagerInterface $entityManager
     ): Response {
+        if (!$user) {
+            $this->addFlash('error', 'Utilisateur non trouvé');
+            return $this->redirectToRoute('app_user_index');
+        }
+        
         if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_token'))) {
             try {
                 $entityManager->remove($user);

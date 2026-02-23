@@ -59,10 +59,17 @@ class GroqService
             $statusCode = $response->getStatusCode();
             
             if ($statusCode !== 200) {
+                $errorContent = $response->getContent(false);
                 $this->logger->error('Groq API Error', [
                     'status_code' => $statusCode,
-                    'response' => $response->getContent(false),
+                    'response' => $errorContent,
                 ]);
+                
+                // Check for rate limit error
+                if ($statusCode === 429) {
+                    $this->logger->error('Groq API Rate Limit Exceeded');
+                }
+                
                 return null;
             }
 
@@ -108,11 +115,15 @@ class GroqService
      */
     public function isAvailable(): bool
     {
-        try {
-            $response = $this->generate('Hello', ['max_tokens' => 10]);
-            return $response !== null;
-        } catch (\Exception $e) {
-            return false;
-        }
+        // Vérifier simplement si la clé API est configurée
+        $available = !empty($this->apiKey) && $this->apiKey !== 'your_groq_api_key_here';
+        
+        $this->logger->info('Groq isAvailable check', [
+            'available' => $available,
+            'apiKey_length' => strlen($this->apiKey ?? ''),
+            'apiKey_first_chars' => substr($this->apiKey ?? '', 0, 10)
+        ]);
+        
+        return $available;
     }
 }
