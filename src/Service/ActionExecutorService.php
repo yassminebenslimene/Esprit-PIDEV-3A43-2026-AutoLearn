@@ -41,17 +41,25 @@ class ActionExecutorService
      */
     public function detectAndExecute(string $response, User $requestingUser): array
     {
-        // Chercher un JSON d'action dans la réponse
-        if (preg_match('/\{[^}]*"action"\s*:\s*"([^"]+)"[^}]*\}/s', $response, $matches)) {
+        // Chercher un JSON d'action dans la réponse (plus flexible)
+        // Cherche { "action": "xxx", "data": {...} } sur la première ligne ou n'importe où
+        
+        // Essayer d'extraire le JSON de manière plus flexible
+        $jsonPattern = '/\{\s*"action"\s*:\s*"([^"]+)"\s*,\s*"data"\s*:\s*\{[^}]*\}\s*\}/s';
+        
+        if (preg_match($jsonPattern, $response, $matches)) {
             $jsonStr = $matches[0];
+            
+            $this->logger->info('Action JSON detected', ['json' => $jsonStr]);
             
             try {
                 $actionData = json_decode($jsonStr, true);
                 
                 if (json_last_error() !== JSON_ERROR_NONE) {
+                    $this->logger->error('JSON decode error', ['error' => json_last_error_msg()]);
                     return [
                         'action_executed' => false,
-                        'message' => 'Format JSON invalide'
+                        'message' => ''
                     ];
                 }
                 
@@ -61,31 +69,40 @@ class ActionExecutorService
                 if (!$action) {
                     return [
                         'action_executed' => false,
-                        'message' => 'Action non spécifiée'
+                        'message' => ''
                     ];
                 }
+                
+                $this->logger->info('Executing action', ['action' => $action, 'params' => $params]);
                 
                 // Exécuter l'action
                 $result = $this->executeAction($action, $params, $requestingUser);
                 
+                $this->logger->info('Action result', ['result' => $result]);
+                
+                // Ne pas ajouter de message supplémentaire, l'IA a déjà répondu
                 return [
                     'action_executed' => $result['success'],
-                    'message' => $result['message'] ?? $result['error'] ?? 'Action exécutée',
+                    'message' => '', // Pas de message supplémentaire
                     'result' => $result
                 ];
                 
             } catch (\Exception $e) {
                 $this->logger->error('Action detection error', [
-                    'response' => $response,
+                    'response' => substr($response, 0, 500),
                     'error' => $e->getMessage()
                 ]);
                 
                 return [
                     'action_executed' => false,
-                    'message' => 'Erreur lors de la détection de l\'action'
+                    'message' => ''
                 ];
             }
         }
+        
+        $this->logger->info('No action detected in response', [
+            'response_preview' => substr($response, 0, 200)
+        ]);
         
         // Aucune action détectée
         return [
@@ -111,7 +128,9 @@ class ActionExecutorService
             return match($action) {
                 'create_student' => $this->createStudent($params),
                 'update_student' => $this->updateStudent($params),
+                'update_user' => $this->updateStudent($params),
                 'filter_students' => $this->filterStudents($params),
+                'get_user' => $this->getUser($params),
                 'create_team' => $this->createTeam($params),
                 'suspend_user' => $this->suspendUser($params),
                 'unsuspend_user' => $this->unsuspendUser($params),
@@ -119,7 +138,7 @@ class ActionExecutorService
                 'get_popular_courses' => $this->getPopularCourses($params),
                 default => [
                     'success' => false,
-                    'error' => "Action inconnue: {$action}"
+                    'error' => "Action non autorisée ou inconnue"
                 ]
             };
         } catch (\Exception $e) {
@@ -145,7 +164,9 @@ class ActionExecutorService
         $adminOnlyActions = [
             'create_student',
             'update_student',
+            'update_user',
             'filter_students',
+            'get_user',
             'suspend_user',
             'unsuspend_user',
             'get_inactive_users'
@@ -220,18 +241,87 @@ class ActionExecutorService
     }
 
     /**
+     * Trouve un utilisateur de manière intelligente (par ID, nom, prénom, email)
+     */
+    private function findUserIntelligently(array $params): ?User
+    {
+        // 1. Chercher par ID direct
+        if (!empty($params['id']) || !empty($params['user_id'])) {
+            $userId = $params['id'] ?? $params['user_id'];
+            $user = $this->userRepository->find($userId);
+            if ($user) {
+                return $user;
+            }
+        }
+
+        // 2. Chercher par email
+        if (!empty($params['email'])) {
+            $user = $this->userRepository->findOneBy(['email' => $params['email']]);
+            if ($user) {
+                return $user;
+            }
+        }
+
+        // 3. Chercher par nom complet (nom + prenom)
+        if (!empty($params['nom']) && !empty($params['prenom'])) {
+            $user = $this->userRepository->findOneBy([
+                'nom' => $params['nom'],
+                'prenom' => $params['prenom']
+            ]);
+            if ($user) {
+                return $user;
+            }
+        }
+
+        // 4. Chercher par nom seul (case insensitive)
+        if (!empty($params['nom'])) {
+            $qb = $this->em->createQueryBuilder();
+            $users = $qb->select('u')
+                ->from('App\Entity\User', 'u')
+                ->where('LOWER(u.nom) LIKE LOWER(:nom)')
+                ->setParameter('nom', '%' . $params['nom'] . '%')
+                ->setMaxResults(1)
+                ->getQuery()
+                ->getResult();
+            
+            if (!empty($users)) {
+                return $users[0];
+            }
+        }
+
+        // 5. Chercher par prénom seul (case insensitive)
+        if (!empty($params['prenom'])) {
+            $qb = $this->em->createQueryBuilder();
+            $users = $qb->select('u')
+                ->from('App\Entity\User', 'u')
+                ->where('LOWER(u.prenom) LIKE LOWER(:prenom)')
+                ->setParameter('prenom', '%' . $params['prenom'] . '%')
+                ->setMaxResults(1)
+                ->getQuery()
+                ->getResult();
+            
+            if (!empty($users)) {
+                return $users[0];
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Modifie un étudiant existant
      */
     private function updateStudent(array $params): array
     {
-        if (empty($params['user_id'])) {
+        // Recherche intelligente de l'utilisateur
+        $user = $this->findUserIntelligently($params);
+        
+        if (!$user) {
             return [
                 'success' => false,
-                'error' => 'L\'ID de l\'utilisateur est requis'
+                'error' => 'Utilisateur introuvable'
             ];
         }
-
-        $user = $this->userRepository->find($params['user_id']);
         if (!$user) {
             return [
                 'success' => false,
@@ -267,6 +357,193 @@ class ActionExecutorService
             'success' => true,
             'message' => "Étudiant modifié avec succès: {$user->getPrenom()} {$user->getNom()}",
             'user_id' => $user->getId()
+        ];
+    }
+
+    /**
+     * Supprime un utilisateur
+     */
+    private function deleteUser(array $params): array
+    {
+        // Recherche intelligente de l'utilisateur
+        $user = $this->findUserIntelligently($params);
+        
+        if (!$user) {
+            return [
+                'success' => false,
+                'error' => 'Utilisateur introuvable'
+            ];
+        }
+
+        $userName = $user->getPrenom() . ' ' . $user->getNom();
+        
+        try {
+            // Supprimer les relations d'équipe d'abord
+            $connection = $this->em->getConnection();
+            
+            // Supprimer les memberships d'équipe (table many-to-many)
+            $connection->executeStatement(
+                'DELETE FROM equipe_etudiant WHERE etudiant_id = ?',
+                [$user->getId()]
+            );
+            
+            // Supprimer l'utilisateur
+            $this->em->remove($user);
+            $this->em->flush();
+
+            return [
+                'success' => true,
+                'message' => "✅ Utilisateur {$userName} supprimé"
+            ];
+        } catch (\Exception $e) {
+            $this->logger->error('Delete user error', ['error' => $e->getMessage()]);
+            
+            // Analyser l'erreur pour donner un message utile
+            $errorMsg = $e->getMessage();
+            
+            if (strpos($errorMsg, 'foreign key constraint') !== false || strpos($errorMsg, 'Integrity constraint') !== false) {
+                // Identifier quelle table cause le problème
+                if (strpos($errorMsg, 'equipe') !== false) {
+                    return [
+                        'success' => false,
+                        'error' => "❌ Impossible: l'utilisateur est dans une équipe. Retirez-le d'abord."
+                    ];
+                } elseif (strpos($errorMsg, 'cours') !== false || strpos($errorMsg, 'course') !== false) {
+                    return [
+                        'success' => false,
+                        'error' => "❌ Impossible: l'utilisateur est inscrit à des cours. Désinscrivez-le d'abord."
+                    ];
+                } elseif (strpos($errorMsg, 'communaute') !== false || strpos($errorMsg, 'community') !== false) {
+                    return [
+                        'success' => false,
+                        'error' => "❌ Impossible: l'utilisateur est dans des communautés. Retirez-le d'abord."
+                    ];
+                } else {
+                    return [
+                        'success' => false,
+                        'error' => "❌ Impossible: l'utilisateur a des données liées. Supprimez-les d'abord."
+                    ];
+                }
+            }
+            
+            return [
+                'success' => false,
+                'error' => '❌ Erreur lors de la suppression'
+            ];
+        }
+    }
+
+    /**
+     * Supprime un utilisateur en forçant (supprime toutes les relations d'abord)
+     */
+    private function forceDeleteUser(array $params): array
+    {
+        // Recherche intelligente de l'utilisateur
+        $user = $this->findUserIntelligently($params);
+        
+        if (!$user) {
+            return [
+                'success' => false,
+                'error' => 'Utilisateur introuvable'
+            ];
+        }
+
+        $userName = $user->getPrenom() . ' ' . $user->getNom();
+        $userId = $user->getId();
+        
+        try {
+            $connection = $this->em->getConnection();
+            
+            // Supprimer TOUTES les relations dans l'ordre
+            
+            // 1. Équipes
+            $connection->executeStatement(
+                'DELETE FROM equipe_etudiant WHERE etudiant_id = ?',
+                [$userId]
+            );
+            
+            // 2. Inscriptions aux cours (si la table existe)
+            try {
+                $connection->executeStatement(
+                    'DELETE FROM cours_etudiant WHERE etudiant_id = ?',
+                    [$userId]
+                );
+            } catch (\Exception $e) {
+                // Table n'existe peut-être pas
+            }
+            
+            // 3. Membres de communautés (si la table existe)
+            try {
+                $connection->executeStatement(
+                    'DELETE FROM communaute_membre WHERE user_id = ?',
+                    [$userId]
+                );
+            } catch (\Exception $e) {
+                // Table n'existe peut-être pas
+            }
+            
+            // 4. Posts et commentaires (si les tables existent)
+            try {
+                $connection->executeStatement(
+                    'DELETE FROM commentaire WHERE user_id = ?',
+                    [$userId]
+                );
+                $connection->executeStatement(
+                    'DELETE FROM post WHERE user_id = ?',
+                    [$userId]
+                );
+            } catch (\Exception $e) {
+                // Tables n'existent peut-être pas
+            }
+            
+            // 5. Supprimer l'utilisateur
+            $this->em->remove($user);
+            $this->em->flush();
+
+            return [
+                'success' => true,
+                'message' => "✅ Utilisateur {$userName} supprimé (avec toutes ses données)"
+            ];
+        } catch (\Exception $e) {
+            $this->logger->error('Force delete user error', ['error' => $e->getMessage()]);
+            
+            return [
+                'success' => false,
+                'error' => '❌ Erreur: ' . substr($e->getMessage(), 0, 100)
+            ];
+        }
+    }
+
+    /**
+     * Récupère les détails d'un utilisateur
+     */
+    private function getUser(array $params): array
+    {
+        // Recherche intelligente de l'utilisateur
+        $user = $this->findUserIntelligently($params);
+        
+        if (!$user) {
+            return [
+                'success' => false,
+                'error' => 'Utilisateur introuvable'
+            ];
+        }
+
+        $userDetails = [
+            'id' => $user->getId(),
+            'nom' => $user->getNom(),
+            'prenom' => $user->getPrenom(),
+            'email' => $user->getEmail(),
+            'role' => $user->getRole(),
+            'niveau' => method_exists($user, 'getNiveau') ? $user->getNiveau() : null,
+            'suspended' => $user->getIsSuspended(),
+            'created_at' => $user->getCreatedAt()->format('d/m/Y'),
+            'last_login' => $user->getLastLoginAt() ? $user->getLastLoginAt()->format('d/m/Y H:i') : 'Jamais'
+        ];
+
+        return [
+            'success' => true,
+            'user' => $userDetails
         ];
     }
 
@@ -389,14 +666,9 @@ class ActionExecutorService
      */
     private function suspendUser(array $params): array
     {
-        if (empty($params['user_id'])) {
-            return [
-                'success' => false,
-                'error' => 'L\'ID de l\'utilisateur est requis'
-            ];
-        }
-
-        $user = $this->userRepository->find($params['user_id']);
+        // Recherche intelligente de l'utilisateur
+        $user = $this->findUserIntelligently($params);
+        
         if (!$user) {
             return [
                 'success' => false,
@@ -404,7 +676,7 @@ class ActionExecutorService
             ];
         }
 
-        if ($user->isSuspended()) {
+        if ($user->getIsSuspended()) {
             return [
                 'success' => false,
                 'error' => 'Cet utilisateur est déjà suspendu'
@@ -429,14 +701,9 @@ class ActionExecutorService
      */
     private function unsuspendUser(array $params): array
     {
-        if (empty($params['user_id'])) {
-            return [
-                'success' => false,
-                'error' => 'L\'ID de l\'utilisateur est requis'
-            ];
-        }
-
-        $user = $this->userRepository->find($params['user_id']);
+        // Recherche intelligente de l'utilisateur
+        $user = $this->findUserIntelligently($params);
+        
         if (!$user) {
             return [
                 'success' => false,
@@ -444,7 +711,7 @@ class ActionExecutorService
             ];
         }
 
-        if (!$user->isSuspended()) {
+        if (!$user->getIsSuspended()) {
             return [
                 'success' => false,
                 'error' => 'Cet utilisateur n\'est pas suspendu'
@@ -547,8 +814,11 @@ class ActionExecutorService
         if ($user->getRole() === 'ADMIN') {
             $actions['admin'] = [
                 'create_student' => 'Créer un nouvel étudiant',
+                'update_student' => 'Modifier un étudiant',
+                'get_user' => 'Voir les détails d\'un utilisateur',
                 'suspend_user' => 'Suspendre un utilisateur',
                 'unsuspend_user' => 'Réactiver un utilisateur',
+                'filter_students' => 'Filtrer les étudiants',
                 'get_inactive_users' => 'Lister les utilisateurs inactifs'
             ];
         }

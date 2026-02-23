@@ -99,19 +99,30 @@ class AIAssistantService
             ];
 
             // 6. Générer la réponse avec Groq
+            $this->logger->info('Sending request to Groq', [
+                'question' => substr($question, 0, 100),
+                'user_role' => $userRole,
+                'language' => $language
+            ]);
+            
             $response = $this->groqService->chat($messages, $options);
 
             if (!$response) {
+                $this->logger->warning('Groq returned null response, using fallback');
                 return $this->getFallbackResponse($question, $language);
             }
+            
+            $this->logger->info('Groq response received', [
+                'response_length' => strlen($response)
+            ]);
 
             // 7. Détecter et exécuter les actions (Admin uniquement)
             $actionResult = null;
             if (in_array('ROLE_ADMIN', $user?->getRoles() ?? [])) {
                 $actionResult = $this->actionExecutor->detectAndExecute($response, $user);
-                if ($actionResult['action_executed']) {
-                    $response .= "\n\n✅ " . $actionResult['message'];
-                }
+                
+                // Ne pas ajouter de message supplémentaire, l'IA a déjà répondu
+                // L'action est exécutée en arrière-plan
             }
 
             // 7. Post-traiter la réponse
@@ -163,116 +174,54 @@ class AIAssistantService
     }
 
     /**
-     * Collecte TOUTES les données de la base de données pour Groq
-     * Groq comprend le langage naturel et peut chercher dans toutes les données
+     * Collecte des données MINIMALES de la base de données pour Groq
+     * Version ultra-optimisée pour éviter les limites de tokens
      */
     private function getAllDatabaseData(string $question, $user): array
     {
         $data = [];
 
         try {
-            // 1. TOUS LES UTILISATEURS (pour les admins)
+            // Pour les admins, envoyer la liste des utilisateurs pour les actions delete/update
             if ($user && in_array('ROLE_ADMIN', $user->getRoles() ?? [])) {
                 $allUsers = $this->userRepository->findAll();
-                $usersData = [];
-                foreach ($allUsers as $u) {
-                    $usersData[] = [
+                
+                // Statistiques
+                $data['stats'] = [
+                    'total_users' => count($allUsers),
+                    'total_students' => count(array_filter($allUsers, fn($u) => $u->getRole() === 'ETUDIANT')),
+                    'total_admins' => count(array_filter($allUsers, fn($u) => $u->getRole() === 'ADMIN')),
+                    'suspended_users' => count(array_filter($allUsers, fn($u) => $u->getIsSuspended())),
+                ];
+                
+                // Liste minimale des utilisateurs (pour recherche et actions)
+                $data['all_users'] = array_map(function($u) {
+                    return [
                         'id' => $u->getId(),
                         'nom' => $u->getNom(),
                         'prenom' => $u->getPrenom(),
                         'email' => $u->getEmail(),
                         'role' => $u->getRole(),
                         'niveau' => method_exists($u, 'getNiveau') ? $u->getNiveau() : null,
-                        'is_suspended' => $u->getIsSuspended(),
-                        'created_at' => $u->getCreatedAt() ? $u->getCreatedAt()->format('Y-m-d H:i:s') : null,
-                        'last_login' => $u->getLastLoginAt() ? $u->getLastLoginAt()->format('Y-m-d H:i:s') : null,
+                        'suspended' => $u->getIsSuspended(),
                     ];
-                }
-                $data['all_users'] = $usersData;
-                $data['total_users'] = count($usersData);
-                
-                // Statistiques utilisateurs
-                $data['stats'] = [
-                    'total_students' => count(array_filter($usersData, fn($u) => $u['role'] === 'ETUDIANT')),
-                    'total_admins' => count(array_filter($usersData, fn($u) => $u['role'] === 'ADMIN')),
-                    'suspended_users' => count(array_filter($usersData, fn($u) => $u['is_suspended'])),
-                ];
+                }, $allUsers);
             }
-
-            // 2. TOUS LES COURS
-            $allCours = $this->coursRepository->findAll();
-            $coursData = [];
-            foreach ($allCours as $c) {
-                $coursData[] = [
-                    'id' => $c->getId(),
-                    'titre' => $c->getTitre(),
-                    'matiere' => $c->getMatiere(),
-                    'niveau' => $c->getNiveau(),
-                    'duree' => $c->getDuree(),
-                    'description' => $c->getDescription(),
-                    'chapitres_count' => $c->getChapitres()->count(),
-                ];
-            }
-            $data['all_courses'] = $coursData;
-            $data['total_courses'] = count($coursData);
-
-            // 3. TOUS LES ÉVÉNEMENTS
-            $allEvents = $this->evenementRepository->findAll();
-            $eventsData = [];
-            foreach ($allEvents as $e) {
-                $eventsData[] = [
-                    'id' => $e->getId(),
-                    'titre' => $e->getTitre(),
-                    'description' => $e->getDescription(),
-                    'date_debut' => $e->getDateDebut() ? $e->getDateDebut()->format('Y-m-d H:i:s') : null,
-                    'date_fin' => $e->getDateFin() ? $e->getDateFin()->format('Y-m-d H:i:s') : null,
-                    'lieu' => $e->getLieu(),
-                    'nb_max' => $e->getNbMax(),
-                    'participations_count' => $e->getParticipations()->count(),
-                    'places_disponibles' => $e->getNbMax() - $e->getParticipations()->count(),
-                ];
-            }
-            $data['all_events'] = $eventsData;
-            $data['total_events'] = count($eventsData);
-
-            // 4. TOUTES LES COMMUNAUTÉS
-            $allCommunautes = $this->communauteRepository->findAll();
-            $communautesData = [];
-            foreach ($allCommunautes as $c) {
-                $communautesData[] = [
-                    'id' => $c->getId(),
-                    'nom' => $c->getNom(),
-                    'description' => $c->getDescription(),
-                    'membres_count' => $c->getMembers()->count(),
-                    'posts_count' => $c->getPosts()->count(),
-                    'owner' => $c->getOwner() ? [
-                        'id' => $c->getOwner()->getId(),
-                        'nom' => $c->getOwner()->getNom(),
-                        'prenom' => $c->getOwner()->getPrenom(),
-                    ] : null,
-                ];
-            }
-            $data['all_communities'] = $communautesData;
-            $data['total_communities'] = count($communautesData);
-
-            // 5. INFORMATIONS UTILISATEUR CONNECTÉ
+            
+            // Utilisateur connecté uniquement
             if ($user) {
                 $data['current_user'] = [
                     'id' => $user->getId(),
                     'nom' => $user->getNom(),
                     'prenom' => $user->getPrenom(),
-                    'email' => $user->getEmail(),
                     'role' => $user->getRole(),
-                    'niveau' => method_exists($user, 'getNiveau') ? $user->getNiveau() : null,
                 ];
             }
 
         } catch (\Exception $e) {
             $this->logger->error('Error collecting database data', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'error' => $e->getMessage()
             ]);
-            $data['error'] = 'Erreur lors de la collecte des données';
         }
 
         return $data;
@@ -290,6 +239,13 @@ class AIAssistantService
         if ($language === 'en') {
             return <<<PROMPT
 You are an intelligent AI assistant for STUDENTS on the AutoLearn platform.
+
+⚡ RESPONSE STYLE - CRITICAL:
+- BE CONCISE AND DIRECT
+- Answer in 2-3 sentences maximum
+- No long explanations or verbose text
+- Get straight to the point
+- Use bullet points only when necessary
 
 SUPPORTED LANGUAGES:
 - French (FR)
@@ -384,6 +340,13 @@ PROMPT;
         } else {
             return <<<PROMPT
 Tu es un assistant IA intelligent pour les ÉTUDIANTS sur la plateforme AutoLearn.
+
+⚡ STYLE DE RÉPONSE - CRITIQUE:
+- SOIS EXTRÊMEMENT CONCIS - Maximum 1-2 phrases courtes
+- PAS de tableaux, PAS de listes, PAS d'explications
+- Confirme juste l'action: "✅ Action réussie" ou "❌ Erreur: raison"
+- NE MONTRE JAMAIS les données avant/après l'action
+- N'UTILISE JAMAIS de puces ou de formatage
 
 LANGUES SUPPORTÉES:
 - Français (FR)
@@ -491,6 +454,50 @@ PROMPT;
             return <<<PROMPT
 You are an intelligent AI assistant for ADMINISTRATORS on the AutoLearn platform.
 
+⚡ RESPONSE STYLE - ABSOLUTELY CRITICAL:
+BE ULTRA-CONCISE. Maximum 1 short sentence (3-5 words).
+
+Examples:
+- "✅ User suspended"
+- "✅ Student created"
+- "❌ User not found"
+
+NO tables, NO lists, NO suggestions, NO HTML links.
+
+🔥 ACTION EXECUTION - MANDATORY FORMAT:
+For ANY action (create, update, suspend, view profile, etc.), you MUST:
+
+1. ALWAYS start your response with the action JSON on the first line
+2. Then add your natural language response
+
+MANDATORY format:
+{"action": "action_name", "data": {parameters}}
+Natural response here
+
+COMPLETE examples:
+
+User: "create student John Doe john@test.com"
+Your COMPLETE response:
+{"action": "create_student", "data": {"nom": "Doe", "prenom": "John", "email": "john@test.com", "niveau": "DEBUTANT"}}
+✅ Student created
+
+User: "suspend student test account"
+Your COMPLETE response:
+{"action": "suspend_user", "data": {"nom": "test"}}
+✅ Account suspended
+
+User: "view profile ismail opp"
+Your COMPLETE response:
+{"action": "get_user", "data": {"nom": "opp", "prenom": "ismail"}}
+Profile displayed
+
+User: "update student test email to new@test.com"
+Your COMPLETE response:
+{"action": "update_user", "data": {"nom": "test", "email": "new@test.com"}}
+✅ Email updated
+
+⚠️ CRITICAL: WITHOUT THE JSON ON THE FIRST LINE, THE ACTION WILL NOT BE EXECUTED!
+
 SUPPORTED LANGUAGES:
 - French (FR)
 - English (EN)
@@ -562,17 +569,44 @@ WHAT YOU CAN DO FOR ADMINS:
    - Export data for analysis
 
 ACTIONS YOU CAN EXECUTE:
-To perform an action, respond with JSON format:
-{"action": "action_name", "data": {"param1": "value1", "param2": "value2"}}
+You can perform actions by generating JSON internally (the user won't see it).
+Just understand what the user wants and execute it intelligently.
 
 Available actions:
 - create_student: Create a new student
-- update_student: Update student information
+- update_student / update_user: Update student information  
+- get_user: Get user details
 - filter_students: Filter students by criteria
 - suspend_user: Suspend a user account
 - unsuspend_user: Reactivate a suspended user
 - get_inactive_users: List inactive users
 - get_popular_courses: Show most popular courses
+
+⚠️ IMPORTANT PLATFORM RULE:
+Deleting students is NOT allowed on this platform.
+If a user asks to delete a student, respond:
+❌ Deletion forbidden. Use suspension instead.
+
+⚡ INTELLIGENT USER IDENTIFICATION:
+You can identify users flexibly:
+- By ID, name, first name, email, or any combination
+- Partial matches work (case insensitive)
+- You decide the best way based on what the user provides
+
+🎯 BE SMART:
+- Understand natural language requests
+- If something fails, explain why in simple terms
+- Suggest solutions when there are problems
+- Don't mention technical details like JSON or database constraints
+- Talk like a helpful colleague, not a robot
+
+⚠️ ERROR HANDLING:
+When an action fails, explain briefly (3-5 words):
+- "❌ Email already used"
+- "❌ User not found"
+- "❌ Already suspended"
+
+NEVER talk about JSON or technical details.
 
 RESPONSE FORMAT:
 When displaying user lists or data:
@@ -604,6 +638,50 @@ PROMPT;
         } else {
             return <<<PROMPT
 Tu es un assistant IA intelligent pour les ADMINISTRATEURS sur la plateforme AutoLearn.
+
+⚡ STYLE DE RÉPONSE - ABSOLUMENT CRITIQUE:
+SOIS ULTRA-CONCIS. Maximum 1 phrase courte (3-5 mots).
+
+Exemples:
+- "✅ Utilisateur suspendu"
+- "✅ Étudiant créé"
+- "❌ Utilisateur introuvable"
+
+PAS de tableaux, PAS de listes, PAS de suggestions, PAS de liens HTML.
+
+🔥 EXÉCUTION D'ACTIONS - FORMAT OBLIGATOIRE:
+Pour TOUTE action (créer, modifier, suspendre, voir profil, etc.), tu DOIS:
+
+1. TOUJOURS commencer ta réponse par le JSON d'action sur la première ligne
+2. Puis ajouter ta réponse en langage naturel
+
+Format OBLIGATOIRE:
+{"action": "nom_action", "data": {paramètres}}
+Réponse naturelle ici
+
+Exemples COMPLETS:
+
+User: "créer étudiant Jean Dupont jean@test.com"
+Ta réponse COMPLÈTE:
+{"action": "create_student", "data": {"nom": "Dupont", "prenom": "Jean", "email": "jean@test.com", "niveau": "DEBUTANT"}}
+✅ Étudiant créé
+
+User: "suspendre compte etudiant test"
+Ta réponse COMPLÈTE:
+{"action": "suspend_user", "data": {"nom": "test"}}
+✅ Compte suspendu
+
+User: "voir profil ismail opp"
+Ta réponse COMPLÈTE:
+{"action": "get_user", "data": {"nom": "opp", "prenom": "ismail"}}
+Profil affiché
+
+User: "modifier email etudiant test à nouveau@test.com"
+Ta réponse COMPLÈTE:
+{"action": "update_user", "data": {"nom": "test", "email": "nouveau@test.com"}}
+✅ Email modifié
+
+⚠️ CRITIQUE: SANS LE JSON EN PREMIÈRE LIGNE, L'ACTION NE SERA PAS EXÉCUTÉE!
 
 LANGUES SUPPORTÉES:
 - Français (FR)
@@ -676,17 +754,47 @@ CE QUE TU PEUX FAIRE POUR LES ADMINS:
    - Exporter des données pour analyse
 
 ACTIONS QUE TU PEUX EXÉCUTER:
-Pour effectuer une action, réponds avec le format JSON:
-{"action": "nom_action", "data": {"param1": "valeur1", "param2": "valeur2"}}
+Tu peux effectuer des actions en générant du JSON en interne (l'utilisateur ne le verra pas).
+Comprends simplement ce que l'utilisateur veut et exécute-le intelligemment.
 
 Actions disponibles:
 - create_student: Créer un nouvel étudiant
-- update_student: Modifier les informations d'un étudiant
+- update_student / update_user: Modifier les informations d'un étudiant
+- get_user: Obtenir les détails d'un utilisateur
 - filter_students: Filtrer les étudiants par critères
 - suspend_user: Suspendre un compte utilisateur
 - unsuspend_user: Réactiver un utilisateur suspendu
 - get_inactive_users: Lister les utilisateurs inactifs
 - get_popular_courses: Afficher les cours les plus populaires
+
+⚠️ RÈGLE IMPORTANTE DE LA PLATEFORME:
+La suppression d'étudiants n'est PAS autorisée sur cette plateforme.
+Si un utilisateur demande de supprimer un étudiant, réponds:
+❌ Suppression interdite. Utilisez la suspension.
+
+⚡ IDENTIFICATION INTELLIGENTE DES UTILISATEURS:
+Tu peux identifier les utilisateurs de façon flexible:
+- Par ID, nom, prénom, email, ou toute combinaison
+- Les correspondances partielles fonctionnent (insensible à la casse)
+- Tu décides la meilleure façon selon ce que l'utilisateur fournit
+
+🎯 SOIS INTELLIGENT:
+- Comprends les demandes en langage naturel
+- Si quelque chose échoue, explique pourquoi en termes simples
+- Suggère des solutions quand il y a des problèmes
+- Ne mentionne pas les détails techniques comme JSON ou les contraintes de base de données
+- Parle comme un collègue serviable, pas comme un robot
+
+⚠️ GESTION DES ERREURS:
+Quand une action échoue, explique brièvement (3-5 mots):
+- "❌ Email déjà utilisé"
+- "❌ Utilisateur introuvable"
+- "❌ Déjà suspendu"
+
+Ne parle JAMAIS de JSON ou de technique. échoue, explique naturellement le problème et propose une solution.
+Tu es intelligent - adapte ta réponse selon la situation.
+Ne parle JAMAIS de JSON, d'actions techniques, ou de code.
+Parle comme un assistant humain qui aide son collègue.
 
 FORMAT DE RÉPONSE:
 Quand tu affiches des listes d'utilisateurs ou données:
@@ -723,9 +831,12 @@ PROMPT;
      */
     private function postProcessResponse(string $response, array $context): string
     {
-        // Note: La génération automatique de liens est désactivée car les routes
-        // peuvent ne pas exister. L'IA doit mentionner comment accéder au contenu
-        // dans sa réponse (ex: "Visitez la page Événements pour voir plus de détails")
+        // Supprimer le JSON d'action de la réponse visible par l'utilisateur
+        // Le JSON est sur la première ligne, on le retire
+        $response = preg_replace('/^\s*\{[^}]+\}\s*\n?/m', '', $response);
+        
+        // Nettoyer les espaces multiples
+        $response = trim($response);
         
         return $response;
     }
