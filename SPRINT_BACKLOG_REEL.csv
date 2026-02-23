@@ -52,6 +52,7 @@ US-1.11;En tant qu'administrateur je souhaite suivre activité utilisateurs en t
 US-1.11;En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel;T11.6;Créer ActivityController (/backoffice/user-activity);src/Bundle/UserActivityBundle/Controller/Admin/ActivityController.php;1.5h;Ilef Yousfi;Sprint 2;Terminé
 US-1.11;En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel;T11.7;Créer vue liste activités (index.html.twig);templates/bundles/UserActivityBundle/admin/index.html.twig;1.5h;Ilef Yousfi;Sprint 2;Terminé
 US-1.11;En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel;T11.8;Créer vue activités par utilisateur (user_activities.html.twig);templates/bundles/UserActivityBundle/admin/user_activities.html.twig;1h;Ilef Yousfi;Sprint 2;Terminé
+US-1.11;En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel;T11.9;Fixer dropdown visibility dans Activity Bundle;templates/bundles/UserActivityBundle/admin/index.html.twig;0.5h;Ilef Yousfi;Sprint 2;Terminé
 US-1.12;En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours;T12.1;Créer AutoSuspendInactiveUsersCommand;src/Command/AutoSuspendInactiveUsersCommand.php;2h;Ilef Yousfi;Sprint 2;Terminé
 US-1.12;En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours;T12.2;Implémenter logique: suspendre si lastLoginAt > 90 jours;src/Command/AutoSuspendInactiveUsersCommand.php;1.5h;Ilef Yousfi;Sprint 2;Terminé
 US-1.12;En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours;T12.3;Envoyer email notification avant suspension;src/Command/AutoSuspendInactiveUsersCommand.php;1.5h;Ilef Yousfi;Sprint 2;Terminé
@@ -59,54 +60,66 @@ US-1.12;En tant qu'administrateur je souhaite suspendre automatiquement comptes 
 US-1.12;En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours;T12.5;Documenter dans SUSPENSION_AUTOMATIQUE_GUIDE.md;SUSPENSION_AUTOMATIQUE_GUIDE.md;0.5h;Ilef Yousfi;Sprint 2;Terminé
 US-1.13;En tant qu'administrateur je souhaite sidebar fixe dans backoffice;T13.1;Fixer sidebar backoffice (position sticky);templates/backoffice/base.html.twig;1h;Ilef Yousfi;Sprint 2;Terminé
 US-1.13;En tant qu'administrateur je souhaite sidebar fixe dans backoffice;T13.2;Corriger tous les templates backoffice;templates/backoffice/;2h;Ilef Yousfi;Sprint 2;Terminé
-US-1.14;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T14.1;Installer et configurer Ollama localement;Installation système;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.14;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T14.2;Télécharger modèle llama3.2:1b;Installation système;0.5h;Ilef Yousfi;Sprint 3;Terminé
-US-1.14;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T14.3;Créer OllamaService pour communication API;src/Service/OllamaService.php;2h;Ilef Yousfi;Sprint 3;Terminé
-US-1.14;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T14.4;Configurer variables environnement (.env);.env + .env.example;0.5h;Ilef Yousfi;Sprint 3;Terminé
-US-1.14;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T14.5;Optimiser paramètres (temperature max_tokens);src/Service/OllamaService.php;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.14;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T14.6;Gérer erreurs et timeouts;src/Service/OllamaService.php;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.15;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T15.1;Créer RAGService;src/Service/RAGService.php;2h;Ilef Yousfi;Sprint 3;Terminé
-US-1.15;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T15.2;Implémenter récupération contexte cours (Chapitre Ressource);src/Service/RAGService.php;2h;Ilef Yousfi;Sprint 3;Terminé
-US-1.15;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T15.3;Implémenter récupération contexte utilisateur;src/Service/RAGService.php;1.5h;Ilef Yousfi;Sprint 3;Terminé
-US-1.15;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T15.4;Implémenter récupération contexte exercices/quiz;src/Service/RAGService.php;1.5h;Ilef Yousfi;Sprint 3;Terminé
-US-1.15;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T15.5;Créer système scoring pertinence;src/Service/RAGService.php;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.15;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T15.6;Optimiser requêtes Doctrine;src/Service/RAGService.php;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.15;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T15.7;Limiter taille contexte (max 4000 tokens);src/Service/RAGService.php;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.15;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T15.8;Ajouter safety checks foreach loops;src/Service/RAGService.php;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T16.1;Créer ActionExecutorService;src/Service/ActionExecutorService.php;2h;Ilef Yousfi;Sprint 3;Terminé
-US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T16.2;Implémenter détection actions dans réponse IA;src/Service/ActionExecutorService.php;2h;Ilef Yousfi;Sprint 3;Terminé
-US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T16.3;Implémenter action: créer cours;src/Service/ActionExecutorService.php;1.5h;Ilef Yousfi;Sprint 3;Terminé
-US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T16.4;Implémenter action: créer chapitre;src/Service/ActionExecutorService.php;1.5h;Ilef Yousfi;Sprint 3;Terminé
-US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T16.5;Implémenter action: créer ressource;src/Service/ActionExecutorService.php;1.5h;Ilef Yousfi;Sprint 3;Terminé
-US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T16.6;Implémenter action: créer exercice;src/Service/ActionExecutorService.php;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T16.7;Implémenter action: modifier cours/chapitre;src/Service/ActionExecutorService.php;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T16.8;Gérer permissions et sécurité actions;src/Service/ActionExecutorService.php;1.5h;Ilef Yousfi;Sprint 3;Terminé
-US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T16.9;Corriger format JSON actions;src/Service/ActionExecutorService.php;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.14;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T14.1;Configurer compte Groq Cloud et obtenir clé API;Configuration externe;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.14;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T14.2;Créer GroqService pour communication API;src/Service/GroqService.php;2h;Ilef Yousfi;Sprint 3;Terminé
+US-1.14;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T14.3;Configurer variables environnement (.env) pour Groq;.env + .env.example;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.14;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T14.4;Configurer modèle llama-3.1-8b-instant;src/Service/GroqService.php;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.14;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T14.5;Optimiser paramètres (temperature max_tokens);src/Service/GroqService.php;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.14;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T14.6;Gérer erreurs et rate limits Groq API;src/Service/GroqService.php;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.14;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T14.7;Créer TestGroqCommand pour tester API;src/Command/TestGroqCommand.php;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.14;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T14.8;Implémenter isAvailable() check pour Groq;src/Service/GroqService.php;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.15;En tant qu'utilisateur je souhaite que IA ait accès complet base de données;T15.1;Créer LanguageDetectorService pour détecter langue;src/Service/LanguageDetectorService.php;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.15;En tant qu'utilisateur je souhaite que IA ait accès complet base de données;T15.2;Implémenter getAllDatabaseData() dans AIAssistantService;src/Service/AIAssistantService.php;2h;Ilef Yousfi;Sprint 3;Terminé
+US-1.15;En tant qu'utilisateur je souhaite que IA ait accès complet base de données;T15.3;Optimiser données envoyées (statistiques + liste minimale);src/Service/AIAssistantService.php;2h;Ilef Yousfi;Sprint 3;Terminé
+US-1.15;En tant qu'utilisateur je souhaite que IA ait accès complet base de données;T15.4;Réduire consommation tokens (5000→1700-2700);src/Service/AIAssistantService.php;1.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.15;En tant qu'utilisateur je souhaite que IA ait accès complet base de données;T15.5;Envoyer liste utilisateurs pour actions admin;src/Service/AIAssistantService.php;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions CRUD sur utilisateurs;T16.1;Créer ActionExecutorService;src/Service/ActionExecutorService.php;2h;Ilef Yousfi;Sprint 3;Terminé
+US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions CRUD sur utilisateurs;T16.2;Implémenter détection JSON actions dans réponse IA;src/Service/ActionExecutorService.php;2h;Ilef Yousfi;Sprint 3;Terminé
+US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions CRUD sur utilisateurs;T16.3;Implémenter action: create_student;src/Service/ActionExecutorService.php;1.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions CRUD sur utilisateurs;T16.4;Implémenter action: update_student/update_user;src/Service/ActionExecutorService.php;1.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions CRUD sur utilisateurs;T16.5;Implémenter action: get_user (voir profil);src/Service/ActionExecutorService.php;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions CRUD sur utilisateurs;T16.6;Implémenter action: suspend_user;src/Service/ActionExecutorService.php;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions CRUD sur utilisateurs;T16.7;Implémenter action: unsuspend_user;src/Service/ActionExecutorService.php;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions CRUD sur utilisateurs;T16.8;Implémenter action: filter_students;src/Service/ActionExecutorService.php;1.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions CRUD sur utilisateurs;T16.9;Implémenter action: get_inactive_users;src/Service/ActionExecutorService.php;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions CRUD sur utilisateurs;T16.10;Créer findUserIntelligently() (recherche par ID email nom prénom);src/Service/ActionExecutorService.php;2h;Ilef Yousfi;Sprint 3;Terminé
+US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions CRUD sur utilisateurs;T16.11;Gérer permissions et sécurité actions (admin uniquement);src/Service/ActionExecutorService.php;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions CRUD sur utilisateurs;T16.12;Interdire suppression utilisateurs (règle plateforme);src/Service/ActionExecutorService.php;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.16;En tant qu'administrateur je souhaite que IA puisse exécuter actions CRUD sur utilisateurs;T16.13;Fixer format JSON obligatoire et réponses ultra-concises;src/Service/AIAssistantService.php + ActionExecutorService.php;2h;Ilef Yousfi;Sprint 3;Terminé
 US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.1;Créer AIAssistantService (orchestration);src/Service/AIAssistantService.php;2h;Ilef Yousfi;Sprint 3;Terminé
-US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.2;Implémenter prompt système intelligent;src/Service/AIAssistantService.php;2h;Ilef Yousfi;Sprint 3;Terminé
-US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.3;Intégrer RAGService pour contexte;src/Service/AIAssistantService.php;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.4;Intégrer ActionExecutorService;src/Service/AIAssistantService.php;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.5;Gérer historique conversation (session);src/Service/AIAssistantService.php;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.6;Créer AIAssistantController;src/Controller/AIAssistantController.php;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.7;Créer widget chat (chat_widget.html.twig);templates/ai_assistant/chat_widget.html.twig;2h;Ilef Yousfi;Sprint 3;Terminé
-US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.8;Implémenter AJAX pour requêtes asynchrones;templates/ai_assistant/chat_widget.html.twig;1.5h;Ilef Yousfi;Sprint 3;Terminé
-US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.9;Ajouter indicateur IA en train d'écrire;templates/ai_assistant/chat_widget.html.twig;0.5h;Ilef Yousfi;Sprint 3;Terminé
-US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.10;Ajouter bulle bienvenue;templates/ai_assistant/chat_widget.html.twig;0.5h;Ilef Yousfi;Sprint 3;Terminé
-US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.11;Styliser interface chat moderne;templates/ai_assistant/chat_widget.html.twig;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.12;Intégrer chat widget dans frontoffice et backoffice;templates/;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.13;Optimiser vitesse réponse;src/Service/AIAssistantService.php;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.2;Implémenter prompt système intelligent (Admin vs Etudiant);src/Service/AIAssistantService.php;3h;Ilef Yousfi;Sprint 3;Terminé
+US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.3;Intégrer ActionExecutorService pour actions admin;src/Service/AIAssistantService.php;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.4;Implémenter post-traitement réponse (retirer JSON visible);src/Service/AIAssistantService.php;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.5;Créer AIAssistantController avec route /ai-assistant/ask;src/Controller/AIAssistantController.php;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.6;Créer widget chat (chat_widget.html.twig);templates/ai_assistant/chat_widget.html.twig;2h;Ilef Yousfi;Sprint 3;Terminé
+US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.7;Implémenter AJAX pour requêtes asynchrones;templates/ai_assistant/chat_widget.html.twig;1.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.8;Ajouter indicateur IA en train d'écrire;templates/ai_assistant/chat_widget.html.twig;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.9;Ajouter bulle bienvenue avec suggestions;templates/ai_assistant/chat_widget.html.twig;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.10;Styliser interface chat moderne;templates/ai_assistant/chat_widget.html.twig;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.11;Intégrer chat widget dans frontoffice et backoffice;templates/;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.17;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T17.12;Fixer widget disponible sur toutes pages sauf quiz;templates/;1h;Ilef Yousfi;Sprint 3;Terminé
 US-1.18;En tant qu'administrateur je souhaite système sécurité avancé;T18.1;Renforcer protection CSRF sur routes sensibles;config/packages/security.yaml;1.5h;Ilef Yousfi;Sprint 3;Terminé
 US-1.18;En tant qu'administrateur je souhaite système sécurité avancé;T18.2;Implémenter validation stricte inputs utilisateur;src/Entity/User.php;1h;Ilef Yousfi;Sprint 3;Terminé
 US-1.18;En tant qu'administrateur je souhaite système sécurité avancé;T18.3;Logger toutes actions IA dans UserActivity;src/Service/AIAssistantService.php;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.19;En tant que développeur je souhaite documentation complète;T19.1;Créer ASSISTANT_IA_ARCHITECTURE.md;ASSISTANT_IA_ARCHITECTURE.md;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.19;En tant que développeur je souhaite documentation complète;T19.2;Créer GUIDE_INSTALLATION_IA.md;GUIDE_INSTALLATION_IA.md;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.19;En tant que développeur je souhaite documentation complète;T19.3;Créer TESTEZ_IA_AGENT_ACTIF.md;TESTEZ_IA_AGENT_ACTIF.md;0.5h;Ilef Yousfi;Sprint 3;Terminé
-US-1.19;En tant que développeur je souhaite documentation complète;T19.4;Créer PROMPT_SYSTEM_IA.md;PROMPT_SYSTEM_IA.md;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.19;En tant que développeur je souhaite documentation complète;T19.5;Créer README_ASSISTANT_IA.md;README_ASSISTANT_IA.md;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.19;En tant que développeur je souhaite documentation complète;T19.6;Créer AUDIT_READY_TO_USE.md;AUDIT_READY_TO_USE.md;0.5h;Ilef Yousfi;Sprint 3;Terminé
-US-1.19;En tant que développeur je souhaite documentation complète;T19.7;Créer USER_ACTIVITY_BUNDLE_COMPLETE.md;USER_ACTIVITY_BUNDLE_COMPLETE.md;1h;Ilef Yousfi;Sprint 3;Terminé
-US-1.19;En tant que développeur je souhaite documentation complète;T19.8;Créer SUSPENSION_AUTOMATIQUE_GUIDE.md;SUSPENSION_AUTOMATIQUE_GUIDE.md;0.5h;Ilef Yousfi;Sprint 3;Terminé
-US-1.19;En tant que développeur je souhaite documentation complète;T19.9;Créer 20+ autres fichiers documentation;Documentation/;3h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.1;Créer GROQ_SETUP_GUIDE.md;GROQ_SETUP_GUIDE.md;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.2;Créer GROQ_MIGRATION_COMPLETE.md;GROQ_MIGRATION_COMPLETE.md;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.3;Créer GROQ_READY_TO_USE.md;GROQ_READY_TO_USE.md;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.4;Créer ASSISTANT_IA_GROQ_VISION.md;ASSISTANT_IA_GROQ_VISION.md;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.5;Créer ASSISTANT_IA_ARCHITECTURE.md;ASSISTANT_IA_ARCHITECTURE.md;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.6;Créer ASSISTANT_IA_AGENT_ACTIF.md;ASSISTANT_IA_AGENT_ACTIF.md;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.7;Créer TESTEZ_IA_AGENT_ACTIF.md;TESTEZ_IA_AGENT_ACTIF.md;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.8;Créer IA_ACCES_COMPLET_BD.md;IA_ACCES_COMPLET_BD.md;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.9;Créer IA_INTELLIGENTE_FLEXIBLE.md;IA_INTELLIGENTE_FLEXIBLE.md;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.10;Créer CRUD_FONCTIONNE_MAINTENANT.md;CRUD_FONCTIONNE_MAINTENANT.md;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.11;Créer TESTEZ_CRUD_MAINTENANT.md;TESTEZ_CRUD_MAINTENANT.md;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.12;Créer RESUME_FINAL_CRUD.md;RESUME_FINAL_CRUD.md;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.13;Créer LIRE_MOI_CRUD.md;LIRE_MOI_CRUD.md;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.14;Créer README_ASSISTANT_IA.md;README_ASSISTANT_IA.md;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.15;Créer AUDIT_READY_TO_USE.md;AUDIT_READY_TO_USE.md;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.16;Créer USER_ACTIVITY_BUNDLE_COMPLETE.md;USER_ACTIVITY_BUNDLE_COMPLETE.md;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.17;Créer SUSPENSION_AUTOMATIQUE_GUIDE.md;SUSPENSION_AUTOMATIQUE_GUIDE.md;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.18;Créer FIX_ALL_SIDEBARS.md;FIX_ALL_SIDEBARS.md;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-1.19;En tant que développeur je souhaite documentation complète;T19.19;Créer 15+ autres fichiers documentation;Documentation/;2h;Ilef Yousfi;Sprint 3;Terminé
 US-1.20;En tant que développeur je souhaite corriger problèmes après merge;T20.1;Merger branche Amira (Events & Participations);Git merge;2h;Ilef Yousfi;Sprint 3;Terminé
 US-1.20;En tant que développeur je souhaite corriger problèmes après merge;T20.2;Fixer conflits migrations database;migrations/;1h;Ilef Yousfi;Sprint 3;Terminé
 US-1.20;En tant que développeur je souhaite corriger problèmes après merge;T20.3;Corriger colonnes snake_case vers camelCase;Base de données + src/Entity/User.php;2h;Ilef Yousfi;Sprint 3;Terminé
@@ -115,3 +128,4 @@ US-1.20;En tant que développeur je souhaite corriger problèmes après merge;T2
 US-1.20;En tant que développeur je souhaite corriger problèmes après merge;T20.6;Fixer relations bidirectionnelles Post/Commentaire;src/Entity/;1h;Ilef Yousfi;Sprint 3;Terminé
 US-1.20;En tant que développeur je souhaite corriger problèmes après merge;T20.7;Fixer affichage owner dans liste membres communauté;templates/frontoffice/communaute/show.html.twig;1h;Ilef Yousfi;Sprint 3;Terminé
 US-1.20;En tant que développeur je souhaite corriger problèmes après merge;T20.8;Fixer récursion infinie comparaison objets Twig;templates/frontoffice/communaute/show.html.twig;1h;Ilef Yousfi;Sprint 3;Terminé
+US-1.20;En tant que développeur je souhaite corriger problèmes après merge;T20.9;Fixer erreurs User entity not found dans controllers;src/Controller/UserController.php + BackofficeController.php;1h;Ilef Yousfi;Sprint 3;Terminé
