@@ -531,4 +531,24 @@ class BackofficeController extends AbstractController
 
         return $this->redirectToRoute('backoffice_challenges');
     }
+
+    /**
+     * API pour récupérer les chapitres d'un cours
+     */
+    #[Route('/backoffice/api/cours/{id}/chapitres', name: 'backoffice_api_cours_chapitres', methods: ['GET'])]
+    public function getCoursChapitres(\App\Entity\GestionDeCours\Cours $cours): Response
+    {
+        $chapitres = $cours->getChapitres();
+        $data = [];
+        
+        foreach ($chapitres as $chapitre) {
+            $data[] = [
+                'id' => $chapitre->getId(),
+                'titre' => $chapitre->getTitre(),
+                'ordre' => $chapitre->getOrdre(),
+            ];
+        }
+        
+        return $this->json($data);
+    }
 }

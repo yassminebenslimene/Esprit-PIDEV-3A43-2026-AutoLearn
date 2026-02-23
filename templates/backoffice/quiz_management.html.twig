@@ -19,13 +19,15 @@
                         <h2 class="card-title mb-1">� Liste des Quiz</h2>
                         <p class="card-subtitle mb-0">Cliquez sur "Sélectionner" pour afficher les questions</p>
                     </div>
-                    <a href="{{ path('app_quiz_new') }}" class="card-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        Nouveau Quiz
-                    </a>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_quiz_new') }}" class="card-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Nouveau Quiz
+                        </a>
+                    </div>
                 </div>
 
                 <div id="quiz-list">
