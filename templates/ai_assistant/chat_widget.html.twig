@@ -52,15 +52,31 @@
             <div class="ai-message ai-message-bot">
                 <div class="ai-message-avatar">🤖</div>
                 <div class="ai-message-content">
-                    <p>Bonjour {{ app.user.prenom }}! 👋</p>
-                    <p>Je suis votre assistant intelligent. Je peux vous aider à:</p>
-                    <ul>
-                        <li>🎓 Trouver des cours adaptés</li>
-                        <li>📅 Découvrir les événements</li>
-                        <li>📊 Suivre vos progrès</li>
-                        <li>💡 Naviguer sur la plateforme</li>
-                    </ul>
-                    <p>Posez-moi une question!</p>
+                    {% if app.user.role == 'ADMIN' %}
+                        {# Message pour Admin #}
+                        <p>Bonjour {{ app.user.prenom }}! 👋</p>
+                        <p>Je suis votre assistant administrateur. Je peux vous aider à:</p>
+                        <ul>
+                            <li>👥 Gérer les étudiants (créer, modifier, rechercher)</li>
+                            <li>📊 Voir les statistiques de la plateforme</li>
+                            <li>🔍 Filtrer et rechercher des utilisateurs</li>
+                            <li>📚 Gérer le contenu (cours, exercices, événements)</li>
+                            <li>📈 Analyser les données et générer des rapports</li>
+                        </ul>
+                        <p>Que souhaitez-vous faire?</p>
+                    {% else %}
+                        {# Message pour Étudiant #}
+                        <p>Bonjour {{ app.user.prenom }}! 👋</p>
+                        <p>Je suis votre assistant d'apprentissage. Je peux vous aider à:</p>
+                        <ul>
+                            <li>📚 Trouver des cours adaptés à votre niveau</li>
+                            <li>💪 Découvrir des exercices et challenges</li>
+                            <li>📅 Voir les événements et workshops à venir</li>
+                            <li>👥 Rejoindre des communautés et équipes</li>
+                            <li>📊 Suivre vos progrès et obtenir des feedbacks</li>
+                        </ul>
+                        <p>Posez-moi une question!</p>
+                    {% endif %}
                 </div>
             </div>
 

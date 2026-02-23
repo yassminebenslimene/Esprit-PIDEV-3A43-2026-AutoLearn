@@ -37,6 +37,64 @@ class ActionExecutorService
     }
 
     /**
+     * Détecte et exécute une action depuis la réponse de l'IA
+     */
+    public function detectAndExecute(string $response, User $requestingUser): array
+    {
+        // Chercher un JSON d'action dans la réponse
+        if (preg_match('/\{[^}]*"action"\s*:\s*"([^"]+)"[^}]*\}/s', $response, $matches)) {
+            $jsonStr = $matches[0];
+            
+            try {
+                $actionData = json_decode($jsonStr, true);
+                
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return [
+                        'action_executed' => false,
+                        'message' => 'Format JSON invalide'
+                    ];
+                }
+                
+                $action = $actionData['action'] ?? null;
+                $params = $actionData['data'] ?? [];
+                
+                if (!$action) {
+                    return [
+                        'action_executed' => false,
+                        'message' => 'Action non spécifiée'
+                    ];
+                }
+                
+                // Exécuter l'action
+                $result = $this->executeAction($action, $params, $requestingUser);
+                
+                return [
+                    'action_executed' => $result['success'],
+                    'message' => $result['message'] ?? $result['error'] ?? 'Action exécutée',
+                    'result' => $result
+                ];
+                
+            } catch (\Exception $e) {
+                $this->logger->error('Action detection error', [
+                    'response' => $response,
+                    'error' => $e->getMessage()
+                ]);
+                
+                return [
+                    'action_executed' => false,
+                    'message' => 'Erreur lors de la détection de l\'action'
+                ];
+            }
+        }
+        
+        // Aucune action détectée
+        return [
+            'action_executed' => false,
+            'message' => ''
+        ];
+    }
+
+    /**
      * Exécute une action demandée par l'IA
      */
     public function executeAction(string $action, array $params, User $requestingUser): array
@@ -52,6 +110,8 @@ class ActionExecutorService
         try {
             return match($action) {
                 'create_student' => $this->createStudent($params),
+                'update_student' => $this->updateStudent($params),
+                'filter_students' => $this->filterStudents($params),
                 'create_team' => $this->createTeam($params),
                 'suspend_user' => $this->suspendUser($params),
                 'unsuspend_user' => $this->unsuspendUser($params),
@@ -84,6 +144,8 @@ class ActionExecutorService
         // Actions réservées aux admins
         $adminOnlyActions = [
             'create_student',
+            'update_student',
+            'filter_students',
             'suspend_user',
             'unsuspend_user',
             'get_inactive_users'
@@ -154,6 +216,126 @@ class ActionExecutorService
             'user_id' => $user->getId(),
             'email' => $user->getEmail(),
             'default_password' => 'AutoLearn2026!'
+        ];
+    }
+
+    /**
+     * Modifie un étudiant existant
+     */
+    private function updateStudent(array $params): array
+    {
+        if (empty($params['user_id'])) {
+            return [
+                'success' => false,
+                'error' => 'L\'ID de l\'utilisateur est requis'
+            ];
+        }
+
+        $user = $this->userRepository->find($params['user_id']);
+        if (!$user) {
+            return [
+                'success' => false,
+                'error' => 'Utilisateur introuvable'
+            ];
+        }
+
+        // Mettre à jour les champs fournis
+        if (isset($params['nom'])) {
+            $user->setNom($params['nom']);
+        }
+        if (isset($params['prenom'])) {
+            $user->setPrenom($params['prenom']);
+        }
+        if (isset($params['email'])) {
+            // Vérifier si l'email n'est pas déjà utilisé
+            $existing = $this->userRepository->findOneBy(['email' => $params['email']]);
+            if ($existing && $existing->getId() !== $user->getId()) {
+                return [
+                    'success' => false,
+                    'error' => 'Cet email est déjà utilisé par un autre utilisateur'
+                ];
+            }
+            $user->setEmail($params['email']);
+        }
+        if (isset($params['niveau']) && method_exists($user, 'setNiveau')) {
+            $user->setNiveau($params['niveau']);
+        }
+
+        $this->em->flush();
+
+        return [
+            'success' => true,
+            'message' => "Étudiant modifié avec succès: {$user->getPrenom()} {$user->getNom()}",
+            'user_id' => $user->getId()
+        ];
+    }
+
+    /**
+     * Filtre les étudiants selon des critères
+     */
+    private function filterStudents(array $params): array
+    {
+        $qb = $this->em->createQueryBuilder();
+        $qb->select('u')
+            ->from('App\Entity\User', 'u')
+            ->where('u.role = :role')
+            ->setParameter('role', 'ETUDIANT');
+
+        // Filtrer par niveau
+        if (!empty($params['niveau'])) {
+            $qb->andWhere('u.niveau = :niveau')
+                ->setParameter('niveau', $params['niveau']);
+        }
+
+        // Filtrer par date d'inscription
+        if (!empty($params['date_from'])) {
+            $qb->andWhere('u.createdAt >= :date_from')
+                ->setParameter('date_from', new \DateTime($params['date_from']));
+        }
+        if (!empty($params['date_to'])) {
+            $qb->andWhere('u.createdAt <= :date_to')
+                ->setParameter('date_to', new \DateTime($params['date_to']));
+        }
+
+        // Filtrer par statut de suspension
+        if (isset($params['suspended'])) {
+            $qb->andWhere('u.isSuspended = :suspended')
+                ->setParameter('suspended', (bool)$params['suspended']);
+        }
+
+        // Recherche par nom ou email
+        if (!empty($params['search'])) {
+            $qb->andWhere('u.nom LIKE :search OR u.prenom LIKE :search OR u.email LIKE :search')
+                ->setParameter('search', '%' . $params['search'] . '%');
+        }
+
+        // Limiter les résultats
+        $limit = $params['limit'] ?? 20;
+        $qb->setMaxResults($limit);
+
+        // Ordre
+        $qb->orderBy('u.createdAt', 'DESC');
+
+        $users = $qb->getQuery()->getResult();
+
+        $usersList = array_map(function($user) {
+            return [
+                'id' => $user->getId(),
+                'nom' => $user->getNom(),
+                'prenom' => $user->getPrenom(),
+                'email' => $user->getEmail(),
+                'niveau' => method_exists($user, 'getNiveau') ? $user->getNiveau() : 'N/A',
+                'created_at' => $user->getCreatedAt()->format('d/m/Y'),
+                'suspended' => $user->isSuspended(),
+                'last_login' => $user->getLastLoginAt() ? $user->getLastLoginAt()->format('d/m/Y H:i') : 'Jamais'
+            ];
+        }, $users);
+
+        return [
+            'success' => true,
+            'count' => count($usersList),
+            'students' => $usersList,
+            'filters_applied' => array_filter($params, fn($v) => !empty($v))
         ];
     }
 

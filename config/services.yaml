@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     uploads_dir: '%kernel.project_dir%/public/uploads'
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -36,3 +37,25 @@ services:
     
     App\Service\FeedbackAnalyticsService:
         arguments: []
+
+    # Configuration Groq Service
+    App\Service\GroqService:
+        arguments:
+            $httpClient: '@http_client'
+            $logger: '@logger'
+            $groqApiKey: '%env(GROQ_API_KEY)%'
+            $groqApiUrl: '%env(GROQ_API_URL)%'
+            $groqModel: '%env(GROQ_MODEL)%'
+
+    # Language Detector Service (no arguments needed)
+    App\Service\LanguageDetectorService: ~
+
+    # AI Assistant Service
+    App\Service\AIAssistantService:
+        arguments:
+            $groqService: '@App\Service\GroqService'
+            $ragService: '@App\Service\RAGService'
+            $languageDetector: '@App\Service\LanguageDetectorService'
+            $actionExecutor: '@App\Service\ActionExecutorService'
+            $logger: '@logger'
+            $security: '@security.helper'

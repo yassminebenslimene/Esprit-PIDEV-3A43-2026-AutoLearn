@@ -1,140 +1,140 @@
-ID US,User Story (US),ID Tâche,Tâches effectuées,Estimation,Responsable,Sprint,Statut
-US-1.1,En tant qu'utilisateur je souhaite m'inscrire (créer un compte),T1.1,Créer entité User (abstract) avec Single Table Inheritance,2h,Ilef Yousfi,Sprint 1,Terminé
-US-1.1,En tant qu'utilisateur je souhaite m'inscrire (créer un compte),T1.2,Créer entité Etudiant (extends User) avec attribut niveau,1.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.1,En tant qu'utilisateur je souhaite m'inscrire (créer un compte),T1.3,Créer entité Admin (extends User),1h,Ilef Yousfi,Sprint 1,Terminé
-US-1.1,En tant qu'utilisateur je souhaite m'inscrire (créer un compte),T1.4,Ajouter champs suspension (isSuspended suspendedAt suspendedBy suspensionReason),1h,Ilef Yousfi,Sprint 1,Terminé
-US-1.1,En tant qu'utilisateur je souhaite m'inscrire (créer un compte),T1.5,Créer migration avec colonnes camelCase,0.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.1,En tant qu'utilisateur je souhaite m'inscrire (créer un compte),T1.6,Créer RegistrationFormType avec validation,2h,Ilef Yousfi,Sprint 1,Terminé
-US-1.1,En tant qu'utilisateur je souhaite m'inscrire (créer un compte),T1.7,Créer RegistrationController avec méthode register(),2h,Ilef Yousfi,Sprint 1,Terminé
-US-1.1,En tant qu'utilisateur je souhaite m'inscrire (créer un compte),T1.8,Implémenter hashage bcrypt du mot de passe,0.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.1,En tant qu'utilisateur je souhaite m'inscrire (créer un compte),T1.9,Créer vue Twig register.html.twig avec design moderne,2h,Ilef Yousfi,Sprint 1,Terminé
-US-1.1,En tant qu'utilisateur je souhaite m'inscrire (créer un compte),T1.10,Ajouter validation JavaScript côté client,1h,Ilef Yousfi,Sprint 1,Terminé
-US-1.2,En tant qu'utilisateur je souhaite me connecter avec mes identifiants,T2.1,Configurer Symfony Security (security.yaml) avec rôles,2h,Ilef Yousfi,Sprint 1,Terminé
-US-1.2,En tant qu'utilisateur je souhaite me connecter avec mes identifiants,T2.2,Créer LoginFormType,1h,Ilef Yousfi,Sprint 1,Terminé
-US-1.2,En tant qu'utilisateur je souhaite me connecter avec mes identifiants,T2.3,Créer SecurityController avec méthode login(),1.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.2,En tant qu'utilisateur je souhaite me connecter avec mes identifiants,T2.4,Implémenter authentification par email/password,1.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.2,En tant qu'utilisateur je souhaite me connecter avec mes identifiants,T2.5,Configurer remember_me (Se souvenir de moi),1h,Ilef Yousfi,Sprint 1,Terminé
-US-1.2,En tant qu'utilisateur je souhaite me connecter avec mes identifiants,T2.6,Redirection selon rôle (Admin→backoffice Etudiant→frontoffice),2h,Ilef Yousfi,Sprint 1,Terminé
-US-1.2,En tant qu'utilisateur je souhaite me connecter avec mes identifiants,T2.7,Mettre à jour lastLoginAt lors de la connexion,1h,Ilef Yousfi,Sprint 1,Terminé
-US-1.2,En tant qu'utilisateur je souhaite me connecter avec mes identifiants,T2.8,Créer vue Twig login.html.twig avec lien mot de passe oublié,2h,Ilef Yousfi,Sprint 1,Terminé
-US-1.2,En tant qu'utilisateur je souhaite me connecter avec mes identifiants,T2.9,Bloquer connexion des comptes suspendus,1h,Ilef Yousfi,Sprint 1,Terminé
-US-1.3,En tant qu'utilisateur je souhaite me déconnecter,T3.1,Configurer route déconnexion dans security.yaml,0.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.3,En tant qu'utilisateur je souhaite me déconnecter,T3.2,Créer lien déconnexion dans menu avec icône,0.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.3,En tant qu'utilisateur je souhaite me déconnecter,T3.3,Configurer redirection après déconnexion,0.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.5,En tant qu'utilisateur je souhaite consulter mon profil,T5.1,Créer route /profile,0.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.5,En tant qu'utilisateur je souhaite consulter mon profil,T5.2,Créer ProfileController,1h,Ilef Yousfi,Sprint 1,Terminé
-US-1.5,En tant qu'utilisateur je souhaite consulter mon profil,T5.3,Créer vue profile.html.twig avec design moderne,3h,Ilef Yousfi,Sprint 1,Terminé
-US-1.6,En tant qu'utilisateur je souhaite modifier mes informations personnelles,T6.1,Créer ProfileEditType avec validation,2h,Ilef Yousfi,Sprint 1,Terminé
-US-1.6,En tant qu'utilisateur je souhaite modifier mes informations personnelles,T6.2,Créer route /profile/edit,0.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.6,En tant qu'utilisateur je souhaite modifier mes informations personnelles,T6.3,Implémenter modification nom prénom email,1h,Ilef Yousfi,Sprint 1,Terminé
-US-1.6,En tant qu'utilisateur je souhaite modifier mes informations personnelles,T6.4,Implémenter upload photo de profil (jpg png max 2MB),3h,Ilef Yousfi,Sprint 1,Terminé
-US-1.6,En tant qu'utilisateur je souhaite modifier mes informations personnelles,T6.5,Stocker image dans /public/uploads/profiles/,1h,Ilef Yousfi,Sprint 1,Terminé
-US-1.6,En tant qu'utilisateur je souhaite modifier mes informations personnelles,T6.6,Créer vue profile_edit.html.twig avec prévisualisation photo,2h,Ilef Yousfi,Sprint 1,Terminé
-US-1.7,En tant qu'administrateur je souhaite rechercher un étudiant,T7.1,Créer route /backoffice/users,0.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.7,En tant qu'administrateur je souhaite rechercher un étudiant,T7.2,Créer UserManagementController,1h,Ilef Yousfi,Sprint 1,Terminé
-US-1.7,En tant qu'administrateur je souhaite rechercher un étudiant,T7.3,Implémenter recherche par nom (LIKE query),2h,Ilef Yousfi,Sprint 1,Terminé
-US-1.7,En tant qu'administrateur je souhaite rechercher un étudiant,T7.4,Implémenter recherche par email (LIKE query),1h,Ilef Yousfi,Sprint 1,Terminé
-US-1.7,En tant qu'administrateur je souhaite rechercher un étudiant,T7.5,Ajouter pagination (10 résultats/page),1.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.7,En tant qu'administrateur je souhaite rechercher un étudiant,T7.6,Ajouter filtres (niveau statut suspension),1.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.7,En tant qu'administrateur je souhaite rechercher un étudiant,T7.7,Créer vue users.html.twig avec tableau moderne,3h,Ilef Yousfi,Sprint 1,Terminé
-US-1.8,En tant qu'administrateur je souhaite consulter le profil détaillé d'un utilisateur,T8.1,Créer route /backoffice/users/{id},0.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.8,En tant qu'administrateur je souhaite consulter le profil détaillé d'un utilisateur,T8.2,Créer méthode show() dans UserManagementController,1h,Ilef Yousfi,Sprint 1,Terminé
-US-1.8,En tant qu'administrateur je souhaite consulter le profil détaillé d'un utilisateur,T8.3,Créer vue user_detail.html.twig avec statistiques,3h,Ilef Yousfi,Sprint 1,Terminé
-US-1.9,En tant qu'administrateur je souhaite ajouter manuellement un nouvel étudiant,T9.1,Créer route /backoffice/users/new,0.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.9,En tant qu'administrateur je souhaite ajouter manuellement un nouvel étudiant,T9.2,Créer AdminUserCreateType,2h,Ilef Yousfi,Sprint 1,Terminé
-US-1.9,En tant qu'administrateur je souhaite ajouter manuellement un nouvel étudiant,T9.3,Implémenter création étudiant avec validation,2h,Ilef Yousfi,Sprint 1,Terminé
-US-1.9,En tant qu'administrateur je souhaite ajouter manuellement un nouvel étudiant,T9.4,Créer vue user_create.html.twig,2h,Ilef Yousfi,Sprint 1,Terminé
-US-1.10,En tant qu'administrateur je souhaite désactiver un compte étudiant,T10.1,Créer route /backoffice/users/{id}/suspend,0.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.10,En tant qu'administrateur je souhaite désactiver un compte étudiant,T10.2,Implémenter méthode suspend() avec raison,1h,Ilef Yousfi,Sprint 1,Terminé
-US-1.10,En tant qu'administrateur je souhaite désactiver un compte étudiant,T10.3,Créer modal pour raison suspension,2h,Ilef Yousfi,Sprint 1,Terminé
-US-1.10,En tant qu'administrateur je souhaite désactiver un compte étudiant,T10.4,Créer route /backoffice/users/{id}/unsuspend pour réactivation,0.5h,Ilef Yousfi,Sprint 1,Terminé
-US-1.10,En tant qu'administrateur je souhaite désactiver un compte étudiant,T10.5,Implémenter réactivation compte,1h,Ilef Yousfi,Sprint 1,Terminé
-US-1.4,En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email,T4.1,Créer entité PasswordResetToken,1h,Ilef Yousfi,Sprint 2,Terminé
-US-1.4,En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email,T4.2,Créer migration pour password_reset_token,0.5h,Ilef Yousfi,Sprint 2,Terminé
-US-1.4,En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email,T4.3,Configurer Symfony Mailer avec Brevo (SMTP),1.5h,Ilef Yousfi,Sprint 2,Terminé
-US-1.4,En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email,T4.4,Créer TestBrevoCommand pour tester email,1.5h,Ilef Yousfi,Sprint 2,Terminé
-US-1.4,En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email,T4.5,Créer formulaire mot de passe oublié,1h,Ilef Yousfi,Sprint 2,Terminé
-US-1.4,En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email,T4.6,Générer token unique avec expiration 1h,1.5h,Ilef Yousfi,Sprint 2,Terminé
-US-1.4,En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email,T4.7,Créer template email de réinitialisation,2h,Ilef Yousfi,Sprint 2,Terminé
-US-1.4,En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email,T4.8,Implémenter envoi email avec token,2h,Ilef Yousfi,Sprint 2,Terminé
-US-1.4,En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email,T4.9,Créer page réinitialisation avec validation token,2h,Ilef Yousfi,Sprint 2,Terminé
-US-1.4,En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email,T4.10,Invalider token après utilisation,1h,Ilef Yousfi,Sprint 2,Terminé
-US-2.1,En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit),T11.1,Installer SimpleThings EntityAudit Bundle via Composer,0.5h,Ilef Yousfi,Sprint 2,Terminé
-US-2.1,En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit),T11.2,Configurer doctrine_audit.yaml (auditer uniquement Etudiant),1h,Ilef Yousfi,Sprint 2,Terminé
-US-2.1,En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit),T11.3,Créer table user_audit avec colonnes camelCase,1h,Ilef Yousfi,Sprint 2,Terminé
-US-2.1,En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit),T11.4,Créer table revisions,0.5h,Ilef Yousfi,Sprint 2,Terminé
-US-2.1,En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit),T11.5,Créer AuditController (/backoffice/audit),2h,Ilef Yousfi,Sprint 2,Terminé
-US-2.1,En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit),T11.6,Créer vue liste révisions (index.html.twig),2h,Ilef Yousfi,Sprint 2,Terminé
-US-2.1,En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit),T11.7,Créer vue détail révision (revision_details.html.twig),2h,Ilef Yousfi,Sprint 2,Terminé
-US-2.1,En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit),T11.8,Créer vue historique utilisateur (user_history.html.twig),2h,Ilef Yousfi,Sprint 2,Terminé
-US-2.1,En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit),T11.9,Créer vue statistiques audit (stats.html.twig),1h,Ilef Yousfi,Sprint 2,Terminé
-US-2.1,En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit),T11.10,Intégrer liens Audit dans sidebar backoffice,0.5h,Ilef Yousfi,Sprint 2,Terminé
-US-2.1,En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit),T11.11,Afficher historique audit dans profil utilisateur,1.5h,Ilef Yousfi,Sprint 2,Terminé
-US-2.2,En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel,T12.1,Créer structure Bundle dans src/Bundle/UserActivityBundle/,1h,Ilef Yousfi,Sprint 2,Terminé
-US-2.2,En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel,T12.2,Créer entité UserActivity (userId action details ipAddress userAgent createdAt),1.5h,Ilef Yousfi,Sprint 2,Terminé
-US-2.2,En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel,T12.3,Créer migration pour table user_activity,0.5h,Ilef Yousfi,Sprint 2,Terminé
-US-2.2,En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel,T12.4,Créer ActivityLogger Service,2h,Ilef Yousfi,Sprint 2,Terminé
-US-2.2,En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel,T12.5,Intégrer logging dans UserManagementController,1h,Ilef Yousfi,Sprint 2,Terminé
-US-2.2,En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel,T12.6,Créer ActivityController (/backoffice/activity),1.5h,Ilef Yousfi,Sprint 2,Terminé
-US-2.2,En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel,T12.7,Créer vue liste activités (index.html.twig),1.5h,Ilef Yousfi,Sprint 2,Terminé
-US-2.2,En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel,T12.8,Créer vue activités par utilisateur (user_activities.html.twig),1h,Ilef Yousfi,Sprint 2,Terminé
-US-2.2,En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel,T12.9,Intégrer liens UserActivity dans sidebar,0.5h,Ilef Yousfi,Sprint 2,Terminé
-US-2.2,En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel,T12.10,Afficher activités récentes dans profil utilisateur,1.5h,Ilef Yousfi,Sprint 2,Terminé
-US-2.3,En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours,T13.1,Créer AutoSuspendInactiveUsersCommand,2h,Ilef Yousfi,Sprint 2,Terminé
-US-2.3,En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours,T13.2,Implémenter logique: suspendre si lastLoginAt > 90 jours,1.5h,Ilef Yousfi,Sprint 2,Terminé
-US-2.3,En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours,T13.3,Envoyer email notification avant suspension,1.5h,Ilef Yousfi,Sprint 2,Terminé
-US-2.3,En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours,T13.4,Créer SimulateInactivityCommand pour tests,1h,Ilef Yousfi,Sprint 2,Terminé
-US-2.3,En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours,T13.5,Configurer tâche planifiée (cron),0.5h,Ilef Yousfi,Sprint 2,Terminé
-US-2.3,En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours,T13.6,Tester suspension automatique,1h,Ilef Yousfi,Sprint 2,Terminé
-US-2.3,En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours,T13.7,Documenter dans SUSPENSION_AUTOMATIQUE_GUIDE.md,0.5h,Ilef Yousfi,Sprint 2,Terminé
-US-2.4,En tant qu'administrateur je souhaite sidebar fixe dans backoffice,T14.1,Fixer sidebar backoffice (position sticky),1h,Ilef Yousfi,Sprint 2,Terminé
-US-2.4,En tant qu'administrateur je souhaite sidebar fixe dans backoffice,T14.2,Corriger tous les templates backoffice,2h,Ilef Yousfi,Sprint 2,Terminé
-US-3.1,En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent,T15.1,Installer et configurer Ollama localement,1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.1,En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent,T15.2,Télécharger modèle llama3.2:1b,0.5h,Ilef Yousfi,Sprint 3,Terminé
-US-3.1,En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent,T15.3,Créer OllamaService pour communication API,2h,Ilef Yousfi,Sprint 3,Terminé
-US-3.1,En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent,T15.4,Configurer variables environnement (.env),0.5h,Ilef Yousfi,Sprint 3,Terminé
-US-3.1,En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent,T15.5,Optimiser paramètres (temperature max_tokens),1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.1,En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent,T15.6,Gérer erreurs et timeouts,1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.2,En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG),T16.1,Créer RAGService,2h,Ilef Yousfi,Sprint 3,Terminé
-US-3.2,En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG),T16.2,Implémenter récupération contexte cours (Chapitre Ressource),2h,Ilef Yousfi,Sprint 3,Terminé
-US-3.2,En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG),T16.3,Implémenter récupération contexte utilisateur,1.5h,Ilef Yousfi,Sprint 3,Terminé
-US-3.2,En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG),T16.4,Implémenter récupération contexte exercices/quiz,1.5h,Ilef Yousfi,Sprint 3,Terminé
-US-3.2,En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG),T16.5,Créer système scoring pertinence,1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.2,En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG),T16.6,Optimiser requêtes Doctrine,1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.2,En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG),T16.7,Limiter taille contexte (max 4000 tokens),1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.2,En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG),T16.8,Ajouter safety checks foreach loops,1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.3,En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données,T17.1,Créer ActionExecutorService,2h,Ilef Yousfi,Sprint 3,Terminé
-US-3.3,En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données,T17.2,Implémenter détection actions dans réponse IA,2h,Ilef Yousfi,Sprint 3,Terminé
-US-3.3,En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données,T17.3,Implémenter action: créer cours,1.5h,Ilef Yousfi,Sprint 3,Terminé
-US-3.3,En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données,T17.4,Implémenter action: créer chapitre,1.5h,Ilef Yousfi,Sprint 3,Terminé
-US-3.3,En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données,T17.5,Implémenter action: créer ressource,1.5h,Ilef Yousfi,Sprint 3,Terminé
-US-3.3,En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données,T17.6,Implémenter action: créer exercice,1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.3,En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données,T17.7,Implémenter action: modifier cours/chapitre,1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.3,En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données,T17.8,Gérer permissions et sécurité actions,1.5h,Ilef Yousfi,Sprint 3,Terminé
-US-3.3,En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données,T17.9,Corriger format JSON actions,1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.4,En tant qu'utilisateur je souhaite interface chat moderne avec IA,T18.1,Créer AIAssistantService (orchestration),2h,Ilef Yousfi,Sprint 3,Terminé
-US-3.4,En tant qu'utilisateur je souhaite interface chat moderne avec IA,T18.2,Implémenter prompt système intelligent,2h,Ilef Yousfi,Sprint 3,Terminé
-US-3.4,En tant qu'utilisateur je souhaite interface chat moderne avec IA,T18.3,Intégrer RAGService pour contexte,1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.4,En tant qu'utilisateur je souhaite interface chat moderne avec IA,T18.4,Intégrer ActionExecutorService,1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.4,En tant qu'utilisateur je souhaite interface chat moderne avec IA,T18.5,Gérer historique conversation (session),1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.4,En tant qu'utilisateur je souhaite interface chat moderne avec IA,T18.6,Créer AIAssistantController,1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.4,En tant qu'utilisateur je souhaite interface chat moderne avec IA,T18.7,Créer widget chat (chat_widget.html.twig),2h,Ilef Yousfi,Sprint 3,Terminé
-US-3.4,En tant qu'utilisateur je souhaite interface chat moderne avec IA,T18.8,Implémenter AJAX pour requêtes asynchrones,1.5h,Ilef Yousfi,Sprint 3,Terminé
-US-3.4,En tant qu'utilisateur je souhaite interface chat moderne avec IA,T18.9,Ajouter indicateur IA en train d'écrire,0.5h,Ilef Yousfi,Sprint 3,Terminé
-US-3.4,En tant qu'utilisateur je souhaite interface chat moderne avec IA,T18.10,Ajouter bulle bienvenue,0.5h,Ilef Yousfi,Sprint 3,Terminé
-US-3.4,En tant qu'utilisateur je souhaite interface chat moderne avec IA,T18.11,Styliser interface chat moderne,1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.4,En tant qu'utilisateur je souhaite interface chat moderne avec IA,T18.12,Intégrer chat widget dans frontoffice et backoffice,1h,Ilef Yousfi,Sprint 3,Terminé
-US-3.4,En tant qu'utilisateur je souhaite interface chat moderne avec IA,T18.13,Optimiser vitesse réponse,1h,Ilef Yousfi,Sprint 3,Terminé
-US-4.1,En tant qu'administrateur je souhaite système sécurité avancé,T19.1,Renforcer protection CSRF sur routes sensibles,1.5h,Ilef Yousfi,Sprint 3,Terminé
-US-4.1,En tant qu'administrateur je souhaite système sécurité avancé,T19.2,Implémenter validation stricte inputs utilisateur,1h,Ilef Yousfi,Sprint 3,Terminé
-US-4.1,En tant qu'administrateur je souhaite système sécurité avancé,T19.3,Logger toutes actions IA dans UserActivity,1h,Ilef Yousfi,Sprint 3,Terminé
-US-5.1,En tant que développeur je souhaite documentation complète,T20.1,Créer ASSISTANT_IA_ARCHITECTURE.md,1h,Ilef Yousfi,Sprint 3,Terminé
-US-5.1,En tant que développeur je souhaite documentation complète,T20.2,Créer GUIDE_INSTALLATION_IA.md,1h,Ilef Yousfi,Sprint 3,Terminé
-US-5.1,En tant que développeur je souhaite documentation complète,T20.3,Créer TESTEZ_IA_AGENT_ACTIF.md,0.5h,Ilef Yousfi,Sprint 3,Terminé
-US-5.1,En tant que développeur je souhaite documentation complète,T20.4,Créer PROMPT_SYSTEM_IA.md,1h,Ilef Yousfi,Sprint 3,Terminé
-US-5.1,En tant que développeur je souhaite documentation complète,T20.5,Créer README_ASSISTANT_IA.md,1h,Ilef Yousfi,Sprint 3,Terminé
-US-5.1,En tant que développeur je souhaite documentation complète,T20.6,Documenter format actions JSON,0.5h,Ilef Yousfi,Sprint 3,Terminé
-US-5.1,En tant que développeur je souhaite documentation complète,T20.7,Créer AUDIT_READY_TO_USE.md,0.5h,Ilef Yousfi,Sprint 3,Terminé
-US-5.1,En tant que développeur je souhaite documentation complète,T20.8,Créer USER_ACTIVITY_BUNDLE_COMPLETE.md,1h,Ilef Yousfi,Sprint 3,Terminé
-US-5.1,En tant que développeur je souhaite documentation complète,T20.9,Créer SUSPENSION_AUTOMATIQUE_GUIDE.md,0.5h,Ilef Yousfi,Sprint 3,Terminé
-US-5.1,En tant que développeur je souhaite documentation complète,T20.10,Créer 20+ autres fichiers documentation,3h,Ilef Yousfi,Sprint 3,Terminé
+ID US;User Story (US);ID Tâche;Tâches effectuées;Estimation;Responsable;Sprint;Statut
+US-1.1;En tant qu'utilisateur je souhaite m'inscrire (créer un compte);T1.1;Créer entité User (abstract) avec Single Table Inheritance;2h;Ilef Yousfi;Sprint 1;Terminé
+US-1.1;En tant qu'utilisateur je souhaite m'inscrire (créer un compte);T1.2;Créer entité Etudiant (extends User) avec attribut niveau;1.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.1;En tant qu'utilisateur je souhaite m'inscrire (créer un compte);T1.3;Créer entité Admin (extends User);1h;Ilef Yousfi;Sprint 1;Terminé
+US-1.1;En tant qu'utilisateur je souhaite m'inscrire (créer un compte);T1.4;Ajouter champs suspension (isSuspended suspendedAt suspendedBy suspensionReason);1h;Ilef Yousfi;Sprint 1;Terminé
+US-1.1;En tant qu'utilisateur je souhaite m'inscrire (créer un compte);T1.5;Créer migration avec colonnes camelCase;0.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.1;En tant qu'utilisateur je souhaite m'inscrire (créer un compte);T1.6;Créer RegistrationFormType avec validation;2h;Ilef Yousfi;Sprint 1;Terminé
+US-1.1;En tant qu'utilisateur je souhaite m'inscrire (créer un compte);T1.7;Créer RegistrationController avec méthode register();2h;Ilef Yousfi;Sprint 1;Terminé
+US-1.1;En tant qu'utilisateur je souhaite m'inscrire (créer un compte);T1.8;Implémenter hashage bcrypt du mot de passe;0.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.1;En tant qu'utilisateur je souhaite m'inscrire (créer un compte);T1.9;Créer vue Twig register.html.twig avec design moderne;2h;Ilef Yousfi;Sprint 1;Terminé
+US-1.1;En tant qu'utilisateur je souhaite m'inscrire (créer un compte);T1.10;Ajouter validation JavaScript côté client;1h;Ilef Yousfi;Sprint 1;Terminé
+US-1.2;En tant qu'utilisateur je souhaite me connecter avec mes identifiants;T2.1;Configurer Symfony Security (security.yaml) avec rôles;2h;Ilef Yousfi;Sprint 1;Terminé
+US-1.2;En tant qu'utilisateur je souhaite me connecter avec mes identifiants;T2.2;Créer LoginFormType;1h;Ilef Yousfi;Sprint 1;Terminé
+US-1.2;En tant qu'utilisateur je souhaite me connecter avec mes identifiants;T2.3;Créer SecurityController avec méthode login();1.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.2;En tant qu'utilisateur je souhaite me connecter avec mes identifiants;T2.4;Implémenter authentification par email/password;1.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.2;En tant qu'utilisateur je souhaite me connecter avec mes identifiants;T2.5;Configurer remember_me (Se souvenir de moi);1h;Ilef Yousfi;Sprint 1;Terminé
+US-1.2;En tant qu'utilisateur je souhaite me connecter avec mes identifiants;T2.6;Redirection selon rôle (Admin→backoffice Etudiant→frontoffice);2h;Ilef Yousfi;Sprint 1;Terminé
+US-1.2;En tant qu'utilisateur je souhaite me connecter avec mes identifiants;T2.7;Mettre à jour lastLoginAt lors de la connexion;1h;Ilef Yousfi;Sprint 1;Terminé
+US-1.2;En tant qu'utilisateur je souhaite me connecter avec mes identifiants;T2.8;Créer vue Twig login.html.twig avec lien mot de passe oublié;2h;Ilef Yousfi;Sprint 1;Terminé
+US-1.2;En tant qu'utilisateur je souhaite me connecter avec mes identifiants;T2.9;Bloquer connexion des comptes suspendus;1h;Ilef Yousfi;Sprint 1;Terminé
+US-1.3;En tant qu'utilisateur je souhaite me déconnecter;T3.1;Configurer route déconnexion dans security.yaml;0.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.3;En tant qu'utilisateur je souhaite me déconnecter;T3.2;Créer lien déconnexion dans menu avec icône;0.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.3;En tant qu'utilisateur je souhaite me déconnecter;T3.3;Configurer redirection après déconnexion;0.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.5;En tant qu'utilisateur je souhaite consulter mon profil;T5.1;Créer route /profile;0.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.5;En tant qu'utilisateur je souhaite consulter mon profil;T5.2;Créer ProfileController;1h;Ilef Yousfi;Sprint 1;Terminé
+US-1.5;En tant qu'utilisateur je souhaite consulter mon profil;T5.3;Créer vue profile.html.twig avec design moderne;3h;Ilef Yousfi;Sprint 1;Terminé
+US-1.6;En tant qu'utilisateur je souhaite modifier mes informations personnelles;T6.1;Créer ProfileEditType avec validation;2h;Ilef Yousfi;Sprint 1;Terminé
+US-1.6;En tant qu'utilisateur je souhaite modifier mes informations personnelles;T6.2;Créer route /profile/edit;0.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.6;En tant qu'utilisateur je souhaite modifier mes informations personnelles;T6.3;Implémenter modification nom prénom email;1h;Ilef Yousfi;Sprint 1;Terminé
+US-1.6;En tant qu'utilisateur je souhaite modifier mes informations personnelles;T6.4;Implémenter upload photo de profil (jpg png max 2MB);3h;Ilef Yousfi;Sprint 1;Terminé
+US-1.6;En tant qu'utilisateur je souhaite modifier mes informations personnelles;T6.5;Stocker image dans /public/uploads/profiles/;1h;Ilef Yousfi;Sprint 1;Terminé
+US-1.6;En tant qu'utilisateur je souhaite modifier mes informations personnelles;T6.6;Créer vue profile_edit.html.twig avec prévisualisation photo;2h;Ilef Yousfi;Sprint 1;Terminé
+US-1.7;En tant qu'administrateur je souhaite rechercher un étudiant;T7.1;Créer route /backoffice/users;0.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.7;En tant qu'administrateur je souhaite rechercher un étudiant;T7.2;Créer UserManagementController;1h;Ilef Yousfi;Sprint 1;Terminé
+US-1.7;En tant qu'administrateur je souhaite rechercher un étudiant;T7.3;Implémenter recherche par nom (LIKE query);2h;Ilef Yousfi;Sprint 1;Terminé
+US-1.7;En tant qu'administrateur je souhaite rechercher un étudiant;T7.4;Implémenter recherche par email (LIKE query);1h;Ilef Yousfi;Sprint 1;Terminé
+US-1.7;En tant qu'administrateur je souhaite rechercher un étudiant;T7.5;Ajouter pagination (10 résultats/page);1.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.7;En tant qu'administrateur je souhaite rechercher un étudiant;T7.6;Ajouter filtres (niveau statut suspension);1.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.7;En tant qu'administrateur je souhaite rechercher un étudiant;T7.7;Créer vue users.html.twig avec tableau moderne;3h;Ilef Yousfi;Sprint 1;Terminé
+US-1.8;En tant qu'administrateur je souhaite consulter le profil détaillé d'un utilisateur;T8.1;Créer route /backoffice/users/{id};0.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.8;En tant qu'administrateur je souhaite consulter le profil détaillé d'un utilisateur;T8.2;Créer méthode show() dans UserManagementController;1h;Ilef Yousfi;Sprint 1;Terminé
+US-1.8;En tant qu'administrateur je souhaite consulter le profil détaillé d'un utilisateur;T8.3;Créer vue user_detail.html.twig avec statistiques;3h;Ilef Yousfi;Sprint 1;Terminé
+US-1.9;En tant qu'administrateur je souhaite ajouter manuellement un nouvel étudiant;T9.1;Créer route /backoffice/users/new;0.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.9;En tant qu'administrateur je souhaite ajouter manuellement un nouvel étudiant;T9.2;Créer AdminUserCreateType;2h;Ilef Yousfi;Sprint 1;Terminé
+US-1.9;En tant qu'administrateur je souhaite ajouter manuellement un nouvel étudiant;T9.3;Implémenter création étudiant avec validation;2h;Ilef Yousfi;Sprint 1;Terminé
+US-1.9;En tant qu'administrateur je souhaite ajouter manuellement un nouvel étudiant;T9.4;Créer vue user_create.html.twig;2h;Ilef Yousfi;Sprint 1;Terminé
+US-1.10;En tant qu'administrateur je souhaite désactiver un compte étudiant;T10.1;Créer route /backoffice/users/{id}/suspend;0.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.10;En tant qu'administrateur je souhaite désactiver un compte étudiant;T10.2;Implémenter méthode suspend() avec raison;1h;Ilef Yousfi;Sprint 1;Terminé
+US-1.10;En tant qu'administrateur je souhaite désactiver un compte étudiant;T10.3;Créer modal pour raison suspension;2h;Ilef Yousfi;Sprint 1;Terminé
+US-1.10;En tant qu'administrateur je souhaite désactiver un compte étudiant;T10.4;Créer route /backoffice/users/{id}/unsuspend pour réactivation;0.5h;Ilef Yousfi;Sprint 1;Terminé
+US-1.10;En tant qu'administrateur je souhaite désactiver un compte étudiant;T10.5;Implémenter réactivation compte;1h;Ilef Yousfi;Sprint 1;Terminé
+US-1.4;En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email;T4.1;Créer entité PasswordResetToken;1h;Ilef Yousfi;Sprint 2;Terminé
+US-1.4;En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email;T4.2;Créer migration pour password_reset_token;0.5h;Ilef Yousfi;Sprint 2;Terminé
+US-1.4;En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email;T4.3;Configurer Symfony Mailer avec Brevo (SMTP);1.5h;Ilef Yousfi;Sprint 2;Terminé
+US-1.4;En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email;T4.4;Créer TestBrevoCommand pour tester email;1.5h;Ilef Yousfi;Sprint 2;Terminé
+US-1.4;En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email;T4.5;Créer formulaire mot de passe oublié;1h;Ilef Yousfi;Sprint 2;Terminé
+US-1.4;En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email;T4.6;Générer token unique avec expiration 1h;1.5h;Ilef Yousfi;Sprint 2;Terminé
+US-1.4;En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email;T4.7;Créer template email de réinitialisation;2h;Ilef Yousfi;Sprint 2;Terminé
+US-1.4;En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email;T4.8;Implémenter envoi email avec token;2h;Ilef Yousfi;Sprint 2;Terminé
+US-1.4;En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email;T4.9;Créer page réinitialisation avec validation token;2h;Ilef Yousfi;Sprint 2;Terminé
+US-1.4;En tant qu'utilisateur je souhaite demander réinitialisation mot de passe via email;T4.10;Invalider token après utilisation;1h;Ilef Yousfi;Sprint 2;Terminé
+US-2.1;En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit);T11.1;Installer SimpleThings EntityAudit Bundle via Composer;0.5h;Ilef Yousfi;Sprint 2;Terminé
+US-2.1;En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit);T11.2;Configurer doctrine_audit.yaml (auditer uniquement Etudiant);1h;Ilef Yousfi;Sprint 2;Terminé
+US-2.1;En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit);T11.3;Créer table user_audit avec colonnes camelCase;1h;Ilef Yousfi;Sprint 2;Terminé
+US-2.1;En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit);T11.4;Créer table revisions;0.5h;Ilef Yousfi;Sprint 2;Terminé
+US-2.1;En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit);T11.5;Créer AuditController (/backoffice/audit);2h;Ilef Yousfi;Sprint 2;Terminé
+US-2.1;En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit);T11.6;Créer vue liste révisions (index.html.twig);2h;Ilef Yousfi;Sprint 2;Terminé
+US-2.1;En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit);T11.7;Créer vue détail révision (revision_details.html.twig);2h;Ilef Yousfi;Sprint 2;Terminé
+US-2.1;En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit);T11.8;Créer vue historique utilisateur (user_history.html.twig);2h;Ilef Yousfi;Sprint 2;Terminé
+US-2.1;En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit);T11.9;Créer vue statistiques audit (stats.html.twig);1h;Ilef Yousfi;Sprint 2;Terminé
+US-2.1;En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit);T11.10;Intégrer liens Audit dans sidebar backoffice;0.5h;Ilef Yousfi;Sprint 2;Terminé
+US-2.1;En tant qu'administrateur je souhaite voir historique modifications étudiant (Audit);T11.11;Afficher historique audit dans profil utilisateur;1.5h;Ilef Yousfi;Sprint 2;Terminé
+US-2.2;En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel;T12.1;Créer structure Bundle dans src/Bundle/UserActivityBundle/;1h;Ilef Yousfi;Sprint 2;Terminé
+US-2.2;En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel;T12.2;Créer entité UserActivity (userId action details ipAddress userAgent createdAt);1.5h;Ilef Yousfi;Sprint 2;Terminé
+US-2.2;En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel;T12.3;Créer migration pour table user_activity;0.5h;Ilef Yousfi;Sprint 2;Terminé
+US-2.2;En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel;T12.4;Créer ActivityLogger Service;2h;Ilef Yousfi;Sprint 2;Terminé
+US-2.2;En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel;T12.5;Intégrer logging dans UserManagementController;1h;Ilef Yousfi;Sprint 2;Terminé
+US-2.2;En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel;T12.6;Créer ActivityController (/backoffice/activity);1.5h;Ilef Yousfi;Sprint 2;Terminé
+US-2.2;En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel;T12.7;Créer vue liste activités (index.html.twig);1.5h;Ilef Yousfi;Sprint 2;Terminé
+US-2.2;En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel;T12.8;Créer vue activités par utilisateur (user_activities.html.twig);1h;Ilef Yousfi;Sprint 2;Terminé
+US-2.2;En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel;T12.9;Intégrer liens UserActivity dans sidebar;0.5h;Ilef Yousfi;Sprint 2;Terminé
+US-2.2;En tant qu'administrateur je souhaite suivre activité utilisateurs en temps réel;T12.10;Afficher activités récentes dans profil utilisateur;1.5h;Ilef Yousfi;Sprint 2;Terminé
+US-2.3;En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours;T13.1;Créer AutoSuspendInactiveUsersCommand;2h;Ilef Yousfi;Sprint 2;Terminé
+US-2.3;En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours;T13.2;Implémenter logique: suspendre si lastLoginAt > 90 jours;1.5h;Ilef Yousfi;Sprint 2;Terminé
+US-2.3;En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours;T13.3;Envoyer email notification avant suspension;1.5h;Ilef Yousfi;Sprint 2;Terminé
+US-2.3;En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours;T13.4;Créer SimulateInactivityCommand pour tests;1h;Ilef Yousfi;Sprint 2;Terminé
+US-2.3;En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours;T13.5;Configurer tâche planifiée (cron);0.5h;Ilef Yousfi;Sprint 2;Terminé
+US-2.3;En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours;T13.6;Tester suspension automatique;1h;Ilef Yousfi;Sprint 2;Terminé
+US-2.3;En tant qu'administrateur je souhaite suspendre automatiquement comptes inactifs après 90 jours;T13.7;Documenter dans SUSPENSION_AUTOMATIQUE_GUIDE.md;0.5h;Ilef Yousfi;Sprint 2;Terminé
+US-2.4;En tant qu'administrateur je souhaite sidebar fixe dans backoffice;T14.1;Fixer sidebar backoffice (position sticky);1h;Ilef Yousfi;Sprint 2;Terminé
+US-2.4;En tant qu'administrateur je souhaite sidebar fixe dans backoffice;T14.2;Corriger tous les templates backoffice;2h;Ilef Yousfi;Sprint 2;Terminé
+US-3.1;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T15.1;Installer et configurer Ollama localement;1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.1;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T15.2;Télécharger modèle llama3.2:1b;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-3.1;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T15.3;Créer OllamaService pour communication API;2h;Ilef Yousfi;Sprint 3;Terminé
+US-3.1;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T15.4;Configurer variables environnement (.env);0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-3.1;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T15.5;Optimiser paramètres (temperature max_tokens);1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.1;En tant qu'utilisateur je souhaite interagir avec assistant IA intelligent;T15.6;Gérer erreurs et timeouts;1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.2;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T16.1;Créer RAGService;2h;Ilef Yousfi;Sprint 3;Terminé
+US-3.2;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T16.2;Implémenter récupération contexte cours (Chapitre Ressource);2h;Ilef Yousfi;Sprint 3;Terminé
+US-3.2;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T16.3;Implémenter récupération contexte utilisateur;1.5h;Ilef Yousfi;Sprint 3;Terminé
+US-3.2;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T16.4;Implémenter récupération contexte exercices/quiz;1.5h;Ilef Yousfi;Sprint 3;Terminé
+US-3.2;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T16.5;Créer système scoring pertinence;1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.2;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T16.6;Optimiser requêtes Doctrine;1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.2;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T16.7;Limiter taille contexte (max 4000 tokens);1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.2;En tant qu'utilisateur je souhaite que IA comprenne contexte questions (RAG);T16.8;Ajouter safety checks foreach loops;1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.3;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T17.1;Créer ActionExecutorService;2h;Ilef Yousfi;Sprint 3;Terminé
+US-3.3;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T17.2;Implémenter détection actions dans réponse IA;2h;Ilef Yousfi;Sprint 3;Terminé
+US-3.3;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T17.3;Implémenter action: créer cours;1.5h;Ilef Yousfi;Sprint 3;Terminé
+US-3.3;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T17.4;Implémenter action: créer chapitre;1.5h;Ilef Yousfi;Sprint 3;Terminé
+US-3.3;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T17.5;Implémenter action: créer ressource;1.5h;Ilef Yousfi;Sprint 3;Terminé
+US-3.3;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T17.6;Implémenter action: créer exercice;1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.3;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T17.7;Implémenter action: modifier cours/chapitre;1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.3;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T17.8;Gérer permissions et sécurité actions;1.5h;Ilef Yousfi;Sprint 3;Terminé
+US-3.3;En tant qu'administrateur je souhaite que IA puisse exécuter actions sur base de données;T17.9;Corriger format JSON actions;1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.4;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T18.1;Créer AIAssistantService (orchestration);2h;Ilef Yousfi;Sprint 3;Terminé
+US-3.4;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T18.2;Implémenter prompt système intelligent;2h;Ilef Yousfi;Sprint 3;Terminé
+US-3.4;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T18.3;Intégrer RAGService pour contexte;1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.4;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T18.4;Intégrer ActionExecutorService;1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.4;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T18.5;Gérer historique conversation (session);1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.4;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T18.6;Créer AIAssistantController;1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.4;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T18.7;Créer widget chat (chat_widget.html.twig);2h;Ilef Yousfi;Sprint 3;Terminé
+US-3.4;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T18.8;Implémenter AJAX pour requêtes asynchrones;1.5h;Ilef Yousfi;Sprint 3;Terminé
+US-3.4;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T18.9;Ajouter indicateur IA en train d'écrire;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-3.4;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T18.10;Ajouter bulle bienvenue;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-3.4;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T18.11;Styliser interface chat moderne;1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.4;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T18.12;Intégrer chat widget dans frontoffice et backoffice;1h;Ilef Yousfi;Sprint 3;Terminé
+US-3.4;En tant qu'utilisateur je souhaite interface chat moderne avec IA;T18.13;Optimiser vitesse réponse;1h;Ilef Yousfi;Sprint 3;Terminé
+US-4.1;En tant qu'administrateur je souhaite système sécurité avancé;T19.1;Renforcer protection CSRF sur routes sensibles;1.5h;Ilef Yousfi;Sprint 3;Terminé
+US-4.1;En tant qu'administrateur je souhaite système sécurité avancé;T19.2;Implémenter validation stricte inputs utilisateur;1h;Ilef Yousfi;Sprint 3;Terminé
+US-4.1;En tant qu'administrateur je souhaite système sécurité avancé;T19.3;Logger toutes actions IA dans UserActivity;1h;Ilef Yousfi;Sprint 3;Terminé
+US-5.1;En tant que développeur je souhaite documentation complète;T20.1;Créer ASSISTANT_IA_ARCHITECTURE.md;1h;Ilef Yousfi;Sprint 3;Terminé
+US-5.1;En tant que développeur je souhaite documentation complète;T20.2;Créer GUIDE_INSTALLATION_IA.md;1h;Ilef Yousfi;Sprint 3;Terminé
+US-5.1;En tant que développeur je souhaite documentation complète;T20.3;Créer TESTEZ_IA_AGENT_ACTIF.md;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-5.1;En tant que développeur je souhaite documentation complète;T20.4;Créer PROMPT_SYSTEM_IA.md;1h;Ilef Yousfi;Sprint 3;Terminé
+US-5.1;En tant que développeur je souhaite documentation complète;T20.5;Créer README_ASSISTANT_IA.md;1h;Ilef Yousfi;Sprint 3;Terminé
+US-5.1;En tant que développeur je souhaite documentation complète;T20.6;Documenter format actions JSON;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-5.1;En tant que développeur je souhaite documentation complète;T20.7;Créer AUDIT_READY_TO_USE.md;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-5.1;En tant que développeur je souhaite documentation complète;T20.8;Créer USER_ACTIVITY_BUNDLE_COMPLETE.md;1h;Ilef Yousfi;Sprint 3;Terminé
+US-5.1;En tant que développeur je souhaite documentation complète;T20.9;Créer SUSPENSION_AUTOMATIQUE_GUIDE.md;0.5h;Ilef Yousfi;Sprint 3;Terminé
+US-5.1;En tant que développeur je souhaite documentation complète;T20.10;Créer 20+ autres fichiers documentation;3h;Ilef Yousfi;Sprint 3;Terminé

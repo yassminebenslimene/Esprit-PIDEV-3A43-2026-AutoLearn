@@ -82,7 +82,7 @@ class AIAssistantController extends AbstractController
      * Obtenir des suggestions de questions
      */
     #[Route('/suggestions', name: 'ai_assistant_suggestions', methods: ['GET'])]
-    public function suggestions(): JsonResponse
+    public function suggestions(Request $request): JsonResponse
     {
         if (!$this->getUser()) {
             return $this->json([
@@ -93,9 +93,10 @@ class AIAssistantController extends AbstractController
         
         $user = $this->getUser();
         $role = $user ? $user->getRole() : 'ETUDIANT';
+        $language = $request->query->get('language', 'fr');
 
         try {
-            $suggestions = $this->aiAssistant->getSuggestions($role);
+            $suggestions = $this->aiAssistant->getSuggestions($role, $language);
 
             return $this->json([
                 'success' => true,
