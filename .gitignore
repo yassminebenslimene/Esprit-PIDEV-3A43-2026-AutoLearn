@@ -27,3 +27,18 @@ node_modules
 
 # Fichiers contenant des clés API privées
 CLES_API_PRIVEES.txt
+
+# Fichiers de documentation et backlogs (*.md et *.html à la racine)
+/*.md
+/*.html
+/*.csv
+/*.txt
+/*.py
+/*.puml
+/*.bat
+
+# Exceptions - Garder certains fichiers importants
+!README.md
+!composer.json
+!composer.lock
+!package.json

@@ -526,6 +526,22 @@
                                         This event has been cancelled. No registrations are accepted.
                                     </p>
                                 </div>
+                            {% elseif evenement.workflowStatus == 'termine' %}
+                                <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%); border-radius: 15px; border: 2px solid #718096;">
+                                    <div style="font-size: 48px; margin-bottom: 15px;">🏁</div>
+                                    <h3 style="color: #2d3748; margin-bottom: 10px; font-size: 24px;">Event Completed</h3>
+                                    <p style="color: #4a5568; margin: 0; font-size: 16px;">
+                                        This event has ended. Registrations are now closed.
+                                    </p>
+                                </div>
+                            {% elseif evenement.workflowStatus == 'en_cours' %}
+                                <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 15px; border: 2px solid #f59e0b;">
+                                    <div style="font-size: 48px; margin-bottom: 15px;">⏳</div>
+                                    <h3 style="color: #92400e; margin-bottom: 10px; font-size: 24px;">Event In Progress</h3>
+                                    <p style="color: #78350f; margin: 0; font-size: 16px;">
+                                        This event is currently happening. New registrations are not accepted.
+                                    </p>
+                                </div>
                             {% elseif data.placesDisponibles > 0 %}
                                 <div style="text-align: center;">
                                     <a href="{{ path('app_event_participate', {'id': evenement.id}) }}" class="participate-btn">

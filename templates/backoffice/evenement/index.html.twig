@@ -64,6 +64,16 @@
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+
+/* Effet hover sur les boutons d'action */
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
 </style>
 
 <script>
@@ -162,33 +172,37 @@ function closeReport() {
                     </td>
                     <td>{{ evenement.nbMax }}</td>
                     <td>
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
                             <a href="{{ path('backoffice_evenement_show', {'id': evenement.id}) }}" 
                                class="btn btn-sm" 
-                               style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px;">
-                                👁 Voir
+                               title="Voir les détails"
+                               style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: transform 0.2s;">
+                                <span style="font-size: 16px;">👁</span> Voir
                             </a>
                             <a href="{{ path('backoffice_evenement_edit', {'id': evenement.id}) }}" 
                                class="btn btn-warning btn-sm" 
-                               style="background: linear-gradient(135deg, var(--gold), var(--amber)); color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px;">
-                                ✏ Modifier
+                               title="Modifier l'événement"
+                               style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: transform 0.2s;">
+                                <span style="font-size: 16px;">✏️</span> Modifier
                             </a>
                             
                             {# Bouton Annuler (Workflow) - Visible seulement si l'événement n'est pas déjà annulé ou terminé #}
                             {% if evenement.workflowStatus in ['planifie', 'en_cours'] %}
-                            <form method="post" action="{{ path('backoffice_evenement_annuler', {'id': evenement.id}) }}" style="display: inline;" onsubmit="return confirm('⚠️ Êtes-vous sûr de vouloir annuler cet événement? Tous les participants recevront un email d\'annulation.')">
+                            <form method="post" action="{{ path('backoffice_evenement_annuler', {'id': evenement.id}) }}" style="display: inline; margin: 0;" onsubmit="return confirm('⚠️ Êtes-vous sûr de vouloir annuler cet événement?\n\nTous les participants recevront un email d\'annulation.')">
                                 <button type="submit" class="btn btn-sm" 
-                                        style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white; padding: 6px 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 12px;">
-                                    ❌ Annuler
+                                        title="Annuler l'événement"
+                                        style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white; padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: transform 0.2s;">
+                                    <span style="font-size: 16px;">❌</span> Annuler
                                 </button>
                             </form>
                             {% endif %}
                             
                             <a href="{{ path('backoffice_evenement_delete', {'id': evenement.id}) }}" 
                                class="btn btn-danger btn-sm" 
-                               onclick="return confirm('Confirmer la suppression ?')"
-                               style="background: linear-gradient(135deg, var(--coral), var(--gold)); color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px;">
-                                🗑 Supprimer
+                               title="Supprimer définitivement"
+                               onclick="return confirm('⚠️ ATTENTION!\n\nCette action est irréversible.\nTous les équipes et participations liées seront également supprimées.\n\nConfirmer la suppression ?')"
+                               style="background: linear-gradient(135deg, #fc5c7d, #6a82fb); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: transform 0.2s;">
+                                <span style="font-size: 16px;">🗑️</span> Supprimer
                             </a>
                         </div>
                     </td>

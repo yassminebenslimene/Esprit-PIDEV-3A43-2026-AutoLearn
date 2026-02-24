@@ -83,6 +83,19 @@ class FrontofficeEvenementController extends AbstractController
     #[Route('/{id}/participate', name: 'app_event_participate', methods: ['GET'])]
     public function participate(Evenement $evenement, EquipeRepository $equipeRepository, ParticipationRepository $participationRepository): Response
     {
+        // Vérifier si les participations sont ouvertes (workflow)
+        if (!$evenement->canAcceptParticipations()) {
+            $message = match($evenement->getWorkflowStatus()) {
+                'en_cours' => 'This event is currently in progress. New registrations are not accepted.',
+                'termine' => 'This event has ended. Registrations are now closed.',
+                'annule' => 'This event has been cancelled. No registrations are accepted.',
+                default => 'Registrations are not available for this event.',
+            };
+            
+            $this->addFlash('error', $message);
+            return $this->redirectToRoute('app_events');
+        }
+        
         // Récupérer les équipes participantes avec moins de 6 membres
         $participationsAcceptees = $participationRepository->createQueryBuilder('p')
             ->where('p.evenement = :evenement')

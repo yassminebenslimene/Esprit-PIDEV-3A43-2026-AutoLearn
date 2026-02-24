@@ -183,4 +183,26 @@ class Evenement
         if (!$this->participations->contains($p)) $this->participations[] = $p;
         return $this;
     }
+    
+    /**
+     * Vérifie si les participations sont ouvertes pour cet événement
+     * Les participations sont ouvertes uniquement si:
+     * - L'événement est planifié (pas encore commencé)
+     * - L'événement n'est pas annulé
+     * - L'événement n'est pas terminé
+     */
+    public function areParticipationsOpen(): bool
+    {
+        // Vérifier le workflow status
+        return $this->workflowStatus === 'planifie' && !$this->isCanceled;
+    }
+    
+    /**
+     * Vérifie si l'événement peut accepter de nouvelles participations
+     * (alias de areParticipationsOpen pour plus de clarté)
+     */
+    public function canAcceptParticipations(): bool
+    {
+        return $this->areParticipationsOpen();
+    }
 }

@@ -78,7 +78,13 @@ class FrontofficeEquipeController extends AbstractController
         $equipe = new Equipe();
         $equipe->setEvenement($evenement);
         
-        $form = $this->createForm(EquipeFrontType::class, $equipe);
+        // Ajouter automatiquement l'étudiant connecté à l'équipe
+        $currentUser = $this->getUser();
+        $equipe->addEtudiant($currentUser);
+        
+        $form = $this->createForm(EquipeFrontType::class, $equipe, [
+            'current_user_id' => $currentUser->getId()
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

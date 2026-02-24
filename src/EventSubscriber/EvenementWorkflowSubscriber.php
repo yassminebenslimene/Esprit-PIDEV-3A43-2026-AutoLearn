@@ -177,15 +177,31 @@ class EvenementWorkflowSubscriber implements EventSubscriberInterface
         $emailsSent = 0;
         $emailsFailed = 0;
         
+        $this->logger->info('Début envoi emails', [
+            'type' => $type,
+            'evenement_id' => $evenement->getId(),
+            'nb_participations' => $evenement->getParticipations()->count(),
+        ]);
+        
         // Récupérer toutes les participations acceptées
         foreach ($evenement->getParticipations() as $participation) {
-            // Vérifier que la participation est acceptée
-            if ($participation->getStatut()->value !== 'Accepté') {
+            // Vérifier que la participation est acceptée (comparer avec l'enum directement)
+            if ($participation->getStatut() !== \App\Enum\StatutParticipation::ACCEPTE) {
+                $this->logger->debug('Participation ignorée (non acceptée)', [
+                    'participation_id' => $participation->getId(),
+                    'statut' => $participation->getStatut()->value,
+                ]);
                 continue;
             }
             
             $equipe = $participation->getEquipe();
             $teamName = $equipe->getNom();
+            
+            $this->logger->info('Traitement équipe', [
+                'equipe_id' => $equipe->getId(),
+                'equipe_nom' => $teamName,
+                'nb_etudiants' => $equipe->getEtudiants()->count(),
+            ]);
             
             // Envoyer un email à chaque étudiant de l'équipe
             foreach ($equipe->getEtudiants() as $etudiant) {
