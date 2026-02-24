@@ -35,10 +35,21 @@ CLES_API_PRIVEES.txt
 /*.txt
 /*.py
 /*.puml
-/*.bat
 
 # Exceptions - Garder certains fichiers importants
 !README.md
 !composer.json
 !composer.lock
 !package.json
+!GUIDE_PARTAGE_BASE_DONNEES.md
+
+# Scripts de gestion de base de données
+!export_database.bat
+!import_database.bat
+
+# Backups de base de données (NE JAMAIS PUSHER)
+database_backups/
+*.sql
+*.dump
+*.db
+*.sqlite
