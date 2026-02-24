@@ -37,13 +37,6 @@ services:
     
     App\Service\FeedbackAnalyticsService:
         arguments: []
-
-    # Configuration du service Twilio SMS
-    App\Service\TwilioSmsService:
-        arguments:
-            $accountSid: '%env(TWILIO_ACCOUNT_SID)%'
-            $authToken: '%env(TWILIO_AUTH_TOKEN)%'
-            $phoneNumber: '%env(TWILIO_PHONE_NUMBER)%'
     
     # Configuration du GrokQuizGeneratorService avec la clé API Groq
     App\Service\GrokQuizGeneratorService:

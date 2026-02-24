@@ -25,32 +25,41 @@ class FrontofficeController extends AbstractController
         ChallengeRepository $challengeRepository,
         EvenementRepository $evenementRepository,
         EquipeRepository $equipeRepository,
-        CoursRepository $coursRepository
+        CoursRepository $coursRepository,
+        \App\Service\CourseProgressService $progressService
     ): Response
     {
         // Si l'utilisateur est connecté
         if ($this->getUser()) {
             $user = $this->getUser();
-            
+
             // Si c'est un admin, rediriger vers le backoffice
             if ($user instanceof Admin || in_array('ROLE_ADMIN', $user->getRoles())) {
                 return $this->redirectToRoute('app_backoffice');
             }
         }
-        
+
         // Récupérer les données
         $cours = $coursRepository->findAll();
         $challenges = $challengeRepository->findAll();
         $evenements = $evenementRepository->findAll();
         $equipes = $equipeRepository->findAll();
-        
+
+        // Calculer la progression pour chaque cours si l'utilisateur est connecté
+        $coursProgress = [];
+        if ($this->getUser() && $this->getUser() instanceof Etudiant) {
+            $coursProgress = $progressService->getAllCoursesProgress($this->getUser(), $cours);
+        }
+
         return $this->render('frontoffice/index.html.twig', [
             'cours' => $cours,
             'challenges' => $challenges,
             'evenements' => $evenements,
             'equipes' => $equipes,
+            'coursProgress' => $coursProgress,
         ]);
     }
+
 
     #[Route('/profile', name: 'app_profile', methods: ['GET', 'POST'])]
     public function profile(

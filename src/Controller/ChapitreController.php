@@ -43,16 +43,23 @@ class ChapitreController extends AbstractController
         $chapitres = $chapitreRepository->findBy(['cours' => $cours], ['ordre' => 'ASC']);
         $user = $this->getUser();
         $progressStats = null;
+        $chaptersCompletion = [];
         
         // Si l'utilisateur est connecté, calculer la progression
         if ($user) {
             $progressStats = $progressService->getCourseProgressStats($user, $cours);
+            
+            // Vérifier la complétion de chaque chapitre
+            foreach ($chapitres as $chapitre) {
+                $chaptersCompletion[$chapitre->getId()] = $progressService->isChapterCompleted($user, $chapitre);
+            }
         }
         
         return $this->render('frontoffice/chapitre/index.html.twig', [
             'chapitres' => $chapitres,
             'cours' => $cours,
             'progress_stats' => $progressStats,
+            'chapters_completion' => $chaptersCompletion,
         ]);
     }
 

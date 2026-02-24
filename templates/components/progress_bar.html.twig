@@ -1,0 +1,59 @@
+{# 
+    Composant: Barre de progression avec couleurs dynamiques
+    
+    Paramètres:
+    - percentage: Le pourcentage de progression (0-100)
+    - show_text: Afficher le texte dans la barre (défaut: true)
+    - show_label: Afficher le label en dessous (défaut: false)
+    - label: Texte du label (optionnel)
+    - completed: Nombre de chapitres complétés (optionnel)
+    - total: Nombre total de chapitres (optionnel)
+    
+    Couleurs automatiques:
+    - Rouge: < 50%
+    - Orange: 50% - 80%
+    - Vert: > 80%
+#}
+
+{% set percentage = percentage|default(0) %}
+{% set show_text = show_text is defined ? show_text : true %}
+{% set show_label = show_label is defined ? show_label : false %}
+
+{# Déterminer la classe de couleur #}
+{% if percentage < 50 %}
+    {% set color_class = 'progress-danger' %}
+{% elseif percentage < 80 %}
+    {% set color_class = 'progress-warning' %}
+{% else %}
+    {% set color_class = 'progress-success' %}
+{% endif %}
+
+<div class="progress-container">
+    <div class="progress-bar-wrapper">
+        <div class="progress-bar {{ color_class }}" 
+             style="width: {{ percentage }}%;" 
+             role="progressbar" 
+             aria-valuenow="{{ percentage }}" 
+             aria-valuemin="0" 
+             aria-valuemax="100">
+            {% if show_text %}
+                <span>{{ percentage|number_format(1) }}%</span>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if show_label %}
+        <div class="progress-text">
+            <span class="progress-label">
+                {% if label is defined %}
+                    {{ label }}
+                {% elseif completed is defined and total is defined %}
+                    {{ completed }} / {{ total }} chapitres complétés
+                {% else %}
+                    Progression
+                {% endif %}
+            </span>
+            <span class="progress-percentage">{{ percentage|number_format(1) }}%</span>
+        </div>
+    {% endif %}
+</div>

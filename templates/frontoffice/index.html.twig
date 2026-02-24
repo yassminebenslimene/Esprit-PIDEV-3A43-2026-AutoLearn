@@ -17,6 +17,9 @@
         <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
         <link rel="stylesheet" href="{{ asset('frontoffice/css/owl.css') }}">
         <link rel="stylesheet" href="{{ asset('frontoffice/css/templatemo-scholar.css') }}">
+        
+        <!-- Progress Bar CSS -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/progress-bar.css') }}">
 
         <!-- Swiper -->
         <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
@@ -414,15 +417,27 @@
                             <div class="main-content">
                                 <h4>{{ cour.titre }}</h4>
                                 <p>{{ cour.description|length > 100 ? cour.description|slice(0, 100) ~ '...' : cour.description }}</p>
+                                
+                                {# Afficher la progression si l'utilisateur est connecté #}
+                                {% if app.user and coursProgress[cour.id] is defined %}
+                                    {% set progress = coursProgress[cour.id] %}
+                                    <div style="margin: 15px 0;">
+                                        {% include 'components/progress_bar.html.twig' with {
+                                            'percentage': progress.percentage,
+                                            'show_label': true,
+                                            'completed': progress.completed_chapters,
+                                            'total': progress.total_chapters
+                                        } %}
+                                    </div>
+                                {% endif %}
+                                
                                 <div class="main-button">
-
                                     <a href="{{ path('app_frontoffice_chapitre_by_cours', {'coursId': cour.id}) }}" class="btn">
                                         {{ 'courses.view'|trans }}
                                     </a>
                                     <a href="{{ path('front_communaute_cours', {'coursId': cour.id}) }}" class="btn" style="background: linear-gradient(135deg, #6c5ce7, #4a69bd);">
                                         <i class="fa fa-users me-1"></i> {{ 'nav.community'|trans }}
                                     </a>
-
                                 </div>
                             </div>
                         </div>

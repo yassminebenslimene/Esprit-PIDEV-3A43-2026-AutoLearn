@@ -465,7 +465,7 @@
 </head>
 <body>
     <div class="quiz-list-header">
-        <a href="{{ path('app_chapitre_index_front') }}" class="back-link">
+        <a href="{{ path('app_chapitre_index_front', {'id': chapitre.cours.id}) }}" class="back-link">
             <i class="fa fa-arrow-left"></i>
             <span>Retour aux chapitres</span>
         </a>
