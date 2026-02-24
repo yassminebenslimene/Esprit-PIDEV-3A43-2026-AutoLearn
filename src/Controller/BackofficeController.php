@@ -32,10 +32,27 @@ class BackofficeController extends AbstractController
     }
 
     #[Route('/backoffice/quiz-management', name: 'backoffice_quiz_management')]
-    public function quizManagement(\App\Repository\QuizRepository $quizRepository): Response
+    public function quizManagement(
+        \App\Repository\QuizRepository $quizRepository,
+        Request $request,
+        \Knp\Component\Pager\PaginatorInterface $paginator
+    ): Response
     {
+        // Créer la requête de base
+        $queryBuilder = $quizRepository->createQueryBuilder('q')
+            ->leftJoin('q.chapitre', 'c')
+            ->addSelect('c')
+            ->orderBy('q.id', 'DESC');
+
+        // Paginer les résultats
+        $pagination = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            5 // Nombre d'éléments par page (modifié de 10 à 5)
+        );
+
         return $this->render('backoffice/quiz_management.html.twig', [
-            'quizzes' => $quizRepository->findAll(),
+            'pagination' => $pagination,
         ]);
     }
 

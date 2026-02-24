@@ -21,10 +21,17 @@
             </div>
         </div>
         <div style="padding: 1.5rem;">
-            {{ include('backoffice/quiz/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
-            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                {{ include('backoffice/quiz/_delete_form.html.twig') }}
-            </div>
+            <!-- Messages flash -->
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert" style="margin-bottom: 1rem;">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            {{ include('backoffice/quiz/_form.html.twig', {'button_label': 'Enregistrer', 'show_delete': true, 'quiz': quiz}) }}
         </div>
     </div>
 {% endblock %}

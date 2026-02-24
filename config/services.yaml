@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     uploads_dir: '%kernel.project_dir%/public/uploads'
+    
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -27,3 +28,18 @@ services:
     App\Service\WeatherService:
         arguments:
             $weatherApiKey: '%env(WEATHER_API_KEY)%'
+    
+    # Configuration du GrokQuizGeneratorService avec la clé API Groq
+    App\Service\GrokQuizGeneratorService:
+        arguments:
+            $grokApiKey: '%env(GROQ_API_KEY)%'
+    
+    # Configuration du QuizCorrectorAIService avec la clé API Groq
+    App\Service\QuizCorrectorAIService:
+        arguments:
+            $grokApiKey: '%env(GROQ_API_KEY)%'
+    
+    # Configuration du QuizTutorAIService avec la clé API Groq
+    App\Service\QuizTutorAIService:
+        arguments:
+            $grokApiKey: '%env(GROQ_API_KEY)%'

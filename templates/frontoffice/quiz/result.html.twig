@@ -712,6 +712,8 @@
             </div>
         </div>
 
+        {% block after_result_header %}{% endblock %}
+
         <h2 class="section-title">
             <i class="fa fa-list-alt"></i>
             Détails des réponses
@@ -760,6 +762,8 @@
                         </div>
                     {% endfor %}
                 </div>
+
+                {% block after_question_answers %}{% endblock %}
             </div>
         {% endfor %}
 

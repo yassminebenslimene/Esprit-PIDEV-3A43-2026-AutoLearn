@@ -1,0 +1,299 @@
+{% extends 'backoffice/base.html.twig' %}
+
+{% block title %}Sélectionner un chapitre - Génération IA{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .ai-header {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .table-container {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .custom-table {
+            width: 100%;
+            margin: 0;
+            color: rgba(255, 255, 255, 0.9);
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .custom-table thead {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%);
+        }
+        
+        .custom-table thead th {
+            padding: 1rem 1.25rem;
+            font-weight: 700;
+            font-size: 0.8125rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #10b981;
+            border-bottom: 2px solid rgba(16, 185, 129, 0.3);
+            white-space: nowrap;
+            text-align: left;
+        }
+        
+        .custom-table thead th.text-center {
+            text-align: center;
+        }
+        
+        .custom-table tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .custom-table tbody tr:hover {
+            background: rgba(16, 185, 129, 0.08);
+        }
+        
+        .custom-table tbody td {
+            padding: 1.25rem;
+            vertical-align: middle;
+            font-size: 0.875rem;
+        }
+        
+        .row-number {
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 700;
+            font-size: 1.125rem;
+            text-align: center;
+            width: 60px;
+        }
+        
+        .chapter-info {
+            min-width: 250px;
+        }
+        
+        .chapter-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+            margin-bottom: 0.375rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .chapter-title i {
+            color: #10b981;
+            font-size: 0.875rem;
+        }
+        
+        .chapter-excerpt {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 2.5rem;
+        }
+        
+        .course-name {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            min-width: 180px;
+        }
+        
+        .course-name i {
+            color: #60a5fa;
+            font-size: 1rem;
+        }
+        
+        .badge-custom {
+            padding: 0.375rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            display: inline-block;
+            min-width: 50px;
+            text-align: center;
+        }
+        
+        .badge-order {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+        
+        .badge-quiz {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+        
+        .btn-generate {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            padding: 0.625rem 1.25rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+        }
+        
+        .btn-generate i {
+            font-size: 1rem;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+        }
+        
+        .info-box h6 {
+            color: #60a5fa;
+            font-weight: 600;
+            margin-bottom: 0.625rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-box p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
+            margin: 0;
+            line-height: 1.6;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: rgba(251, 191, 36, 0.5);
+            margin-bottom: 1.5rem;
+        }
+        
+        .empty-state h5 {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <!-- En-tête -->
+    <div class="ai-header">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h3 class="mb-1" style="color: #10b981; font-weight: 700;">
+                    <i class="fas fa-robot me-2"></i>Génération automatique de Quiz par IA
+                </h3>
+                <p class="mb-0" style="color: rgba(255, 255, 255, 0.7); font-size: 0.875rem;">
+                    Sélectionnez un chapitre et laissez l'IA créer un quiz personnalisé
+                </p>
+            </div>
+            <a href="{{ path('backoffice_quiz_management') }}" class="btn btn-outline-light btn-sm">
+                <i class="fas fa-arrow-left me-2"></i>Retour
+            </a>
+        </div>
+    </div>
+
+    <!-- Tableau des chapitres -->
+    <div class="table-container">
+        {% if chapitres is empty %}
+            <div class="empty-state">
+                <i class="fas fa-book-open"></i>
+                <h5>Aucun chapitre disponible</h5>
+                <p>Veuillez d'abord créer des chapitres pour générer des quiz.</p>
+            </div>
+        {% else %}
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th style="width: 4%;" class="text-center">#</th>
+                        <th style="width: 40%;">Chapitre</th>
+                        <th style="width: 22%;">Cours</th>
+                        <th style="width: 8%;" class="text-center">Ordre</th>
+                        <th style="width: 8%;" class="text-center">Quiz</th>
+                        <th style="width: 18%;" class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for chapitre in chapitres %}
+                        <tr>
+                            <td class="row-number">
+                                {{ loop.index }}
+                            </td>
+                            <td class="chapter-info">
+                                <div class="chapter-title">
+                                    <i class="fas fa-book"></i>
+                                    {{ chapitre.titre }}
+                                </div>
+                                <div class="chapter-excerpt">
+                                    {{ chapitre.contenu|striptags|slice(0, 60) }}...
+                                </div>
+                            </td>
+                            <td>
+                                <div class="course-name">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <span>{{ chapitre.cours.titre }}</span>
+                                </div>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="badge-custom badge-order">{{ chapitre.ordre }}</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="badge-custom badge-quiz">{{ chapitre.quizzes|length }}</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <a href="{{ path('app_quiz_generate_from_chapitre', {'id': chapitre.id}) }}" 
+                                   class="btn-generate">
+                                    <i class="fas fa-magic"></i>
+                                    Générer
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+
+    <!-- Information -->
+    <div class="info-box">
+        <h6><i class="fas fa-info-circle me-2"></i>Comment ça fonctionne ?</h6>
+        <p>
+            Cliquez sur "Générer" pour créer automatiquement un quiz basé sur le contenu du chapitre. 
+            L'IA analysera le texte et générera des questions pertinentes avec plusieurs options de réponse. 
+            Le quiz sera créé en mode brouillon pour révision avant activation.
+        </p>
+    </div>
+</div>
+{% endblock %}

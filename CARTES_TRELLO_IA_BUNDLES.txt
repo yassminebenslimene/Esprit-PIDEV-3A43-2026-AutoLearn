@@ -1,0 +1,505 @@
+═══════════════════════════════════════════════════════════════
+📋 CARTES TRELLO - AGENTS IA ET BUNDLES
+═══════════════════════════════════════════════════════════════
+
+🤖 AGENTS IA (3 cartes)
+═══════════════════════════════════════════════════════════════
+
+CARTE 1: IA-1 : Agent Correcteur Intelligent
+─────────────────────────────────────────────
+Titre: IA-1 : Agent Correcteur Intelligent
+
+Description:
+Analyse les réponses des étudiants aux quiz et génère des explications pédagogiques personnalisées pour chaque question.
+
+✓ Explications personnalisées par question
+✓ Analyse des erreurs avec détails
+✓ Explication de la bonne réponse
+✓ Conseils pratiques pour progresser
+✓ Ressources recommandées
+✓ Résumé pédagogique global
+✓ Messages d'encouragement adaptés
+
+Service: QuizCorrectorAIService
+API: Groq (Llama 4)
+Criticité: ⭐⭐⭐⭐⭐
+
+Fichiers:
+- src/Service/QuizCorrectorAIService.php
+- templates/frontoffice/quiz/result_with_ai.html.twig
+
+Étiquettes: Agent IA, API Groq, Critique
+
+
+CARTE 2: IA-2 : Agent Tuteur Conversationnel
+─────────────────────────────────────────────
+Titre: IA-2 : Agent Tuteur Conversationnel
+
+Description:
+Assistant IA post-quiz qui répond aux questions des étudiants de manière contextuelle et interactive.
+
+✓ Réponses contextuelles basées sur le quiz
+✓ Gestion de l'historique de conversation
+✓ Suggestions de questions pertinentes
+✓ Explications approfondies sur demande
+✓ Adaptation au niveau de l'étudiant
+✓ Interface conversationnelle interactive
+
+Service: QuizTutorAIService
+API: Groq (Llama 4)
+Criticité: ⭐⭐⭐⭐
+
+Fichiers:
+- src/Service/QuizTutorAIService.php
+- src/Controller/FrontOffice/QuizTutorController.php
+
+Étiquettes: Agent IA, API Groq, Tuteur
+
+
+CARTE 3: IA-3 : Agent Générateur de Quiz
+─────────────────────────────────────────────
+Titre: IA-3 : Agent Générateur de Quiz
+
+Description:
+Génère automatiquement des quiz complets avec questions et options à partir d'un chapitre de cours via LLM.
+
+✓ Génération automatique de questions pertinentes
+✓ Création d'options de réponse cohérentes
+✓ Validation des questions générées
+✓ Régénération de questions si nécessaire
+✓ Adaptation au niveau de difficulté
+✓ Persistance automatique en base de données
+
+Service: GrokQuizGeneratorService
+API: Groq (Llama 4)
+Criticité: ⭐⭐⭐⭐⭐
+
+Fichiers:
+- src/Service/GrokQuizGeneratorService.php
+- src/Controller/Backoffice/QuizController.php
+
+Étiquettes: Agent IA, API Groq, Générateur, Critique
+
+
+═══════════════════════════════════════════════════════════════
+📦 BUNDLES SYMFONY (19 cartes)
+═══════════════════════════════════════════════════════════════
+
+🔧 UTILITAIRES (8 cartes)
+═══════════════════════════════════════════════════════════════
+
+CARTE 1: KnpPaginatorBundle
+─────────────────────────────────────────────
+Titre: KnpPaginatorBundle
+
+Description:
+Pagination des listes de quiz et résultats étudiants.
+
+Package: knplabs/knp-paginator-bundle
+Version: ^6.10
+Criticité: ⭐⭐⭐
+
+Utilisation dans Quiz:
+✓ Pagination liste des quiz (backoffice)
+✓ Pagination résultats étudiants
+✓ Configuration nombre d'items par page
+✓ Tri et filtrage des listes
+
+Étiquettes: Bundle, Utilitaire, Pagination
+
+
+CARTE 2: VichUploaderBundle
+─────────────────────────────────────────────
+Titre: VichUploaderBundle
+
+Description:
+Gestion des uploads de fichiers et médias dans les questions de quiz.
+
+Package: vich/uploader-bundle
+Version: ^2.9
+Criticité: ⭐⭐⭐
+
+Utilisation dans Quiz:
+✓ Upload d'images dans les questions
+✓ Gestion des fichiers médias
+✓ Nommage automatique des fichiers
+✓ Suppression automatique des anciens fichiers
+
+Étiquettes: Bundle, Utilitaire, Upload
+
+
+CARTE 3: MonologBundle
+─────────────────────────────────────────────
+Titre: MonologBundle
+
+Description:
+Système de logging et traçabilité pour le système de quiz et les appels IA.
+
+Package: symfony/monolog-bundle
+Version: ^3.0|^4.0
+Criticité: ⭐⭐⭐⭐
+
+Utilisation dans Quiz:
+✓ Logging des erreurs API Groq
+✓ Traçabilité des générations de quiz
+✓ Logs des tentatives étudiants
+✓ Monitoring des performances IA
+✓ Débogage des services
+
+Étiquettes: Bundle, Utilitaire, Logging, Critique
+
+
+CARTE 4: TwigBundle
+─────────────────────────────────────────────
+Titre: TwigBundle
+
+Description:
+Moteur de templates pour le rendu des pages quiz et interfaces IA.
+
+Package: symfony/twig-bundle
+Version: 6.4.*
+Criticité: ⭐⭐⭐⭐⭐
+
+Utilisation dans Quiz:
+✓ Templates quiz (list.html.twig, passage.html.twig)
+✓ Affichage résultats (result_with_ai.html.twig)
+✓ Formulaires création/édition quiz
+✓ Interface tuteur IA conversationnel
+✓ Rendu des explications IA
+
+Étiquettes: Bundle, Utilitaire, Templates, Critique
+
+
+CARTE 5: SecurityBundle
+─────────────────────────────────────────────
+Titre: SecurityBundle
+
+Description:
+Authentification et gestion des autorisations pour l'accès aux quiz.
+
+Package: symfony/security-bundle
+Version: 6.4.*
+Criticité: ⭐⭐⭐⭐⭐
+
+Utilisation dans Quiz:
+✓ Restriction accès quiz (ROLE_ETUDIANT)
+✓ Protection génération IA (ROLE_ADMIN)
+✓ Vérification permissions passage quiz
+✓ Sécurisation des routes backoffice
+
+Étiquettes: Bundle, Utilitaire, Sécurité, Critique
+
+
+CARTE 6: StimulusBundle
+─────────────────────────────────────────────
+Titre: StimulusBundle
+
+Description:
+Framework JavaScript pour interactions dynamiques dans l'interface quiz.
+
+Package: symfony/stimulus-bundle
+Version: ^2.32
+Criticité: ⭐⭐
+
+Utilisation dans Quiz:
+✓ Interactions JavaScript interface quiz
+✓ Gestion dynamique des formulaires
+✓ Timer de quiz
+✓ Validation côté client
+
+Étiquettes: Bundle, Utilitaire, JavaScript
+
+
+CARTE 7: TurboBundle
+─────────────────────────────────────────────
+Titre: TurboBundle
+
+Description:
+Navigation SPA-like sans rechargement de page pour une meilleure UX.
+
+Package: symfony/ux-turbo
+Version: ^2.32
+Criticité: ⭐⭐
+
+Utilisation dans Quiz:
+✓ Navigation fluide entre quiz
+✓ Chargement partiel des pages
+✓ Amélioration UX
+✓ Réduction temps de chargement
+
+Étiquettes: Bundle, Utilitaire, UX
+
+
+CARTE 8: AssetMapper Component
+─────────────────────────────────────────────
+Titre: AssetMapper Component
+
+Description:
+Gestion des assets (CSS, JS) pour l'interface quiz.
+
+Package: symfony/asset-mapper
+Version: 6.4.*
+Criticité: ⭐⭐⭐
+
+Utilisation dans Quiz:
+✓ Gestion des fichiers CSS/JS
+✓ Importmap pour dépendances
+✓ Assets pour interface quiz
+✓ Optimisation des ressources
+
+Étiquettes: Bundle, Utilitaire, Assets
+
+
+═══════════════════════════════════════════════════════════════
+💾 PERSISTANCE & BASE DE DONNÉES (4 cartes)
+═══════════════════════════════════════════════════════════════
+
+CARTE 9: DoctrineBundle
+─────────────────────────────────────────────
+Titre: DoctrineBundle
+
+Description:
+ORM principal pour la gestion de la base de données du système de quiz.
+
+Package: doctrine/doctrine-bundle
+Version: ^2.18
+Criticité: ⭐⭐⭐⭐⭐
+
+Utilisation dans Quiz:
+✓ Persistance des entités Quiz, Question, Option
+✓ Gestion des relations OneToMany, ManyToOne
+✓ Repositories (QuizRepository, ChapitreRepository)
+✓ EntityManager pour CRUD
+✓ Transactions et flush
+
+Étiquettes: Bundle, Persistance, Doctrine, Critique
+
+
+CARTE 10: Doctrine ORM
+─────────────────────────────────────────────
+Titre: Doctrine ORM
+
+Description:
+Mapping objet-relationnel et gestion des entités du système de quiz.
+
+Package: doctrine/orm
+Version: ^3.6
+Criticité: ⭐⭐⭐⭐⭐
+
+Utilisation dans Quiz:
+✓ Annotations/Attributs pour entités
+✓ QueryBuilder pour requêtes complexes
+✓ Relations entre Quiz/Question/Option
+✓ Lazy loading et eager loading
+✓ Cascade operations
+
+Étiquettes: Bundle, Persistance, ORM, Critique
+
+
+CARTE 11: DoctrineMigrationsBundle
+─────────────────────────────────────────────
+Titre: DoctrineMigrationsBundle
+
+Description:
+Gestion des migrations de schéma de base de données.
+
+Package: doctrine/doctrine-migrations-bundle
+Version: ^3.7
+Criticité: ⭐⭐⭐
+
+Utilisation dans Quiz:
+✓ 25 migrations créées pour le projet
+✓ Création tables quiz, question, option
+✓ Évolution du schéma de données
+✓ Versioning de la base de données
+
+Étiquettes: Bundle, Persistance, Migrations
+
+
+CARTE 12: DoctrineFixturesBundle
+─────────────────────────────────────────────
+Titre: DoctrineFixturesBundle
+
+Description:
+Chargement de données de test pour le développement (dev uniquement).
+
+Package: doctrine/doctrine-fixtures-bundle
+Version: ^4.3
+Criticité: ⭐⭐
+
+Utilisation dans Quiz:
+✓ Données de test pour quiz
+✓ Fixtures pour développement
+✓ Environnement de test
+✓ Jeux de données de démonstration
+
+Étiquettes: Bundle, Persistance, Dev
+
+
+═══════════════════════════════════════════════════════════════
+📝 FORMULAIRES & VALIDATION (3 cartes)
+═══════════════════════════════════════════════════════════════
+
+CARTE 13: Form Component
+─────────────────────────────────────────────
+Titre: Form Component
+
+Description:
+Création et gestion de formulaires Symfony pour les quiz.
+
+Package: symfony/form
+Version: 6.4.*
+Criticité: ⭐⭐⭐⭐⭐
+
+Utilisation dans Quiz:
+✓ QuizType pour création/édition de quiz
+✓ QuestionType pour gestion des questions
+✓ OptionType pour les choix de réponse
+✓ Formulaires de génération automatique
+✓ CollectionType pour questions multiples
+
+Étiquettes: Bundle, Formulaire, Critique
+
+
+CARTE 14: Validator Component
+─────────────────────────────────────────────
+Titre: Validator Component
+
+Description:
+Validation des données et règles métier du système de quiz.
+
+Package: symfony/validator
+Version: 6.4.*
+Criticité: ⭐⭐⭐⭐
+
+Utilisation dans Quiz:
+✓ Validation des entités Quiz/Question
+✓ Contraintes (NotBlank, Length, Range)
+✓ Validation des règles métier (QuizManagementService)
+✓ Validation des réponses étudiants
+
+Étiquettes: Bundle, Validation, Critique
+
+
+CARTE 15: PropertyAccess Component
+─────────────────────────────────────────────
+Titre: PropertyAccess Component
+
+Description:
+Accès aux propriétés des objets pour le binding des formulaires.
+
+Package: symfony/property-access
+Version: 6.4.*
+Criticité: ⭐⭐⭐
+
+Utilisation dans Quiz:
+✓ Binding des formulaires aux entités
+✓ Lecture/écriture de propriétés
+✓ Support des getters/setters
+✓ Accès aux propriétés imbriquées
+
+Étiquettes: Bundle, Formulaire
+
+
+═══════════════════════════════════════════════════════════════
+🌐 API & HTTP (4 cartes)
+═══════════════════════════════════════════════════════════════
+
+CARTE 16: HttpClient Component
+─────────────────────────────────────────────
+Titre: HttpClient Component
+
+Description:
+Client HTTP pour tous les appels API externes (Groq).
+
+Package: symfony/http-client
+Version: 6.4.*
+Criticité: ⭐⭐⭐⭐⭐
+
+Utilisation dans Quiz:
+✓ Appels API Groq (GrokQuizGeneratorService)
+✓ Appels API Groq (QuizCorrectorAIService)
+✓ Appels API Groq (QuizTutorAIService)
+✓ Gestion des timeouts et erreurs réseau
+✓ Configuration des headers et authentification
+
+Étiquettes: Bundle, API, HTTP, Critique
+
+
+CARTE 17: Serializer Component
+─────────────────────────────────────────────
+Titre: Serializer Component
+
+Description:
+Sérialisation/désérialisation de données pour les API.
+
+Package: symfony/serializer
+Version: 6.4.*
+Criticité: ⭐⭐⭐⭐
+
+Utilisation dans Quiz:
+✓ Conversion JSON des réponses API Groq
+✓ Sérialisation des données de quiz
+✓ Gestion des réponses AJAX tuteur IA
+✓ Normalisation des entités
+
+Étiquettes: Bundle, API, Serializer, Critique
+
+
+CARTE 18: Guzzle HTTP Client
+─────────────────────────────────────────────
+Titre: Guzzle HTTP Client
+
+Description:
+Client HTTP avancé pour requêtes complexes (alternative à HttpClient).
+
+Package: guzzlehttp/guzzle
+Version: ^7.10
+Criticité: ⭐⭐
+
+Utilisation dans Quiz:
+✓ Alternative pour appels API complexes
+✓ Gestion avancée des requêtes HTTP
+✓ Support des middlewares
+✓ Retry et circuit breaker
+
+Étiquettes: Bundle, API, HTTP
+
+
+CARTE 19: Mailer Component
+─────────────────────────────────────────────
+Titre: Mailer Component
+
+Description:
+Envoi d'emails pour notifications quiz.
+
+Package: symfony/mailer
+Version: 6.4.*
+Criticité: ⭐⭐
+
+Utilisation dans Quiz:
+✓ Notifications de résultats quiz
+✓ Emails de rappel
+✓ Intégration Brevo/SendGrid
+✓ Templates d'emails
+
+Étiquettes: Bundle, Email, Notifications
+
+
+═══════════════════════════════════════════════════════════════
+📊 RÉSUMÉ
+═══════════════════════════════════════════════════════════════
+
+Total: 22 cartes
+- 3 Agents IA
+- 19 Bundles Symfony
+  - 8 Utilitaires
+  - 4 Persistance
+  - 3 Formulaires
+  - 4 API/HTTP
+
+Version Symfony: 6.4.*
+Version PHP: 8.1+
+Modèle IA: Llama 4 (Groq)
+
+═══════════════════════════════════════════════════════════════
