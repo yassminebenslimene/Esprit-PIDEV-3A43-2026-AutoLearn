@@ -13,6 +13,7 @@
         "dompdf/dompdf": "^3.1",
         "endroid/qr-code": "^5.0",
         "guzzlehttp/guzzle": "^7.10",
+        "knplabs/knp-paginator-bundle": "^6.10",
         "phpdocumentor/reflection-docblock": "5.2",
         "phpstan/phpdoc-parser": "^2.3",
         "sonata-project/entity-audit-bundle": "^1.22",
@@ -51,7 +52,8 @@
         "symfonycasts/reset-password-bundle": "*",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0",
-        "twilio/sdk": "*"
+        "twilio/sdk": "*",
+        "vich/uploader-bundle": "^2.9"
     },
     "config": {
         "allow-plugins": {

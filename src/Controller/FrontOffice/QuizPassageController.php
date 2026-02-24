@@ -20,7 +20,8 @@ class QuizPassageController extends AbstractController
 {
     public function __construct(
         private QuizManagementService $quizService,
-        private CourseProgressService $progressService
+        private CourseProgressService $progressService,
+        private \App\Service\QuizCorrectorAIService $correctorAI
     ) {}
 
     #[Route('/{id}/start', name: 'app_quiz_start')]
@@ -33,8 +34,8 @@ class QuizPassageController extends AbstractController
             return $this->redirectToRoute('app_frontoffice');
         }
 
-        // Vérifier si l'étudiant peut passer le quiz
-        $check = $this->quizService->canStudentTakeQuiz($etudiant, $quiz);
+        // Vérifier si l'étudiant peut passer le quiz (avec vérification des tentatives)
+        $check = $this->quizService->canStudentTakeQuiz($etudiant, $quiz, $session);
         if (!$check['canTake']) {
             foreach ($check['errors'] as $error) {
                 $this->addFlash('error', $error);
@@ -63,12 +64,41 @@ class QuizPassageController extends AbstractController
             'quiz_data' => $quizData
         ]);
 
+        // Récupérer les quiz précédent et suivant du même chapitre
+        $chapitre = $quiz->getChapitre();
+        $previousQuiz = null;
+        $nextQuiz = null;
+        
+        if ($chapitre) {
+            $allQuizzes = $chapitre->getQuizzes()->toArray();
+            // Filtrer uniquement les quiz actifs
+            $allQuizzes = array_filter($allQuizzes, fn($q) => $q->getEtat() === 'actif');
+            // Réindexer le tableau
+            $allQuizzes = array_values($allQuizzes);
+            
+            // Trouver l'index du quiz actuel
+            $currentIndex = array_search($quiz, $allQuizzes, true);
+            
+            if ($currentIndex !== false) {
+                // Quiz précédent
+                if ($currentIndex > 0) {
+                    $previousQuiz = $allQuizzes[$currentIndex - 1];
+                }
+                // Quiz suivant
+                if ($currentIndex < count($allQuizzes) - 1) {
+                    $nextQuiz = $allQuizzes[$currentIndex + 1];
+                }
+            }
+        }
+
         return $this->render('frontoffice/quiz/passage.html.twig', [
             'quiz' => $quiz,
             'quizData' => $quizData,
-            'chapitre' => $quiz->getChapitre(),
+            'chapitre' => $chapitre,
             'dureeMaxMinutes' => $quiz->getDureeMaxMinutes(),
-            'timestampDebut' => $dateDebut->getTimestamp()
+            'timestampDebut' => $dateDebut->getTimestamp(),
+            'previousQuiz' => $previousQuiz,
+            'nextQuiz' => $nextQuiz
         ]);
     }
 
@@ -117,6 +147,9 @@ class QuizPassageController extends AbstractController
         // Calculer le score
         $result = $this->quizService->calculateScore($quiz, $reponses);
         
+        // Enregistrer la tentative
+        $this->quizService->enregistrerTentative($etudiant, $quiz, $session, $result);
+        
         // Déterminer le statut
         $seuilReussite = $quiz->getSeuilReussite() ?? 50;
         $statut = $result['percentage'] >= $seuilReussite ? 'VALIDÉ' : 'ÉCHEC';
@@ -133,14 +166,40 @@ class QuizPassageController extends AbstractController
         // Nettoyer la tentative en cours
         $session->remove($tentativeKey);
         
-        return $this->render('frontoffice/quiz/result.html.twig', [
+        // Sauvegarder les résultats en session pour le tuteur IA
+        $resultKey = 'quiz_result_' . $quiz->getId() . '_' . $etudiant->getId();
+        $session->set($resultKey, [
+            'details' => $result['details'],
+            'percentage' => $result['percentage'],
+            'score' => $result['score'],
+            'timestamp' => time()
+        ]);
+        
+        // Obtenir les statistiques de l'étudiant
+        $statistiques = $this->quizService->getStatistiquesEtudiant($etudiant, $quiz, $session);
+        
+        // Générer les explications IA pour chaque question
+        $explications = [];
+        $resumePedagogique = [];
+        try {
+            $explications = $this->correctorAI->genererExplicationsPersonnalisees($result['details']);
+            $resumePedagogique = $this->correctorAI->genererResumePedagogique($result['details'], $result['percentage']);
+        } catch (\Exception $e) {
+            // En cas d'erreur, continuer sans les explications IA
+            $this->addFlash('warning', 'Les explications IA ne sont pas disponibles pour le moment.');
+        }
+        
+        return $this->render('frontoffice/quiz/result_with_ai.html.twig', [
             'quiz' => $quiz,
             'result' => $result,
             'statut' => $statut,
             'seuilReussite' => $seuilReussite,
             'chapitre' => $quiz->getChapitre(),
             'dureeReelle' => $dureeReelleMinutes,
-            'tempsDepasse' => $tempsDepasse
+            'tempsDepasse' => $tempsDepasse,
+            'statistiques' => $statistiques,
+            'explications' => $explications,
+            'resumePedagogique' => $resumePedagogique
         ]);
     }
 

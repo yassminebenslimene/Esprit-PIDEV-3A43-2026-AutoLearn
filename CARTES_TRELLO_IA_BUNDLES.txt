@@ -1,19 +1,93 @@
 ═══════════════════════════════════════════════════════════════════
     CARTES TRELLO - AUTOLEARN SPRINT 1
-    Module: Gestion de Cours + Intelligence Artificielle
+    Module: Gestion de Cours + Intelligence Artificielle + Quiz IA
 ═══════════════════════════════════════════════════════════════════
 
-Instructions:
-1. Créer 4 listes dans Trello: "À FAIRE", "EN COURS", "À VÉRIFIER", "TERMINÉ"
-2. Copier chaque carte ci-dessous dans la liste correspondante
-3. Ajouter les étiquettes (labels) indiquées pour chaque carte
+═══════════════════════════════════════════════════════════════
+📋 AGENTS IA - QUIZ (3 cartes)
+═══════════════════════════════════════════════════════════════
+
+CARTE 1: IA-1 : Agent Correcteur Intelligent
+─────────────────────────────────────────────
+Titre: IA-1 : Agent Correcteur Intelligent
+
+Description:
+Analyse les réponses des étudiants aux quiz et génère des explications pédagogiques personnalisées pour chaque question.
+
+✓ Explications personnalisées par question
+✓ Analyse des erreurs avec détails
+✓ Explication de la bonne réponse
+✓ Conseils pratiques pour progresser
+✓ Ressources recommandées
+✓ Résumé pédagogique global
+✓ Messages d'encouragement adaptés
+
+Service: QuizCorrectorAIService
+API: Groq (Llama 4)
+Criticité: ⭐⭐⭐⭐⭐
+
+Fichiers:
+- src/Service/QuizCorrectorAIService.php
+- templates/frontoffice/quiz/result_with_ai.html.twig
+
+Étiquettes: Agent IA, API Groq, Critique
+
+
+CARTE 2: IA-2 : Agent Tuteur Conversationnel
+─────────────────────────────────────────────
+Titre: IA-2 : Agent Tuteur Conversationnel
+
+Description:
+Assistant IA post-quiz qui répond aux questions des étudiants de manière contextuelle et interactive.
+
+✓ Réponses contextuelles basées sur le quiz
+✓ Gestion de l'historique de conversation
+✓ Suggestions de questions pertinentes
+✓ Explications approfondies sur demande
+✓ Adaptation au niveau de l'étudiant
+✓ Interface conversationnelle interactive
+
+Service: QuizTutorAIService
+API: Groq (Llama 4)
+Criticité: ⭐⭐⭐⭐
+
+Fichiers:
+- src/Service/QuizTutorAIService.php
+- src/Controller/FrontOffice/QuizTutorController.php
+
+Étiquettes: Agent IA, API Groq, Tuteur
+
+
+CARTE 3: IA-3 : Agent Générateur de Quiz
+─────────────────────────────────────────────
+Titre: IA-3 : Agent Générateur de Quiz
+
+Description:
+Génère automatiquement des quiz complets avec questions et options à partir d'un chapitre de cours via LLM.
+
+✓ Génération automatique de questions pertinentes
+✓ Création d'options de réponse cohérentes
+✓ Validation des questions générées
+✓ Régénération de questions si nécessaire
+✓ Adaptation au niveau de difficulté
+✓ Persistance automatique en base de données
+
+Service: GrokQuizGeneratorService
+API: Groq (Llama 4)
+Criticité: ⭐⭐⭐⭐⭐
+
+Fichiers:
+- src/Service/GrokQuizGeneratorService.php
+- src/Controller/Backoffice/QuizController.php
+
+Étiquettes: Agent IA, API Groq, Générateur, Critique
+
 
 ═══════════════════════════════════════════════════════════════════
 📌 LISTE: À FAIRE (4 cartes)
 ═══════════════════════════════════════════════════════════════════
 
-───────────────────────────────────────────────────────────────────
-CARTE 1
+CARTE 4: 🤖 Recommandation de Cours
 ───────────────────────────────────────────────────────────────────
 Titre: 🤖 Recommandation de Cours
 
@@ -27,8 +101,7 @@ Détails:
 
 Étiquettes: IA
 
-───────────────────────────────────────────────────────────────────
-CARTE 2
+CARTE 5: 💬 Chatbot Assistant
 ───────────────────────────────────────────────────────────────────
 Titre: 💬 Chatbot Assistant
 
@@ -42,8 +115,7 @@ Détails:
 
 Étiquettes: IA
 
-───────────────────────────────────────────────────────────────────
-CARTE 3
+CARTE 6: 📝 Résumé Automatique
 ───────────────────────────────────────────────────────────────────
 Titre: 📝 Résumé Automatique
 
@@ -57,8 +129,7 @@ Détails:
 
 Étiquettes: IA, Priorité
 
-───────────────────────────────────────────────────────────────────
-CARTE 4
+CARTE 7: 💡 Explication Simplifiée
 ───────────────────────────────────────────────────────────────────
 Titre: 💡 Explication Simplifiée
 
@@ -77,8 +148,7 @@ Détails:
 🔄 LISTE: EN COURS (2 cartes)
 ═══════════════════════════════════════════════════════════════════
 
-───────────────────────────────────────────────────────────────────
-CARTE 5
+CARTE 8: 📱 Intégration Twilio SMS
 ───────────────────────────────────────────────────────────────────
 Titre: 📱 Intégration Twilio SMS
 
@@ -93,8 +163,7 @@ Détails:
 
 Étiquettes: Bundle, Priorité
 
-───────────────────────────────────────────────────────────────────
-CARTE 6
+CARTE 9: 🌍 Traduction Multilingue
 ───────────────────────────────────────────────────────────────────
 Titre: 🌍 Traduction Multilingue
 
@@ -114,8 +183,7 @@ Détails:
 ✅ LISTE: À VÉRIFIER (2 cartes)
 ═══════════════════════════════════════════════════════════════════
 
-───────────────────────────────────────────────────────────────────
-CARTE 7
+CARTE 10: 🎨 Design & Interface
 ───────────────────────────────────────────────────────────────────
 Titre: 🎨 Design & Interface
 
@@ -130,8 +198,7 @@ Détails:
 
 Étiquettes: Bundle
 
-───────────────────────────────────────────────────────────────────
-CARTE 8
+CARTE 11: 🔔 Système de Notifications
 ───────────────────────────────────────────────────────────────────
 Titre: 🔔 Système de Notifications
 
@@ -148,11 +215,10 @@ Détails:
 
 
 ═══════════════════════════════════════════════════════════════════
-✅ LISTE: TERMINÉ (10 cartes)
+✅ LISTE: TERMINÉ (13 cartes)
 ═══════════════════════════════════════════════════════════════════
 
-───────────────────────────────────────────────────────────────────
-CARTE 9
+CARTE 12: ✓ CRUD Cours Complet
 ───────────────────────────────────────────────────────────────────
 Titre: ✓ CRUD Cours Complet
 
@@ -167,8 +233,7 @@ Détails:
 
 Étiquettes: Bundle, Terminé
 
-───────────────────────────────────────────────────────────────────
-CARTE 10
+CARTE 13: ✓ CRUD Chapitres
 ───────────────────────────────────────────────────────────────────
 Titre: ✓ CRUD Chapitres
 
@@ -183,8 +248,7 @@ Détails:
 
 Étiquettes: Bundle, Terminé
 
-───────────────────────────────────────────────────────────────────
-CARTE 11
+CARTE 14: ✓ Génération PDF
 ───────────────────────────────────────────────────────────────────
 Titre: ✓ Génération PDF
 
@@ -199,8 +263,7 @@ Détails:
 
 Étiquettes: Bundle, Terminé
 
-───────────────────────────────────────────────────────────────────
-CARTE 12
+CARTE 15: ✓ Système de Progression
 ───────────────────────────────────────────────────────────────────
 Titre: ✓ Système de Progression
 
@@ -215,8 +278,7 @@ Détails:
 
 Étiquettes: Bundle, Terminé
 
-───────────────────────────────────────────────────────────────────
-CARTE 13
+CARTE 16: ✓ Recherche Globale
 ───────────────────────────────────────────────────────────────────
 Titre: ✓ Recherche Globale
 
@@ -231,8 +293,7 @@ Détails:
 
 Étiquettes: Bundle, Terminé
 
-───────────────────────────────────────────────────────────────────
-CARTE 14
+CARTE 17: ✓ Rappel d'Inactivité
 ───────────────────────────────────────────────────────────────────
 Titre: ✓ Rappel d'Inactivité
 
@@ -247,8 +308,7 @@ Détails:
 
 Étiquettes: Bundle, Terminé
 
-───────────────────────────────────────────────────────────────────
-CARTE 15
+CARTE 18: ✓ Interface Backoffice
 ───────────────────────────────────────────────────────────────────
 Titre: ✓ Interface Backoffice
 
@@ -263,8 +323,7 @@ Détails:
 
 Étiquettes: Bundle, Terminé
 
-───────────────────────────────────────────────────────────────────
-CARTE 16
+CARTE 19: ✓ Interface Frontoffice
 ───────────────────────────────────────────────────────────────────
 Titre: ✓ Interface Frontoffice
 
@@ -279,8 +338,7 @@ Détails:
 
 Étiquettes: Bundle, Terminé
 
-───────────────────────────────────────────────────────────────────
-CARTE 17
+CARTE 20: ✓ API Traduction
 ───────────────────────────────────────────────────────────────────
 Titre: ✓ API Traduction
 
@@ -295,8 +353,7 @@ Détails:
 
 Étiquettes: IA, Terminé
 
-───────────────────────────────────────────────────────────────────
-CARTE 18
+CARTE 21: ✓ Fixtures de Données
 ───────────────────────────────────────────────────────────────────
 Titre: ✓ Fixtures de Données
 
@@ -311,21 +368,69 @@ Détails:
 
 Étiquettes: Bundle, Terminé
 
+CARTE 22: ✓ Système Quiz IA Complet
+───────────────────────────────────────────────────────────────────
+Titre: ✓ Système Quiz IA Complet
+
+Description:
+Système complet de quiz avec génération, correction et tuteur IA
+
+Détails:
+✅ Génération automatique de quiz via IA
+✅ Correction intelligente avec explications
+✅ Tuteur conversationnel post-quiz
+✅ Gestion des tentatives et statistiques
+✅ Interface moderne et responsive
+
+Étiquettes: IA, Bundle, Terminé
+
+CARTE 23: ✓ Gestion Quiz Backoffice
+───────────────────────────────────────────────────────────────────
+Titre: ✓ Gestion Quiz Backoffice
+
+Description:
+Interface complète de gestion des quiz pour les administrateurs
+
+Détails:
+✅ CRUD complet des quiz
+✅ Gestion des questions et options
+✅ Génération automatique via IA
+✅ Pagination et filtrage
+✅ Upload de médias (VichUploader)
+
+Étiquettes: Bundle, Terminé
+
+CARTE 24: ✓ Passage Quiz Étudiants
+───────────────────────────────────────────────────────────────────
+Titre: ✓ Passage Quiz Étudiants
+
+Description:
+Interface de passage de quiz pour les étudiants
+
+Détails:
+✅ Timer de quiz avec limite de temps
+✅ Randomisation des questions
+✅ Soumission et calcul de score
+✅ Résultats avec explications IA
+✅ Navigation entre quiz
+
+Étiquettes: Bundle, Terminé
+
 
 ═══════════════════════════════════════════════════════════════════
 📊 STATISTIQUES DU SPRINT
 ═══════════════════════════════════════════════════════════════════
 
-Total des cartes: 18
+Total des cartes: 24
 
 À FAIRE:        4 cartes (IA uniquement)
 EN COURS:       2 cartes (1 Bundle + 1 IA)
 À VÉRIFIER:     2 cartes (Bundle)
-TERMINÉ:       10 cartes (9 Bundle + 1 IA)
+TERMINÉ:       16 cartes (13 Bundle + 3 IA)
 
 Répartition:
-• Bundle:      13 tâches
-• IA:           5 tâches
+• Bundle:      18 tâches
+• IA:           6 tâches
 
 
 ═══════════════════════════════════════════════════════════════════
@@ -336,17 +441,6 @@ Répartition:
 2. IA               (Couleur: Jaune)
 3. Priorité         (Couleur: Orange)
 4. Terminé          (Couleur: Vert foncé)
-
-
-═══════════════════════════════════════════════════════════════════
-💡 CONSEILS D'UTILISATION
-═══════════════════════════════════════════════════════════════════
-
-1. Créer d'abord les 4 étiquettes dans Trello
-2. Copier-coller le titre de chaque carte
-3. Copier-coller la description complète
-4. Ajouter les étiquettes correspondantes
-5. Optionnel: Ajouter des dates d'échéance
-6. Optionnel: Assigner des membres de l'équipe
-
-═══════════════════════════════════════════════════════════════════
+5. Agent IA         (Couleur: Violet)
+6. API Groq         (Couleur: Rose)
+7. Critique         (Couleur: Rouge)

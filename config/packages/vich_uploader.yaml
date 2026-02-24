@@ -1,0 +1,35 @@
+vich_uploader:
+    db_driver: orm
+    
+    mappings:
+        quiz_images:
+            uri_prefix: /uploads/quiz/images
+            upload_destination: '%kernel.project_dir%/public/uploads/quiz/images'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true
+        
+        question_images:
+            uri_prefix: /uploads/questions/images
+            upload_destination: '%kernel.project_dir%/public/uploads/questions/images'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true
+        
+        question_audio:
+            uri_prefix: /uploads/questions/audio
+            upload_destination: '%kernel.project_dir%/public/uploads/questions/audio'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true
+        
+        question_video:
+            uri_prefix: /uploads/questions/video
+            upload_destination: '%kernel.project_dir%/public/uploads/questions/video'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true
