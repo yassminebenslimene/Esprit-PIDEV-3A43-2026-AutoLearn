@@ -142,6 +142,13 @@ class FrontofficeController extends AbstractController
         return $this->render('frontoffice/communaute/communaute.html.twig');
     }
 
+    #[Route('/chapitres/cours/{coursId}', name: 'app_frontoffice_chapitre_by_cours')]
+    public function chapitresByCours(int $coursId): Response
+    {
+        // Rediriger directement vers la liste des chapitres du cours
+        return $this->redirectToRoute('app_chapitre_index_front', ['id' => $coursId]);
+    }
+
     #[Route('/contact', name: 'app_contact', methods: ['POST'])]
     public function contact(
         Request $request,

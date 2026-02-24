@@ -1,0 +1,268 @@
+{% extends 'frontoffice/base.html.twig' %}
+
+{% block title %}Mes Notifications - Autolearn{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .notifications-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .notifications-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .notifications-header h1 {
+            font-size: 2rem;
+            color: #333;
+            margin: 0;
+        }
+
+        .unread-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .notifications-actions {
+            margin-bottom: 20px;
+        }
+
+        .btn-mark-all {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .btn-mark-all:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .notification-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .notification-card.unread {
+            border-left-color: #667eea;
+            background: linear-gradient(to right, #f8f9ff 0%, white 100%);
+        }
+
+        .notification-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .notification-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification-icon {
+            font-size: 1.5rem;
+        }
+
+        .notification-date {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .notification-message {
+            color: #666;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-action {
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-mark-read {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .btn-mark-read:hover {
+            background: #c8e6c9;
+        }
+
+        .btn-delete {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .btn-delete:hover {
+            background: #ffcdd2;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h2 {
+            color: #999;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #bbb;
+        }
+
+        .notification-type-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .type-inactivity_reminder {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .type-course_update {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #4caf50;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="notifications-container">
+    <div class="notifications-header">
+        <h1>📬 Mes Notifications</h1>
+        {% if unreadCount > 0 %}
+            <span class="unread-badge">{{ unreadCount }} non lue{{ unreadCount > 1 ? 's' : '' }}</span>
+        {% endif %}
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            ✓ {{ message }}
+        </div>
+    {% endfor %}
+
+    {% if unreadCount > 0 %}
+        <div class="notifications-actions">
+            <form method="post" action="{{ path('app_notifications_mark_all_read') }}" style="display: inline;">
+                <button type="submit" class="btn-mark-all">
+                    ✓ Tout marquer comme lu
+                </button>
+            </form>
+        </div>
+    {% endif %}
+
+    {% if notifications is empty %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <h2>Aucune notification</h2>
+            <p>Vous n'avez pas encore de notifications. Elles apparaîtront ici.</p>
+        </div>
+    {% else %}
+        {% for notification in notifications %}
+            <div class="notification-card {{ notification.isRead ? '' : 'unread' }}">
+                <div class="notification-header">
+                    <h3 class="notification-title">
+                        <span class="notification-icon">{{ notification.title|split(' ')[0] }}</span>
+                        {{ notification.title|split(' ')|slice(1)|join(' ') }}
+                        <span class="notification-type-badge type-{{ notification.type }}">
+                            {{ notification.type == 'inactivity_reminder' ? 'Rappel' : 'Info' }}
+                        </span>
+                    </h3>
+                    <span class="notification-date">
+                        {{ notification.createdAt|date('d/m/Y à H:i') }}
+                    </span>
+                </div>
+
+                <div class="notification-message">
+                    {{ notification.message }}
+                </div>
+
+                <div class="notification-actions">
+                    {% if not notification.isRead %}
+                        <form method="post" action="{{ path('app_notifications_mark_read', {id: notification.id}) }}" style="display: inline;">
+                            <button type="submit" class="btn-action btn-mark-read">
+                                ✓ Marquer comme lu
+                            </button>
+                        </form>
+                    {% endif %}
+                    
+                    <form method="post" action="{{ path('app_notifications_delete', {id: notification.id}) }}" style="display: inline;">
+                        <button type="submit" class="btn-action btn-delete" onclick="return confirm('Supprimer cette notification ?')">
+                            🗑️ Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

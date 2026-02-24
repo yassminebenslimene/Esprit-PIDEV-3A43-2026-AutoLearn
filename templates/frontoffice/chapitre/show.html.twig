@@ -141,7 +141,7 @@
             </div>
 
             <div class="chapter-navigation">
-                <a href="{{ path('app_chapitre_index_front') }}" class="btn-modern btn-back">
+                <a href="{{ path('app_chapitre_index_front', {id: chapitre.cours.id}) }}" class="btn-modern btn-back">
                     <i class="fa fa-arrow-left"></i> 
                     {{ 'frontoffice.chapter.back_to_list'|trans }}
                 </a>

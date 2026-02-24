@@ -30,6 +30,42 @@
             height: 80px !important;
         }
         
+        /* Notification Badge Styles */
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(255, 68, 68, 0.6);
+            animation: pulse 2s infinite;
+            z-index: 10;
+        }
+        
+        .badge-count {
+            color: white;
+            font-size: 10px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 6px rgba(255, 68, 68, 0.6);
+            }
+            50% {
+                transform: scale(1.2);
+                box-shadow: 0 4px 12px rgba(255, 68, 68, 0.8);
+            }
+        }
+        
         .main-nav .nav {
             display: flex !important;
             align-items: center !important;
@@ -204,6 +240,9 @@
                     <ul class="nav">
                         <li><a href="{{ path('app_frontoffice') }}">{{ 'nav.home'|trans }}</a></li>
                         <li><a href="{{ path('app_frontoffice') }}#cours">{{ 'nav.courses'|trans }}</a></li>
+                        {% if app.user %}
+                            <li><a href="{{ path('app_notifications_index') }}" style="color: #FFD700; font-weight: bold;">🔔 Notifications</a></li>
+                        {% endif %}
                         <li><a href="{{ path('app_events') }}">{{ 'nav.events'|trans }}</a></li>
                         <li><a href="{{ path('frontchallenge') }}">{{ 'nav.challenges'|trans }}</a></li>
                         <li><a href="{{ path('front_communaute') }}">{{ 'nav.community'|trans }}</a></li>
@@ -358,7 +397,31 @@
                     return true;
                 });
             }
+            
+            // Charger le nombre de notifications non lues
+            {% if app.user %}
+            updateNotificationBadge();
+            // Actualiser toutes les 30 secondes
+            setInterval(updateNotificationBadge, 30000);
+            {% endif %}
         });
+        
+        {% if app.user %}
+        function updateNotificationBadge() {
+            fetch('{{ path('app_notifications_unread_count') }}')
+                .then(response => response.json())
+                .then(data => {
+                    var badge = document.getElementById('notification-badge');
+                    if (data.count > 0) {
+                        badge.textContent = data.count > 9 ? '9+' : data.count;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                })
+                .catch(error => console.error('Erreur lors du chargement des notifications:', error));
+        }
+        {% endif %}
     </script>
 {% endblock %}
 

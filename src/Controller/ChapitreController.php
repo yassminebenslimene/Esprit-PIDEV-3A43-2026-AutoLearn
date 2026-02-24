@@ -24,27 +24,34 @@ class ChapitreController extends AbstractController
         ]);
     }
 
-    #[Route('/front', name: 'app_chapitre_index_front', methods: ['GET'])]
+    #[Route('/cours/{id}/chapitres', name: 'app_chapitre_index_front', methods: ['GET'])]
     public function indexFront(
+        int $id,
         ChapitreRepository $chapitreRepository,
-        CourseProgressService $progressService
+        CourseProgressService $progressService,
+        EntityManagerInterface $entityManager
     ): Response
     {
-        $chapitres = $chapitreRepository->findAll();
+        // Récupérer le cours
+        $cours = $entityManager->getRepository(\App\Entity\GestionDeCours\Cours::class)->find($id);
+        
+        if (!$cours) {
+            throw $this->createNotFoundException('Le cours avec l\'ID ' . $id . ' n\'existe pas');
+        }
+        
+        // Récupérer les chapitres du cours
+        $chapitres = $chapitreRepository->findBy(['cours' => $cours], ['ordre' => 'ASC']);
         $user = $this->getUser();
         $progressStats = null;
         
-        // Si l'utilisateur est connecté et qu'il y a des chapitres
-        if ($user && !empty($chapitres)) {
-            // Prendre le cours du premier chapitre pour afficher la progression globale
-            $cours = $chapitres[0]->getCours();
-            if ($cours) {
-                $progressStats = $progressService->getCourseProgressStats($user, $cours);
-            }
+        // Si l'utilisateur est connecté, calculer la progression
+        if ($user) {
+            $progressStats = $progressService->getCourseProgressStats($user, $cours);
         }
         
         return $this->render('frontoffice/chapitre/index.html.twig', [
             'chapitres' => $chapitres,
+            'cours' => $cours,
             'progress_stats' => $progressStats,
         ]);
     }
