@@ -23,7 +23,7 @@ class Commentaire
     #[ORM\JoinColumn(nullable: false)]
     private ?Post $post = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(referencedColumnName: 'userId', nullable: true)]
     private ?User $user = null;
 
@@ -32,46 +32,21 @@ class Commentaire
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    public function getId(): ?int { return $this->id; }
 
-    public function getContenu(): ?string
-    {
-        return $this->contenu;
-    }
+    public function getContenu(): ?string { return $this->contenu; }
+    public function setContenu(string $contenu): self { $this->contenu = $contenu; return $this; }
 
-    public function setContenu(string $contenu): self
-    {
-        $this->contenu = $contenu;
-        return $this;
-    }
+    public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
 
-    public function getCreatedAt(): \DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
+    public function getPost(): ?Post { return $this->post; }
+    public function setPost(?Post $post): self { $this->post = $post; return $this; }
 
-    public function getPost(): ?Post
-    {
-        return $this->post;
-    }
+    public function getUser(): ?User { return $this->user; }
+    public function setUser(?User $user): self { $this->user = $user; return $this; }
 
-    public function setPost(?Post $post): self
+    public function __toString(): string
     {
-        $this->post = $post;
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-        return $this;
+        return (string) ($this->contenu ?? '');
     }
 }

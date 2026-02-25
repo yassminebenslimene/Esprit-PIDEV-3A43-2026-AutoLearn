@@ -7,6 +7,7 @@ use App\Entity\Quiz;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -54,6 +55,34 @@ class QuizType extends AbstractType
                 'placeholder' => 'Sélectionnez un chapitre',
                 'required' => false,
                 'help' => 'Associez ce quiz à un chapitre spécifique'
+            ])
+            ->add('dureeMaxMinutes', IntegerType::class, [
+                'label' => 'Durée maximale (minutes)',
+                'attr' => [
+                    'placeholder' => 'Ex: 20',
+                    'min' => 1
+                ],
+                'required' => false,
+                'help' => 'Laissez vide pour un quiz sans limite de temps'
+            ])
+            ->add('seuilReussite', IntegerType::class, [
+                'label' => 'Seuil de réussite (%)',
+                'attr' => [
+                    'placeholder' => 'Ex: 50',
+                    'min' => 0,
+                    'max' => 100
+                ],
+                'required' => false,
+                'help' => 'Pourcentage minimum pour valider le quiz (défaut: 50%)'
+            ])
+            ->add('maxTentatives', IntegerType::class, [
+                'label' => 'Nombre maximum de tentatives',
+                'attr' => [
+                    'placeholder' => 'Ex: 3',
+                    'min' => 1
+                ],
+                'required' => false,
+                'help' => 'Laissez vide pour un nombre illimité de tentatives'
             ])
         ;
     }

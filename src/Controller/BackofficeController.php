@@ -129,7 +129,8 @@ class BackofficeController extends AbstractController
         Request $request, 
         UserPasswordHasherInterface $passwordHasher, 
         EntityManagerInterface $entityManager,
-        \App\Service\BrevoMailService $mailService
+        \App\Service\BrevoMailService $mailService,
+        \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
     ): Response
     {
         $userDto = new UserCreateDTO();
@@ -155,6 +156,9 @@ class BackofficeController extends AbstractController
 
             $entityManager->persist($user);
             $entityManager->flush();
+
+            // Log the user creation activity
+            $activityLogger->logCreate($user);
 
             // Send welcome email with credentials
             try {
@@ -183,8 +187,18 @@ class BackofficeController extends AbstractController
 
     #[Route('/backoffice/users/{id}/edit', name: 'backoffice_user_edit')]
     #[IsGranted('ROLE_ADMIN')]
-    public function editUser(User $user, Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
+    public function editUser(
+        ?User $user, 
+        Request $request, 
+        UserPasswordHasherInterface $passwordHasher, 
+        EntityManagerInterface $entityManager,
+        \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
+    ): Response
     {
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur non trouvé');
+        }
+        
         // SIMPLE CHECK: Only allow editing ETUDIANT users
         if ($user->getRole() !== 'ETUDIANT') {
             $this->addFlash('error', 'Vous ne pouvez modifier que les étudiants.');
@@ -206,6 +220,24 @@ class BackofficeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $changes = [];
+            
+            if ($user->getNom() !== $userDto->nom) {
+                $changes['nom'] = ['old' => $user->getNom(), 'new' => $userDto->nom];
+            }
+            if ($user->getPrenom() !== $userDto->prenom) {
+                $changes['prenom'] = ['old' => $user->getPrenom(), 'new' => $userDto->prenom];
+            }
+            if ($user->getEmail() !== $userDto->email) {
+                $changes['email'] = ['old' => $user->getEmail(), 'new' => $userDto->email];
+            }
+            if ($user instanceof Etudiant && $user->getNiveau() !== $userDto->niveau) {
+                $changes['niveau'] = ['old' => $user->getNiveau(), 'new' => $userDto->niveau];
+            }
+            if ($userDto->password) {
+                $changes['password'] = 'changed';
+            }
+            
             $user->setNom($userDto->nom);
             $user->setPrenom($userDto->prenom);
             $user->setEmail($userDto->email);
@@ -219,6 +251,10 @@ class BackofficeController extends AbstractController
             }
 
             $entityManager->flush();
+            
+            // Log the update activity
+            $activityLogger->logUpdate($user, $changes);
+            
             $this->addFlash('success', 'Étudiant modifié avec succès!');
             return $this->redirectToRoute('backoffice_users');
         }
@@ -262,8 +298,18 @@ class BackofficeController extends AbstractController
 
     #[Route('/backoffice/users/{id}', name: 'backoffice_user_show')]
     #[IsGranted('ROLE_ADMIN')]
-    public function showUser(User $user): Response
+    public function showUser(
+        ?User $user,
+        Request $request,
+        \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
+    ): Response
     {
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur non trouvé');
+        }
+        
+        // Log the view activity
+        $activityLogger->logView($user);
         
         return $this->render('backoffice/users/user_show.html.twig', [
             'user' => $user,
@@ -274,11 +320,17 @@ class BackofficeController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function suspendUser(
         Request $request, 
-        User $user, 
+        ?User $user, 
         EntityManagerInterface $entityManager,
-        \App\Service\BrevoMailService $mailService
+        \App\Service\BrevoMailService $mailService,
+        \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
     ): Response
     {
+        if (!$user) {
+            $this->addFlash('error', 'Utilisateur non trouvé');
+            return $this->redirectToRoute('backoffice_users');
+        }
+        
         // Only allow suspending ETUDIANT users
         if ($user->getRole() !== 'ETUDIANT') {
             $this->addFlash('error', 'Vous ne pouvez suspendre que les étudiants.');
@@ -301,6 +353,9 @@ class BackofficeController extends AbstractController
             $user->setSuspendedBy($this->getUser()->getId());
             
             $entityManager->flush();
+            
+            // Log the suspension activity
+            $activityLogger->logSuspend($user, $reason);
             
             // Send suspension email
             try {
@@ -327,11 +382,17 @@ class BackofficeController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function reactivateUser(
         Request $request, 
-        User $user, 
+        ?User $user, 
         EntityManagerInterface $entityManager,
-        \App\Service\BrevoMailService $mailService
+        \App\Service\BrevoMailService $mailService,
+        \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
     ): Response
     {
+        if (!$user) {
+            $this->addFlash('error', 'Utilisateur non trouvé');
+            return $this->redirectToRoute('backoffice_users');
+        }
+        
         // Only allow reactivating ETUDIANT users
         if ($user->getRole() !== 'ETUDIANT') {
             $this->addFlash('error', 'Vous ne pouvez réactiver que les étudiants.');
@@ -352,6 +413,9 @@ class BackofficeController extends AbstractController
             $user->setSuspendedBy(null);
             
             $entityManager->flush();
+            
+            // Log the reactivation activity
+            $activityLogger->logReactivate($user);
             
             // Send reactivation email
             try {
@@ -467,7 +531,6 @@ class BackofficeController extends AbstractController
     {
         return $this->render('backoffice/about-templatemo.html.twig');
     }
-   
 
     #[Route('/backoffice/exercices', name: 'backoffice_exercices')]
     public function listExercices(ExerciceRepository $repo): Response

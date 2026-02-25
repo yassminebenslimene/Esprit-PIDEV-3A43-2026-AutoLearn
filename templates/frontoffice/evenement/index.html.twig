@@ -276,6 +276,17 @@
             padding: 40px;
             color: #718096;
         }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
     </style>
 {% endblock %}
 
@@ -307,13 +318,20 @@
                 {% set diff = date(evenement.dateDebut).diff(now) %}
                 {% set daysLeft = diff.days %}
                 
-                <div class="event-card" id="event-{{ evenement.id }}">
+                <div class="event-card" id="event-{{ evenement.id }}" {% if evenement.isCanceled %}style="opacity: 0.85; border: 3px solid #e53e3e;"{% endif %}>
                     <div class="event-header" onclick="toggleEvent({{ evenement.id }})">
-                        <img src="{{ asset('frontoffice/images/event-0' ~ ((loop.index0 % 3) + 1) ~ '.jpg') }}" alt="{{ evenement.titre }}" class="event-image">
+                        <img src="{{ asset('frontoffice/images/event-0' ~ ((loop.index0 % 3) + 1) ~ '.jpg') }}" alt="{{ evenement.titre }}" class="event-image" {% if evenement.isCanceled %}style="filter: grayscale(50%);"{% endif %}>
                         
                         <div class="event-info">
-                            <span class="event-type">{{ evenement.type.value }}</span>
-                            <h3 class="event-title">{{ evenement.titre }}</h3>
+                            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                <span class="event-type">{{ evenement.type.value }}</span>
+                                {% if evenement.isCanceled %}
+                                    <span style="background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%); color: white; padding: 5px 15px; border-radius: 15px; font-size: 12px; font-weight: 700; text-transform: uppercase; animation: pulse 2s infinite;">
+                                        ❌ CANCELLED
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <h3 class="event-title" {% if evenement.isCanceled %}style="text-decoration: line-through; color: #718096;"{% endif %}>{{ evenement.titre }}</h3>
                             
                             <div class="event-meta">
                                 <div class="meta-item">
@@ -369,6 +387,92 @@
                                 <p style="color: #4a5568; line-height: 1.6;">{{ evenement.description }}</p>
                             </div>
                             
+                            {# Weather Forecast Section #}
+                            {% if data.weather is not null %}
+                                <div class="details-section">
+                                    <h4>
+                                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+                                        </svg>
+                                        Weather {% if data.weather.is_forecast is defined and data.weather.is_forecast %}Forecast{% else %}Information{% endif %}
+                                    </h4>
+                                    
+                                    {% if data.weather.available is defined and data.weather.available %}
+                                        <div style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-radius: 15px; padding: 25px; border-left: 5px solid #0ea5e9;">
+                                            {% if data.weather.is_forecast is defined and not data.weather.is_forecast %}
+                                                <div style="background: rgba(251, 191, 36, 0.2); border-radius: 10px; padding: 10px; margin-bottom: 15px; text-align: center;">
+                                                    <small style="color: #92400e; font-weight: 600;">
+                                                        ℹ️ Current weather in Tunis (event is too far for accurate forecast)
+                                                    </small>
+                                                </div>
+                                            {% else %}
+                                                <div style="background: rgba(34, 197, 94, 0.2); border-radius: 10px; padding: 10px; margin-bottom: 15px; text-align: center;">
+                                                    <small style="color: #166534; font-weight: 600;">
+                                                        📍 Weather forecast for event day in Tunis, Tunisia
+                                                    </small>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                                                <div style="font-size: 64px;">
+                                                    {{ weatherService.getWeatherEmoji(data.weather.icon) }}
+                                                </div>
+                                                <div style="flex: 1;">
+                                                    <div style="font-size: 36px; font-weight: 700; color: #0c4a6e; margin-bottom: 5px;">
+                                                        {{ data.weather.temperature }}°C
+                                                    </div>
+                                                    <div style="font-size: 18px; color: #075985; font-weight: 600; margin-bottom: 10px;">
+                                                        {{ data.weather.description }}
+                                                    </div>
+                                                    <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 14px; color: #0c4a6e;">
+                                                        <span>🌡️ Feels like: {{ data.weather.feels_like }}°C</span>
+                                                        <span>💨 Wind: {{ data.weather.wind_speed }} km/h</span>
+                                                        <span>💧 Humidity: {{ data.weather.humidity }}%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            {# Personalized message based on weather #}
+                                            <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.7); border-radius: 10px;">
+                                                {% if data.weather.is_forecast is defined and not data.weather.is_forecast %}
+                                                    <p style="margin: 0; color: #0c4a6e; font-weight: 600;">
+                                                        ℹ️ This shows today's weather as reference. Actual forecast will be available 5 days before the event.
+                                                    </p>
+                                                {% elseif data.weather.temperature > 25 %}
+                                                    <p style="margin: 0; color: #0c4a6e; font-weight: 600;">
+                                                        ☀️ It will be hot! Remember to bring water and wear light clothing.
+                                                    </p>
+                                                {% elseif data.weather.temperature < 10 %}
+                                                    <p style="margin: 0; color: #0c4a6e; font-weight: 600;">
+                                                        🧥 It will be cold! Dress warmly for the event.
+                                                    </p>
+                                                {% elseif 'rain' in data.weather.description|lower %}
+                                                    <p style="margin: 0; color: #0c4a6e; font-weight: 600;">
+                                                        🌧️ Rain expected! Don't forget your umbrella.
+                                                    </p>
+                                                {% else %}
+                                                    <p style="margin: 0; color: #0c4a6e; font-weight: 600;">
+                                                        🌤️ Perfect weather for the event! See you there!
+                                                    </p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% elseif data.weather.error is defined and data.weather.error %}
+                                        <div style="background: #fee2e2; border-radius: 10px; padding: 20px; border-left: 5px solid #ef4444;">
+                                            <p style="margin: 0; color: #991b1b; font-weight: 600;">
+                                                ⚠️ {{ data.weather.message }}
+                                            </p>
+                                        </div>
+                                    {% else %}
+                                        <div style="background: #fef3c7; border-radius: 10px; padding: 20px; border-left: 5px solid #f59e0b;">
+                                            <p style="margin: 0; color: #92400e; font-weight: 600;">
+                                                ℹ️ Weather information not available for this location
+                                            </p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            
                             <div class="details-section">
                                 <h4>
                                     <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -409,7 +513,15 @@
                                 {% endif %}
                             </div>
                             
-                            {% if data.placesDisponibles > 0 %}
+                            {% if evenement.isCanceled %}
+                                <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-radius: 15px; border: 2px solid #e53e3e;">
+                                    <div style="font-size: 48px; margin-bottom: 15px;">❌</div>
+                                    <h3 style="color: #991b1b; margin-bottom: 10px; font-size: 24px;">Event Cancelled</h3>
+                                    <p style="color: #7f1d1d; margin: 0; font-size: 16px;">
+                                        This event has been cancelled. No registrations are accepted.
+                                    </p>
+                                </div>
+                            {% elseif data.placesDisponibles > 0 %}
                                 <div style="text-align: center;">
                                     <a href="{{ path('app_event_participate', {'id': evenement.id}) }}" class="participate-btn">
                                         🎯 Participate in This Event

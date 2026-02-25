@@ -6,18 +6,24 @@ use App\Entity\Evenement;
 use App\Form\EvenementType;
 use App\Repository\EvenementRepository;
 use App\Repository\ParticipationRepository;
+use App\Service\FeedbackAnalyticsService;
+use App\Service\AIReportService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/backoffice/evenement')]
 final class EvenementController extends AbstractController
 {
     #[Route('/', name: 'backoffice_evenements', methods: ['GET'])]
-    public function index(EvenementRepository $evenementRepository, EntityManagerInterface $entityManager): Response
-    {
+    public function index(
+        EvenementRepository $evenementRepository, 
+        EntityManagerInterface $entityManager,
+        FeedbackAnalyticsService $analyticsService
+    ): Response {
         $evenements = $evenementRepository->findAll();
         
         // Mettre à jour le statut de chaque événement
@@ -26,8 +32,12 @@ final class EvenementController extends AbstractController
         }
         $entityManager->flush();
         
+        // Récupérer les statistiques pour la section AI
+        $statsByType = $analyticsService->analyzeByEventType();
+        
         return $this->render('backoffice/evenement/index.html.twig', [
             'evenements' => $evenements,
+            'stats_by_type' => $statsByType,
         ]);
     }
 
@@ -114,5 +124,82 @@ final class EvenementController extends AbstractController
 
         $this->addFlash('success', 'Événement, équipes et participations supprimés avec succès');
         return $this->redirectToRoute('backoffice_evenements', [], Response::HTTP_SEE_OTHER);
+    }
+    
+    // ===== ROUTES POUR LES RAPPORTS AI =====
+    
+    #[Route('/ai/generate-analysis', name: 'backoffice_evenement_ai_analysis', methods: ['POST'])]
+    public function generateAIAnalysis(AIReportService $aiReportService): JsonResponse
+    {
+        try {
+            $report = $aiReportService->generateAnalysisReport();
+            
+            if (!$report) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Erreur lors de la génération du rapport. Vérifiez votre clé API Hugging Face dans .env.local'
+                ], 500);
+            }
+
+            return new JsonResponse([
+                'success' => true,
+                'report' => $report
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Erreur: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    #[Route('/ai/generate-recommendations', name: 'backoffice_evenement_ai_recommendations', methods: ['POST'])]
+    public function generateAIRecommendations(AIReportService $aiReportService): JsonResponse
+    {
+        try {
+            $recommendations = $aiReportService->generateEventRecommendations();
+            
+            if (!$recommendations) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Erreur lors de la génération des recommandations.'
+                ], 500);
+            }
+
+            return new JsonResponse([
+                'success' => true,
+                'recommendations' => $recommendations
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Erreur: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    #[Route('/ai/generate-improvements', name: 'backoffice_evenement_ai_improvements', methods: ['POST'])]
+    public function generateAIImprovements(AIReportService $aiReportService): JsonResponse
+    {
+        try {
+            $improvements = $aiReportService->generateImprovementSuggestions();
+            
+            if (!$improvements) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Erreur lors de la génération des suggestions.'
+                ], 500);
+            }
+
+            return new JsonResponse([
+                'success' => true,
+                'improvements' => $improvements
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Erreur: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -85,6 +85,29 @@
                 </div>
             {% endif %}
 
+            <!-- Actions PDF -->
+            <div class="pdf-actions" style="margin: 30px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; text-align: center;">
+                <h3 style="color: white; margin-bottom: 15px;">
+                    <i class="fa fa-file-pdf"></i> Télécharger ce chapitre
+                </h3>
+                <p style="color: rgba(255,255,255,0.9); margin-bottom: 20px;">
+                    Accédez au contenu hors ligne en format PDF avec le branding Autolearn
+                </p>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <a href="{{ path('app_chapitre_pdf_preview', {id: chapitre.id}) }}" 
+                       target="_blank"
+                       class="btn-modern" 
+                       style="background: white; color: #667eea; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                        <i class="fa fa-eye"></i> Prévisualiser PDF
+                    </a>
+                    <a href="{{ path('app_chapitre_pdf_download', {id: chapitre.id}) }}" 
+                       class="btn-modern" 
+                       style="background: rgba(255,255,255,0.2); color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; border: 2px solid white; transition: all 0.3s;">
+                        <i class="fa fa-download"></i> Télécharger PDF
+                    </a>
+                </div>
+            </div>
+
             <div class="chapter-navigation">
                 <a href="{{ path('app_chapitre_index_front') }}" class="btn-modern btn-back">
                     <i class="fa fa-arrow-left"></i> 

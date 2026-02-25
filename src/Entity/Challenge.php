@@ -41,11 +41,9 @@ class Challenge
     orphanRemoval: true)]
     private Collection $exercices;
 
-    /**
-     * @var Collection<int, Quiz>
-     */
-    #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'challenge')]
-    private Collection $quizzes;
+    #[ORM\ManyToOne(inversedBy: 'challenges')]
+    #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: true)]
+    private ?User $created_by = null;
 
     public function __construct()
     {

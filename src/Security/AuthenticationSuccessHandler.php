@@ -3,6 +3,7 @@
 namespace App\Security;
 
 use App\Entity\User;
+use App\Bundle\UserActivityBundle\Service\ActivityLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,17 +20,20 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
     private Security $security;
     private RequestStack $requestStack;
     private EntityManagerInterface $entityManager;
+    private ActivityLogger $activityLogger;
 
     public function __construct(
         RouterInterface $router, 
         Security $security, 
         RequestStack $requestStack,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        ActivityLogger $activityLogger
     ) {
         $this->router = $router;
         $this->security = $security;
         $this->requestStack = $requestStack;
         $this->entityManager = $entityManager;
+        $this->activityLogger = $activityLogger;
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): Response
@@ -38,6 +42,9 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
 
         // Check if user is suspended
         if ($user instanceof User && $user->getIsSuspended()) {
+            // Log failed login attempt due to suspension
+            $this->activityLogger->logLogin($user, false, 'Account suspended: ' . $user->getSuspensionReason());
+            
             // Logout the user immediately
             $this->security->logout(false);
             
@@ -56,6 +63,9 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
         if ($user instanceof User) {
             $user->setLastLoginAt(new \DateTime());
             $this->entityManager->flush();
+            
+            // Log successful login
+            $this->activityLogger->logLogin($user, true);
         }
 
         // Redirect Admin to backoffice

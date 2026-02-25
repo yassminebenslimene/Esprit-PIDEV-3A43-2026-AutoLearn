@@ -9,6 +9,7 @@ use App\Enum\StatutParticipation;
 use App\Repository\EvenementRepository;
 use App\Repository\EquipeRepository;
 use App\Repository\ParticipationRepository;
+use App\Service\WeatherService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,8 +19,12 @@ use Doctrine\ORM\EntityManagerInterface;
 class FrontofficeEvenementController extends AbstractController
 {
     #[Route('/', name: 'app_events', methods: ['GET'])]
-    public function index(EvenementRepository $evenementRepository, ParticipationRepository $participationRepository, EntityManagerInterface $entityManager): Response
-    {
+    public function index(
+        EvenementRepository $evenementRepository, 
+        ParticipationRepository $participationRepository, 
+        EntityManagerInterface $entityManager,
+        WeatherService $weatherService
+    ): Response {
         $evenements = $evenementRepository->findAll();
         
         // Pour chaque événement, mettre à jour le statut et calculer les places disponibles
@@ -45,11 +50,15 @@ class FrontofficeEvenementController extends AbstractController
                 $equipes[] = $participation->getEquipe();
             }
             
+            // Récupérer la météo pour l'événement (toujours pour Tunis, Tunisie)
+            $weather = $weatherService->getWeatherForEvent('Tunis,TN', $evenement->getDateDebut());
+            
             $evenementsData[] = [
                 'evenement' => $evenement,
                 'placesDisponibles' => $placesDisponibles,
                 'placesOccupees' => $placesOccupees,
-                'equipes' => $equipes
+                'equipes' => $equipes,
+                'weather' => $weather
             ];
         }
         
@@ -57,6 +66,7 @@ class FrontofficeEvenementController extends AbstractController
         
         return $this->render('frontoffice/evenement/index.html.twig', [
             'evenementsData' => $evenementsData,
+            'weatherService' => $weatherService
         ]);
     }
     
