@@ -594,6 +594,34 @@
                 {% endfor %}
             </ul>
         </div>
+
+        {# Section des demandes d'adhésion #}
+        {% if communaute.pendingMembers|length > 0 %}
+        <div class="members-box" style="background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%); border: 1px solid rgba(255, 193, 7, 0.3);">
+            <strong style="color: #856404;">📬 Demandes d'adhésion ({{ communaute.pendingMembers|length }})</strong>
+            <ul class="members-list">
+                {% for pendingUser in communaute.pendingMembers %}
+                <li>
+                    <span>{{ pendingUser.prenom }} {{ pendingUser.nom }}</span>
+                    <div style="display: flex; gap: 8px;">
+                        <form method="post" action="{{ path('app_communaute_accept_member', {id: communaute.id, userId: pendingUser.id}) }}" style="display: inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('accept_member_' ~ pendingUser.id) }}">
+                            <button type="submit" style="padding: 6px 14px; font-size: 0.85rem; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-weight: 500;">
+                                ✓ Accepter
+                            </button>
+                        </form>
+                        <form method="post" action="{{ path('app_communaute_reject_member', {id: communaute.id, userId: pendingUser.id}) }}" style="display: inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('reject_member_' ~ pendingUser.id) }}">
+                            <button type="submit" style="padding: 6px 14px; font-size: 0.85rem; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-weight: 500;">
+                                ✗ Refuser
+                            </button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
     {% endif %}
 
     {% for post in communaute.posts %}

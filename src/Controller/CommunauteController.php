@@ -104,6 +104,92 @@ final class CommunauteController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/request-join', name: 'app_communaute_request_join', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function requestJoin(Request $request, Communaute $communaute, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        
+        if (!$this->isCsrfTokenValid('join_' . $communaute->getId(), $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token de sécurité invalide.');
+            return $this->redirectToRoute('app_communaute_index');
+        }
+
+        $user = $this->getUser();
+        
+        if ($communaute->getMembers()->contains($user) || $communaute->getOwner() === $user) {
+            $this->addFlash('error', 'Vous êtes déjà membre de cette communauté.');
+            return $this->redirectToRoute('app_communaute_index');
+        }
+
+        if ($communaute->hasPendingRequest($user)) {
+            $this->addFlash('error', 'Vous avez déjà envoyé une demande pour cette communauté.');
+            return $this->redirectToRoute('app_communaute_index');
+        }
+
+        $communaute->addPendingMember($user);
+        $em->flush();
+
+        $this->addFlash('success', 'Votre demande a été envoyée au créateur de la communauté.');
+        return $this->redirectToRoute('app_communaute_index');
+    }
+
+    #[Route('/{id}/accept-member/{userId}', name: 'app_communaute_accept_member', requirements: ['id' => '\d+', 'userId' => '\d+'], methods: ['POST'])]
+    public function acceptMember(Request $request, Communaute $communaute, int $userId, UserRepository $userRepository, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        
+        if ($communaute->getOwner() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Seul le créateur peut accepter les demandes.');
+        }
+
+        if (!$this->isCsrfTokenValid('accept_member_' . $userId, $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token de sécurité invalide.');
+            return $this->redirectToRoute('app_communaute_show', ['id' => $communaute->getId()]);
+        }
+
+        $user = $userRepository->find($userId);
+        
+        if (!$user || !$communaute->getPendingMembers()->contains($user)) {
+            $this->addFlash('error', 'Demande introuvable.');
+            return $this->redirectToRoute('app_communaute_show', ['id' => $communaute->getId()]);
+        }
+
+        $communaute->removePendingMember($user);
+        $communaute->addMember($user);
+        $em->flush();
+
+        $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté.');
+        return $this->redirectToRoute('app_communaute_show', ['id' => $communaute->getId()]);
+    }
+
+    #[Route('/{id}/reject-member/{userId}', name: 'app_communaute_reject_member', requirements: ['id' => '\d+', 'userId' => '\d+'], methods: ['POST'])]
+    public function rejectMember(Request $request, Communaute $communaute, int $userId, UserRepository $userRepository, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        
+        if ($communaute->getOwner() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Seul le créateur peut refuser les demandes.');
+        }
+
+        if (!$this->isCsrfTokenValid('reject_member_' . $userId, $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token de sécurité invalide.');
+            return $this->redirectToRoute('app_communaute_show', ['id' => $communaute->getId()]);
+        }
+
+        $user = $userRepository->find($userId);
+        
+        if (!$user || !$communaute->getPendingMembers()->contains($user)) {
+            $this->addFlash('error', 'Demande introuvable.');
+            return $this->redirectToRoute('app_communaute_show', ['id' => $communaute->getId()]);
+        }
+
+        $communaute->removePendingMember($user);
+        $em->flush();
+
+        $this->addFlash('success', 'La demande a été refusée.');
+        return $this->redirectToRoute('app_communaute_show', ['id' => $communaute->getId()]);
+    }
+
     /** Retirer un membre (réservé au propriétaire). */
     #[Route('/{id}/remove-member/{userId}', name: 'app_communaute_remove_member', requirements: ['id' => '\d+', 'userId' => '\d+'], methods: ['POST'], priority: 10)]
     public function removeMember(Request $request, Communaute $communaute, int $userId, UserRepository $userRepository, EntityManagerInterface $em): Response

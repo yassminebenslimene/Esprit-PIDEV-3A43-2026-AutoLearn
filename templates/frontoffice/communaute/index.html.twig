@@ -333,9 +333,29 @@
                     </div>
 
                     <div class="community-actions">
-                        <a href="/communaute/{{ communaute.id }}" class="btn-outline">
-                            👁️ Voir
-                        </a>
+                        {% set isMember = app.user and (communaute.members.contains(app.user) or (communaute.owner and communaute.owner.id == app.user.id)) %}
+                        {% set hasPendingRequest = app.user and communaute.hasPendingRequest(app.user) %}
+                        
+                        {% if isMember %}
+                            <a href="/communaute/{{ communaute.id }}" class="btn-outline">
+                                👁️ Voir
+                            </a>
+                        {% elseif hasPendingRequest %}
+                            <button class="btn-outline" disabled style="opacity: 0.6; cursor: not-allowed;">
+                                ⏳ Demande en attente
+                            </button>
+                        {% elseif app.user %}
+                            <form method="post" action="{{ path('app_communaute_request_join', {id: communaute.id}) }}" style="display: inline-block;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('join_' ~ communaute.id) }}">
+                                <button type="submit" class="btn-outline">
+                                    ➕ Rejoindre
+                                </button>
+                            </form>
+                        {% else %}
+                            <a href="{{ path('app_login') }}" class="btn-outline">
+                                🔒 Connexion requise
+                            </a>
+                        {% endif %}
 
                         {% if app.user and communaute.owner and communaute.owner.id == app.user.id %}
                             <a href="/communaute/{{ communaute.id }}/edit" class="btn-outline btn-edit">
