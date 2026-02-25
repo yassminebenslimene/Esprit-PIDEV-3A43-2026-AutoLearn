@@ -21,6 +21,9 @@ class Post
     #[ORM\Column(type: 'text')]
     private ?string $contenu = null;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $summary = null;
+
     #[ORM\Column(nullable: true)]
     private ?string $imageFile = null;
 
@@ -57,6 +60,9 @@ class Post
 
     public function getContenu(): ?string { return $this->contenu; }
     public function setContenu(?string $contenu): self { $this->contenu = $contenu ?? ''; return $this; }
+
+    public function getSummary(): ?string { return $this->summary; }
+    public function setSummary(?string $summary): self { $this->summary = $summary; return $this; }
 
     public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
 

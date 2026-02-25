@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Post;
 use App\Entity\Communaute;
 use App\Form\PostType;
+use App\Service\AiSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +19,8 @@ final class PostController extends AbstractController
     public function new(
         Communaute $communaute,
         Request $request,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        AiSummaryService $aiSummary
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -42,8 +44,11 @@ final class PostController extends AbstractController
                 $post->setUser($this->getUser());
             }
 
-            // ✅ Plus aucun code d’upload ici
-            // Vich gère automatiquement les fichiers
+            // Générer le résumé AI automatiquement
+            $summary = $aiSummary->generateSummary($post->getContenu());
+            if ($summary) {
+                $post->setSummary($summary);
+            }
 
             $em->persist($post);
             $em->flush();
@@ -71,7 +76,8 @@ final class PostController extends AbstractController
     public function edit(
         Request $request,
         Post $post,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        AiSummaryService $aiSummary
     ): Response {
         if ($post->getUser() !== $this->getUser()) {
             $this->addFlash('error', 'Vous ne pouvez modifier que vos propres posts.');
@@ -87,7 +93,11 @@ final class PostController extends AbstractController
 
             $post->setContenu($post->getContenu() ?? '');
 
-            // ✅ Vich gère automatiquement les modifications
+            // Régénérer le résumé AI si le contenu a changé
+            $summary = $aiSummary->generateSummary($post->getContenu());
+            if ($summary) {
+                $post->setSummary($summary);
+            }
 
             $em->flush();
 
