@@ -310,6 +310,21 @@ class AIAssistantService
                 'total' => count($allQuizzes),
             ];
 
+            // ========== POSTS DATA (Limité à 10) ==========
+            $allPosts = $this->postRepository->findAll();
+            $data['posts'] = [
+                'total' => count($allPosts),
+                'list' => array_map(function($p) {
+                    return [
+                        'id' => $p->getId(),
+                        'contenu' => substr($p->getContenu(), 0, 100) . '...',
+                        'auteur' => $p->getUser() ? $p->getUser()->getPrenom() . ' ' . $p->getUser()->getNom() : 'Inconnu',
+                        'communaute' => $p->getCommunaute() ? $p->getCommunaute()->getNom() : null,
+                        'created_at' => $p->getCreatedAt()->format('Y-m-d'),
+                    ];
+                }, array_slice($allPosts, 0, 10))
+            ];
+
             // ========== STUDENT-SPECIFIC DATA ==========
             if (!$isAdmin && $user) {
                 // Student's enrolled courses (limité à 5)
@@ -732,7 +747,13 @@ WHAT YOU CAN DO FOR ADMINS:
    - Update quiz details
    - View quiz results and statistics
 
-8. 🔍 ADVANCED SEARCH & FILTERING
+8. 📱 POST MANAGEMENT
+   - List all posts from communities
+   - View post details with comments
+   - Monitor community activity
+   - Moderate content
+
+9. 🔍 ADVANCED SEARCH & FILTERING
    - Filter students by multiple criteria
    - Search across all platform data
    - Generate custom reports
@@ -781,6 +802,10 @@ COMMUNITY MANAGEMENT:
 QUIZ MANAGEMENT:
 - create_quiz: Create a quiz for a course
 - get_quiz: Get quiz information
+
+POST MANAGEMENT:
+- list_posts: List all posts from communities
+- get_post: Get post details
 
 GENERAL:
 - get_popular_courses: Show most popular courses
@@ -1008,6 +1033,8 @@ Actions disponibles:
 - create_course: Créer un cours (titre, description, niveau)
 - create_challenge: Créer un challenge
 - create_community: Créer une communauté
+- list_posts: Afficher tous les posts des communautés
+- get_post: Voir les détails d'un post
 
 ⚠️ RÈGLE IMPORTANTE DE LA PLATEFORME:
 La suppression d'étudiants n'est PAS autorisée sur cette plateforme.

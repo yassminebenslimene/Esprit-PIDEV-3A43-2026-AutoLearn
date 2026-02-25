@@ -190,6 +190,10 @@ class ActionExecutorService
                 'create_quiz' => $this->createQuiz($params),
                 'get_quiz' => $this->getQuiz($params),
                 
+                // POST ACTIONS
+                'list_posts' => $this->listPosts($params),
+                'get_post' => $this->getPost($params),
+                
                 // STUDENT ACTIONS
                 'create_team' => $this->createTeam($params),
                 'enroll_in_course' => $this->enrollInCourse($params),
@@ -1400,6 +1404,57 @@ class ActionExecutorService
         ];
     }
 
+    // ========== POST ACTIONS ==========
+    
+    private function listPosts(array $params): array
+    {
+        $limit = $params['limit'] ?? 50;
+        $posts = $this->postRepository->findBy([], ['createdAt' => 'DESC'], $limit);
+        
+        return [
+            'success' => true,
+            'count' => count($posts),
+            'posts' => array_map(function($p) {
+                return [
+                    'id' => $p->getId(),
+                    'contenu' => substr($p->getContenu(), 0, 150) . (strlen($p->getContenu()) > 150 ? '...' : ''),
+                    'auteur' => $p->getUser() ? $p->getUser()->getPrenom() . ' ' . $p->getUser()->getNom() : 'Inconnu',
+                    'communaute' => $p->getCommunaute() ? $p->getCommunaute()->getNom() : 'Aucune',
+                    'created_at' => $p->getCreatedAt()->format('d/m/Y H:i'),
+                    'has_image' => !empty($p->getImageFile()),
+                    'has_video' => !empty($p->getVideoFile()),
+                    'commentaires_count' => $p->getCommentaires()->count()
+                ];
+            }, $posts)
+        ];
+    }
+
+    private function getPost(array $params): array
+    {
+        if (empty($params['id'])) {
+            return ['success' => false, 'error' => 'ID post requis'];
+        }
+
+        $post = $this->postRepository->find($params['id']);
+        if (!$post) {
+            return ['success' => false, 'error' => 'Post introuvable'];
+        }
+
+        return [
+            'success' => true,
+            'post' => [
+                'id' => $post->getId(),
+                'contenu' => $post->getContenu(),
+                'auteur' => $post->getUser() ? $post->getUser()->getPrenom() . ' ' . $post->getUser()->getNom() : 'Inconnu',
+                'communaute' => $post->getCommunaute() ? $post->getCommunaute()->getNom() : 'Aucune',
+                'created_at' => $post->getCreatedAt()->format('d/m/Y H:i'),
+                'has_image' => !empty($post->getImageFile()),
+                'has_video' => !empty($post->getVideoFile()),
+                'commentaires_count' => $post->getCommentaires()->count()
+            ]
+        ];
+    }
+
     // ========== STUDENT ACTIONS ==========
     
     private function enrollInCourse(array $params): array
@@ -1461,7 +1516,8 @@ class ActionExecutorService
                 'list_courses' => 'Lister tous les cours',
                 'list_events' => 'Lister tous les événements',
                 'list_challenges' => 'Lister tous les challenges',
-                'list_communities' => 'Lister toutes les communautés'
+                'list_communities' => 'Lister toutes les communautés',
+                'list_posts' => 'Lister tous les posts'
             ]
         ];
 
@@ -1484,7 +1540,9 @@ class ActionExecutorService
                 'update_challenge' => 'Modifier un challenge',
                 'create_community' => 'Créer une communauté',
                 'update_community' => 'Modifier une communauté',
-                'create_quiz' => 'Créer un quiz'
+                'create_quiz' => 'Créer un quiz',
+                'list_posts' => 'Lister tous les posts',
+                'get_post' => 'Voir les détails d\'un post'
             ];
         }
 
