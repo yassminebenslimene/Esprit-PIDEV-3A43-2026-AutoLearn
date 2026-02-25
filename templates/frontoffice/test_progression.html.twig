@@ -1,0 +1,176 @@
+{% extends 'frontoffice/base.html.twig' %}
+
+{% block title %}Test Progression - AutoLearn{% endblock %}
+
+{% block body %}
+<div class="container mt-5 mb-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4">
+            <i class="fas fa-chart-line text-primary"></i> 
+            Test du Système de Progression
+        </h1>
+        <p class="lead text-muted">Visualisez votre progression dans tous les cours</p>
+    </div>
+
+    {% if app.user %}
+        <div class="alert alert-info mb-4">
+            <i class="fas fa-user"></i> Connecté en tant que: <strong>{{ app.user.prenom }} {{ app.user.nom }}</strong>
+        </div>
+
+        <div class="row">
+            {% for c in cours %}
+                {% set stats = all_progress[c.id] %}
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-book"></i> {{ c.titre }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-3">{{ c.description|slice(0, 100) }}...</p>
+                            
+                            {# Barre de progression #}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted">Progression</span>
+                                    <strong>{{ stats.percentage }}%</strong>
+                                </div>
+                                <div class="progress" style="height: 25px;">
+                                    <div class="progress-bar 
+                                                {% if stats.percentage >= 100 %}bg-success
+                                                {% elseif stats.percentage >= 75 %}bg-info
+                                                {% elseif stats.percentage >= 50 %}bg-primary
+                                                {% else %}bg-warning{% endif %}" 
+                                         role="progressbar" 
+                                         style="width: {{ stats.percentage }}%">
+                                        {{ stats.percentage }}%
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {# Statistiques #}
+                            <div class="row text-center mb-3">
+                                <div class="col-4">
+                                    <div class="p-2 bg-light rounded">
+                                        <h4 class="mb-0 text-success">{{ stats.completed_chapters }}</h4>
+                                        <small class="text-muted">Complétés</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="p-2 bg-light rounded">
+                                        <h4 class="mb-0 text-warning">{{ stats.remaining_chapters }}</h4>
+                                        <small class="text-muted">Restants</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="p-2 bg-light rounded">
+                                        <h4 class="mb-0 text-primary">{{ stats.total_chapters }}</h4>
+                                        <small class="text-muted">Total</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% if stats.is_completed %}
+                                <div class="alert alert-success mb-3">
+                                    <i class="fas fa-trophy"></i> <strong>Cours terminé !</strong> 🎉
+                                </div>
+                            {% endif %}
+                            
+                            {# Informations du cours #}
+                            <div class="d-flex justify-content-between text-muted small mb-3">
+                                <span><i class="fas fa-tag"></i> {{ c.matiere }}</span>
+                                <span><i class="fas fa-signal"></i> {{ c.niveau }}</span>
+                                <span><i class="fas fa-clock"></i> {{ c.duree }}h</span>
+                            </div>
+                            
+                            <a href="{{ path('front_cours_show', {id: c.id}) }}" class="btn btn-primary w-100">
+                                <i class="fas fa-eye"></i> Voir le cours
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-warning text-center">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                        <p class="mb-0">Aucun cours disponible pour le moment.</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {# Instructions pour tester #}
+        <div class="card shadow-sm mt-5">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle"></i> Comment tester la progression ?
+                </h5>
+            </div>
+            <div class="card-body">
+                <ol class="mb-0">
+                    <li class="mb-2">
+                        <strong>Simuler une validation de chapitre :</strong>
+                        <p class="text-muted mb-0">
+                            Pour tester, vous devez créer un quiz et le réussir. Le système marquera automatiquement le chapitre comme complété.
+                        </p>
+                    </li>
+                    <li class="mb-2">
+                        <strong>Méthode alternative (pour test rapide) :</strong>
+                        <p class="text-muted mb-0">
+                            Utilisez la console Symfony pour marquer manuellement un chapitre comme complété :
+                        </p>
+                        <code class="d-block bg-dark text-white p-2 rounded mt-1">
+                            php bin/console app:test-progress [user_id] [chapitre_id] [score]
+                        </code>
+                    </li>
+                    <li class="mb-0">
+                        <strong>Vérifier la progression :</strong>
+                        <p class="text-muted mb-0">
+                            Rechargez cette page pour voir la progression mise à jour automatiquement.
+                        </p>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+    {% else %}
+        <div class="alert alert-warning text-center">
+            <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+            <h4>Vous devez être connecté</h4>
+            <p class="mb-3">Connectez-vous pour voir votre progression dans les cours.</p>
+            <a href="{{ path('backoffice_login') }}" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Se connecter
+            </a>
+        </div>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="{{ path('app_frontoffice') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Retour à l'accueil
+        </a>
+    </div>
+</div>
+
+<style>
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.progress {
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.progress-bar {
+    font-weight: bold;
+    transition: width 0.6s ease;
+}
+</style>
+{% endblock %}
