@@ -190,4 +190,15 @@ class Quiz
         $this->maxTentatives = $maxTentatives;
         return $this;
     }
+
+    public function getChallenge(): ?Challenge
+    {
+        return $this->challenge;
+    }
+
+    public function setChallenge(?Challenge $challenge): static
+    {
+        $this->challenge = $challenge;
+        return $this;
+    }
 }

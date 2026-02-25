@@ -37,13 +37,14 @@ class Challenge
     /**
      * @var Collection<int, Exercice>
      */
-    #[ORM\OneToMany(targetEntity: Exercice::class, mappedBy: 'challenge',    cascade: ['persist', 'remove'],
-    orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Exercice::class, mappedBy: 'challenge', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $exercices;
 
-    #[ORM\ManyToOne(inversedBy: 'challenges')]
-    #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: true)]
-    private ?User $created_by = null;
+    /**
+     * @var Collection<int, Quiz>
+     */
+    #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'challenge')]
+    private Collection $quizzes;
 
     public function __construct()
     {

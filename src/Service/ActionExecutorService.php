@@ -185,8 +185,9 @@ class ActionExecutorService
                 'list_challenges' => $this->listChallenges($params),
                 
                 // COMMUNITY ACTIONS
-                'create_community' => $this->createCommunity($params),
-                'update_community' => $this->updateCommunity($params),
+                'create_community' => $this->createCommunity($params, $requestingUser),
+                'update_community' => $this->updateCommunity($params, $requestingUser),
+                'delete_community' => $this->deleteCommunity($params, $requestingUser),
                 'get_community' => $this->getCommunity($params),
                 'list_communities' => $this->listCommunities($params),
                 
@@ -246,13 +247,14 @@ class ActionExecutorService
             'create_course', 'update_course', 'add_chapter',
             'create_event', 'update_event', 'delete_event',
             'create_challenge', 'update_challenge',
-            'create_community', 'update_community',
+            'update_community',
             'create_quiz'
         ];
 
         // Actions réservées aux étudiants
         $studentOnlyActions = [
-            'create_team', 'enroll_in_course', 'join_community'
+            'create_team', 'enroll_in_course', 'join_community', 'create_community',
+            'update_community', 'delete_community'
         ];
 
         // Actions admin uniquement
@@ -1427,7 +1429,7 @@ class ActionExecutorService
 
     // ========== COMMUNITY ACTIONS ==========
     
-    private function createCommunity(array $params): array
+    private function createCommunity(array $params, User $creator): array
     {
         $required = ['nom', 'description'];
         foreach ($required as $field) {
@@ -1439,6 +1441,12 @@ class ActionExecutorService
         $community = new \App\Entity\Communaute();
         $community->setNom($params['nom']);
         $community->setDescription($params['description']);
+        
+        // Définir le créateur comme propriétaire
+        $community->setOwner($creator);
+        
+        // Ajouter automatiquement le créateur comme premier membre
+        $community->addMember($creator);
 
         $this->em->persist($community);
         $this->em->flush();
@@ -1450,19 +1458,44 @@ class ActionExecutorService
         ];
     }
 
-    private function updateCommunity(array $params): array
+    private function updateCommunity(array $params, User $requestingUser): array
     {
-        if (empty($params['id'])) {
-            return ['success' => false, 'error' => 'ID communauté requis'];
+        if (empty($params['id']) && empty($params['nom'])) {
+            return ['success' => false, 'error' => 'ID ou nom de communauté requis'];
         }
 
-        $community = $this->communauteRepository->find($params['id']);
+        // Chercher par ID ou par nom
+        $community = null;
+        if (!empty($params['id']) && is_numeric($params['id'])) {
+            $community = $this->communauteRepository->find($params['id']);
+        } else {
+            // Chercher par nom
+            $searchName = $params['id'] ?? $params['nom'];
+            $communities = $this->communauteRepository->findAll();
+            foreach ($communities as $c) {
+                if (stripos($c->getNom(), $searchName) !== false) {
+                    $community = $c;
+                    break;
+                }
+            }
+        }
+
         if (!$community) {
             return ['success' => false, 'error' => 'Communauté introuvable'];
         }
 
-        if (isset($params['nom'])) $community->setNom($params['nom']);
-        if (isset($params['description'])) $community->setDescription($params['description']);
+        // Vérifier que l'utilisateur est le propriétaire
+        if ($community->getOwner() && $community->getOwner()->getId() !== $requestingUser->getId()) {
+            return ['success' => false, 'error' => 'Seul le propriétaire peut modifier cette communauté'];
+        }
+
+        // Mettre à jour les champs fournis
+        if (isset($params['nom']) && $params['nom'] !== $community->getNom()) {
+            $community->setNom($params['nom']);
+        }
+        if (isset($params['description'])) {
+            $community->setDescription($params['description']);
+        }
 
         $this->em->flush();
 
@@ -1470,6 +1503,48 @@ class ActionExecutorService
             'success' => true,
             'message' => "Communauté modifiée: {$community->getNom()}",
             'community_id' => $community->getId()
+        ];
+    }
+
+    private function deleteCommunity(array $params, User $requestingUser): array
+    {
+        if (empty($params['id']) && empty($params['nom'])) {
+            return ['success' => false, 'error' => 'ID ou nom de communauté requis'];
+        }
+
+        // Chercher par ID ou par nom
+        $community = null;
+        if (!empty($params['id']) && is_numeric($params['id'])) {
+            $community = $this->communauteRepository->find($params['id']);
+        } else {
+            // Chercher par nom
+            $searchName = $params['id'] ?? $params['nom'];
+            $communities = $this->communauteRepository->findAll();
+            foreach ($communities as $c) {
+                if (stripos($c->getNom(), $searchName) !== false) {
+                    $community = $c;
+                    break;
+                }
+            }
+        }
+
+        if (!$community) {
+            return ['success' => false, 'error' => 'Communauté introuvable'];
+        }
+
+        // Vérifier que l'utilisateur est le propriétaire
+        if ($community->getOwner() && $community->getOwner()->getId() !== $requestingUser->getId()) {
+            return ['success' => false, 'error' => 'Seul le propriétaire peut supprimer cette communauté'];
+        }
+
+        $communityName = $community->getNom();
+        
+        $this->em->remove($community);
+        $this->em->flush();
+
+        return [
+            'success' => true,
+            'message' => "Communauté supprimée: {$communityName}"
         ];
     }
 
@@ -1861,6 +1936,7 @@ class ActionExecutorService
                 'update_challenge' => 'Modifier un challenge',
                 'create_community' => 'Créer une communauté',
                 'update_community' => 'Modifier une communauté',
+                'delete_community' => 'Supprimer une communauté',
                 'create_quiz' => 'Créer un quiz',
                 'list_posts' => 'Lister tous les posts',
                 'get_post' => 'Voir les détails d\'un post',
@@ -1876,6 +1952,9 @@ class ActionExecutorService
                 'create_team' => 'Créer une équipe pour un événement',
                 'enroll_in_course' => 'S\'inscrire à un cours',
                 'join_community' => 'Rejoindre une communauté',
+                'create_community' => 'Créer une communauté',
+                'update_community' => 'Modifier une communauté',
+                'delete_community' => 'Supprimer une communauté',
                 'list_teams' => 'Voir toutes les équipes',
                 'get_team' => 'Voir les détails d\'une équipe',
                 'list_students' => 'Voir tous les étudiants'
