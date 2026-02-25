@@ -85,3 +85,6 @@ services:
             $commentaireRepository: '@App\Repository\CommentaireRepository'
             $quizRepository: '@App\Repository\QuizRepository'
             $logger: '@logger'
+
+    # Workflow service alias for Evenement
+    Symfony\Component\Workflow\WorkflowInterface $evenementPublishingStateMachine: '@state_machine.evenement_publishing'

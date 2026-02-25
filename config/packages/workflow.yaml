@@ -1,0 +1,42 @@
+framework:
+    workflows:
+        evenement_publishing:
+            type: 'state_machine'
+            audit_trail:
+                enabled: true
+            marking_store:
+                type: 'method'
+                property: 'workflowStatus'
+            supports:
+                - App\Entity\Evenement
+            initial_marking: planifie
+            places:
+                - planifie
+                - en_cours
+                - termine
+                - annule
+            transitions:
+                demarrer:
+                    from: planifie
+                    to: en_cours
+                    metadata:
+                        title: "Démarrer l'événement"
+                        description: "L'événement commence maintenant"
+                        color: 'success'
+                        icon: 'play'
+                terminer:
+                    from: en_cours
+                    to: termine
+                    metadata:
+                        title: "Terminer l'événement"
+                        description: "L'événement est maintenant terminé"
+                        color: 'info'
+                        icon: 'check'
+                annuler:
+                    from: [planifie, en_cours]
+                    to: annule
+                    metadata:
+                        title: "Annuler l'événement"
+                        description: "L'événement est annulé"
+                        color: 'danger'
+                        icon: 'times'
