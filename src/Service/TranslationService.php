@@ -2,138 +2,161 @@
 
 namespace App\Service;
 
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
+/**
+ * Service de traduction automatique avec Groq AI
+ */
 class TranslationService
 {
-    private const LIBRETRANSLATE_URL = 'https://libretranslate.com/translate';
-    private const TIMEOUT = 10; // 10 seconds timeout
+    private const MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct';
+    private const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+    
+    private const LANGUAGES = [
+        'fr' => 'Français',
+        'en' => 'English',
+        'es' => 'Español',
+        'ar' => 'العربية',
+        'de' => 'Deutsch',
+        'it' => 'Italiano',
+        'pt' => 'Português',
+        'zh' => '中文',
+    ];
+
+    private string $apiKey;
+    private HttpClientInterface $httpClient;
+    private LoggerInterface $logger;
+    private CacheInterface $cache;
 
     public function __construct(
-        private HttpClientInterface $httpClient,
-        private LoggerInterface $logger
-    ) {}
+        HttpClientInterface $httpClient,
+        LoggerInterface $logger,
+        CacheInterface $cache,
+        string $groqApiKey
+    ) {
+        $this->httpClient = $httpClient;
+        $this->logger = $logger;
+        $this->cache = $cache;
+        $this->apiKey = $groqApiKey;
+    }
 
     /**
-     * Traduit un texte via l'API LibreTranslate
+     * Traduit un texte vers une langue cible
      * 
      * @param string $text Texte à traduire
-     * @param string $sourceLang Langue source (ex: 'fr')
-     * @param string $targetLang Langue cible (ex: 'en')
-     * @return string|null Texte traduit ou null en cas d'erreur
+     * @param string $targetLang Code de la langue cible (fr, en, es, ar, etc.)
+     * @param string $sourceLang Code de la langue source (optionnel, auto-détecté si null)
+     * @return string Texte traduit
      */
-    public function translate(string $text, string $sourceLang, string $targetLang): ?string
+    public function translate(string $text, string $targetLang, ?string $sourceLang = null): string
     {
-        // Essaie d'abord MyMemory API (gratuit, sans clé)
-        $result = $this->translateWithMyMemory($text, $sourceLang, $targetLang);
-        
-        // Si MyMemory échoue, utilise le mode demo
-        if ($result === null) {
-            $this->logger->warning('MyMemory API failed, using demo mode');
-            return $this->translateDemo($text, $targetLang);
-        }
-        
-        return $result;
+        // Générer une clé de cache unique
+        $cacheKey = 'translation_' . md5($text . $targetLang . $sourceLang);
 
-        /* PRODUCTION: Décommentez ce code et utilisez une vraie API de traduction
-        try {
-            $response = $this->httpClient->request('POST', self::LIBRETRANSLATE_URL, [
-                'timeout' => self::TIMEOUT,
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
-                    'q' => $text,
-                    'source' => $sourceLang,
-                    'target' => $targetLang,
-                    'format' => 'text'
-                ]
+        // Vérifier le cache
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($text, $targetLang, $sourceLang) {
+            $item->expiresAfter(86400 * 7); // Cache 7 jours
+
+            $this->logger->info('Translating text', [
+                'target_lang' => $targetLang,
+                'source_lang' => $sourceLang,
+                'text_length' => strlen($text)
             ]);
 
-            $data = $response->toArray();
-            
-            if (isset($data['translatedText'])) {
-                return $data['translatedText'];
+            $prompt = $this->buildTranslationPrompt($text, $targetLang, $sourceLang);
+
+            try {
+                $response = $this->httpClient->request('POST', self::API_URL, [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->apiKey,
+                        'Content-Type' => 'application/json',
+                    ],
+                    'json' => [
+                        'model' => self::MODEL,
+                        'messages' => [
+                            [
+                                'role' => 'system',
+                                'content' => 'Tu es un traducteur professionnel. Tu traduis le texte de manière précise et naturelle, en préservant le formatage HTML si présent.'
+                            ],
+                            [
+                                'role' => 'user',
+                                'content' => $prompt
+                            ]
+                        ],
+                        'temperature' => 0.3,
+                        'max_tokens' => 4000,
+                    ],
+                    'timeout' => 30
+                ]);
+
+                $data = $response->toArray();
+                $translatedText = $data['choices'][0]['message']['content'] ?? '';
+
+                $this->logger->info('Translation successful');
+
+                return $translatedText;
+
+            } catch (\Exception $e) {
+                $this->logger->error('Translation error', [
+                    'error' => $e->getMessage()
+                ]);
+                
+                return $text; // Retourner le texte original en cas d'erreur
             }
-
-            $this->logger->error('LibreTranslate: Réponse invalide', ['data' => $data]);
-            return null;
-
-        } catch (\Exception $e) {
-            $this->logger->error('Erreur de traduction', [
-                'message' => $e->getMessage(),
-                'source' => $sourceLang,
-                'target' => $targetLang
-            ]);
-            return null;
-        }
-        */
+        });
     }
 
     /**
-     * Traduction de démonstration pour les tests
-     * Ajoute simplement un préfixe pour montrer que la traduction fonctionne
+     * Traduit un chapitre complet
+     * 
+     * @param object $chapitre Entité Chapitre
+     * @param string $targetLang Langue cible
+     * @return array ['titre' => string, 'contenu' => string]
      */
-    private function translateDemo(string $text, string $targetLang): string
+    public function translateChapter($chapitre, string $targetLang): array
     {
-        $prefixes = [
-            'en' => '[EN] ',
-            'es' => '[ES] ',
-            'de' => '[DE] ',
-            'it' => '[IT] ',
+        $titre = $chapitre->getTitre();
+        $contenu = $chapitre->getContenu();
+
+        return [
+            'titre' => $this->translate($titre, $targetLang),
+            'contenu' => $this->translate($contenu, $targetLang),
         ];
-
-        $prefix = $prefixes[$targetLang] ?? '[' . strtoupper($targetLang) . '] ';
-        
-        // Simule un délai de traduction réaliste
-        usleep(500000); // 0.5 secondes
-        
-        return $prefix . $text;
     }
 
     /**
-     * Traduction avec MyMemory API (gratuit, sans clé API)
-     * Alternative gratuite et simple à utiliser
+     * Construit le prompt de traduction
      */
-    private function translateWithMyMemory(string $text, string $sourceLang, string $targetLang): ?string
+    private function buildTranslationPrompt(string $text, string $targetLang, ?string $sourceLang): string
     {
-        try {
-            $url = sprintf(
-                'https://api.mymemory.translated.net/get?q=%s&langpair=%s|%s',
-                urlencode($text),
-                $sourceLang,
-                $targetLang
-            );
-
-            $response = $this->httpClient->request('GET', $url, [
-                'timeout' => self::TIMEOUT
-            ]);
-
-            $data = $response->toArray();
-            
-            if (isset($data['responseData']['translatedText'])) {
-                return $data['responseData']['translatedText'];
-            }
-
-            $this->logger->error('MyMemory: Réponse invalide', ['data' => $data]);
-            return null;
-
-        } catch (\Exception $e) {
-            $this->logger->error('MyMemory error', [
-                'message' => $e->getMessage(),
-                'source' => $sourceLang,
-                'target' => $targetLang
-            ]);
-            return null;
+        $targetLanguageName = self::LANGUAGES[$targetLang] ?? $targetLang;
+        
+        if ($sourceLang) {
+            $sourceLanguageName = self::LANGUAGES[$sourceLang] ?? $sourceLang;
+            return "Traduis ce texte de {$sourceLanguageName} vers {$targetLanguageName}. Préserve le formatage HTML si présent. Ne traduis que le contenu, pas les balises HTML.\n\nTexte à traduire:\n{$text}";
         }
+
+        return "Traduis ce texte vers {$targetLanguageName}. Préserve le formatage HTML si présent. Ne traduis que le contenu, pas les balises HTML.\n\nTexte à traduire:\n{$text}";
+    }
+
+    /**
+     * Retourne la liste des langues supportées
+     * 
+     * @return array ['code' => 'Nom']
+     */
+    public function getSupportedLanguages(): array
+    {
+        return self::LANGUAGES;
     }
 
     /**
      * Vérifie si une langue est supportée
      */
-    public function isLanguageSupported(string $lang): bool
+    public function isLanguageSupported(string $langCode): bool
     {
-        return in_array($lang, ['fr', 'en', 'es', 'de', 'it', 'pt', 'ru', 'zh', 'ja', 'ar']);
+        return isset(self::LANGUAGES[$langCode]);
     }
 }

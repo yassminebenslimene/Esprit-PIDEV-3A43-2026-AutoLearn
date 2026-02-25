@@ -5,9 +5,9 @@
 1. **Clé API Groq configurée**
    - Vérifier dans `.env.local`:
    ```env
-   GROQ_API_KEY=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
+   GROQ_API_KEY=votre_cle_api_groq_ici
    ```
-   ✅ Déjà configurée !
+   ✅ À configurer !
 
 2. **Cache vidé**
    ```bash

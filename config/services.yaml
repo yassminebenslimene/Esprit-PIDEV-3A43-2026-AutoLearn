@@ -57,3 +57,8 @@ services:
     App\Service\ChapterExplainerService:
         arguments:
             $groqApiKey: '%env(GROQ_API_KEY)%'
+    
+    # Configuration du TranslationService avec la clé API Groq
+    App\Service\TranslationService:
+        arguments:
+            $groqApiKey: '%env(GROQ_API_KEY)%'

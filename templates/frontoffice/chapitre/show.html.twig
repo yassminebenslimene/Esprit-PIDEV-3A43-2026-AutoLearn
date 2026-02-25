@@ -182,7 +182,12 @@
             contentEl.innerHTML = '<div style="text-align: center; padding: 40px;"><i class="fa fa-spinner fa-spin fa-3x"></i><p style="margin-top: 20px;">Traduction en cours...</p></div>';
             
             try {
-                const response = await fetch(`/api/chapitres/${chapitreId}?lang=${lang}`);
+                const response = await fetch(`/api/chapitres/${chapitreId}/translate?lang=${lang}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
                 if (data.status === 'error') {

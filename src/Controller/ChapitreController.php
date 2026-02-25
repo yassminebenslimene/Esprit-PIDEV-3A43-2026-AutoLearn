@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\GestionDeCours\Chapitre;
 use App\Form\GestionCours\ChapitreType;
 use App\Repository\Cours\ChapitreRepository;
-use App\Service\PdfGeneratorService;
+use App\Bundle\PdfGeneratorBundle\Service\PdfService;
 use App\Service\CourseProgressService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -148,10 +148,10 @@ class ChapitreController extends AbstractController
      * Afficher le chapitre en PDF dans le navigateur
      */
     #[Route('/front/{id}/pdf', name: 'app_chapitre_pdf_preview', methods: ['GET'])]
-    public function pdfPreview(Chapitre $chapitre, PdfGeneratorService $pdfGenerator): Response
+    public function pdfPreview(Chapitre $chapitre, PdfService $pdfService): Response
     {
-        // Générer le PDF
-        $dompdf = $pdfGenerator->generateChapterPdf($chapitre);
+        // Générer le PDF avec le bundle
+        $dompdf = $pdfService->generateChapterPdf($chapitre);
         
         // Afficher dans le navigateur (inline)
         return new Response(
@@ -168,10 +168,10 @@ class ChapitreController extends AbstractController
      * Télécharger le chapitre en PDF
      */
     #[Route('/front/{id}/pdf/download', name: 'app_chapitre_pdf_download', methods: ['GET'])]
-    public function pdfDownload(Chapitre $chapitre, PdfGeneratorService $pdfGenerator): Response
+    public function pdfDownload(Chapitre $chapitre, PdfService $pdfService): Response
     {
-        // Générer le PDF
-        $dompdf = $pdfGenerator->generateChapterPdf($chapitre);
+        // Générer le PDF avec le bundle
+        $dompdf = $pdfService->generateChapterPdf($chapitre);
         
         // Forcer le téléchargement (attachment)
         return new Response(
