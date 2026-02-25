@@ -205,13 +205,17 @@ class BackofficeController extends AbstractController
     #[Route('/backoffice/users/{id}/edit', name: 'backoffice_user_edit')]
     #[IsGranted('ROLE_ADMIN')]
     public function editUser(
-        User $user, 
+        ?User $user, 
         Request $request, 
         UserPasswordHasherInterface $passwordHasher, 
         EntityManagerInterface $entityManager,
         \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
     ): Response
     {
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur non trouvé');
+        }
+        
         // SIMPLE CHECK: Only allow editing ETUDIANT users
         if ($user->getRole() !== 'ETUDIANT') {
             $this->addFlash('error', 'Vous ne pouvez modifier que les étudiants.');
@@ -312,11 +316,15 @@ class BackofficeController extends AbstractController
     #[Route('/backoffice/users/{id}', name: 'backoffice_user_show')]
     #[IsGranted('ROLE_ADMIN')]
     public function showUser(
-        User $user,
+        ?User $user,
         Request $request,
         \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
     ): Response
     {
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur non trouvé');
+        }
+        
         // Log the view activity
         $activityLogger->logView($user);
         
@@ -329,12 +337,17 @@ class BackofficeController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function suspendUser(
         Request $request, 
-        User $user, 
+        ?User $user, 
         EntityManagerInterface $entityManager,
         \App\Service\BrevoMailService $mailService,
         \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
     ): Response
     {
+        if (!$user) {
+            $this->addFlash('error', 'Utilisateur non trouvé');
+            return $this->redirectToRoute('backoffice_users');
+        }
+        
         // Only allow suspending ETUDIANT users
         if ($user->getRole() !== 'ETUDIANT') {
             $this->addFlash('error', 'Vous ne pouvez suspendre que les étudiants.');
@@ -386,12 +399,17 @@ class BackofficeController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function reactivateUser(
         Request $request, 
-        User $user, 
+        ?User $user, 
         EntityManagerInterface $entityManager,
         \App\Service\BrevoMailService $mailService,
         \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
     ): Response
     {
+        if (!$user) {
+            $this->addFlash('error', 'Utilisateur non trouvé');
+            return $this->redirectToRoute('backoffice_users');
+        }
+        
         // Only allow reactivating ETUDIANT users
         if ($user->getRole() !== 'ETUDIANT') {
             $this->addFlash('error', 'Vous ne pouvez réactiver que les étudiants.');

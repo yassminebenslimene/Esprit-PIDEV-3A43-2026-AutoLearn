@@ -1,7 +1,7 @@
 {% extends 'backoffice/base.html.twig' %}
 
-{% block title %}Audit Statistics{% endblock %}
-{% block page_title %}📊 Audit Statistics{% endblock %}
+{% block title %}Admin Actions Statistics{% endblock %}
+{% block page_title %}📊 Admin Actions Statistics{% endblock %}
 
 {% block body %}
 <div class="audit-container">
@@ -15,6 +15,14 @@
             Back to Audit Trail
         </a>
     </div>
+    
+    <!-- Info Banner -->
+    <div style="background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.3); border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+        <p style="margin: 0; color: #60a5fa;">
+            ℹ️ These statistics show ONLY administrator actions on students. 
+            For student activity analytics, visit the <a href="{{ path('admin_user_activity_index') }}" style="color: #60a5fa; text-decoration: underline;">User Activity Dashboard</a>.
+        </p>
+    </div>
 
     <!-- Stats Cards -->
     <div class="stats-grid">
@@ -27,7 +35,7 @@
             </div>
             <div class="stat-content">
                 <h3>{{ stats.total_revisions }}</h3>
-                <p>Total Revisions</p>
+                <p>Admin Actions</p>
             </div>
         </div>
 
@@ -136,19 +144,27 @@
     <!-- Most Active Users -->
     <div class="glass-card" style="margin-top: 30px;">
         <div class="card-header">
-            <h3>👥 Most Active Users</h3>
+            <h3>👨‍💼 Most Active Admins</h3>
+            <span class="badge badge-info">Who performed the most actions</span>
         </div>
         <div class="active-users-list">
             {% if stats.active_users is empty %}
                 <div class="empty-state">
-                    <p>No user activity recorded yet</p>
+                    <p>No admin activity recorded yet</p>
                 </div>
             {% else %}
                 {% for user in stats.active_users %}
                     <div class="active-user-item">
                         <div class="user-rank">{{ loop.index }}</div>
                         <div class="user-details">
-                            <span class="user-name">{{ user.username }}</span>
+                            {% if user.admin %}
+                                <span class="user-name">
+                                    🔑 {{ user.admin.prenom }} {{ user.admin.nom }}
+                                </span>
+                                <span class="user-email">{{ user.username }}</span>
+                            {% else %}
+                                <span class="user-name">{{ user.username }}</span>
+                            {% endif %}
                             <span class="user-actions">{{ user.count }} actions</span>
                         </div>
                         <div class="user-progress">
@@ -373,6 +389,12 @@
 .user-name {
     font-size: 16px;
     font-weight: 600;
+}
+
+.user-email {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
 }
 
 .user-actions {

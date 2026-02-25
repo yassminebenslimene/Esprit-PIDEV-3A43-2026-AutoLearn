@@ -4,7 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
+<<<<<<< HEAD
     "content-hash": "52f55cb16fee424d6a38e78ed6e76d81",
+=======
+    "content-hash": "d8d1e48260f96ba8d60379b5726b9b4f",
+>>>>>>> 25f7b58cd52b70b45edce7d817dab4102802a9b3
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1985,6 +1989,7 @@
             "time": "2025-11-30T20:12:26+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "knplabs/knp-components",
             "version": "v5.2.0",
             "source": {
@@ -2149,6 +2154,8 @@
             "time": "2025-11-29T09:14:09+00:00"
         },
         {
+=======
+>>>>>>> 25f7b58cd52b70b45edce7d817dab4102802a9b3
             "name": "masterminds/html5",
             "version": "2.10.0",
             "source": {

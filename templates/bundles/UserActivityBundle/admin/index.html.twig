@@ -156,6 +156,11 @@
         min-width: 200px;
     }
     
+    .filter-input option {
+        background: white;
+        color: black;
+    }
+    
     .filter-input::placeholder {
         color: rgba(255,255,255,0.5);
     }
@@ -214,20 +219,28 @@
     
     <!-- Activity Table -->
     <div class="activity-table">
-        <h3>Recent User Activities</h3>
-        <p class="subtitle">Last 100 activities across all users</p>
+        <h3>👨‍🎓 Student Activities Dashboard</h3>
+        <p class="subtitle">Last 100 activities - includes both student actions (login, logout) and admin actions on students (suspend, create, update)</p>
+        <p class="subtitle" style="font-size: 12px; color: rgba(96, 165, 250, 0.8); margin-top: -10px;">
+            ℹ️ For admin-only actions audit trail, visit <a href="{{ path('backoffice_audit_index') }}" style="color: #60a5fa; text-decoration: underline;">Audit Trail</a>
+        </p>
         
         <!-- Filter Bar -->
         <div class="filter-bar">
             <input type="text" class="filter-input" id="searchInput" placeholder="Search by user, action, or IP...">
             <select class="filter-input" id="actionFilter" style="flex: 0 0 200px;">
                 <option value="">All Actions</option>
-                <option value="login">Login</option>
-                <option value="suspend">Suspend</option>
-                <option value="reactivate">Reactivate</option>
-                <option value="create">Create</option>
-                <option value="update">Update</option>
-                <option value="view">View</option>
+                <optgroup label="👨‍🎓 Student Actions">
+                    <option value="login">Login</option>
+                    <option value="logout">Logout</option>
+                    <option value="view">View Profile</option>
+                </optgroup>
+                <optgroup label="👨‍💼 Admin Actions on Students">
+                    <option value="suspend">Suspend</option>
+                    <option value="reactivate">Reactivate</option>
+                    <option value="create">Create</option>
+                    <option value="update">Update</option>
+                </optgroup>
             </select>
             <select class="filter-input" id="statusFilter" style="flex: 0 0 150px;">
                 <option value="">All Status</option>

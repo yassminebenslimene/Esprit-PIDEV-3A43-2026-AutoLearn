@@ -17,6 +17,7 @@ return [
     App\Bundle\UserActivityBundle\UserActivityBundle::class => ['all' => true],
     Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['dev' => true, 'test' => true],
     Knp\Bundle\PaginatorBundle\KnpPaginatorBundle::class => ['all' => true],
+    // SimpleThings\EntityAudit\SimpleThingsEntityAuditBundle::class => ['all' => true], // Temporairement désactivé
     Vich\UploaderBundle\VichUploaderBundle::class => ['all' => true],
     App\Bundle\PdfGeneratorBundle\PdfGeneratorBundle::class => ['all' => true],
 ];

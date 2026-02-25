@@ -1,7 +1,8 @@
 vich_uploader:
     db_driver: orm
-    
+
     mappings:
+        # Quiz images (Yasmine)
         quiz_images:
             uri_prefix: /uploads/quiz/images
             upload_destination: '%kernel.project_dir%/public/uploads/quiz/images'
@@ -33,3 +34,14 @@ vich_uploader:
             inject_on_load: false
             delete_on_update: true
             delete_on_remove: true
+        
+        # Post images and videos (Ilef)
+        post_images:
+            uri_prefix: /uploads/images
+            upload_destination: '%kernel.project_dir%/public/uploads/images'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+
+        post_videos:
+            uri_prefix: /uploads/videos
+            upload_destination: '%kernel.project_dir%/public/uploads/videos'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer

@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Repository\Cours\CoursRepository;
 use App\Repository\EvenementRepository;
 use App\Repository\UserRepository;
+use App\Repository\CommunauteRepository;
 use App\Bundle\UserActivityBundle\Repository\UserActivityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
@@ -20,6 +21,7 @@ class RAGService
     private CoursRepository $coursRepository;
     private EvenementRepository $evenementRepository;
     private UserRepository $userRepository;
+    private CommunauteRepository $communauteRepository;
     private ?UserActivityRepository $activityRepository;
 
     public function __construct(
@@ -28,6 +30,7 @@ class RAGService
         CoursRepository $coursRepository,
         EvenementRepository $evenementRepository,
         UserRepository $userRepository,
+        CommunauteRepository $communauteRepository,
         ?UserActivityRepository $activityRepository = null
     ) {
         $this->em = $em;
@@ -35,6 +38,7 @@ class RAGService
         $this->coursRepository = $coursRepository;
         $this->evenementRepository = $evenementRepository;
         $this->userRepository = $userRepository;
+        $this->communauteRepository = $communauteRepository;
         $this->activityRepository = $activityRepository;
     }
 
@@ -65,6 +69,10 @@ class RAGService
             
             case 'list_events':
                 $context['data'] = $this->getEventsContext();
+                break;
+            
+            case 'list_communities':
+                $context['data'] = $this->getCommunitiesContext();
                 break;
             
             case 'user_stats':
@@ -101,6 +109,11 @@ class RAGService
         // Événements
         if (preg_match('/(événement|event|semaine|mois|particip)/i', $query)) {
             return 'list_events';
+        }
+
+        // Communautés
+        if (preg_match('/(communauté|communaute|community|groupe|équipe|team|rejoindre)/i', $query)) {
+            return 'list_communities';
         }
 
         // Statistiques utilisateur
@@ -191,7 +204,7 @@ class RAGService
                     'titre' => $event->getTitre(),
                     'date' => $event->getDateDebut()->format('d/m/Y H:i'),
                     'lieu' => $event->getLieu(),
-                    'places_disponibles' => $event->getCapaciteMax() - $event->getParticipations()->count(),
+                    'places_disponibles' => $event->getNbMax() - $event->getParticipations()->count(),
                     'description' => substr($event->getDescription(), 0, 100) . '...'
                 ];
             }
@@ -221,7 +234,7 @@ class RAGService
         }
 
         $stats = [
-            'user_id' => $user->getUserId(),
+            'user_id' => $user->getId(),
             'name' => $user->getPrenom() . ' ' . $user->getNom(),
             'email' => $user->getEmail(),
             'role' => $user->getRole(),
@@ -305,5 +318,43 @@ class RAGService
             'total_courses' => $this->coursRepository->count([]),
             'upcoming_events' => $this->evenementRepository->count([])
         ];
+    }
+
+    /**
+     * Contexte des communautés disponibles
+     */
+    private function getCommunitiesContext(): array
+    {
+        try {
+            $communautes = $this->communauteRepository->findAll();
+            
+            // Vérification de sécurité
+            if (!is_array($communautes) && !($communautes instanceof \Traversable)) {
+                $communautes = [];
+            }
+            
+            $communautesData = [];
+            foreach ($communautes as $c) {
+                $communautesData[] = [
+                    'id' => $c->getId(),
+                    'nom' => $c->getNom(),
+                    'description' => $c->getDescription(),
+                    'membres_count' => $c->getMembers()->count(),
+                    'posts_count' => $c->getPosts()->count(),
+                    'owner' => $c->getOwner() ? $c->getOwner()->getPrenom() . ' ' . $c->getOwner()->getNom() : 'Aucun'
+                ];
+            }
+
+            return [
+                'available_communities' => $communautesData,
+                'total_communities' => count($communautesData)
+            ];
+        } catch (\Exception $e) {
+            return [
+                'available_communities' => [],
+                'total_communities' => 0,
+                'error' => 'Erreur lors de la récupération des communautés'
+            ];
+        }
     }
 }

@@ -5,130 +5,472 @@
 {% block body %}
 
 <style>
+/* Container principal */
 .community-container {
-    max-width: 900px;
-    margin: 80px auto;
+    max-width: 1100px;
+    margin: 120px auto 80px;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
 }
+
+/* En-tête de la page */
+.page-heading {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 50px 40px;
+    border-radius: 20px;
+    color: white;
+    margin-bottom: 40px;
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+    text-align: center;
+    position: relative;
+}
+
+.page-heading h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.breadcrumb {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+}
+
+.breadcrumb a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.3s;
+}
+
+.breadcrumb a:hover {
+    opacity: 0.8;
+}
+
+/* Description de la communauté */
+.community-container > p {
+    background: #f8f9ff;
+    padding: 20px 25px;
+    border-radius: 12px;
+    border-left: 4px solid #667eea;
+    margin-bottom: 30px;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #555;
+}
+
+/* Alertes */
+.alert-success, .alert-error {
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    animation: slideIn 0.3s ease;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.alert-error {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Bouton nouveau post */
+.btn-new-post {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+    margin-bottom: 30px;
+}
+
+.btn-new-post:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    color: white;
+    text-decoration: none;
+}
+
+/* Message pour non-membres */
+.cannot-post-msg {
+    background: #fff3cd;
+    color: #856404;
+    padding: 15px 20px;
+    border-radius: 12px;
+    border-left: 4px solid #ffc107;
+    margin-bottom: 25px;
+    font-style: normal;
+}
+
+/* Bloc inviter et membres */
+.invite-box, .members-box {
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(102, 126, 234, 0.15);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.invite-box strong, .members-box strong {
+    display: block;
+    color: #667eea;
+    font-size: 1.15rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.invite-box form {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.invite-box input[type="email"] {
+    flex: 1;
+    min-width: 250px;
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.invite-box input[type="email"]:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.invite-box button {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.invite-box button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Liste des membres */
+.members-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.members-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 12px;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    transition: background 0.3s;
+}
+
+.members-list li:hover {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.members-list li:last-child {
+    border-bottom: none;
+}
+
+.members-list li span {
+    font-weight: 500;
+    color: #333;
+}
+
+.member-remove-form {
+    margin: 0;
+}
+
+.member-remove-form button {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.member-remove-form button:hover {
+    background: #c82333;
+    transform: scale(1.05);
+}
+
+/* Cartes de post */
 .post-card {
     position: relative;
     background: white;
-    border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 25px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
-.post-media {
+
+.post-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.post-card > p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.post-card > small {
+    display: block;
+    color: #999;
+    font-size: 0.9rem;
     margin-top: 15px;
-    text-align: center;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
 }
+
+.post-card hr {
+    border: none;
+    border-top: 2px solid #f0f0f0;
+    margin: 25px 0;
+}
+
+/* Média du post */
+.post-media {
+    margin: 20px 0;
+    text-align: center;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
 .post-media img,
 .post-media video,
 .post-media iframe {
-    max-width: 75%;
-    max-height: 420px;
-    border-radius: 14px;
-    object-fit: cover;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-}
-.comment {
-    position: relative;
-    margin-left: 20px;
-    padding: 10px 14px;
-    background: #f4f5ff;
+    max-width: 100%;
+    max-height: 500px;
     border-radius: 12px;
-    margin-bottom: 8px;
+    object-fit: cover;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
+
+/* Bouton voir le post */
+.btn-see-post {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+
+.btn-see-post:hover {
+    color: #764ba2;
+    gap: 12px;
+    text-decoration: none;
+}
+
+/* Menu 3 points */
+.post-menu, .comment-menu {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
 .menu-btn {
-    background: none;
+    background: rgba(0, 0, 0, 0.05);
     border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
     font-size: 18px;
     cursor: pointer;
+    transition: all 0.3s;
+    color: #666;
 }
-.post-menu,
-.comment-menu {
-    position: absolute;
-    right: 14px;
-    top: 14px;
+
+.menu-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
 }
-.post-dropdown,
-.comment-dropdown {
+
+.post-dropdown, .comment-dropdown {
     display: none;
     position: absolute;
     right: 0;
-    top: 26px;
+    top: 40px;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     overflow: hidden;
     z-index: 10;
+    min-width: 150px;
 }
+
 .post-menu:focus-within .post-dropdown,
 .comment-menu:focus-within .comment-dropdown {
     display: block;
+    animation: fadeIn 0.2s ease;
 }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .post-dropdown a,
 .post-dropdown button,
 .comment-dropdown a,
 .comment-dropdown button {
     display: block;
     width: 100%;
-    padding: 8px 14px;
+    padding: 12px 16px;
     border: none;
     background: white;
     text-align: left;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 0.95rem;
+    color: #333;
+    transition: all 0.2s;
+    text-decoration: none;
 }
+
 .post-dropdown a:hover,
 .post-dropdown button:hover,
 .comment-dropdown a:hover,
 .comment-dropdown button:hover {
-    background: #f2f4ff;
+    background: #f8f9ff;
+    color: #667eea;
 }
+
+/* Commentaires */
+.comment {
+    position: relative;
+    background: #f8f9ff;
+    border-radius: 12px;
+    padding: 15px 18px;
+    margin-bottom: 12px;
+    border-left: 3px solid #667eea;
+    transition: all 0.3s;
+}
+
+.comment:hover {
+    background: #f0f2ff;
+}
+
+.comment small {
+    color: #999;
+    font-size: 0.85rem;
+    margin-top: 8px;
+    display: block;
+}
+
+/* Formulaire de commentaire */
+.comment-form {
+    margin-top: 20px;
+}
+
 .comment-form textarea {
     width: 100%;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    padding: 10px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+    transition: all 0.3s;
 }
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
 .comment-form button {
-    background: #7a6ad8;
+    margin-top: 10px;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    padding: 6px 16px;
     border-radius: 20px;
-    margin-top: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
 }
-.btn-new-post {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 18px;
-    background: linear-gradient(135deg, #7a6ad8, #6c63ff);
-    color: white;
-    border-radius: 999px;
-    text-decoration: none;
-    margin-bottom: 25px;
+
+.comment-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
-.invite-box, .members-box {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 20px;
+
+/* Message aucun post */
+.community-container > p:last-child {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    font-size: 1.1rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
-.invite-box form { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-.invite-box input[type="email"] { padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd; min-width: 220px; }
-.invite-box button { padding: 8px 16px; background: #7a6ad8; color: white; border: none; border-radius: 8px; cursor: pointer; }
-.members-list { list-style: none; padding: 0; margin: 0; }
-.members-list li { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
-.members-list li:last-child { border-bottom: none; }
-.member-remove-form { margin: 0; }
-.member-remove-form button { padding: 4px 10px; font-size: 12px; background: #f44336; color: white; border: none; border-radius: 6px; cursor: pointer; }
-.alert-success { background: #d4edda; color: #155724; padding: 12px; border-radius: 8px; margin-bottom: 16px; }
-.alert-error { background: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; margin-bottom: 16px; }
-.cannot-post-msg { color: #666; font-style: italic; margin-bottom: 20px; }
-.btn-see-post { display: inline-block; margin-top: 10px; color: #7a6ad8; font-size: 14px; text-decoration: none; }
-.btn-see-post:hover { text-decoration: underline; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .page-heading h3 {
+        font-size: 1.8rem;
+    }
+    
+    .invite-box input[type="email"] {
+        min-width: 100%;
+    }
+    
+    .post-card {
+        padding: 20px;
+    }
+}
 </style>
 
 <div class="community-container">
@@ -168,10 +510,17 @@
                 <button type="submit">Inviter</button>
             </form>
         </div>
-        {% if communaute.members|length > 0 %}
         <div class="members-box">
-            <strong>Membres ({{ communaute.members|length }})</strong>
+            <strong>Membres ({{ (communaute.members|length) + 1 }})</strong>
             <ul class="members-list">
+                {# Afficher le propriétaire en premier #}
+                {% if communaute.owner %}
+                <li>
+                    <span>{{ communaute.owner.prenom }} {{ communaute.owner.nom }} <span style="color: #667eea; font-weight: 600;">(Créateur)</span></span>
+                </li>
+                {% endif %}
+                
+                {# Afficher les autres membres #}
                 {% for member in communaute.members %}
                 <li>
                     <span>{{ member.prenom }} {{ member.nom }}</span>
@@ -184,7 +533,6 @@
                 {% endfor %}
             </ul>
         </div>
-        {% endif %}
     {% endif %}
 
     {% for post in communaute.posts %}
@@ -211,10 +559,10 @@
             {% endif %}
 
             {% if post.imageFile %}
-                <div class="post-media">
-                    <img src="{{ asset('uploads/' ~ post.imageFile) }}">
-                </div>
-            {% endif %}
+    <div class="post-media">
+        <img src="{{ asset('uploads/images/' ~ post.imageFile) }}" alt="Image du post">
+    </div>
+{% endif %}
 
             <small>
                 Posté le {{ post.createdAt|date('d/m/Y H:i') }}
@@ -231,7 +579,7 @@
             {% for commentaire in post.commentaires %}
                 <div class="comment">
 
-                    {% if commentaire.user == app.user %}
+                    {% if commentaire.user and app.user and commentaire.user.id == app.user.id %}
                     <div class="comment-menu">
                         <button class="menu-btn">⋮</button>
                         <div class="comment-dropdown">
@@ -250,9 +598,6 @@
                     {{ commentaire.contenu }}<br>
                     <small>
                         {{ commentaire.createdAt|date('d/m/Y H:i') }}
-                        {% if commentaire.user %}
-                            par {{ commentaire.user.prenom }}
-                        {% endif %}
                     </small>
                 </div>
             {% else %}

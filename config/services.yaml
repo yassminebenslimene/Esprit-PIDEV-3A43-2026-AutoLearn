@@ -62,3 +62,30 @@ services:
     App\Service\TranslationService:
         arguments:
             $groqApiKey: '%env(GROQ_API_KEY)%'
+
+    # Configuration Groq Service (Ilef)
+    App\Service\GroqService:
+        arguments:
+            $httpClient: '@http_client'
+            $logger: '@logger'
+            $groqApiKey: '%env(GROQ_API_KEY)%'
+            $groqApiUrl: '%env(GROQ_API_URL)%'
+            $groqModel: '%env(GROQ_MODEL)%'
+
+    # Language Detector Service (no arguments needed)
+    App\Service\LanguageDetectorService: ~
+
+    # AI Assistant Service (with direct database access, no RAG)
+    App\Service\AIAssistantService:
+        arguments:
+            $groqService: '@App\Service\GroqService'
+            $languageDetector: '@App\Service\LanguageDetectorService'
+            $actionExecutor: '@App\Service\ActionExecutorService'
+            $logger: '@logger'
+            $security: '@security.helper'
+            $em: '@doctrine.orm.entity_manager'
+            $userRepository: '@App\Repository\UserRepository'
+            $coursRepository: '@App\Repository\Cours\CoursRepository'
+            $evenementRepository: '@App\Repository\EvenementRepository'
+            $communauteRepository: '@App\Repository\CommunauteRepository'
+            $activityRepository: '@App\Bundle\UserActivityBundle\Repository\UserActivityRepository'
