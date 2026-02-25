@@ -88,3 +88,17 @@ services:
 
     # Workflow service alias for Evenement
     Symfony\Component\Workflow\WorkflowInterface $evenementPublishingStateMachine: '@state_machine.evenement_publishing'
+
+    # Chapter Explainer Service
+    App\Service\ChapterExplainerService:
+        arguments:
+            $httpClient: '@http_client'
+            $logger: '@logger'
+            $groqApiKey: '%env(GROQ_API_KEY)%'
+
+    # Quiz Corrector AI Service
+    App\Service\QuizCorrectorAIService:
+        arguments:
+            $httpClient: '@http_client'
+            $logger: '@logger'
+            $grokApiKey: '%env(GROQ_API_KEY)%'

@@ -5,6 +5,8 @@ namespace App\Controller\FrontOffice;
 use App\Entity\Quiz;
 use App\Entity\Etudiant;
 use App\Service\QuizManagementService;
+use App\Service\CourseProgressService;
+use App\Service\QuizCorrectorAIService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +20,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class QuizPassageController extends AbstractController
 {
     public function __construct(
-        private QuizManagementService $quizService
+        private QuizManagementService $quizService,
+        private CourseProgressService $progressService,
+        private QuizCorrectorAIService $correctorAI
     ) {}
 
     #[Route('/{id}/start', name: 'app_quiz_start')]
@@ -119,17 +123,39 @@ class QuizPassageController extends AbstractController
         $seuilReussite = $quiz->getSeuilReussite() ?? 50;
         $statut = $result['percentage'] >= $seuilReussite ? 'VALIDÉ' : 'ÉCHEC';
         
+        // Si le quiz est validé, marquer le chapitre comme complété
+        if ($statut === 'VALIDÉ' && $quiz->getChapitre()) {
+            $this->progressService->markChapterAsCompleted(
+                $etudiant,
+                $quiz->getChapitre(),
+                (int) $result['percentage']
+            );
+        }
+        
         // Nettoyer la tentative en cours
         $session->remove($tentativeKey);
         
-        return $this->render('frontoffice/quiz/result.html.twig', [
+        // Générer les explications IA pour chaque question
+        $explications = [];
+        $resumePedagogique = [];
+        try {
+            $explications = $this->correctorAI->genererExplicationsPersonnalisees($result['details']);
+            $resumePedagogique = $this->correctorAI->genererResumePedagogique($result['details'], $result['percentage']);
+        } catch (\Exception $e) {
+            // En cas d'erreur, continuer sans les explications IA
+            $this->addFlash('warning', 'Les explications IA ne sont pas disponibles pour le moment.');
+        }
+        
+        return $this->render('frontoffice/quiz/result_with_ai.html.twig', [
             'quiz' => $quiz,
             'result' => $result,
             'statut' => $statut,
             'seuilReussite' => $seuilReussite,
             'chapitre' => $quiz->getChapitre(),
             'dureeReelle' => $dureeReelleMinutes,
-            'tempsDepasse' => $tempsDepasse
+            'tempsDepasse' => $tempsDepasse,
+            'explications' => $explications,
+            'resumePedagogique' => $resumePedagogique
         ]);
     }
 

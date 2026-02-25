@@ -7,6 +7,7 @@ use App\Repository\EvenementRepository;
 use App\Repository\UserRepository;
 use App\Repository\CommunauteRepository;
 use App\Bundle\UserActivityBundle\Repository\UserActivityRepository;
+use App\Service\CourseProgressService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
 
@@ -23,6 +24,7 @@ class RAGService
     private UserRepository $userRepository;
     private CommunauteRepository $communauteRepository;
     private ?UserActivityRepository $activityRepository;
+    private CourseProgressService $progressService;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -31,6 +33,7 @@ class RAGService
         EvenementRepository $evenementRepository,
         UserRepository $userRepository,
         CommunauteRepository $communauteRepository,
+        CourseProgressService $progressService,
         ?UserActivityRepository $activityRepository = null
     ) {
         $this->em = $em;
@@ -40,6 +43,7 @@ class RAGService
         $this->userRepository = $userRepository;
         $this->communauteRepository = $communauteRepository;
         $this->activityRepository = $activityRepository;
+        $this->progressService = $progressService;
     }
 
     /**
@@ -63,6 +67,31 @@ class RAGService
 
         // Collecte des données selon l'intention
         switch ($intent) {
+            case 'course_progress':
+                // Retourner uniquement les cours avec progression
+                $coursesData = $this->getCoursesContext($user);
+                
+                // Format ultra-strict pour l'IA
+                $strictProgress = [];
+                if (!empty($coursesData['user_progress'])) {
+                    foreach ($coursesData['user_progress'] as $prog) {
+                        $strictProgress[] = [
+                            'nom_cours' => $prog['cours'],
+                            'chapitres_completes' => (int)$prog['chapitres_completes'],
+                            'chapitres_total' => (int)$prog['chapitres_total'],
+                            'pourcentage' => $prog['progression']
+                        ];
+                    }
+                }
+                
+                $context['data'] = [
+                    'INSTRUCTION_IMPORTANTE' => 'Affiche UNIQUEMENT les cours listés ci-dessous avec leurs VRAIES données. N\'invente AUCUNE donnée.',
+                    'nombre_cours_commences' => count($strictProgress),
+                    'cours_avec_progression' => $strictProgress,
+                    'format_reponse_attendu' => 'Pour chaque cours: [Nom du cours]: [X]/[Y] chapitres complétés ([Z]%)'
+                ];
+                break;
+            
             case 'recommend_course':
                 $context['data'] = $this->getCoursesContext($user);
                 break;
@@ -101,6 +130,11 @@ class RAGService
     {
         $query = strtolower($query);
 
+        // Progression dans les cours (priorité haute)
+        if (preg_match('/(ma progression|mon progrès|mes progrès|progression dans|progrès dans|avancement|où j\'en suis|combien.*complété)/i', $query)) {
+            return 'course_progress';
+        }
+
         // Recommandation de cours
         if (preg_match('/(cours|apprendre|étudier|recommand|python|java|web|programming)/i', $query)) {
             return 'recommend_course';
@@ -117,7 +151,7 @@ class RAGService
         }
 
         // Statistiques utilisateur
-        if (preg_match('/(progrès|statistique|activité|historique|mes cours)/i', $query)) {
+        if (preg_match('/(statistique|activité|historique)/i', $query)) {
             return 'user_stats';
         }
 
@@ -145,8 +179,10 @@ class RAGService
             }
             
             $coursData = [];
+            $userProgress = [];
+            
             foreach ($cours as $c) {
-                $coursData[] = [
+                $coursInfo = [
                     'id' => $c->getId(),
                     'titre' => $c->getTitre(),
                     'matiere' => $c->getMatiere(),
@@ -155,19 +191,83 @@ class RAGService
                     'chapitres_count' => $c->getChapitres()->count(),
                     'description' => substr($c->getDescription(), 0, 150) . '...'
                 ];
+                
+                // Récupérer la progression DIRECTEMENT depuis la BD avec SQL
+                if ($user) {
+                    try {
+                        $userId = method_exists($user, 'getUserId') ? $user->getUserId() : $user->getId();
+                        $coursId = $c->getId();
+                        
+                        // Requête SQL directe pour les vraies données
+                        $conn = $this->em->getConnection();
+                        $sql = "
+                            SELECT 
+                                COUNT(DISTINCT cp.id) as chapitres_completes,
+                                (SELECT COUNT(*) FROM chapitre WHERE cours_id = :cours_id) as total_chapitres
+                            FROM chapter_progress cp
+                            JOIN chapitre ch ON cp.chapitre_id = ch.id
+                            WHERE cp.user_id = :user_id 
+                            AND ch.cours_id = :cours_id
+                            AND cp.completed_at IS NOT NULL
+                        ";
+                        
+                        $stmt = $conn->prepare($sql);
+                        $result = $stmt->executeQuery([
+                            'user_id' => $userId,
+                            'cours_id' => $coursId
+                        ]);
+                        $data = $result->fetchAssociative();
+                        
+                        $completedChapters = (int)($data['chapitres_completes'] ?? 0);
+                        $totalChapters = (int)($data['total_chapitres'] ?? $c->getChapitres()->count());
+                        $percentage = $totalChapters > 0 ? round(($completedChapters / $totalChapters) * 100, 1) : 0;
+                        
+                        $coursInfo['progression'] = [
+                            'pourcentage' => $percentage,
+                            'chapitres_completes' => $completedChapters,
+                            'chapitres_total' => $totalChapters,
+                            'chapitres_restants' => $totalChapters - $completedChapters,
+                            'cours_termine' => $percentage >= 100
+                        ];
+                        
+                        // Ajouter aux cours en progression SEULEMENT si > 0
+                        if ($completedChapters > 0) {
+                            $userProgress[] = [
+                                'cours' => $c->getTitre(),
+                                'progression' => $percentage . '%',
+                                'chapitres_completes' => $completedChapters,
+                                'chapitres_total' => $totalChapters,
+                                'details' => $completedChapters . '/' . $totalChapters . ' chapitres'
+                            ];
+                        }
+                    } catch (\Exception $e) {
+                        // En cas d'erreur, progression = 0
+                        $coursInfo['progression'] = [
+                            'pourcentage' => 0,
+                            'chapitres_completes' => 0,
+                            'chapitres_total' => $c->getChapitres()->count(),
+                            'error' => $e->getMessage()
+                        ];
+                    }
+                }
+                
+                $coursData[] = $coursInfo;
             }
 
             return [
                 'user_level' => $niveau,
                 'available_courses' => $coursData,
-                'total_courses' => count($coursData)
+                'total_courses' => count($coursData),
+                'user_progress' => $userProgress,
+                'courses_in_progress' => count($userProgress)
             ];
         } catch (\Exception $e) {
             return [
                 'user_level' => $niveau,
                 'available_courses' => [],
                 'total_courses' => 0,
-                'error' => 'Erreur lors de la récupération des cours'
+                'user_progress' => [],
+                'error' => 'Erreur lors de la récupération des cours: ' . $e->getMessage()
             ];
         }
     }
