@@ -40,7 +40,7 @@ final class CommentaireController extends AbstractController
 
         // 🔥 IA MODERATION
         if (!$aiModeration->isClean($data['contenu'])) {
-            $this->addFlash('error', 'Commentaire refusé : contenu inapproprié détecté par IA.');
+            $this->addFlash('error', 'Commentaire refusé : contenu inapproprié détecté par système.');
             return $this->redirectToRoute('app_communaute_show', [
                 'id' => $communaute->getId()
             ]);

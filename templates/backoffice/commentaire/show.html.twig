@@ -1,129 +1,120 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détails du Commentaire - GlassAdmin</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('backoffice/css/templatemo-glass-admin-style.css') }}">
-    <style>
-        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .info-item { padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px; }
-        .info-label { font-size: 0.875rem; opacity: 0.7; margin-bottom: 0.5rem; }
-        .info-value { font-size: 1.125rem; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="background"></div>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
+{% extends 'backoffice/base.html.twig' %}
 
-    <div class="dashboard">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">G</div>
-                <span class="logo-text">AutoLearn</span>
-            </div>
-            <ul class="nav-menu">
-                <li class="nav-section">
-                    <span class="nav-section-title">Communauté</span>
-                    <ul>
-                        <li class="nav-item"><a href="{{ path('backoffice_commentaire_index') }}" class="nav-link">
-                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                            </svg>Commentaires</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </aside>
+{% block title %}Détails du Commentaire{% endblock %}
 
-        <main class="main-content">
-            <nav class="navbar">
-                <div class="page-header">
-                    <h1 class="page-title">Détails du Commentaire</h1>
-                    <div class="page-breadcrumb">
-                        <a href="{{ path('app_backoffice') }}">Dashboard</a><span>/</span>
-                        <a href="{{ path('backoffice_commentaire_index') }}">Commentaires</a><span>/</span>
-                        <span>Détails</span>
-                    </div>
-                </div>
-                <div class="navbar-right">
-                    <a href="{{ path('backoffice_commentaire_index') }}" class="card-btn">Retour</a>
-                </div>
-            </nav>
+{% block page_title %}
+Détails du Commentaire
+{% endblock %}
 
-            <section class="content-grid" style="grid-template-columns: 1fr;">
-                <div class="glass-card">
-                    <div class="card-header">
-                        <h2 class="card-title">Informations du Commentaire</h2>
-                    </div>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">Auteur</div>
-                            <div class="info-value">
-                                {% if commentaire.user %}
-                                    {{ commentaire.user.prenom }} {{ commentaire.user.nom }}
-                                {% else %}
-                                    <span style="opacity:0.5">Anonyme</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Post associé</div>
-                            <div class="info-value">
-                                {% if commentaire.post %}
-                                    <a href="{{ path('backoffice_post_show', {id: commentaire.post.id}) }}" style="color: var(--cyan);">
-                                        Voir le post
-                                    </a>
-                                {% else %}
-                                    <span style="opacity:0.5">-</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Date de création</div>
-                            <div class="info-value">{{ commentaire.createdAt|date('d/m/Y à H:i') }}</div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 1rem;">
-                        <div class="info-label">Contenu</div>
-                        <div class="info-value" style="white-space: pre-wrap;">{{ commentaire.contenu }}</div>
-                    </div>
-                </div>
+{% block body %}
 
-                {% if commentaire.post %}
-                <div class="glass-card">
-                    <div class="card-header">
-                        <h2 class="card-title">Post associé</h2>
-                    </div>
-                    <div style="padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px;">
-                        <div style="margin-bottom: 0.5rem;">
-                            <span style="font-weight: 600;">
-                                {% if commentaire.post.user %}
-                                    {{ commentaire.post.user.prenom }} {{ commentaire.post.user.nom }}
-                                {% else %}
-                                    Anonyme
-                                {% endif %}
-                            </span>
-                            <span style="opacity: 0.7; font-size: 0.875rem; margin-left: 0.5rem;">
-                                {{ commentaire.post.createdAt|date('d/m/Y à H:i') }}
-                            </span>
-                        </div>
-                        <div>{{ commentaire.post.contenu|slice(0, 200) }}{% if commentaire.post.contenu|length > 200 %}...{% endif %}</div>
-                        <div style="margin-top: 1rem;">
-                            <a href="{{ path('backoffice_post_show', {id: commentaire.post.id}) }}" class="card-btn">
-                                Voir le post complet
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            </section>
-        </main>
+<nav class="navbar">
+    <div class="page-header">
+        <div class="page-breadcrumb">
+            <a href="{{ path('app_backoffice') }}">Dashboard</a>
+            <span>/</span>
+            <a href="{{ path('backoffice_commentaire_index') }}">Commentaires</a>
+            <span>/</span>
+            <span>Détails</span>
+        </div>
     </div>
-    <script src="{{ asset('backoffice/js/templatemo-glass-admin-script.js') }}"></script>
-</body>
-</html>
+
+    <div class="navbar-right">
+        <a href="{{ path('backoffice_commentaire_index') }}" class="card-btn">
+            Retour
+        </a>
+    </div>
+</nav>
+
+
+<section class="content-grid" style="grid-template-columns: 1fr;">
+
+    <div class="glass-card">
+        <div class="card-header">
+            <h2 class="card-title">Informations du Commentaire</h2>
+        </div>
+
+        <div class="info-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1rem; margin-bottom:2rem;">
+
+            <div class="info-item" style="padding:1rem; background:rgba(255,255,255,0.05); border-radius:12px;">
+                <div class="info-label" style="opacity:0.7;">Auteur</div>
+                <div class="info-value" style="font-weight:600;">
+                    {% if commentaire.user %}
+                        {{ commentaire.user.prenom }} {{ commentaire.user.nom }}
+                    {% else %}
+                        <span style="opacity:0.5">Anonyme</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="info-item" style="padding:1rem; background:rgba(255,255,255,0.05); border-radius:12px;">
+                <div class="info-label" style="opacity:0.7;">Post associé</div>
+                <div class="info-value">
+                    {% if commentaire.post %}
+                        <a href="{{ path('backoffice_post_show', {id: commentaire.post.id}) }}">
+                            Voir le post
+                        </a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="info-item" style="padding:1rem; background:rgba(255,255,255,0.05); border-radius:12px;">
+                <div class="info-label" style="opacity:0.7;">Date</div>
+                <div class="info-value">
+                    {{ commentaire.createdAt|date('d/m/Y à H:i') }}
+                </div>
+            </div>
+
+        </div>
+
+        <div style="margin-top:1rem;">
+            <div class="info-label" style="opacity:0.7;">Contenu</div>
+            <div style="white-space:pre-wrap; font-weight:500;">
+                {{ commentaire.contenu }}
+            </div>
+        </div>
+    </div>
+
+
+    {% if commentaire.post %}
+        <div class="glass-card">
+            <div class="card-header">
+                <h2 class="card-title">Post associé</h2>
+            </div>
+
+            <div style="padding:1rem; background:rgba(255,255,255,0.05); border-radius:12px;">
+
+                <div style="margin-bottom:0.5rem;">
+                    <strong>
+                        {% if commentaire.post.user %}
+                            {{ commentaire.post.user.prenom }} {{ commentaire.post.user.nom }}
+                        {% else %}
+                            Anonyme
+                        {% endif %}
+                    </strong>
+
+                    <span style="opacity:0.7; font-size:0.875rem; margin-left:0.5rem;">
+                        {{ commentaire.post.createdAt|date('d/m/Y à H:i') }}
+                    </span>
+                </div>
+
+                <div>
+                    {{ commentaire.post.contenu|slice(0,200) }}
+                    {% if commentaire.post.contenu|length > 200 %}...{% endif %}
+                </div>
+
+                <div style="margin-top:1rem;">
+                    <a href="{{ path('backoffice_post_show', {id: commentaire.post.id}) }}" class="card-btn">
+                        Voir le post complet
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    {% endif %}
+
+</section>
+
+{% endblock %}
