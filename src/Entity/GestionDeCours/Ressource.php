@@ -28,7 +28,7 @@ class Ressource
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $fichier = null;
 
-    #[ORM\ManyToOne(targetEntity: Chapitre::class, inversedBy: 'ressources')]
+    #[ORM\ManyToOne(targetEntity: Chapitre::class, inversedBy: 'ressourcesMultiples')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Chapitre $chapitre = null;
 

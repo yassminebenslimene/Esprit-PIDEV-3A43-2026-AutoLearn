@@ -19,7 +19,7 @@ class Commentaire
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'commentaires')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Post $post = null;
 

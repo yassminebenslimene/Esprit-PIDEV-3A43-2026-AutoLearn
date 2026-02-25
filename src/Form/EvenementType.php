@@ -69,6 +69,7 @@ class EvenementType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Evenement::class,
             'is_edit' => false, // Par défaut, on est en mode création
+            'attr' => ['novalidate' => 'novalidate'], // Désactive la validation HTML5
         ]);
     }
 }

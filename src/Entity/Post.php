@@ -39,7 +39,7 @@ class Post
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Communaute $communaute = null;
 

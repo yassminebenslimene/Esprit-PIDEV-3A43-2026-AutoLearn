@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\GestionDeCours\Chapitre;
 use App\Form\GestionCours\ChapitreType;
 use App\Repository\Cours\ChapitreRepository;
+use App\Service\PdfGeneratorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -95,5 +96,73 @@ class ChapitreController extends AbstractController
         return $this->render('frontoffice/chapitre/show.html.twig', [
             'chapitre' => $chapitre,
         ]);
+    }
+
+    // ==================== PDF GENERATION ====================
+    
+    /**
+     * Afficher le chapitre en PDF dans le navigateur
+     */
+    #[Route('/front/{id}/pdf', name: 'app_chapitre_pdf_preview', methods: ['GET'])]
+    public function pdfPreview(Chapitre $chapitre, PdfGeneratorService $pdfGenerator): Response
+    {
+        // Générer le PDF
+        $dompdf = $pdfGenerator->generateChapterPdf($chapitre);
+        
+        // Afficher dans le navigateur (inline)
+        return new Response(
+            $dompdf->output(),
+            Response::HTTP_OK,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="chapitre-' . $chapitre->getOrdre() . '-' . $this->slugify($chapitre->getTitre()) . '.pdf"'
+            ]
+        );
+    }
+
+    /**
+     * Télécharger le chapitre en PDF
+     */
+    #[Route('/front/{id}/pdf/download', name: 'app_chapitre_pdf_download', methods: ['GET'])]
+    public function pdfDownload(Chapitre $chapitre, PdfGeneratorService $pdfGenerator): Response
+    {
+        // Générer le PDF
+        $dompdf = $pdfGenerator->generateChapterPdf($chapitre);
+        
+        // Forcer le téléchargement (attachment)
+        return new Response(
+            $dompdf->output(),
+            Response::HTTP_OK,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="chapitre-' . $chapitre->getOrdre() . '-' . $this->slugify($chapitre->getTitre()) . '.pdf"'
+            ]
+        );
+    }
+
+    /**
+     * Utilitaire pour créer un slug depuis un titre
+     */
+    private function slugify(string $text): string
+    {
+        // Remplacer les caractères non alphanumériques par des tirets
+        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+        
+        // Translittérer
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+        
+        // Supprimer les caractères indésirables
+        $text = preg_replace('~[^-\w]+~', '', $text);
+        
+        // Supprimer les tirets en début et fin
+        $text = trim($text, '-');
+        
+        // Supprimer les tirets multiples
+        $text = preg_replace('~-+~', '-', $text);
+        
+        // Mettre en minuscules
+        $text = strtolower($text);
+        
+        return empty($text) ? 'chapitre' : $text;
     }
 }
