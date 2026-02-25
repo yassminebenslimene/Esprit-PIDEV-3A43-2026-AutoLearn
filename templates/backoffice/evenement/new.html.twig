@@ -48,6 +48,12 @@
             </div>
         </div>
 
+        <div class="form-group">
+            {{ form_label(form.lieu, 'Lieu') }}
+            {{ form_widget(form.lieu, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.lieu) }}
+        </div>
+
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Créer</button>
             <a href="{{ path('backoffice_evenements') }}" class="btn btn-secondary">Annuler</a>

@@ -48,18 +48,40 @@
             </div>
         </div>
 
-        <div class="form-row">
-            <div class="form-group">
-                {{ form_label(form.isCanceled, 'Annulé') }}
-                {{ form_widget(form.isCanceled, {'attr': {'class': 'form-control'}}) }}
-                {{ form_errors(form.isCanceled) }}
-            </div>
+        <div class="form-group">
+            {{ form_label(form.lieu, 'Lieu') }}
+            {{ form_widget(form.lieu, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.lieu) }}
         </div>
 
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
-            <a href="{{ path('backoffice_evenements') }}" class="btn btn-secondary">Annuler</a>
+        <div class="form-actions" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; margin-top: 30px;">
+            <button type="submit" class="btn btn-primary" style="padding: 12px 24px; font-size: 15px; display: inline-flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px;">💾</span> Enregistrer
+            </button>
+            <a href="{{ path('backoffice_evenements') }}" class="btn btn-secondary" style="padding: 12px 24px; font-size: 15px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
+                <span style="font-size: 18px;">↩️</span> Retour
+            </a>
+            
+            {# Bouton Annuler l'événement (Workflow) #}
+            {% if can_annuler %}
+            <form method="post" action="{{ path('backoffice_evenement_annuler', {'id': evenement.id}) }}" style="display: inline; margin: 0;" onsubmit="return confirm('⚠️ Êtes-vous sûr de vouloir annuler cet événement?\n\nTous les participants recevront un email d\'annulation.\n\nCette action ne peut pas être annulée.')">
+                <button type="submit" class="btn" style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white; padding: 12px 24px; font-size: 15px; border: none; cursor: pointer; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                    <span style="font-size: 18px;">❌</span> Annuler l'événement
+                </button>
+            </form>
+            {% endif %}
         </div>
     {{ form_end(form) }}
 </div>
+
+<style>
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+</style>
 {% endblock %}

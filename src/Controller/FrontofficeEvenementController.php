@@ -70,9 +70,31 @@ class FrontofficeEvenementController extends AbstractController
         ]);
     }
     
+    /**
+     * Route pour afficher le calendrier des événements
+     * Accessible à tous les étudiants pour voir les dates des événements
+     */
+    #[Route('/calendar', name: 'app_events_calendar', methods: ['GET'])]
+    public function calendar(): Response
+    {
+        return $this->render('frontoffice/evenement/calendar.html.twig');
+    }
+    
     #[Route('/{id}/participate', name: 'app_event_participate', methods: ['GET'])]
     public function participate(Evenement $evenement, EquipeRepository $equipeRepository, ParticipationRepository $participationRepository): Response
     {
+        // Vérifier si les participations sont ouvertes (workflow)
+        if (!$evenement->canAcceptParticipations()) {
+            $message = match($evenement->getWorkflowStatus()) {
+                'termine' => 'This event has ended. Registrations are now closed.',
+                'annule' => 'This event has been cancelled. No registrations are accepted.',
+                default => 'Registrations are not available for this event.',
+            };
+            
+            $this->addFlash('error', $message);
+            return $this->redirectToRoute('app_events');
+        }
+        
         // Récupérer les équipes participantes avec moins de 6 membres
         $participationsAcceptees = $participationRepository->createQueryBuilder('p')
             ->where('p.evenement = :evenement')
