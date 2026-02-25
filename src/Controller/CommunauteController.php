@@ -6,11 +6,13 @@ use App\Entity\Communaute;
 use App\Form\CommunauteType;
 use App\Repository\CommunauteRepository;
 use App\Repository\UserRepository;
+use App\Service\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[Route('/communaute')]
 final class CommunauteController extends AbstractController
@@ -51,7 +53,7 @@ final class CommunauteController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_communaute_show', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function show(Request $request, Communaute $communaute, ?UserRepository $userRepository = null, ?EntityManagerInterface $em = null): Response
+    public function show(Request $request, Communaute $communaute, ?UserRepository $userRepository = null, ?EntityManagerInterface $em = null, ?EmailService $emailService = null): Response
     {
         // Gestion de l'invitation en POST sur la même URL
         if ($request->isMethod('POST') && $request->request->has('_invite_token')) {
@@ -68,7 +70,21 @@ final class CommunauteController extends AbstractController
                         } elseif (!$communaute->getMembers()->exists(fn($i, $m) => $m->getId() === $user->getId())) {
                             $communaute->addMember($user);
                             $em->flush();
-                            $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté.');
+                            
+                            // 📧 Envoyer l'email d'invitation
+                            try {
+                                $communityUrl = $this->generateUrl('app_communaute_show', ['id' => $communaute->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+                                $emailService->sendCommunityInvitation(
+                                    $user->getEmail(),
+                                    $user->getPrenom() . ' ' . $user->getNom(),
+                                    $communaute->getNom(),
+                                    $this->getUser()->getPrenom() . ' ' . $this->getUser()->getNom(),
+                                    $communityUrl
+                                );
+                                $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté et un email d\'invitation a été envoyé.');
+                            } catch (\Exception $e) {
+                                $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté (email non envoyé).');
+                            }
                         } else {
                             $this->addFlash('error', 'Cette personne est déjà membre.');
                         }
@@ -167,7 +183,8 @@ final class CommunauteController extends AbstractController
         int $coursId,
         Request $request,
         EntityManagerInterface $entityManager,
-        ?UserRepository $userRepository = null
+        ?UserRepository $userRepository = null,
+        ?EmailService $emailService = null
     ): Response {
         // Récupérer le cours
         $cours = $entityManager->getRepository(\App\Entity\GestionDeCours\Cours::class)->find($coursId);
@@ -211,7 +228,21 @@ final class CommunauteController extends AbstractController
                         } elseif (!$communaute->getMembers()->exists(fn($i, $m) => $m->getId() === $user->getId())) {
                             $communaute->addMember($user);
                             $entityManager->flush();
-                            $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté.');
+                            
+                            // 📧 Envoyer l'email d'invitation
+                            try {
+                                $communityUrl = $this->generateUrl('front_communaute_cours', ['coursId' => $coursId], UrlGeneratorInterface::ABSOLUTE_URL);
+                                $emailService->sendCommunityInvitation(
+                                    $user->getEmail(),
+                                    $user->getPrenom() . ' ' . $user->getNom(),
+                                    $communaute->getNom(),
+                                    $this->getUser()->getPrenom() . ' ' . $this->getUser()->getNom(),
+                                    $communityUrl
+                                );
+                                $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté et un email d\'invitation a été envoyé.');
+                            } catch (\Exception $e) {
+                                $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté (email non envoyé).');
+                            }
                         } else {
                             $this->addFlash('error', 'Cette personne est déjà membre.');
                         }

@@ -110,4 +110,30 @@ class EmailService
 
         $this->mailer->send($email);
     }
+
+    /**
+     * Envoie un email d'invitation à rejoindre une communauté
+     */
+    public function sendCommunityInvitation(
+        string $toEmail,
+        string $memberName,
+        string $communityName,
+        string $inviterName,
+        string $communityUrl
+    ): void {
+        $html = $this->twig->render('emails/community_invitation.html.twig', [
+            'memberName' => $memberName,
+            'communityName' => $communityName,
+            'inviterName' => $inviterName,
+            'communityUrl' => $communityUrl,
+        ]);
+
+        $email = (new Email())
+            ->from(new Address($this->fromEmail, $this->fromName))
+            ->to($toEmail)
+            ->subject('Invitation à rejoindre ' . $communityName)
+            ->html($html);
+
+        $this->mailer->send($email);
+    }
 }
