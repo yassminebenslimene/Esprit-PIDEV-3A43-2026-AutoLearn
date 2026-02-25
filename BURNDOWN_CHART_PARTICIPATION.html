@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Burndown Chart - Participation aux Événements</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+        
+        .content {
+            padding: 50px;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            text-align: center;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+        }
+        
+        .metric-value {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        
+        .metric-label {
+            font-size: 1.1em;
+            opacity: 0.95;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .chart-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 100%;
+            overflow: visible;
+        }
+        
+        .chart-title {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 4px solid #667eea;
+            text-align: center;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .concept-box {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .concept-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .concept-box p {
+            color: #555;
+            line-height: 1.8;
+            font-size: 1.05em;
+        }
+        
+        .interpretation {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-left: 5px solid #4caf50;
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: 10px;
+        }
+        
+        .interpretation h3 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .interpretation p {
+            color: #1b5e20;
+            line-height: 1.8;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+        
+        .interpretation ul {
+            margin-left: 25px;
+            color: #1b5e20;
+        }
+        
+        .interpretation li {
+            margin: 10px 0;
+            line-height: 1.6;
+            font-size: 1.05em;
+        }
+        
+        .user-stories-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .story-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .story-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .story-id {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        
+        .story-title {
+            color: #333;
+            font-size: 1em;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .story-sp {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+        
+        canvas {
+            max-height: 600px;
+            width: 100% !important;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            .header {
+                page-break-after: avoid;
+            }
+            .metrics-grid {
+                page-break-after: avoid;
+            }
+            .chart-container {
+                page-break-before: always;
+                page-break-after: always;
+                page-break-inside: avoid;
+                padding: 20px;
+                margin: 0;
+                width: 100%;
+            }
+            .chart-container canvas {
+                max-width: 100% !important;
+                height: auto !important;
+                page-break-inside: avoid;
+            }
+            .section {
+                page-break-before: always;
+                page-break-inside: avoid;
+            }
+            .interpretation {
+                page-break-before: always;
+                page-break-inside: avoid;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            .header {
+                padding: 30px 20px;
+            }
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Sprint Burndown Chart</h1>
+            <p>Module de Participation aux Événements</p>
+        </div>
+        
+        <div class="content">
+            <!-- Métriques principales -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Story Points Planifiés</div>
+                    <div class="metric-value">60 SP</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Story Points Complétés</div>
+                    <div class="metric-value">60 SP</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Durée du Sprint</div>
+                    <div class="metric-value">10 jours</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Vélocité Moyenne</div>
+                    <div class="metric-value">6 SP/jour</div>
+                </div>
+            </div>
+            
+            <!-- Graphique Burndown combiné -->
+            <div class="chart-container">
+                <h2 class="chart-title">Sprint Burndown Chart - Progression Quotidienne</h2>
+                <canvas id="burndownChart"></canvas>
+            </div>
+            
+            <!-- Concepts de base -->
+            <div class="section">
+                <h2 class="section-title">📚 Concepts de Base</h2>
+                
+                <div class="concept-box">
+                    <h3>🎯 Qu'est-ce qu'un Story Point (SP) ?</h3>
+                    <p>
+                        Un <strong>Story Point</strong> est une unité de mesure qui représente la <strong>complexité</strong> 
+                        et l'<strong>effort</strong> nécessaire pour réaliser une tâche. Contrairement aux heures, 
+                        les Story Points mesurent la difficulté relative d'une tâche, indépendamment du développeur qui la réalise.
+                    </p>
+                    <p style="margin-top: 10px;">
+                        <strong>Échelle utilisée :</strong> 1, 2, 3, 5, 8, 13, 21... (suite de Fibonacci)<br>
+                        • Tâche simple : 1-3 SP<br>
+                        • Tâche moyenne : 5-8 SP<br>
+                        • Tâche complexe : 13+ SP
+                    </p>
+                </div>
+                
+                <div class="concept-box">
+                    <h3>📝 Qu'est-ce qu'une User Story ?</h3>
+                    <p>
+                        Une <strong>User Story</strong> est une description simple d'une fonctionnalité du point de vue de l'utilisateur. 
+                        Elle suit généralement le format : <em>"En tant que [rôle], je veux [action], afin de [bénéfice]"</em>.
+                    </p>
+                    <p style="margin-top: 10px;">
+                        <strong>Exemple :</strong> "En tant qu'étudiant, je veux créer une équipe pour un événement, 
+                        afin de pouvoir participer avec mes camarades."
+                    </p>
+                </div>
+                
+                <div class="concept-box">
+                    <h3>📊 Qu'est-ce qu'un Burndown Chart ?</h3>
+                    <p>
+                        Le <strong>Burndown Chart</strong> est un graphique qui visualise le travail restant au fil du temps. 
+                        Il permet de suivre la progression du sprint et de détecter rapidement les problèmes.
+                    </p>
+                    <p style="margin-top: 10px;">
+                        <strong>Ligne rouge pointillée :</strong> Progression idéale (si le travail est distribué uniformément)<br>
+                        <strong>Ligne bleue :</strong> Progression réelle de l'équipe<br>
+                        <strong>Barres violettes :</strong> Story Points complétés chaque jour
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Répartition des User Stories -->
+            <div class="section">
+                <h2 class="section-title">📋 Répartition des User Stories (60 SP)</h2>
+                
+                <div class="user-stories-list">
+                    <div class="story-card">
+                        <div class="story-id">US-01</div>
+                        <div class="story-title">En tant qu'étudiant, je souhaite créer une équipe pour un événement</div>
+                        <span class="story-sp">5 SP</span>
+                    </div>
+                    
+                    <div class="story-card">
+                        <div class="story-id">US-02</div>
+                        <div class="story-title">En tant qu'étudiant, je souhaite rejoindre une équipe existante avec places disponibles</div>
+                        <span class="story-sp">8 SP</span>
+                    </div>
+                    
+                    <div class="story-card">
+                        <div class="story-id">US-03</div>
+                        <div class="story-title">En tant qu'étudiant, je souhaite soumettre la participation de mon équipe</div>
+                        <span class="story-sp">5 SP</span>
+                    </div>
+                    
+                    <div class="story-card">
+                        <div class="story-id">US-04</div>
+                        <div class="story-title">Le système accepte automatiquement la participation d'une équipe si le nombre maximal d'équipes n'est pas atteint</div>
+                        <span class="story-sp">13 SP</span>
+                    </div>
+                    
+                    <div class="story-card">
+                        <div class="story-id">US-05</div>
+                        <div class="story-title">Le système envoie un email de confirmation avec pièces jointes</div>
+                        <span class="story-sp">8 SP</span>
+                    </div>
+                    
+                    <div class="story-card">
+                        <div class="story-id">US-06</div>
+                        <div class="story-title">Le système refuse la participation si elle ne vérifie pas les contraintes (nb équipes > nb max, un étudiant est avec 2 équipes dans un même événement) et affiche la raison en message</div>
+                        <span class="story-sp">3 SP</span>
+                    </div>
+                    
+                    <div class="story-card">
+                        <div class="story-id">US-07</div>
+                        <div class="story-title">En tant qu'étudiant, je souhaite voir mes participations acceptées</div>
+                        <span class="story-sp">3 SP</span>
+                    </div>
+                    
+                    <div class="story-card">
+                        <div class="story-id">US-08</div>
+                        <div class="story-title">Le système envoie des emails lors du démarrage d'un événement</div>
+                        <span class="story-sp">5 SP</span>
+                    </div>
+                    
+                    <div class="story-card">
+                        <div class="story-id">US-09</div>
+                        <div class="story-title">Le système envoie des emails lors de l'annulation d'un événement</div>
+                        <span class="story-sp">5 SP</span>
+                    </div>
+                    
+                    <div class="story-card">
+                        <div class="story-id">US-10</div>
+                        <div class="story-title">Le système nettoie les participations refusées</div>
+                        <span class="story-sp">5 SP</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Interprétation du graphique -->
+            <div class="interpretation">
+                <h3>🔍 Interprétation du Burndown Chart</h3>
+                
+                <p><strong>Vue d'ensemble :</strong></p>
+                <p>
+                    Ce Burndown Chart représente le développement du module de participation aux événements sur un sprint de 10 jours. 
+                    L'équipe a planifié 60 Story Points de travail et a réussi à tout compléter dans les délais prévus.
+                </p>
+                
+                <p><strong>Analyse de la progression :</strong></p>
+                <ul>
+                    <li><strong>Jours 1-2 (Démarrage) :</strong> L'équipe démarre légèrement en dessous du rythme idéal avec 5 SP complétés par jour. 
+                    Ceci est normal en début de sprint (mise en place, compréhension des tâches).</li>
+                    
+                    <li><strong>Jours 3-4 (Accélération) :</strong> L'équipe travaille sur US-04, la tâche la plus complexe (13 SP). 
+                    La progression s'accélère avec 7 SP puis 6 SP complétés. La ligne bleue se rapproche de la ligne rouge idéale.</li>
+                    
+                    <li><strong>Jour 5 (Pic de productivité) :</strong> Meilleure journée du sprint avec 8 SP complétés (US-02). 
+                    L'équipe passe en dessous de la ligne idéale, indiquant une avance sur le planning.</li>
+                    
+                    <li><strong>Jours 6-7 (Stabilisation) :</strong> Travail sur l'intégration email (US-05) avec 4 SP par jour. 
+                    Rythme plus lent mais constant, probablement dû à la complexité technique de la génération des pièces jointes.</li>
+                    
+                    <li><strong>Jours 8-9 (Sprint final) :</strong> L'équipe accélère pour terminer les dernières fonctionnalités. 
+                    Jour 9 est particulièrement productif avec 10 SP complétés (US-08 + US-09 : workflow emails).</li>
+                    
+                    <li><strong>Jour 10 (Finalisation) :</strong> Derniers 5 SP complétés (US-10 : nettoyage) et tests finaux. 
+                    Sprint terminé avec succès, ligne bleue atteint zéro.</li>
+                </ul>
+                
+                <p><strong>Points positifs :</strong></p>
+                <ul>
+                    <li>✅ <strong>Sprint terminé à temps :</strong> Les 60 SP planifiés ont été complétés en 10 jours.</li>
+                    <li>✅ <strong>Vélocité stable :</strong> Moyenne de 6 SP/jour maintenue tout au long du sprint.</li>
+                    <li>✅ <strong>Bonne gestion des tâches complexes :</strong> US-04 (13 SP) a été divisée sur 2 jours, évitant les blocages.</li>
+                    <li>✅ <strong>Pas de scope creep :</strong> Aucun ajout de travail en cours de sprint (ligne bleue ne remonte jamais).</li>
+                    <li>✅ <strong>Progression constante :</strong> Pas de période de stagnation (ligne bleue toujours descendante).</li>
+                </ul>
+                
+                <p><strong>Conclusion :</strong></p>
+                <p>
+                    Ce sprint démontre une excellente planification et exécution. L'équipe a su maintenir un rythme constant, 
+                    gérer efficacement les tâches complexes, et livrer toutes les fonctionnalités prévues. La vélocité de 6 SP/jour 
+                    peut être utilisée comme référence pour planifier les prochains sprints avec confiance.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+        Chart.defaults.font.size = 14;
+        
+        // Données du sprint
+        const sprintData = {
+            days: ['J0', 'J1', 'J2', 'J3', 'J4', 'J5', 'J6', 'J7', 'J8', 'J9', 'J10'],
+            ideal: [60, 54, 48, 42, 36, 30, 24, 18, 12, 6, 0],
+            actual: [60, 55, 50, 43, 37, 29, 25, 21, 15, 5, 0],
+            completed: [0, 5, 5, 7, 6, 8, 4, 4, 6, 10, 5]
+        };
+        
+        // Graphique Burndown combiné (lignes + barres)
+        const ctx = document.getElementById('burndownChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: sprintData.days,
+                datasets: [
+                    {
+                        type: 'line',
+                        label: 'Ligne Idéale',
+                        data: sprintData.ideal,
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.05)',
+                        borderWidth: 3,
+                        borderDash: [10, 5],
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#dc3545',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        tension: 0,
+                        fill: false,
+                        yAxisID: 'y'
+                    },
+                    {
+                        type: 'line',
+                        label: 'Progression Réelle',
+                        data: sprintData.actual,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 4,
+                        pointRadius: 7,
+                        pointHoverRadius: 9,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 3,
+                        tension: 0.3,
+                        fill: true,
+                        yAxisID: 'y'
+                    },
+                    {
+                        type: 'bar',
+                        label: 'SP Complétés par Jour',
+                        data: sprintData.completed,
+                        backgroundColor: 'rgba(118, 75, 162, 0.15)',
+                        borderColor: 'rgba(118, 75, 162, 0.3)',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 30,
+                        top: 10,
+                        bottom: 10
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                        padding: 15,
+                        titleFont: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 14
+                        },
+                        callbacks: {
+                            title: function(context) {
+                                return 'Jour ' + context[0].label.substring(1);
+                            },
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y;
+                                
+                                if (label.includes('Idéale') || label.includes('Réelle')) {
+                                    return label + ': ' + value + ' SP restants';
+                                } else {
+                                    return label + ': ' + value + ' SP';
+                                }
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        beginAtZero: true,
+                        max: 65,
+                        title: {
+                            display: true,
+                            text: 'Story Points Restants',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            color: '#333'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.08)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 13
+                            }
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: true,
+                        max: 12,
+                        title: {
+                            display: true,
+                            text: 'SP Complétés',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            color: '#764ba2'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 13
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Jours du Sprint',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            color: '#333'
+                        },
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 13,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

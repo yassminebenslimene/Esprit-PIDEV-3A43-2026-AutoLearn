@@ -1,0 +1,172 @@
+ID US,User Story,ID Tache,Tache Technique Detaillee,Estimation (min),Responsable
+US-5.16,Le systeme empeche participation a evenement annule,T5.16.1,Verification deja implementee dans validateParticipation() de Participation.php: if ($this->evenement->getIsCanceled()) { $this->setStatut(StatutParticipation::REFUSE); return ['accepted' => false]; },10,Admin
+US-5.16,Le systeme empeche participation a evenement annule,T5.16.2,Verification supplementaire dans participate() de FrontofficeEvenementController: if (!$evenement->canAcceptParticipations()),10,Admin
+US-5.16,Le systeme empeche participation a evenement annule,T5.16.3,Tester avec evenement annule: tenter de creer equipe/participation -> verifier message Event is cancelled et redirection,20,Admin
+US-5.17,Le systeme limite a capacite maximale,T5.17.1,Logique deja implementee dans validateParticipation(): comparaison $nbAcceptees < $nbMax,5,Admin
+US-5.17,Le systeme limite a capacite maximale,T5.17.2,Tests supplementaires de cas limites: evenement avec nbMax=5 creer 5 participations acceptees tenter 6eme -> verifier refus,25,Admin
+US-5.18,Le systeme verifie taille d'equipe (4-6),T5.18.1,Validation deja implementee dans Equipe.php: Assert\Count(min: 4 max: 6 minMessage: Une equipe doit avoir au moins 4 etudiants maxMessage: Une equipe ne peut pas avoir plus de 6 etudiants),5,Admin
+US-5.18,Le systeme verifie taille d'equipe (4-6),T5.18.2,Messages d'erreur personnalises deja configures avec {{ limit }} pour afficher le nombre,5,Admin
+US-5.18,Le systeme verifie taille d'equipe (4-6),T5.18.3,Tests complets: creer equipe avec 3 membres -> erreur au moins 4 4 membres -> succes 6 membres -> succes 7 membres -> erreur pas plus de 6,35,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.1,Installer SendGrid: composer require symfony/sendgrid-mailer,10,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.2,Configurer dans .env.local: MAILER_DSN=sendgrid://KEY@default avec cle API SendGrid obtenue sur sendgrid.com,15,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.3,Creer src/Service/EmailService.php avec injection MailerInterface $mailer BadgeService $badgeService string $mailerFrom dans __construct,25,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.4,Implementer methode sendParticipationConfirmation(Participation $participation Equipe $equipe Evenement $evenement): void,45,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.5,Installer endroid/qr-code: composer require endroid/qr-code,10,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.6,Generer QR code dans sendParticipationConfirmation: $qrCode = QrCode::create($data)->setSize(300)->setMargin(10); $writer = new PngWriter(); $result = $writer->write($qrCode); $qrCodeData = $result->getString(); avec data = JSON contenant ID participation evenement equipe,35,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.7,Creer src/Service/BadgeService.php avec injection Dompdf $dompdf,30,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.8,Installer dompdf: composer require dompdf/dompdf,10,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.9,Implementer methode generateBadge(Etudiant $etudiant Evenement $evenement string $qrCodeData): string qui retourne PDF en string,60,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.10,Design badge HTML/CSS: logo en haut nom evenement nom etudiant QR code date lieu style professionnel avec gradients,50,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.11,Creer template templates/emails/participation_confirmation.html.twig avec design moderne informations evenement message personnalise,50,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.12,Generer fichier .ics: implementer generateIcsFile(Evenement $evenement): string avec format iCalendar (BEGIN:VCALENDAR VERSION:2.0 VEVENT avec DTSTART DTEND SUMMARY LOCATION DESCRIPTION UID),40,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.13,Dans sendParticipationConfirmation: creer email avec $email = (new Email())->from($this->mailerFrom)->to($etudiant->getEmail())->subject('Participation Confirmed')->htmlTemplate('emails/participation_confirmation.html.twig'),25,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.14,Attacher fichiers: $email->attach($qrCodeData 'qrcode.png' 'image/png')->attach($badgePdf 'badge.pdf' 'application/pdf')->attach($icsFile 'event.ics' 'text/calendar'),30,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.15,Envoyer email: $this->mailer->send($email) avec gestion erreurs try/catch,20,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.16,Appeler sendParticipationConfirmation() dans FrontofficeParticipationController apres $result = $participation->validateParticipation() si $result['accepted'] === true boucle sur tous etudiants de l'equipe,25,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.17,Tester envoi email: creer participation acceptee -> verifier email recu avec 3 pieces jointes (QR code PNG badge PDF event.ics),30,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.18,Tester QR code: scanner avec smartphone -> verifier donnees decodees (ID participation evenement equipe),20,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.19,Tester badge PDF: ouvrir fichier -> verifier design professionnel toutes informations presentes QR code visible,20,Admin
+US-5.19,Le systeme envoie email confirmation avec QR code et badge PDF,T5.19.20,Tester fichier .ics: importer dans Google Calendar/Outlook -> verifier evenement ajoute avec dates lieu description corrects,25,Admin
+US-5.20,Le systeme envoie email annulation evenement,T5.20.1,Creer methode sendEventCancellation(Evenement $evenement Equipe $equipe): void dans EmailService,30,Admin
+US-5.20,Le systeme envoie email annulation evenement,T5.20.2,Creer template templates/emails/event_cancelled.html.twig avec message d'excuses informations evenement annule design professionnel,40,Admin
+US-5.20,Le systeme envoie email annulation evenement,T5.20.3,Creer src/EventSubscriber/EvenementWorkflowSubscriber.php avec implements EventSubscriberInterface,25,Admin
+US-5.20,Le systeme envoie email annulation evenement,T5.20.4,Injecter dependances: EmailService $emailService LoggerInterface $logger dans __construct,15,Admin
+US-5.20,Le systeme envoie email annulation evenement,T5.20.5,Implementer getSubscribedEvents(): array retournant ['workflow.evenement_publishing.entered.annule' => 'onAnnule'],20,Admin
+US-5.20,Le systeme envoie email annulation evenement,T5.20.6,Implementer methode onAnnule(Event $event): void qui recupere evenement: $evenement = $event->getSubject(),25,Admin
+US-5.20,Le systeme envoie email annulation evenement,T5.20.7,Parcourir participations acceptees: foreach ($evenement->getParticipations() as $participation) { if ($participation->getStatut()->value === 'Accepte') { $equipe = $participation->getEquipe(); foreach ($equipe->getEtudiants() as $etudiant) { try { $this->emailService->sendEventCancellation($evenement $equipe); $this->logger->info('Email sent'); } catch (\Exception $e) { $this->logger->error('Email failed: ' . $e->getMessage()); } } } },45,Admin
+US-5.20,Le systeme envoie email annulation evenement,T5.20.8,Logger succes/echecs avec contexte (ID evenement email etudiant),20,Admin
+US-5.20,Le systeme envoie email annulation evenement,T5.20.9,Tester: creer evenement avec 2 equipes acceptees (8 etudiants total) -> annuler evenement -> verifier 8 emails envoyes consulter logs,35,Admin
+US-5.21,Le systeme envoie email demarrage evenement,T5.21.1,Creer methode sendEventStarted(Evenement $evenement Equipe $equipe): void dans EmailService,30,Admin
+US-5.21,Le systeme envoie email demarrage evenement,T5.21.2,Creer template templates/emails/event_started.html.twig avec message de bienvenue rappel lieu/horaires,40,Admin
+US-5.21,Le systeme envoie email demarrage evenement,T5.21.3,Ajouter dans getSubscribedEvents(): 'workflow.evenement_publishing.entered.en_cours' => 'onEnCours',15,Admin
+US-5.21,Le systeme envoie email demarrage evenement,T5.21.4,Implementer methode onEnCours(Event $event): void avec meme logique que onAnnule mais appel sendEventStarted(),35,Admin
+US-5.21,Le systeme envoie email demarrage evenement,T5.21.5,Tester: evenement avec dateDebut = maintenant -> executer commande workflow -> verifier emails envoyes,25,Admin
+US-5.22,Le systeme envoie email rappel 3 jours avant,T5.22.1,Creer src/Command/SendEventRemindersCommand.php avec #[AsCommand(name: 'app:send-event-reminders')],30,Admin
+US-5.22,Le systeme envoie email rappel 3 jours avant,T5.22.2,Injecter: EvenementRepository $evenementRepository EmailService $emailService,15,Admin
+US-5.22,Le systeme envoie email rappel 3 jours avant,T5.22.3,Recuperer evenements dans 3 jours: $targetDate = (new \DateTime())->modify('+3 days'); $evenements = $evenementRepository->createQueryBuilder('e')->where('DATE(e.dateDebut) = :targetDate')->setParameter('targetDate' $targetDate->format('Y-m-d'))->getQuery()->getResult();,35,Admin
+US-5.22,Le systeme envoie email rappel 3 jours avant,T5.22.4,Creer methode sendEventReminder(Evenement $evenement Equipe $equipe): void dans EmailService,30,Admin
+US-5.22,Le systeme envoie email rappel 3 jours avant,T5.22.5,Creer template templates/emails/event_reminder.html.twig avec countdown 3 days left! checklist preparation,40,Admin
+US-5.22,Le systeme envoie email rappel 3 jours avant,T5.22.6,Envoyer a tous participants: boucle sur evenements participations equipes etudiants,30,Admin
+US-5.22,Le systeme envoie email rappel 3 jours avant,T5.22.7,Configurer cron job: documentation pour executer commande quotidiennement a 9h00: 0 9 * * * php /path/to/project/bin/console app:send-event-reminders,20,Admin
+US-5.22,Le systeme envoie email rappel 3 jours avant,T5.22.8,Tester commande manuellement: creer evenement dans 3 jours -> executer php bin/console app:send-event-reminders -> verifier emails,25,Admin
+US-5.23,Le systeme genere et envoie certificats PDF,T5.23.1,Creer src/Service/CertificateService.php avec injection Dompdf,30,Admin
+US-5.23,Le systeme genere et envoie certificats PDF,T5.23.2,Implementer generateCertificate(Etudiant $etudiant Evenement $evenement): string retournant PDF en string,60,Admin
+US-5.23,Le systeme genere et envoie certificats PDF,T5.23.3,Design template certificat HTML/CSS: bordure decorative logo plateforme en haut titre Certificate of Participation texte This certifies that [Nom Etudiant] has successfully participated in [Nom Evenement] date signature digitale QR code verification,80,Admin
+US-5.23,Le systeme genere et envoie certificats PDF,T5.23.4,Styliser avec CSS professionnel: police elegante (serif) couleurs or/bleu background pattern subtil,50,Admin
+US-5.23,Le systeme genere et envoie certificats PDF,T5.23.5,Ajouter QR code de verification contenant URL: https://platform.com/verify/certificate/{uniqueId},30,Admin
+US-5.23,Le systeme genere et envoie certificats PDF,T5.23.6,Creer methode sendCertificate(Etudiant $etudiant Evenement $evenement string $certificatePdf): void dans EmailService,30,Admin
+US-5.23,Le systeme genere et envoie certificats PDF,T5.23.7,Creer src/Command/SendCertificatesCommand.php pour envoyer certificats evenements termines,35,Admin
+US-5.23,Le systeme genere et envoie certificats PDF,T5.23.8,Recuperer evenements termines: $evenements = $evenementRepository->createQueryBuilder('e')->where('e.workflowStatus = :status')->setParameter('status' 'termine')->getQuery()->getResult();,25,Admin
+US-5.23,Le systeme genere et envoie certificats PDF,T5.23.9,Pour chaque evenement generer et envoyer certificat a chaque participant accepte,35,Admin
+US-5.23,Le systeme genere et envoie certificats PDF,T5.23.10,Tester: evenement termine avec 2 equipes -> executer commande -> verifier certificats PDF recus design professionnel QR code present,35,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.1,Installer tattali/calendar-bundle: composer require tattali/calendar-bundle,10,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.2,Creer config/packages/calendar.yaml avec configuration de base,15,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.3,Creer src/EventSubscriber/CalendarSubscriber.php implements EventSubscriberInterface,25,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.4,Injecter EvenementRepository $evenementRepository dans __construct,10,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.5,Implementer getSubscribedEvents(): array retournant [CalendarEvents::SET_DATA => 'onCalendarSetData'],15,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.6,Implementer onCalendarSetData(CalendarEvent $calendar): void qui recupere evenements entre start et end dates du calendrier,40,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.7,Convertir chaque Evenement en CalendarEvent: $calendarEvent = new CalendarEvent($evenement->getTitre() $evenement->getDateDebut() $evenement->getDateFin()); $calendarEvent->addOption('url' $this->router->generate('app_event_participate' ['id' => $evenement->getId()])); $calendarEvent->addOption('backgroundColor' $this->getColorByType($evenement->getType())); $calendar->addEvent($calendarEvent);,35,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.8,Ajouter route #[Route('/calendar' name: 'app_events_calendar' methods: ['GET'])] dans FrontofficeEvenementController,15,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.9,Creer template templates/frontoffice/evenement/calendar.html.twig extends 'frontoffice/base.html.twig',30,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.10,Integrer FullCalendar v6.1.10 via CDN: <link href=https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css rel=stylesheet> <script src=https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js></script>,20,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.11,Initialiser FullCalendar avec JavaScript: var calendar = new FullCalendar.Calendar(calendarEl { initialView: 'dayGridMonth' headerToolbar: { left: 'prev next today' center: 'title' right: 'dayGridMonth timeGridWeek timeGridDay listMonth' } events: '{{ path('calendar_feed') }}' eventClick: function(info) { window.location.href = info.event.url; } });,40,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.12,Configurer 4 vues: Month (dayGridMonth) Week (timeGridWeek) Day (timeGridDay) List (listMonth),25,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.13,Styliser avec couleurs par type: Conference=bleu Hackathon=rouge Workshop=vert Seminar=orange Meetup=violet Training=cyan,30,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.14,Ajouter modal popup au clic: afficher details evenement (titre type dates lieu description places disponibles) bouton Participate,50,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.15,Integrer navbar frontoffice avec lien retour vers liste evenements,20,Admin
+US-5.24,Consulter un calendrier visuel,T5.24.16,Tester affichage calendrier: creer 5 evenements differentes dates -> verifier affichage dans calendrier changement vues clic evenement,30,Admin
+US-5.25,Voir la meteo prevue,T5.25.1,Creer compte OpenWeatherMap API sur openweathermap.org obtenir cle API gratuite,10,Admin
+US-5.25,Voir la meteo prevue,T5.25.2,Configurer dans .env.local: WEATHER_API_KEY=your_openweathermap_key,10,Admin
+US-5.25,Voir la meteo prevue,T5.25.3,Creer src/Service/WeatherService.php avec injection HttpClientInterface $httpClient string $weatherApiKey,25,Admin
+US-5.25,Voir la meteo prevue,T5.25.4,Implementer getWeatherForEvent(string $city \DateTimeInterface $eventDate): ?array,50,Admin
+US-5.25,Voir la meteo prevue,T5.25.5,Calculer jours jusqu'a evenement: $now = new \DateTime(); $diff = $now->diff($eventDate); $daysUntilEvent = (int) $diff->format('%R%a');,20,Admin
+US-5.25,Voir la meteo prevue,T5.25.6,Si evenement > 5 jours OU passe: appeler API meteo actuelle https://api.openweathermap.org/data/2.5/weather?q={city}&appid={apiKey}&units=metric&lang=en,30,Admin
+US-5.25,Voir la meteo prevue,T5.25.7,Si evenement dans 0-5 jours: appeler API previsions https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={apiKey}&units=metric&lang=en trouver prevision la plus proche de eventDate,45,Admin
+US-5.25,Voir la meteo prevue,T5.25.8,Retourner tableau: ['available' => true 'is_forecast' => bool 'temperature' => int 'feels_like' => int 'description' => string 'icon' => string 'humidity' => int 'wind_speed' => float 'city' => string],25,Admin
+US-5.25,Voir la meteo prevue,T5.25.9,Creer methode getWeatherEmoji(string $icon): string avec mapping: '01d'=>'soleil' '01n'=>'lune' '02d'=>'nuages' '09d'=>'pluie' '10d'=>'averses' '11d'=>'orage' '13d'=>'neige' '50d'=>'brouillard',25,Admin
+US-5.25,Voir la meteo prevue,T5.25.10,Integrer dans FrontofficeEvenementController->index(): appeler $weather = $weatherService->getWeatherForEvent('Tunis TN' $evenement->getDateDebut()) pour chaque evenement (deja fait dans US-5.7),15,Admin
+US-5.25,Voir la meteo prevue,T5.25.11,Afficher section meteo dans index.html.twig (deja fait dans US-5.7): emoji temperature description humidite vent,20,Admin
+US-5.25,Voir la meteo prevue,T5.25.12,Styliser avec gradients selon temperature: {% if weather.temperature > 25 %} background: linear-gradient(135deg #ff6b6b #feca57) {% elseif weather.temperature < 10 %} background: linear-gradient(135deg #48dbfb #0abde3) {% else %} background: linear-gradient(135deg #2ed573 #1e90ff) {% endif %},30,Admin
+US-5.25,Voir la meteo prevue,T5.25.13,Messages personnalises: Perfect weather for the event! Bring an umbrella! Dress warmly!,25,Admin
+US-5.25,Voir la meteo prevue,T5.25.14,Gerer erreurs API: try/catch retourner ['available' => false 'error' => true 'message' => 'Unable to fetch weather'] si timeout ou cle invalide,25,Admin
+US-5.25,Voir la meteo prevue,T5.25.15,Tester avec evenement dans 2 jours: verifier previsions affichees emoji correct temperature description,20,Admin
+US-5.25,Voir la meteo prevue,T5.25.16,Tester avec evenement dans 10 jours: verifier meteo actuelle affichee avec note Current weather (forecast not available),15,Admin
+US-5.26,Donner mon feedback,T5.26.1,Colonne feedbacks (JSON) deja ajoutee dans Participation.php (US-5.11): #[ORM\Column(type: 'json' nullable: true)],10,Admin
+US-5.26,Donner mon feedback,T5.26.2,Migration deja generee (US-5.11),5,Admin
+US-5.26,Donner mon feedback,T5.26.3,Creer src/Enum/SentimentFeedback.php avec cases: TRES_SATISFAIT SATISFAIT NEUTRE DECU TRES_DECU,15,Admin
+US-5.26,Donner mon feedback,T5.26.4,Implementer addFeedback(int $etudiantId string $etudiantName int $ratingGlobal array $ratingCategories string $sentiment string $emoji ?string $comment): void dans Participation.php,40,Admin
+US-5.26,Donner mon feedback,T5.26.5,Structure feedback JSON: ['etudiant_id' => int 'etudiant_name' => string 'rating_global' => int 'rating_categories' => ['organisation' => int 'contenu' => int 'lieu' => int 'animation' => int] 'sentiment' => string 'emoji' => string 'comment' => string|null 'created_at' => datetime],25,Admin
+US-5.26,Donner mon feedback,T5.26.6,Implementer getFeedbackByEtudiant(int $etudiantId): ?array qui parcourt feedbacks et retourne feedback de l'etudiant ou null,20,Admin
+US-5.26,Donner mon feedback,T5.26.7,Creer src/Controller/FeedbackController.php avec #[Route('/feedback')],20,Admin
+US-5.26,Donner mon feedback,T5.26.8,Ajouter route #[Route('/participation/{id}' name: 'app_feedback_form' methods: ['GET'])],15,Admin
+US-5.26,Donner mon feedback,T5.26.9,Implementer methode showFeedbackForm(Participation $participation): Response avec verifications: evenement termine ($participation->getEvenement()->getDateFin() >= $now) utilisateur membre equipe feedback deja donne,35,Admin
+US-5.26,Donner mon feedback,T5.26.10,Ajouter route POST #[Route('/submit/{id}' name: 'app_feedback_submit' methods: ['POST'])],15,Admin
+US-5.26,Donner mon feedback,T5.26.11,Implementer submitFeedback(Participation $participation Request $request EntityManagerInterface $entityManager): JsonResponse qui recupere donnees JSON valide appelle addFeedback() flush retourne JSON success,40,Admin
+US-5.26,Donner mon feedback,T5.26.12,Creer template templates/frontoffice/feedback/form.html.twig avec design moderne,60,Admin
+US-5.26,Donner mon feedback,T5.26.13,Systeme notation par etoiles (1-5): HTML avec 5 etoiles cliquables JavaScript pour gerer selection CSS pour hover/selected states (etoiles jaunes),45,Admin
+US-5.26,Donner mon feedback,T5.26.14,Selection sentiment avec emojis: 5 boutons radio stylises avec emojis (Tres satisfait Satisfait Neutre Decu Tres decu) effet hover scale,35,Admin
+US-5.26,Donner mon feedback,T5.26.15,Champ commentaire libre: <textarea rows=5 placeholder=Share your experience...> avec compteur caracteres (max 500),20,Admin
+US-5.26,Donner mon feedback,T5.26.16,Styliser avec design moderne: gradients ombres animations responsive,40,Admin
+US-5.26,Donner mon feedback,T5.26.17,Soumettre via AJAX: fetch(url {method: 'POST' headers: {'Content-Type': 'application/json'} body: JSON.stringify(data)}) afficher message succes/erreur,35,Admin
+US-5.26,Donner mon feedback,T5.26.18,Tester soumission feedback: evenement termine participation acceptee -> donner feedback -> verifier sauvegarde en BDD (JSON) message succes affiche,30,Admin
+US-5.27,Modifier ou supprimer mon feedback,T5.27.1,Ajouter route #[Route('/{participationId}/edit' name: 'app_feedback_edit' methods: ['GET' 'POST'])] dans FeedbackController,15,Admin
+US-5.27,Modifier ou supprimer mon feedback,T5.27.2,Implementer methode edit() qui recupere feedback existant via getFeedbackByEtudiant() affiche formulaire pre-rempli,30,Admin
+US-5.27,Modifier ou supprimer mon feedback,T5.27.3,Pre-remplir formulaire: etoiles selectionnees sentiment coche commentaire affiche JavaScript pour initialiser etat,25,Admin
+US-5.27,Modifier ou supprimer mon feedback,T5.27.4,Modifier feedback: supprimer ancien feedback du tableau JSON ajouter nouveau avec addFeedback(),20,Admin
+US-5.27,Modifier ou supprimer mon feedback,T5.27.5,Ajouter route DELETE #[Route('/{participationId}/delete' name: 'app_feedback_delete' methods: ['DELETE'])],15,Admin
+US-5.27,Modifier ou supprimer mon feedback,T5.27.6,Implementer methode delete() qui supprime feedback de l'etudiant du tableau JSON flush,20,Admin
+US-5.27,Modifier ou supprimer mon feedback,T5.27.7,Ajouter boutons Edit Feedback et Delete Feedback dans mes_participations.html.twig si feedback existe,20,Admin
+US-5.27,Modifier ou supprimer mon feedback,T5.27.8,Confirmation JavaScript pour suppression: if (confirm('Delete your feedback?')),10,Admin
+US-5.27,Modifier ou supprimer mon feedback,T5.27.9,Tester modification feedback: changer note sentiment commentaire -> verifier modifications sauvegardees,20,Admin
+US-5.27,Modifier ou supprimer mon feedback,T5.27.10,Tester suppression feedback: supprimer -> verifier feedback retire de JSON en BDD,15,Admin
+US-5.28,Consulter les feedbacks (Admin),T5.28.1,Ajouter section Feedbacks dans templates/backoffice/evenement/show.html.twig,30,Admin
+US-5.28,Consulter les feedbacks (Admin),T5.28.2,Afficher liste de tous les feedbacks: parcourir participations extraire feedbacks JSON afficher avec nom etudiant note globale sentiment commentaire,45,Admin
+US-5.28,Consulter les feedbacks (Admin),T5.28.3,Styliser avec cartes colorees selon sentiment: Tres satisfait=vert Satisfait=bleu Neutre=gris Decu=orange Tres decu=rouge,40,Admin
+US-5.28,Consulter les feedbacks (Admin),T5.28.4,Calculer et afficher statistiques: note moyenne globale distribution des sentiments (pourcentages) nombre total feedbacks,35,Admin
+US-5.28,Consulter les feedbacks (Admin),T5.28.5,Ajouter filtres JavaScript: boutons pour filtrer par sentiment afficher/cacher feedbacks selon selection,30,Admin
+US-5.28,Consulter les feedbacks (Admin),T5.28.6,Afficher graphique distribution notes avec Chart.js: bar chart avec notes 1-5 sur axe X nombre feedbacks sur axe Y,40,Admin
+US-5.28,Consulter les feedbacks (Admin),T5.28.7,Tester affichage avec evenement ayant 10 feedbacks varies (differentes notes sentiments commentaires) -> verifier statistiques correctes,25,Admin
+US-5.29,Generer rapport statistiques AI,T5.29.1,Creer src/Service/AIReportService.php avec injection HttpClientInterface $httpClient string $huggingfaceApiKey,30,Admin
+US-5.29,Generer rapport statistiques AI,T5.29.2,Configurer dans .env.local: HUGGINGFACE_API_KEY=your_huggingface_key (obtenir sur huggingface.co),15,Admin
+US-5.29,Generer rapport statistiques AI,T5.29.3,Installer symfony/http-client si pas deja fait: composer require symfony/http-client,10,Admin
+US-5.29,Generer rapport statistiques AI,T5.29.4,Implementer methode generateStatisticsReport(Evenement $evenement): string qui retourne rapport texte genere par AI,60,Admin
+US-5.29,Generer rapport statistiques AI,T5.29.5,Construire prompt detaille: Analyze this event: Title: {titre} Type: {type} Participants: {nbParticipants} Accepted: {nbAccepted} Refused: {nbRefused} Average Rating: {avgRating}. Generate a comprehensive statistical report with insights trends and recommendations.,40,Admin
+US-5.29,Generer rapport statistiques AI,T5.29.6,Appeler API Hugging Face: POST https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2 avec headers Authorization: Bearer {apiKey} body JSON {inputs: prompt parameters: {max_new_tokens: 500 temperature: 0.7}},45,Admin
+US-5.29,Generer rapport statistiques AI,T5.29.7,Parser reponse JSON: $response = $httpClient->request('POST' $url ['headers' => [...] 'json' => [...]]); $data = $response->toArray(); $generatedText = $data[0]['generated_text'];,30,Admin
+US-5.29,Generer rapport statistiques AI,T5.29.8,Gerer erreurs API: try/catch retourner message d'erreur si timeout quota depasse ou cle invalide,25,Admin
+US-5.29,Generer rapport statistiques AI,T5.29.9,Ajouter route #[Route('/backoffice/evenement/{id}/ai/generate-report' name: 'backoffice_evenement_ai_report' methods: ['POST'])] dans EvenementController,20,Admin
+US-5.29,Generer rapport statistiques AI,T5.29.10,Implementer methode qui appelle AIReportService retourne JsonResponse avec rapport genere,25,Admin
+US-5.29,Generer rapport statistiques AI,T5.29.11,Ajouter bouton Generate AI Report dans templates/backoffice/evenement/index.html.twig avec icone robot,20,Admin
+US-5.29,Generer rapport statistiques AI,T5.29.12,Implementer appel AJAX: fetch(url {method: 'POST'}) afficher loading spinner pendant generation,30,Admin
+US-5.29,Generer rapport statistiques AI,T5.29.13,Afficher rapport dans modal Bootstrap: titre AI-Generated Report contenu avec formatage markdown bouton fermer,35,Admin
+US-5.29,Generer rapport statistiques AI,T5.29.14,Styliser modal avec design professionnel: gradient header icone AI texte bien formate avec sections,30,Admin
+US-5.29,Generer rapport statistiques AI,T5.29.15,Tester generation rapport: evenement termine avec participations et feedbacks -> cliquer bouton -> verifier rapport genere pertinent et detaille,30,Admin
+US-5.30,Generer analyse sentiments AI,T5.30.1,Creer methode generateSentimentAnalysis(Evenement $evenement): string dans AIReportService,40,Admin
+US-5.30,Generer analyse sentiments AI,T5.30.2,Extraire tous commentaires feedbacks: parcourir participations recuperer feedbacks JSON extraire champ comment,30,Admin
+US-5.30,Generer analyse sentiments AI,T5.30.3,Construire prompt: Analyze these participant feedbacks: [liste commentaires]. Provide: 1) Overall sentiment (positive/negative/neutral) 2) Recurring themes 3) Strengths 4) Weaknesses 5) Actionable recommendations.,35,Admin
+US-5.30,Generer analyse sentiments AI,T5.30.4,Appeler API Hugging Face avec prompt parser reponse (meme logique que US-5.29),25,Admin
+US-5.30,Generer analyse sentiments AI,T5.30.5,Ajouter route #[Route('/backoffice/evenement/{id}/ai/analyze-sentiment' name: 'backoffice_evenement_ai_sentiment' methods: ['POST'])],15,Admin
+US-5.30,Generer analyse sentiments AI,T5.30.6,Ajouter bouton Analyze Sentiment dans index.html.twig avec icone,20,Admin
+US-5.30,Generer analyse sentiments AI,T5.30.7,Afficher analyse dans modal avec sections: Sentiment Global (badge colore) Themes Recurrents (liste) Points Forts (liste verte) Points Faibles (liste rouge) Recommandations (liste bleue),50,Admin
+US-5.30,Generer analyse sentiments AI,T5.30.8,Styliser avec badges colores: positif=vert (#2ed573) negatif=rouge (#ff4757) neutre=gris (#95a5a6),30,Admin
+US-5.30,Generer analyse sentiments AI,T5.30.9,Ajouter graphique pie chart avec Chart.js: distribution sentiments (% positif negatif neutre),40,Admin
+US-5.30,Generer analyse sentiments AI,T5.30.10,Tester avec evenement ayant feedbacks varies (5 positifs 3 neutres 2 negatifs) -> verifier analyse pertinente themes identifies,30,Admin
+US-5.31,Generer recommandations evenements AI,T5.31.1,Creer methode buildRecommendationPrompt(array $evenementsData): string dans AIReportService,40,Admin
+US-5.31,Generer recommandations evenements AI,T5.31.2,Structurer prompt: Based on past events data [resume evenements avec taux participation feedbacks] recommend 3 new event ideas. For each: 1) Event type 2) Target audience 3) Expected outcomes 4) Justification based on data.,35,Admin
+US-5.31,Generer recommandations evenements AI,T5.31.3,Inclure donnees historiques: types evenements populaires taux participation moyens feedbacks positifs/negatifs,30,Admin
+US-5.31,Generer recommandations evenements AI,T5.31.4,Implementer methode generateEventRecommendations(): string qui appelle API avec prompt,25,Admin
+US-5.31,Generer recommandations evenements AI,T5.31.5,Ajouter route #[Route('/backoffice/evenement/ai/generate-recommendations' name: 'backoffice_evenement_ai_recommendations' methods: ['POST'])],15,Admin
+US-5.31,Generer recommandations evenements AI,T5.31.6,Ajouter bouton Recommandations AI dans index.html.twig avec icone,25,Admin
+US-5.31,Generer recommandations evenements AI,T5.31.7,Implementer appel AJAX et affichage dans modal avec loading state,35,Admin
+US-5.31,Generer recommandations evenements AI,T5.31.8,Styliser avec cartes pour chaque recommandation: titre evenement type audience cible justification icone selon type,40,Admin
+US-5.31,Generer recommandations evenements AI,T5.31.9,Tester generation recommandations: base de 10 evenements passes -> verifier 3 recommandations pertinentes avec justifications basees sur donnees,25,Admin
+US-5.32,Generer suggestions d'amelioration AI,T5.32.1,Creer methode buildImprovementPrompt(Evenement $evenement): string dans AIReportService,40,Admin
+US-5.32,Generer suggestions d'amelioration AI,T5.32.2,Structurer prompt: Analyze this event [donnees evenement + feedbacks]. Generate an improvement plan with: 1) Issues identified 2) Suggested improvements 3) Priority level (HIGH/MEDIUM/LOW) 4) Expected impact.,35,Admin
+US-5.32,Generer suggestions d'amelioration AI,T5.32.3,Inclure dans prompt: taux participation feedbacks negatifs problemes recurrents mentionnes,30,Admin
+US-5.32,Generer suggestions d'amelioration AI,T5.32.4,Implementer methode generateImprovementSuggestions(Evenement $evenement): string,25,Admin
+US-5.32,Generer suggestions d'amelioration AI,T5.32.5,Ajouter route #[Route('/backoffice/evenement/{id}/ai/generate-improvements' name: 'backoffice_evenement_ai_improvements' methods: ['POST'])],15,Admin
+US-5.32,Generer suggestions d'amelioration AI,T5.32.6,Ajouter bouton Suggestions d'Amelioration AI dans index.html.twig avec icone,25,Admin
+US-5.32,Generer suggestions d'amelioration AI,T5.32.7,Implementer appel AJAX et affichage dans modal,35,Admin
+US-5.32,Generer suggestions d'amelioration AI,T5.32.8,Styliser avec badges de priorite colores: HAUTE=rouge (#ff4757) MOYENNE=orange (#ffa502) BASSE=bleu (#1e90ff),40,Admin
+US-5.32,Generer suggestions d'amelioration AI,T5.32.9,Afficher suggestions en liste avec: probleme identifie amelioration suggeree priorite (badge) impact attendu,35,Admin
+US-5.32,Generer suggestions d'amelioration AI,T5.32.10,Tester generation suggestions: evenement avec feedbacks negatifs -> verifier suggestions pertinentes avec priorites appropriees,25,Admin

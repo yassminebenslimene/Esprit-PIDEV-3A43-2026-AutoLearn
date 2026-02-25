@@ -1,0 +1,41 @@
+ID,User Story,Acteur,Priorité
+US-5.1,"En tant qu'Admin, je souhaite créer un événement afin de permettre aux étudiants d'y participer",Admin,1
+US-5.2,"En tant qu'Admin, je souhaite modifier un événement afin de mettre à jour ses informations",Admin,1
+US-5.3,"En tant qu'Admin, je souhaite supprimer un événement afin de retirer un événement obsolète de la plateforme",Admin,1
+US-5.4,"Le système gère automatiquement les transitions d'états via Workflow (planifié → en cours → terminé). L'Admin peut uniquement annuler manuellement un événement",Système / Admin,1
+US-5.5,"En tant qu'Admin, je souhaite consulter la liste des événements afin d'avoir une vue globale des événements créés",Admin,1
+US-5.6,"En tant qu'Admin, je souhaite définir un nombre maximum d'équipes pour un événement afin de limiter le nombre de participants",Admin,1
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles afin de choisir celui auquel participer",Étudiant,1
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe afin de participer à un événement",Étudiant,1
+US-5.9,"En tant qu'Étudiant, je souhaite modifier mon équipe (nom, ajout/retrait de membres) afin de mettre à jour sa composition",Étudiant,2
+US-5.10,"En tant qu'Étudiant, je souhaite supprimer mon équipe afin de ne plus participer avec celle-ci",Étudiant,2
+US-5.11,"En tant qu'Étudiant, je souhaite inscrire mon équipe à un événement afin de participer à la compétition",Étudiant,1
+US-5.12,"Le système accepte automatiquement la participation d'une équipe si le nombre maximal d'équipes n'est pas atteint",Système,1
+US-5.13,"Le système refuse automatiquement la participation d'une équipe si un étudiant est membre dans deux équipes différentes pour le même événement",Système,1
+US-5.14,"En tant qu'Étudiant, je souhaite consulter le statut de ma participation afin de savoir si mon équipe est acceptée ou refusée",Étudiant,1
+US-5.15,"Le système empêche un étudiant de participer sans équipe afin de respecter les règles de la plateforme",Système,1
+US-5.16,"Le système empêche toute nouvelle participation à un événement annulé afin de garantir la cohérence des données",Système,1
+US-5.17,"Le système limite le nombre d'équipes acceptées à la capacité maximale définie afin de respecter les contraintes de l'événement",Système,1
+US-5.18,"Le système vérifie que chaque équipe respecte le nombre minimum et maximum de membres (4-6) afin d'assurer une participation valide",Système,1
+US-5.19,"Le système envoie automatiquement un email de confirmation avec QR code et badge PDF lorsqu'une participation est acceptée",Système,1
+US-5.20,"Le système envoie automatiquement un email d'annulation à tous les participants lorsqu'un événement est annulé",Système,1
+US-5.21,"Le système envoie automatiquement un email de démarrage à tous les participants lorsqu'un événement commence",Système,1
+US-5.22,"Le système envoie automatiquement un email de rappel 3 jours avant l'événement",Système,2
+US-5.23,"Le système génère et envoie automatiquement des certificats PDF après la fin d'un événement",Système,1
+US-5.24,"En tant qu'Étudiant, je souhaite consulter un calendrier visuel des événements afin de voir les dates importantes",Étudiant,2
+US-5.25,"En tant qu'Étudiant, je souhaite voir la météo prévue pour l'événement afin de me préparer en conséquence",Étudiant,3
+US-5.26,"En tant qu'Étudiant, je souhaite donner mon feedback après un événement afin de partager mon expérience",Étudiant,1
+US-5.27,"En tant qu'Étudiant, je souhaite modifier ou supprimer mon feedback afin de corriger ou retirer mon avis",Étudiant,2
+US-5.28,"En tant qu'Étudiant, je souhaite évaluer l'événement par catégories (organisation, contenu, lieu, animation) afin de donner un feedback détaillé",Étudiant,1
+US-5.29,"En tant qu'Admin, je souhaite consulter les statistiques de feedbacks par type d'événement afin d'analyser la satisfaction",Admin,1
+US-5.30,"En tant qu'Admin, je souhaite générer un rapport d'analyse AI basé sur les feedbacks afin d'obtenir des insights",Admin,1
+US-5.31,"En tant qu'Admin, je souhaite générer des recommandations d'événements via AI afin de planifier de futurs événements",Admin,1
+US-5.32,"En tant qu'Admin, je souhaite générer des suggestions d'amélioration via AI afin d'optimiser les événements futurs",Admin,1
+US-5.33,"Le système empêche les participations aux événements en cours ou terminés afin de respecter les règles métier",Système,1
+US-5.34,"Le système log toutes les transitions d'états avec traçabilité (qui, quand, quoi) afin d'assurer un audit complet",Système,1
+US-5.35,"En tant qu'Étudiant, je souhaite rejoindre une équipe existante afin de participer sans créer une nouvelle équipe",Étudiant,2
+US-5.36,"En tant qu'Étudiant, je souhaite voir les équipes participantes à un événement afin de connaître la compétition",Étudiant,3
+US-5.37,"En tant qu'Admin, je souhaite voir les détails d'un événement (participations, équipes, statistiques) afin d'avoir une vue complète",Admin,1
+US-5.38,"Le système supprime automatiquement les participations refusées afin de garder une base de données propre",Système,2
+US-5.39,"Le système génère automatiquement un fichier .ics pour ajouter l'événement au calendrier personnel",Système,3
+US-5.40,"Le système valide automatiquement les contraintes de dates (date fin >= date début)",Système,1

@@ -1,0 +1,432 @@
+@startuml Diagramme de Séquence - Participation à un Événement
+
+title Processus Complet de Participation à un Événement\n(Architecture 3 Couches)
+
+' Définition des acteurs et composants
+actor Étudiant as etudiant
+participant "<<Présentation>>\nNavigateur Web" as browser
+participant "<<Présentation>>\nFrontofficeController" as controller
+participant "<<Métier>>\nSecurityService" as security
+participant "<<Métier>>\nEquipeService" as equipeService
+participant "<<Métier>>\nParticipationService" as participationService
+participant "<<Métier>>\nValidationService" as validationService
+participant "<<Métier>>\nEmailService" as emailService
+participant "<<Métier>>\nBadgeService" as badgeService
+participant "<<Métier>>\nCertificateService" as certificateService
+database "<<Données>>\nBase de Données" as db
+
+' Styles
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+== Phase 1 : Authentification ==
+
+ref over etudiant, security
+    **Processus d'Authentification**
+    (Voir diagramme séparé)
+end ref
+
+etudiant -> browser : Accède à /events
+browser -> controller : GET /events
+controller -> security : verifyAuthentication()
+alt Utilisateur non authentifié
+    security --> controller : AuthenticationException
+    controller --> browser : Redirect /login
+    browser --> etudiant : Page de connexion
+    note right: L'utilisateur doit\nse connecter d'abord
+else Utilisateur authentifié
+    security --> controller : User authenticated
+    controller -> db : SELECT * FROM evenement\nWHERE status != 'Annulé'
+    db --> controller : Liste des événements
+    controller --> browser : Render events/index.html.twig
+    browser --> etudiant : Affichage des événements disponibles
+end
+
+== Phase 2 : Sélection d'un Événement ==
+
+etudiant -> browser : Clique sur "Participer" (événement ID=5)
+browser -> controller : GET /evenement/5/participate
+controller -> db : SELECT * FROM evenement WHERE id=5
+db --> controller : Événement {id:5, titre:"Hackathon 2026",\nnbMax:10, dateDebut:"2026-03-15"}
+
+controller -> db : SELECT COUNT(*) FROM participation\nWHERE evenement_id=5 AND statut='Accepté'
+db --> controller : nbParticipations = 7
+
+alt Événement annulé
+    controller --> browser : Flash error: "Événement annulé"
+    browser --> etudiant : Message d'erreur
+else Événement complet (nbParticipations >= nbMax)
+    controller --> browser : Flash warning: "Événement complet"
+    browser --> etudiant : Message d'avertissement
+else Événement disponible
+    controller -> db : SELECT e.* FROM equipe e\nJOIN equipe_etudiant ee ON e.id = ee.equipe_id\nWHERE ee.etudiant_id = {userId}\nAND e.evenement_id = 5
+    db --> controller : Liste des équipes de l'étudiant
+    
+    controller --> browser : Render participate.html.twig\n{evenement, mesEquipes}
+    browser --> etudiant : Page de participation avec 2 options:\n1. Créer une nouvelle équipe\n2. Rejoindre une équipe existante
+end
+
+== Phase 3A : Option 1 - Créer une Nouvelle Équipe ==
+
+etudiant -> browser : Clique sur "Créer une équipe"
+browser -> controller : GET /equipe/new-for-event/5
+controller --> browser : Render equipe/new.html.twig
+browser --> etudiant : Formulaire de création d'équipe
+
+etudiant -> browser : Remplit le formulaire:\n- Nom: "Team Innovators"\n- Membres: Ahmed, Fatima, Youssef, Sara (4 membres)
+browser -> controller : POST /equipe/new-for-event/5\n{nom, membres[]}
+
+controller -> equipeService : createEquipe(nom, membres, evenementId)
+equipeService -> equipeService : validateEquipe()
+
+alt Validation échouée (< 4 ou > 6 membres)
+    equipeService --> controller : ValidationException:\n"Une équipe doit avoir entre 4 et 6 membres"
+    controller --> browser : Flash error + formulaire avec erreurs
+    browser --> etudiant : Erreurs de validation affichées
+else Validation réussie
+    equipeService -> db : INSERT INTO equipe\n(nom, evenement_id)\nVALUES ('Team Innovators', 5)
+    db --> equipeService : equipe_id = 42
+    
+    loop Pour chaque membre
+        equipeService -> db : INSERT INTO equipe_etudiant\n(equipe_id, etudiant_id)\nVALUES (42, membre_id)
+        db --> equipeService : OK
+    end
+    
+    equipeService --> controller : Équipe créée {id:42}
+    controller --> browser : Flash success: "Équipe créée avec succès!"\nRedirect /equipe/42/event/5
+    browser --> etudiant : Page de l'équipe avec bouton\n"Participer avec cette équipe"
+end
+
+== Phase 3B : Option 2 - Rejoindre une Équipe Existante ==
+
+etudiant -> browser : Clique sur "Rejoindre une équipe"
+browser -> controller : GET /evenement/5/equipes-disponibles
+controller -> db : SELECT e.*, COUNT(ee.etudiant_id) as nbMembres\nFROM equipe e\nLEFT JOIN equipe_etudiant ee ON e.id = ee.equipe_id\nWHERE e.evenement_id = 5\nGROUP BY e.id\nHAVING nbMembres < 6
+db --> controller : Liste des équipes avec places disponibles
+
+controller --> browser : Render equipes_disponibles.html.twig
+browser --> etudiant : Liste des équipes:\n- Team Alpha (5/6 membres) - 1 place\n- Team Beta (4/6 membres) - 2 places
+
+etudiant -> browser : Clique sur "Rejoindre Team Alpha"
+browser -> controller : POST /equipe/35/join
+
+controller -> equipeService : joinEquipe(equipeId:35, userId)
+equipeService -> db : SELECT COUNT(*) FROM equipe_etudiant\nWHERE equipe_id=35
+db --> equipeService : nbMembres = 5
+
+alt Équipe complète (nbMembres >= 6)
+    equipeService --> controller : BusinessException:\n"Équipe complète (6/6 membres)"
+    controller --> browser : Flash error
+    browser --> etudiant : Message d'erreur
+else Étudiant déjà membre
+    equipeService -> db : SELECT * FROM equipe_etudiant\nWHERE equipe_id=35 AND etudiant_id={userId}
+    db --> equipeService : Membre trouvé
+    equipeService --> controller : BusinessException:\n"Vous êtes déjà membre de cette équipe"
+    controller --> browser : Flash error
+    browser --> etudiant : Message d'erreur
+else Rejoindre réussi
+    equipeService -> db : INSERT INTO equipe_etudiant\n(equipe_id, etudiant_id)\nVALUES (35, {userId})
+    db --> equipeService : OK
+    equipeService --> controller : Membre ajouté
+    controller --> browser : Flash success: "Vous avez rejoint Team Alpha!"\nRedirect /equipe/35/event/5
+    browser --> etudiant : Page de l'équipe
+end
+
+== Phase 4 : Soumission de la Participation ==
+
+etudiant -> browser : Clique sur "Participer avec cette équipe"
+browser -> controller : POST /participation/new-for-team/42/event/5
+
+controller -> participationService : createParticipation(equipeId:42, evenementId:5)
+participationService -> db : BEGIN TRANSACTION
+
+' Création de la participation
+participationService -> db : INSERT INTO participation\n(equipe_id, evenement_id, statut)\nVALUES (42, 5, 'En attente')
+db --> participationService : participation_id = 123
+
+' Mise à jour du statut de l'événement
+participationService -> db : SELECT * FROM evenement WHERE id=5
+db --> participationService : Événement {dateDebut, dateFin, isCanceled}
+participationService -> participationService : updateStatus()
+
+' Validation automatique
+participationService -> validationService : validateParticipation(participation:123)
+
+validationService -> validationService : **Règle 1: Vérifier si événement annulé**
+validationService -> db : SELECT isCanceled FROM evenement WHERE id=5
+db --> validationService : isCanceled = false
+
+alt Événement annulé
+    validationService -> db : UPDATE participation\nSET statut='Refusé'\nWHERE id=123
+    db --> validationService : OK
+    validationService --> participationService : {accepted:false,\nmessage:"L'événement a été annulé"}
+    participationService -> db : ROLLBACK
+    participationService --> controller : ValidationException
+    controller --> browser : Flash error (message en rouge)
+    browser --> etudiant : ❌ "L'événement Hackathon 2026 a été annulé.\nAucune participation n'est acceptée."
+else Événement actif
+    validationService -> validationService : **Règle 2: Vérifier capacité maximale**
+    validationService -> db : SELECT COUNT(*) FROM participation\nWHERE evenement_id=5\nAND statut='Accepté'\nAND id != 123
+    db --> validationService : acceptedCount = 9
+    
+    alt Capacité atteinte (acceptedCount >= nbMax)
+        validationService -> db : UPDATE participation\nSET statut='Refusé'\nWHERE id=123
+        db --> validationService : OK
+        validationService --> participationService : {accepted:false,\nmessage:"Capacité maximale atteinte"}
+        participationService -> db : ROLLBACK
+        participationService --> controller : ValidationException
+        controller --> browser : Flash error (message en rouge)
+        browser --> etudiant : ❌ "La capacité maximale de l'événement\nest atteinte (10 équipes maximum).\nVotre participation a été refusée."
+    else Capacité disponible
+        validationService -> validationService : **Règle 3: Vérifier doublon d'étudiant**
+        validationService -> db : SELECT DISTINCT ee.etudiant_id, e.nom as equipe_nom\nFROM participation p\nJOIN equipe e ON p.equipe_id = e.id\nJOIN equipe_etudiant ee ON e.id = ee.equipe_id\nWHERE p.evenement_id=5\nAND p.statut='Accepté'\nAND p.id != 123
+        db --> validationService : Liste des étudiants déjà inscrits
+        
+        validationService -> db : SELECT etudiant_id, prenom, nom\nFROM equipe_etudiant ee\nJOIN etudiant et ON ee.etudiant_id = et.userId\nWHERE ee.equipe_id=42
+        db --> validationService : Membres de Team Innovators
+        
+        validationService -> validationService : Comparer les listes\npour détecter les doublons
+        
+        alt Doublon détecté
+            validationService -> db : UPDATE participation\nSET statut='Refusé'\nWHERE id=123
+            db --> validationService : OK
+            validationService --> participationService : {accepted:false,\nmessage:"Ahmed participe déjà avec Team Alpha"}
+            participationService -> db : ROLLBACK
+            participationService --> controller : ValidationException
+            controller --> browser : Flash error (message en rouge)
+            browser --> etudiant : ❌ "L'étudiant Ahmed participe déjà\nà cet événement avec l'équipe Team Alpha.\nUn étudiant ne peut pas participer avec\ndeux équipes différentes au même événement."
+        else Aucun doublon - PARTICIPATION ACCEPTÉE ✅
+            validationService -> db : UPDATE participation\nSET statut='Accepté'\nWHERE id=123
+            db --> validationService : OK
+            validationService --> participationService : {accepted:true,\nmessage:"Participation acceptée avec succès!"}
+            
+            participationService -> db : COMMIT
+            participationService --> controller : Participation acceptée {id:123}
+            
+            controller --> browser : Flash success (message en vert)
+            browser --> etudiant : ✅ "Participation acceptée avec succès!\nVotre équipe Team Innovators est inscrite\nà l'événement Hackathon 2026."
+        end
+    end
+end
+
+== Phase 5 : Envoi Automatique d'Email de Confirmation ==
+
+note over controller, emailService
+    Cette phase se déclenche automatiquement
+    après l'acceptation de la participation
+end note
+
+controller -> emailService : sendParticipationConfirmation(participation:123)
+
+' Récupération des données
+emailService -> db : SELECT e.*, eq.nom as equipe_nom, ev.titre, ev.dateDebut, ev.lieu\nFROM participation p\nJOIN equipe eq ON p.equipe_id = eq.id\nJOIN evenement ev ON p.evenement_id = ev.id\nWHERE p.id=123
+db --> emailService : Données de la participation
+
+emailService -> db : SELECT et.email, et.prenom, et.nom\nFROM equipe_etudiant ee\nJOIN etudiant et ON ee.etudiant_id = et.userId\nWHERE ee.equipe_id=42
+db --> emailService : Liste des membres:\n- ahmed@email.com (Ahmed Ben Ali)\n- fatima@email.com (Fatima Zahra)\n- youssef@email.com (Youssef Mansouri)\n- sara@email.com (Sara Alami)
+
+loop Pour chaque membre de l'équipe
+    emailService -> emailService : Valider l'email
+    
+    alt Email invalide
+        emailService -> emailService : Log error:\n"Email invalide: {email}"
+        note right: Continue avec\nles autres membres
+    else Email valide
+        ' Génération du QR Code
+        emailService -> emailService : generateQRCode(participation:123)
+        emailService -> emailService : Créer contenu QR:\n"EVENT PARTICIPATION\nPARTICIPANT: Ahmed Ben Ali\nTEAM: Team Innovators\nEVENT: Hackathon 2026\nDATE: 15/03/2026\nREGISTRATION ID: #000123"
+        emailService -> emailService : Appel API externe:\nhttps://api.qrserver.com/v1/create-qr-code/
+        emailService --> emailService : QR Code PNG (base64)
+        
+        ' Génération du Badge PDF
+        emailService -> badgeService : generateBadge(prenom, nom, equipe, evenement, date)
+        badgeService -> badgeService : Créer PDF avec TCPDF:\n- Logo de l'événement\n- Nom du participant\n- Nom de l'équipe\n- QR Code intégré\n- Date et lieu
+        badgeService --> emailService : Badge PDF (binary)
+        
+        ' Génération du fichier .ics
+        emailService -> emailService : generateIcsFile(evenement, date, lieu)
+        emailService -> emailService : Format iCalendar:\nBEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:20260315T090000Z\nDTEND:20260315T180000Z\nSUMMARY:Hackathon 2026\nLOCATION:Salle A\nEND:VEVENT\nEND:VCALENDAR
+        emailService --> emailService : Fichier .ics
+        
+        ' Envoi de l'email
+        emailService -> emailService : Render template:\nparticipation_confirmation.html.twig
+        emailService -> emailService : Composer l'email:\nTo: ahmed@email.com\nSubject: Participation Confirmed - Hackathon 2026\nAttachments:\n- qrcode.png\n- event-badge.pdf\n- event.ics
+        
+        emailService -> emailService : Send via Brevo/SendGrid API
+        
+        alt Envoi réussi
+            emailService -> emailService : Log success:\n"Email envoyé à ahmed@email.com"
+            emailService -> emailService : successCount++
+        else Envoi échoué
+            emailService -> emailService : Log error:\n"Erreur envoi à ahmed@email.com: {error}"
+            emailService -> emailService : failedEmails.add(ahmed@email.com)
+        end
+    end
+end
+
+emailService --> controller : {successCount:4, failedEmails:[]}
+controller --> browser : Flash success:\n"✅ Participation acceptée!\n4 email(s) de confirmation envoyés avec succès."
+browser --> etudiant : Confirmation affichée
+
+note over etudiant
+    L'étudiant reçoit un email avec:
+    - QR Code pour l'entrée
+    - Badge PDF à imprimer
+    - Fichier .ics pour le calendrier
+end note
+
+== Phase 6 : Consultation de la Participation ==
+
+etudiant -> browser : Accède à "Mes Participations"
+browser -> controller : GET /participation/mes-participations
+controller -> db : SELECT p.*, eq.nom, ev.titre, ev.dateDebut, ev.status\nFROM participation p\nJOIN equipe eq ON p.equipe_id = eq.id\nJOIN evenement ev ON p.evenement_id = ev.id\nJOIN equipe_etudiant ee ON eq.id = ee.equipe_id\nWHERE ee.etudiant_id={userId}\nAND p.statut IN ('Accepté', 'En attente')
+db --> controller : Liste des participations
+
+controller --> browser : Render mes_participations.html.twig
+browser --> etudiant : Liste des participations:\n- Hackathon 2026 (Team Innovators) - Accepté\n  [Voir détails] [Badge PDF]
+
+etudiant -> browser : Clique sur "Badge PDF"
+browser -> controller : GET /participation/123/badge
+controller -> badgeService : generateBadge(participation:123)
+badgeService -> db : SELECT * FROM participation p\nJOIN equipe eq ON p.equipe_id = eq.id\nJOIN evenement ev ON p.evenement_id = ev.id\nWHERE p.id=123
+db --> badgeService : Données complètes
+badgeService -> badgeService : Générer PDF avec TCPDF
+badgeService --> controller : Badge PDF (binary)
+controller --> browser : Response:\nContent-Type: application/pdf\nContent-Disposition: attachment;\nfilename="badge-hackathon-2026.pdf"
+browser --> etudiant : Téléchargement du badge PDF\n(prêt à imprimer)
+
+== Phase 7 : Déroulement de l'Événement ==
+
+note over db
+    L'événement se déroule...
+    Date: 15/03/2026
+    Les étudiants participent avec leur badge
+end note
+
+' Transition automatique du workflow
+db -> db : Commande cron exécutée:\nphp bin/console app:update-evenement-workflow
+
+db -> db : SELECT * FROM evenement\nWHERE workflowStatus='planifie'\nAND dateDebut <= NOW()
+db -> db : Événement ID=5 trouvé
+
+db -> db : UPDATE evenement\nSET workflowStatus='en_cours',\nstatus='En cours'\nWHERE id=5
+
+db -> emailService : Trigger: workflow.entered.en_cours
+emailService -> db : SELECT DISTINCT et.email, et.prenom, et.nom, eq.nom as equipe\nFROM participation p\nJOIN equipe eq ON p.equipe_id = eq.id\nJOIN equipe_etudiant ee ON eq.id = ee.equipe_id\nJOIN etudiant et ON ee.etudiant_id = et.userId\nWHERE p.evenement_id=5\nAND p.statut='Accepté'
+db --> emailService : Liste des participants
+
+loop Pour chaque participant
+    emailService -> emailService : Send email:\nSubject: 🚀 Event Started - Hackathon 2026\nTemplate: event_started.html.twig
+end
+
+note over etudiant
+    L'étudiant reçoit un email:
+    "Votre événement Hackathon 2026 a démarré!
+    Rendez-vous à Salle A.
+    Bonne chance à Team Innovators!"
+end note
+
+' Fin de l'événement
+db -> db : SELECT * FROM evenement\nWHERE workflowStatus='en_cours'\nAND dateFin < NOW()
+db -> db : Événement ID=5 trouvé
+
+db -> db : UPDATE evenement\nSET workflowStatus='termine',\nstatus='Passé'\nWHERE id=5
+
+== Phase 8 : Après l'Événement - Feedback ==
+
+note over etudiant
+    24h après la fin de l'événement
+end note
+
+etudiant -> browser : Accède à "Mes Participations"
+browser -> controller : GET /participation/mes-participations
+controller -> db : SELECT p.*, ev.status\nFROM participation p\nJOIN evenement ev ON p.evenement_id = ev.id\nWHERE ...
+db --> controller : Participations avec statut événement
+
+controller --> browser : Render avec bouton "Donner mon feedback"\n(visible uniquement si événement terminé)
+browser --> etudiant : Bouton "Donner mon feedback" affiché
+
+etudiant -> browser : Clique sur "Donner mon feedback"
+browser -> controller : GET /feedback/participation/123
+controller -> db : SELECT * FROM participation WHERE id=123
+db --> controller : Participation {feedbacks:[]}
+
+alt Feedback déjà donné
+    controller --> browser : Flash info:\n"Vous avez déjà donné votre feedback"
+    browser --> etudiant : Message informatif
+else Feedback non donné
+    controller --> browser : Render feedback/form.html.twig
+    browser --> etudiant : Formulaire de feedback:\n- Rating global (1-5 étoiles)\n- Ratings par catégorie\n- Sentiment (emoji)\n- Commentaire libre
+    
+    etudiant -> browser : Remplit et soumet le feedback:\n- Rating global: 5/5\n- Organisation: 5/5\n- Contenu: 4/5\n- Lieu: 3/5\n- Animation: 5/5\n- Sentiment: Très satisfait 😍\n- Commentaire: "Super événement!"
+    
+    browser -> controller : POST /feedback/submit/123\n{ratings, sentiment, comment}
+    controller -> participationService : addFeedback(participation:123, feedback)
+    participationService -> db : SELECT feedbacks FROM participation\nWHERE id=123
+    db --> participationService : feedbacks = []
+    
+    participationService -> participationService : Créer objet feedback:\n{\n  etudiant_id: {userId},\n  etudiant_name: "Ahmed Ben Ali",\n  rating_global: 5,\n  rating_categories: {...},\n  sentiment: "tres_satisfait",\n  emoji: "😍",\n  comment: "Super événement!",\n  created_at: "2026-03-16 10:30:00"\n}
+    
+    participationService -> db : UPDATE participation\nSET feedbacks = JSON_ARRAY_APPEND(feedbacks, '$', {feedback})\nWHERE id=123
+    db --> participationService : OK
+    
+    participationService --> controller : Feedback enregistré
+    controller --> browser : Flash success:\n"Merci pour votre feedback!"
+    browser --> etudiant : Confirmation
+end
+
+== Phase 9 : Génération et Envoi du Certificat ==
+
+note over db
+    Commande cron exécutée quotidiennement:
+    php bin/console app:send-certificates
+end note
+
+db -> certificateService : Trigger: SendCertificatesCommand
+certificateService -> db : SELECT DISTINCT p.id, et.email, et.prenom, et.nom,\nev.titre, ev.type, ev.dateDebut\nFROM participation p\nJOIN equipe eq ON p.equipe_id = eq.id\nJOIN equipe_etudiant ee ON eq.id = ee.equipe_id\nJOIN etudiant et ON ee.etudiant_id = et.userId\nJOIN evenement ev ON p.evenement_id = ev.id\nWHERE p.statut='Accepté'\nAND ev.status='Passé'\nAND p.certificate_sent = false
+db --> certificateService : Liste des participants\néligibles au certificat
+
+loop Pour chaque participant
+    certificateService -> certificateService : generateCertificate(prenom, nom, evenement, type, date)
+    certificateService -> certificateService : Créer PDF avec TCPDF:\n- Design professionnel\n- Logo de l'institution\n- Texte: "Certifie que Ahmed Ben Ali\n  a participé à Hackathon 2026\n  le 15 mars 2026"\n- Signature numérique\n- QR Code de vérification
+    certificateService --> certificateService : Certificat PDF (binary)
+    
+    certificateService -> emailService : sendCertificate(email, prenom, nom, evenement, certificatePDF)
+    emailService -> emailService : Composer l'email:\nTo: ahmed@email.com\nSubject: Your Certificate - Hackathon 2026\nTemplate: certificate_email.html.twig\nAttachment: certificate.pdf
+    
+    emailService -> emailService : Send via Brevo/SendGrid API
+    
+    alt Envoi réussi
+        emailService --> certificateService : Email envoyé
+        certificateService -> db : UPDATE participation\nSET certificate_sent = true,\ncertificate_sent_at = NOW()\nWHERE id=123
+        db --> certificateService : OK
+        certificateService -> certificateService : Log success:\n"Certificat envoyé à ahmed@email.com"
+    else Envoi échoué
+        emailService --> certificateService : Erreur: {error}
+        certificateService -> certificateService : Log error:\n"Échec envoi certificat: {error}"
+        note right: Réessayera lors\nde la prochaine exécution
+    end
+end
+
+certificateService -> certificateService : Log final:\n"Certificats envoyés: 4/4\nÉchecs: 0"
+
+note over etudiant
+    L'étudiant reçoit un email avec:
+    - Certificat de participation en PDF
+    - Message de félicitations
+    - Possibilité d'imprimer le certificat
+end note
+
+etudiant -> browser : Ouvre l'email
+etudiant -> browser : Télécharge certificate.pdf
+etudiant -> browser : Imprime le certificat
+
+note over etudiant
+    🎉 Processus complet terminé!
+    L'étudiant a:
+    ✅ Participé à l'événement
+    ✅ Donné son feedback
+    ✅ Reçu son certificat
+end note
+
+@enduml

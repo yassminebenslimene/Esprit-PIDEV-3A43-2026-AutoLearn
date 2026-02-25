@@ -138,14 +138,8 @@ class EvenementWorkflowSubscriber implements EventSubscriberInterface
             'date_fin' => $evenement->getDateFin()->format('Y-m-d H:i:s'),
         ]);
         
-        // TODO: Générer les certificats automatiquement
-        // $this->certificateService->generateForEvent($evenement);
-        
-        // TODO: Envoyer email de remerciement
-        // $this->emailService->sendThankYou($evenement);
-        
-        // TODO: Archiver l'événement
-        // $this->archiveService->archive($evenement);
+        // Envoyer automatiquement les certificats de participation
+        $this->sendCertificatesToParticipants($evenement);
     }
 
     /**
@@ -256,6 +250,117 @@ class EvenementWorkflowSubscriber implements EventSubscriberInterface
             'emails_sent' => $emailsSent,
             'emails_failed' => $emailsFailed,
         ]);
+    }
+    
+    /**
+     * Envoie automatiquement les certificats de participation à tous les participants
+     * 
+     * @param Evenement $evenement L'événement terminé
+     */
+    private function sendCertificatesToParticipants(Evenement $evenement): void
+    {
+        $certificatesSent = 0;
+        $certificatesFailed = 0;
+        $quotaExceeded = false;
+        
+        $this->logger->info('🎓 Début envoi des certificats', [
+            'evenement_id' => $evenement->getId(),
+            'evenement_titre' => $evenement->getTitre(),
+            'nb_participations' => $evenement->getParticipations()->count(),
+        ]);
+        
+        // Récupérer toutes les participations acceptées
+        foreach ($evenement->getParticipations() as $participation) {
+            // Si le quota est dépassé, arrêter l'envoi
+            if ($quotaExceeded) {
+                $this->logger->warning('⚠️ Arrêt de l\'envoi: quota SendGrid dépassé', [
+                    'certificates_sent' => $certificatesSent,
+                    'certificates_pending' => $evenement->getParticipations()->count() - $certificatesSent - $certificatesFailed,
+                ]);
+                break;
+            }
+            
+            // Vérifier que la participation est acceptée
+            if ($participation->getStatut() !== \App\Enum\StatutParticipation::ACCEPTE) {
+                $this->logger->debug('Participation ignorée pour certificat (non acceptée)', [
+                    'participation_id' => $participation->getId(),
+                    'statut' => $participation->getStatut()->value,
+                ]);
+                continue;
+            }
+            
+            $equipe = $participation->getEquipe();
+            
+            // Envoyer un certificat à chaque étudiant de l'équipe
+            foreach ($equipe->getEtudiants() as $etudiant) {
+                // Si le quota est dépassé, arrêter l'envoi
+                if ($quotaExceeded) {
+                    break;
+                }
+                
+                try {
+                    $this->emailService->sendCertificate(
+                        $etudiant->getEmail(),
+                        $etudiant->getPrenom(),
+                        $etudiant->getNom(),
+                        $evenement->getTitre(),
+                        $evenement->getType()->value,
+                        $evenement->getDateDebut()
+                    );
+                    
+                    $certificatesSent++;
+                    
+                    $this->logger->info('✓ Certificat envoyé', [
+                        'evenement_id' => $evenement->getId(),
+                        'student_email' => $etudiant->getEmail(),
+                        'student_name' => $etudiant->getPrenom() . ' ' . $etudiant->getNom(),
+                    ]);
+                    
+                    // Petit délai pour éviter le rate limiting (50ms)
+                    usleep(50000);
+                    
+                } catch (\Exception $e) {
+                    $certificatesFailed++;
+                    
+                    // Détecter si c'est une erreur de quota (code 403)
+                    if (strpos($e->getMessage(), '403') !== false || 
+                        strpos($e->getMessage(), 'exceeded') !== false ||
+                        strpos($e->getMessage(), 'limit') !== false) {
+                        $quotaExceeded = true;
+                        $this->logger->error('❌ QUOTA SENDGRID DÉPASSÉ', [
+                            'evenement_id' => $evenement->getId(),
+                            'student_email' => $etudiant->getEmail(),
+                            'error' => $e->getMessage(),
+                            'solution' => 'Vérifiez votre plan SendGrid ou attendez le renouvellement du quota',
+                        ]);
+                    } else {
+                        $this->logger->error('✗ Erreur envoi certificat', [
+                            'evenement_id' => $evenement->getId(),
+                            'student_email' => $etudiant->getEmail(),
+                            'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString(),
+                        ]);
+                    }
+                }
+            }
+        }
+        
+        $this->logger->info('🎓 Envoi des certificats terminé', [
+            'evenement_id' => $evenement->getId(),
+            'certificates_sent' => $certificatesSent,
+            'certificates_failed' => $certificatesFailed,
+            'quota_exceeded' => $quotaExceeded,
+        ]);
+        
+        // Si le quota est dépassé, logger un message d'avertissement
+        if ($quotaExceeded) {
+            $this->logger->warning('⚠️ ATTENTION: Certains certificats n\'ont pas pu être envoyés à cause du quota SendGrid', [
+                'evenement_id' => $evenement->getId(),
+                'certificates_sent' => $certificatesSent,
+                'certificates_failed' => $certificatesFailed,
+                'action_requise' => 'Relancez la commande php bin/console app:send-certificates manuellement après renouvellement du quota',
+            ]);
+        }
     }
 
     /**
