@@ -60,23 +60,13 @@
 
         {% if post.imageFile %}
             <div class="post-media">
-                <img src="{{ asset('uploads/' ~ post.imageFile) }}" alt="Image du post">
-            </div>
-        {% elseif post.imageUrl %}
-            <div class="post-media">
-                <img src="{{ post.imageUrl }}" alt="Image du post">
+                <img src="{{ asset('uploads/images/' ~ post.imageFile) }}" alt="Image du post">
             </div>
         {% endif %}
->>>>>>> cfb395af102040282b5c092027ab22ecc58f164a
 
         {% if post.videoFile %}
             <div class="post-media">
-                <video controls src="{{ asset('uploads/' ~ post.videoFile) }}"></video>
-            </div>
-        {% elseif post.videoUrl %}
-            <div class="post-media">
-                {% set embedUrl = post.videoUrl|replace({'watch?v=': 'embed/'}) %}
-                <iframe width="100%" height="400" src="{{ embedUrl }}" frameborder="0" allowfullscreen></iframe>
+                <video controls src="{{ asset('uploads/videos/' ~ post.videoFile) }}"></video>
             </div>
         {% endif %}
 

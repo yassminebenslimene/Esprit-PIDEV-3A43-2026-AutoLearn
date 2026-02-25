@@ -38,12 +38,16 @@
                 </span>
             </div>
             <div class="info-row">
-                <span class="label">User:</span>
+                <span class="label">👨‍💼 Admin Who Performed Action:</span>
                 <span class="value">
-                    {% if revision.username %}
-                        <span class="user-badge">{{ revision.username }}</span>
+                    {% if admin and admin.role == 'ADMIN' %}
+                        <span class="user-badge admin-badge">
+                            🔑 {{ admin.prenom }} {{ admin.nom }} ({{ admin.email }})
+                        </span>
+                    {% elseif revision.username %}
+                        <span class="user-badge admin-badge">🔑 {{ revision.username }}</span>
                     {% else %}
-                        <span class="text-muted">System</span>
+                        <span class="text-muted">⚙️ System / Auto-Suspension</span>
                     {% endif %}
                 </span>
             </div>
@@ -71,12 +75,25 @@
                 <div class="change-item">
                     <div class="change-header">
                         <div>
-                            <h4>User ID: {{ change.userId }}</h4>
+                            <h4>👨‍🎓 Student Affected: 
+                                {% if change.student %}
+                                    {{ change.student.prenom }} {{ change.student.nom }}
+                                {% else %}
+                                    User ID {{ change.userId }}
+                                {% endif %}
+                            </h4>
                             <span class="change-type change-type-{{ change.revtype|lower }}">
                                 {% if change.revtype == 'INS' %}
                                     ➕ INSERT - Student Created
                                 {% elseif change.revtype == 'UPD' %}
-                                    ✏️ UPDATE - Student Modified
+                                    {# Detect if it's suspension or reactivation #}
+                                    {% if change.isSuspended == 1 %}
+                                        🚫 SUSPENDED - Student Account Suspended
+                                    {% elseif change.isSuspended == 0 and change.suspendedAt %}
+                                        ✅ REACTIVATED - Student Account Reactivated
+                                    {% else %}
+                                        ✏️ UPDATE - Student Information Modified
+                                    {% endif %}
                                 {% elseif change.revtype == 'DEL' %}
                                     🗑️ DELETE - Student Deleted
                                 {% endif %}
@@ -88,25 +105,25 @@
                         <div class="detail-grid">
                             {% if change.nom %}
                                 <div class="detail-item">
-                                    <span class="detail-label">Nom:</span>
+                                    <span class="detail-label">📝 Nom:</span>
                                     <span class="detail-value">{{ change.nom }}</span>
                                 </div>
                             {% endif %}
                             {% if change.prenom %}
                                 <div class="detail-item">
-                                    <span class="detail-label">Prénom:</span>
+                                    <span class="detail-label">📝 Prénom:</span>
                                     <span class="detail-value">{{ change.prenom }}</span>
                                 </div>
                             {% endif %}
                             {% if change.email %}
                                 <div class="detail-item">
-                                    <span class="detail-label">Email:</span>
+                                    <span class="detail-label">📧 Email:</span>
                                     <span class="detail-value">{{ change.email }}</span>
                                 </div>
                             {% endif %}
                             {% if change.role %}
                                 <div class="detail-item">
-                                    <span class="detail-label">Role:</span>
+                                    <span class="detail-label">👤 Role:</span>
                                     <span class="detail-value">
                                         <span class="badge">{{ change.role }}</span>
                                     </span>
@@ -114,7 +131,7 @@
                             {% endif %}
                             {% if change.discr %}
                                 <div class="detail-item">
-                                    <span class="detail-label">Type:</span>
+                                    <span class="detail-label">🏷️ Type:</span>
                                     <span class="detail-value">
                                         <span class="badge badge-info">{{ change.discr }}</span>
                                     </span>
@@ -122,26 +139,52 @@
                             {% endif %}
                             {% if change.niveau is defined and change.niveau %}
                                 <div class="detail-item">
-                                    <span class="detail-label">Niveau:</span>
-                                    <span class="detail-value">{{ change.niveau }}</span>
+                                    <span class="detail-label">📊 Niveau:</span>
+                                    <span class="detail-value">
+                                        <span class="badge" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">{{ change.niveau }}</span>
+                                    </span>
                                 </div>
                             {% endif %}
-                            {% if change.is_suspended is defined %}
+                            {% if change.isSuspended is defined %}
                                 <div class="detail-item">
-                                    <span class="detail-label">Suspended:</span>
+                                    <span class="detail-label">🚫 Suspended Status:</span>
                                     <span class="detail-value">
-                                        {% if change.is_suspended %}
-                                            <span class="badge badge-danger">Yes</span>
+                                        {% if change.isSuspended %}
+                                            <span class="badge" style="background: linear-gradient(135deg, #ef4444, #dc2626);">🚫 SUSPENDED</span>
                                         {% else %}
-                                            <span class="badge badge-success">No</span>
+                                            <span class="badge" style="background: linear-gradient(135deg, #22c55e, #16a34a);">✅ ACTIVE</span>
                                         {% endif %}
                                     </span>
                                 </div>
                             {% endif %}
-                            {% if change.last_login_at %}
+                            {% if change.suspendedAt %}
                                 <div class="detail-item">
-                                    <span class="detail-label">Last Login:</span>
-                                    <span class="detail-value">{{ change.last_login_at|date('Y-m-d H:i:s') }}</span>
+                                    <span class="detail-label">📅 Suspended At:</span>
+                                    <span class="detail-value">{{ change.suspendedAt|date('Y-m-d H:i:s') }}</span>
+                                </div>
+                            {% endif %}
+                            {% if change.suspensionReason %}
+                                <div class="detail-item" style="grid-column: 1 / -1;">
+                                    <span class="detail-label">💬 Suspension Reason:</span>
+                                    <span class="detail-value" style="color: #fbbf24; font-weight: 600;">{{ change.suspensionReason }}</span>
+                                </div>
+                            {% endif %}
+                            {% if change.suspendedBy %}
+                                <div class="detail-item">
+                                    <span class="detail-label">👨‍💼 Suspended By Admin ID:</span>
+                                    <span class="detail-value">{{ change.suspendedBy }}</span>
+                                </div>
+                            {% endif %}
+                            {% if change.createdAt %}
+                                <div class="detail-item">
+                                    <span class="detail-label">📅 Created At:</span>
+                                    <span class="detail-value">{{ change.createdAt|date('Y-m-d H:i:s') }}</span>
+                                </div>
+                            {% endif %}
+                            {% if change.lastLoginAt %}
+                                <div class="detail-item">
+                                    <span class="detail-label">🕐 Last Login:</span>
+                                    <span class="detail-value">{{ change.lastLoginAt|date('Y-m-d H:i:s') }}</span>
                                 </div>
                             {% endif %}
                         </div>
@@ -187,6 +230,13 @@
     font-weight: 500;
 }
 
+.admin-badge {
+    background: linear-gradient(135deg, #f59e0b, #f97316);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
 .change-item {
     margin: 20px;
     padding: 24px;
@@ -207,6 +257,7 @@
 .change-header h4 {
     font-size: 18px;
     margin-bottom: 8px;
+    color: #60a5fa;
 }
 
 .change-type {
