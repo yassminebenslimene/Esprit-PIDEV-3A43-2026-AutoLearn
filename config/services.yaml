@@ -5,7 +5,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     uploads_dir: '%kernel.project_dir%/public/uploads'
-
+    
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -37,8 +37,33 @@ services:
     
     App\Service\FeedbackAnalyticsService:
         arguments: []
+    
+    # Configuration du GrokQuizGeneratorService avec la clé API Groq
+    App\Service\GrokQuizGeneratorService:
+        arguments:
+            $grokApiKey: '%env(GROQ_API_KEY)%'
+    
+    # Configuration du QuizCorrectorAIService avec la clé API Groq
+    App\Service\QuizCorrectorAIService:
+        arguments:
+            $grokApiKey: '%env(GROQ_API_KEY)%'
+    
+    # Configuration du QuizTutorAIService avec la clé API Groq
+    App\Service\QuizTutorAIService:
+        arguments:
+            $grokApiKey: '%env(GROQ_API_KEY)%'
+    
+    # Configuration du ChapterExplainerService avec la clé API Groq
+    App\Service\ChapterExplainerService:
+        arguments:
+            $groqApiKey: '%env(GROQ_API_KEY)%'
+    
+    # Configuration du TranslationService avec la clé API Groq
+    App\Service\TranslationService:
+        arguments:
+            $groqApiKey: '%env(GROQ_API_KEY)%'
 
-    # Configuration Groq Service
+    # Configuration Groq Service (Ilef)
     App\Service\GroqService:
         arguments:
             $httpClient: '@http_client'
@@ -88,17 +113,3 @@ services:
 
     # Workflow service alias for Evenement
     Symfony\Component\Workflow\WorkflowInterface $evenementPublishingStateMachine: '@state_machine.evenement_publishing'
-
-    # Chapter Explainer Service
-    App\Service\ChapterExplainerService:
-        arguments:
-            $httpClient: '@http_client'
-            $logger: '@logger'
-            $groqApiKey: '%env(GROQ_API_KEY)%'
-
-    # Quiz Corrector AI Service
-    App\Service\QuizCorrectorAIService:
-        arguments:
-            $httpClient: '@http_client'
-            $logger: '@logger'
-            $grokApiKey: '%env(GROQ_API_KEY)%'

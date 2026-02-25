@@ -37,6 +37,11 @@
                     <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Description</label>
                     <p style="color: var(--text-secondary);">{{ quiz.description }}</p>
                 </div>
+                <div style="border: 2px solid #4ade80; border-radius: 0.5rem; padding: 1rem; background: rgba(74, 222, 128, 0.1);">
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #4ade80;">🔗 Chapitre lié</label>
+                    <p style="color: var(--text-primary); font-weight: 500;">{{ quiz.chapitre.titre }}</p>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem;">Chapitre #{{ quiz.chapitre.id }} - Ordre: {{ quiz.chapitre.ordre }}</p>
+                </div>
                 <div>
                     <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">État</label>
                     <span class="status-badge {{ quiz.etat ? 'completed' : 'pending' }}">

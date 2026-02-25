@@ -19,4 +19,5 @@ return [
     SimpleThings\EntityAudit\SimpleThingsEntityAuditBundle::class => ['all' => true],
     Vich\UploaderBundle\VichUploaderBundle::class => ['all' => true],
     CalendarBundle\CalendarBundle::class => ['all' => true],
+    Knp\Bundle\PaginatorBundle\KnpPaginatorBundle::class => ['all' => true],
 ];

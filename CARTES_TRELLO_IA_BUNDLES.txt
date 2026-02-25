@@ -1,0 +1,446 @@
+═══════════════════════════════════════════════════════════════════
+    CARTES TRELLO - AUTOLEARN SPRINT 1
+    Module: Gestion de Cours + Intelligence Artificielle + Quiz IA
+═══════════════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════════
+📋 AGENTS IA - QUIZ (3 cartes)
+═══════════════════════════════════════════════════════════════
+
+CARTE 1: IA-1 : Agent Correcteur Intelligent
+─────────────────────────────────────────────
+Titre: IA-1 : Agent Correcteur Intelligent
+
+Description:
+Analyse les réponses des étudiants aux quiz et génère des explications pédagogiques personnalisées pour chaque question.
+
+✓ Explications personnalisées par question
+✓ Analyse des erreurs avec détails
+✓ Explication de la bonne réponse
+✓ Conseils pratiques pour progresser
+✓ Ressources recommandées
+✓ Résumé pédagogique global
+✓ Messages d'encouragement adaptés
+
+Service: QuizCorrectorAIService
+API: Groq (Llama 4)
+Criticité: ⭐⭐⭐⭐⭐
+
+Fichiers:
+- src/Service/QuizCorrectorAIService.php
+- templates/frontoffice/quiz/result_with_ai.html.twig
+
+Étiquettes: Agent IA, API Groq, Critique
+
+
+CARTE 2: IA-2 : Agent Tuteur Conversationnel
+─────────────────────────────────────────────
+Titre: IA-2 : Agent Tuteur Conversationnel
+
+Description:
+Assistant IA post-quiz qui répond aux questions des étudiants de manière contextuelle et interactive.
+
+✓ Réponses contextuelles basées sur le quiz
+✓ Gestion de l'historique de conversation
+✓ Suggestions de questions pertinentes
+✓ Explications approfondies sur demande
+✓ Adaptation au niveau de l'étudiant
+✓ Interface conversationnelle interactive
+
+Service: QuizTutorAIService
+API: Groq (Llama 4)
+Criticité: ⭐⭐⭐⭐
+
+Fichiers:
+- src/Service/QuizTutorAIService.php
+- src/Controller/FrontOffice/QuizTutorController.php
+
+Étiquettes: Agent IA, API Groq, Tuteur
+
+
+CARTE 3: IA-3 : Agent Générateur de Quiz
+─────────────────────────────────────────────
+Titre: IA-3 : Agent Générateur de Quiz
+
+Description:
+Génère automatiquement des quiz complets avec questions et options à partir d'un chapitre de cours via LLM.
+
+✓ Génération automatique de questions pertinentes
+✓ Création d'options de réponse cohérentes
+✓ Validation des questions générées
+✓ Régénération de questions si nécessaire
+✓ Adaptation au niveau de difficulté
+✓ Persistance automatique en base de données
+
+Service: GrokQuizGeneratorService
+API: Groq (Llama 4)
+Criticité: ⭐⭐⭐⭐⭐
+
+Fichiers:
+- src/Service/GrokQuizGeneratorService.php
+- src/Controller/Backoffice/QuizController.php
+
+Étiquettes: Agent IA, API Groq, Générateur, Critique
+
+
+═══════════════════════════════════════════════════════════════════
+📌 LISTE: À FAIRE (4 cartes)
+═══════════════════════════════════════════════════════════════════
+
+CARTE 4: 🤖 Recommandation de Cours
+───────────────────────────────────────────────────────────────────
+Titre: 🤖 Recommandation de Cours
+
+Description:
+Suggérer des cours personnalisés selon le profil étudiant
+
+Détails:
+• Algorithme de suggestion basé sur l'historique
+• Analyse des préférences de l'étudiant
+• Recommandations intelligentes via IA
+
+Étiquettes: IA
+
+CARTE 5: 💬 Chatbot Assistant
+───────────────────────────────────────────────────────────────────
+Titre: 💬 Chatbot Assistant
+
+Description:
+Assistant virtuel pour répondre aux questions sur les cours
+
+Détails:
+• Q&A contextuel sur le contenu
+• Interface chat dans frontoffice
+• Intégration API conversationnelle (GPT/Claude)
+
+Étiquettes: IA
+
+CARTE 6: 📝 Résumé Automatique
+───────────────────────────────────────────────────────────────────
+Titre: 📝 Résumé Automatique
+
+Description:
+Générer des résumés intelligents des chapitres
+
+Détails:
+• Synthèse automatique du contenu via IA
+• Endpoint API pour récupérer les résumés
+• Cache des résumés générés
+
+Étiquettes: IA, Priorité
+
+CARTE 7: 💡 Explication Simplifiée
+───────────────────────────────────────────────────────────────────
+Titre: 💡 Explication Simplifiée
+
+Description:
+Reformuler le contenu complexe en langage simple avec exemples
+
+Détails:
+• Reformulation pédagogique du contenu
+• Génération d'exemples pratiques
+• Adaptation au niveau de l'étudiant
+
+Étiquettes: IA, Priorité
+
+
+═══════════════════════════════════════════════════════════════════
+🔄 LISTE: EN COURS (2 cartes)
+═══════════════════════════════════════════════════════════════════
+
+CARTE 8: 📱 Intégration Twilio SMS
+───────────────────────────────────────────────────────────────────
+Titre: 📱 Intégration Twilio SMS
+
+Description:
+Configuration et tests des rappels SMS via Twilio
+
+Détails:
+• Configuration du service TwilioSmsService
+• Tests d'envoi de SMS
+• Gestion des erreurs et fallback
+• Commande de rappel automatique
+
+Étiquettes: Bundle, Priorité
+
+CARTE 9: 🌍 Traduction Multilingue
+───────────────────────────────────────────────────────────────────
+Titre: 🌍 Traduction Multilingue
+
+Description:
+Traduire les chapitres en plusieurs langues (FR, EN, ES, DE, AR)
+
+Détails:
+• Service TranslationService avec MyMemory API
+• Cache des traductions en base de données
+• Dropdown de sélection de langue
+• Rechargement dynamique du contenu
+
+Étiquettes: IA
+
+
+═══════════════════════════════════════════════════════════════════
+✅ LISTE: À VÉRIFIER (2 cartes)
+═══════════════════════════════════════════════════════════════════
+
+CARTE 10: 🎨 Design & Interface
+───────────────────────────────────────────────────────────────────
+Titre: 🎨 Design & Interface
+
+Description:
+Valider le design et l'ergonomie de toutes les interfaces
+
+Détails:
+• Vérifier la cohérence visuelle
+• Tester la responsivité mobile/tablette
+• Valider les animations CSS
+• Contrôler l'accessibilité
+
+Étiquettes: Bundle
+
+CARTE 11: 🔔 Système de Notifications
+───────────────────────────────────────────────────────────────────
+Titre: 🔔 Système de Notifications
+
+Description:
+Tests complets du système de notifications avec badge
+
+Détails:
+• Tester l'affichage du badge de notifications
+• Vérifier le marquage comme lu
+• Valider les notifications en temps réel
+• Tests navigateurs multiples
+
+Étiquettes: Bundle
+
+
+═══════════════════════════════════════════════════════════════════
+✅ LISTE: TERMINÉ (13 cartes)
+═══════════════════════════════════════════════════════════════════
+
+CARTE 12: ✓ CRUD Cours Complet
+───────────────────────────────────────────────────────────────────
+Titre: ✓ CRUD Cours Complet
+
+Description:
+Créer, modifier, supprimer et consulter les cours
+
+Détails:
+✅ Entité Cours avec Doctrine ORM
+✅ Controllers et routes CRUD
+✅ Formulaires Symfony
+✅ Templates backoffice
+
+Étiquettes: Bundle, Terminé
+
+CARTE 13: ✓ CRUD Chapitres
+───────────────────────────────────────────────────────────────────
+Titre: ✓ CRUD Chapitres
+
+Description:
+Gestion complète des chapitres avec ordre et organisation
+
+Détails:
+✅ Entité Chapitre avec relations
+✅ Routes imbriquées /cours/{id}/chapitres
+✅ Ordre des chapitres
+✅ Templates backoffice et frontoffice
+
+Étiquettes: Bundle, Terminé
+
+CARTE 14: ✓ Génération PDF
+───────────────────────────────────────────────────────────────────
+Titre: ✓ Génération PDF
+
+Description:
+Export des chapitres en PDF avec design personnalisé
+
+Détails:
+✅ KnpSnappyBundle configuré
+✅ Template PDF personnalisé
+✅ Export chapitre individuel
+✅ Design professionnel
+
+Étiquettes: Bundle, Terminé
+
+CARTE 15: ✓ Système de Progression
+───────────────────────────────────────────────────────────────────
+Titre: ✓ Système de Progression
+
+Description:
+Suivi de l'avancement de l'étudiant dans chaque cours
+
+Détails:
+✅ Service CourseProgressService
+✅ Entité UserProgress
+✅ Calcul automatique du pourcentage
+✅ Barre de progression style Moodle
+
+Étiquettes: Bundle, Terminé
+
+CARTE 16: ✓ Recherche Globale
+───────────────────────────────────────────────────────────────────
+Titre: ✓ Recherche Globale
+
+Description:
+Recherche dans cours, chapitres et contenus
+
+Détails:
+✅ SearchController avec recherche full-text
+✅ Recherche dans titres et contenus
+✅ Affichage des résultats paginés
+✅ Interface de recherche responsive
+
+Étiquettes: Bundle, Terminé
+
+CARTE 17: ✓ Rappel d'Inactivité
+───────────────────────────────────────────────────────────────────
+Titre: ✓ Rappel d'Inactivité
+
+Description:
+Système automatique de rappel pour utilisateurs inactifs
+
+Détails:
+✅ Commande SendInactivityRemindersCommand
+✅ Détection des utilisateurs inactifs
+✅ Envoi d'emails de rappel
+✅ Configuration des seuils d'inactivité
+
+Étiquettes: Bundle, Terminé
+
+CARTE 18: ✓ Interface Backoffice
+───────────────────────────────────────────────────────────────────
+Titre: ✓ Interface Backoffice
+
+Description:
+Interface d'administration complète et fonctionnelle
+
+Détails:
+✅ Templates Twig pour gestion cours/chapitres
+✅ Formulaires avec validation
+✅ Design Bootstrap responsive
+✅ Navigation intuitive
+
+Étiquettes: Bundle, Terminé
+
+CARTE 19: ✓ Interface Frontoffice
+───────────────────────────────────────────────────────────────────
+Titre: ✓ Interface Frontoffice
+
+Description:
+Interface utilisateur avec animations et interactions
+
+Détails:
+✅ Templates frontoffice modernes
+✅ Animations CSS (chapitres-animations.css)
+✅ Interactions JavaScript (chapitres-interactions.js)
+✅ Design responsive et accessible
+
+Étiquettes: Bundle, Terminé
+
+CARTE 20: ✓ API Traduction
+───────────────────────────────────────────────────────────────────
+Titre: ✓ API Traduction
+
+Description:
+Connexion à l'API de traduction MyMemory établie
+
+Détails:
+✅ ChapitreApiController créé
+✅ Endpoint GET /api/chapitres/{id}/translations
+✅ Intégration MyMemory API
+✅ Cache des traductions
+
+Étiquettes: IA, Terminé
+
+CARTE 21: ✓ Fixtures de Données
+───────────────────────────────────────────────────────────────────
+Titre: ✓ Fixtures de Données
+
+Description:
+Cours Java, Python et Web Development chargés
+
+Détails:
+✅ JavaCourseFixtures
+✅ WebDevelopmentFixtures
+✅ Cours Python avec chapitres
+✅ Données de test complètes
+
+Étiquettes: Bundle, Terminé
+
+CARTE 22: ✓ Système Quiz IA Complet
+───────────────────────────────────────────────────────────────────
+Titre: ✓ Système Quiz IA Complet
+
+Description:
+Système complet de quiz avec génération, correction et tuteur IA
+
+Détails:
+✅ Génération automatique de quiz via IA
+✅ Correction intelligente avec explications
+✅ Tuteur conversationnel post-quiz
+✅ Gestion des tentatives et statistiques
+✅ Interface moderne et responsive
+
+Étiquettes: IA, Bundle, Terminé
+
+CARTE 23: ✓ Gestion Quiz Backoffice
+───────────────────────────────────────────────────────────────────
+Titre: ✓ Gestion Quiz Backoffice
+
+Description:
+Interface complète de gestion des quiz pour les administrateurs
+
+Détails:
+✅ CRUD complet des quiz
+✅ Gestion des questions et options
+✅ Génération automatique via IA
+✅ Pagination et filtrage
+✅ Upload de médias (VichUploader)
+
+Étiquettes: Bundle, Terminé
+
+CARTE 24: ✓ Passage Quiz Étudiants
+───────────────────────────────────────────────────────────────────
+Titre: ✓ Passage Quiz Étudiants
+
+Description:
+Interface de passage de quiz pour les étudiants
+
+Détails:
+✅ Timer de quiz avec limite de temps
+✅ Randomisation des questions
+✅ Soumission et calcul de score
+✅ Résultats avec explications IA
+✅ Navigation entre quiz
+
+Étiquettes: Bundle, Terminé
+
+
+═══════════════════════════════════════════════════════════════════
+📊 STATISTIQUES DU SPRINT
+═══════════════════════════════════════════════════════════════════
+
+Total des cartes: 24
+
+À FAIRE:        4 cartes (IA uniquement)
+EN COURS:       2 cartes (1 Bundle + 1 IA)
+À VÉRIFIER:     2 cartes (Bundle)
+TERMINÉ:       16 cartes (13 Bundle + 3 IA)
+
+Répartition:
+• Bundle:      18 tâches
+• IA:           6 tâches
+
+
+═══════════════════════════════════════════════════════════════════
+🏷️ ÉTIQUETTES À CRÉER DANS TRELLO
+═══════════════════════════════════════════════════════════════════
+
+1. Bundle           (Couleur: Bleu)
+2. IA               (Couleur: Jaune)
+3. Priorité         (Couleur: Orange)
+4. Terminé          (Couleur: Vert foncé)
+5. Agent IA         (Couleur: Violet)
+6. API Groq         (Couleur: Rose)
+7. Critique         (Couleur: Rouge)
