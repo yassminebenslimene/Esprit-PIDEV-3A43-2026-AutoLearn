@@ -25,19 +25,19 @@
         <div class="back-navigation">
             <a href="{{ path('app_frontoffice') }}#cours" class="btn-back-to-courses">
                 <i class="fa fa-arrow-left"></i>
-                Retour aux cours
+                {{ 'frontoffice.chapter.back_to_courses'|trans }}
             </a>
         </div>
 
-        <h1 class="page-title">📚 Découvrez nos chapitres</h1>
+        <h1 class="page-title">📚 {{ 'frontoffice.chapter.discover_chapters'|trans }}</h1>
 
         <div class="row">
             {% if chapitres is empty %}
                 <div class="col-12">
                     <div class="empty-state">
                         <div class="empty-state-icon">📖</div>
-                        <h3 class="empty-state-title">Aucun chapitre disponible</h3>
-                        <p class="empty-state-text">Les chapitres seront bientôt disponibles. Revenez plus tard !</p>
+                        <h3 class="empty-state-title">{{ 'frontoffice.chapter.no_chapters'|trans }}</h3>
+                        <p class="empty-state-text">{{ 'frontoffice.chapter.chapters_soon'|trans }}</p>
                     </div>
                 </div>
             {% else %}
@@ -60,7 +60,7 @@
                             {# Métadonnées #}
                             <div class="chapter-meta">
                                 <span class="chapter-order">
-                                    <i class="fa fa-bookmark"></i> Chapitre {{ chapitre.ordre }}
+                                    <i class="fa fa-bookmark"></i> {{ 'frontoffice.chapter.chapter'|trans }} {{ chapitre.ordre }}
                                 </span>
                                 {% if chapitre.cours %}
                                     <span class="chapter-course">
@@ -73,11 +73,15 @@
                             <div class="chapter-actions">
                                 <a href="{{ path('app_chapitre_show_front', {'id': chapitre.id}) }}" class="btn-modern">
                                     <i class="fa fa-book-open"></i>
-                                    Lire le chapitre
+                                    {{ 'frontoffice.chapter.read_chapter'|trans }}
+                                </a>
+                                <a href="{{ path('app_chapitre_pdf_download', {'id': chapitre.id}) }}" class="btn-modern" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                    <i class="fa fa-file-pdf"></i>
+                                    PDF
                                 </a>
                                 <a href="{{ path('app_frontoffice_quiz_list', {'chapitreId': chapitre.id}) }}" class="btn-modern btn-quiz">
                                     <i class="fa fa-question-circle"></i>
-                                    Passer le quiz
+                                    {{ 'frontoffice.chapter.take_quiz'|trans }}
                                 </a>
                             </div>
                         </div>
@@ -92,6 +96,75 @@
     <script src="{{ asset('frontoffice/vendor/bootstrap/js/bootstrap.min.js') }}"></script>
     <!-- Interactions dynamiques -->
     <script src="{{ asset('frontoffice/js/chapitres-interactions.js') }}"></script>
+    
+    <script>
+        // Système de sons
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        // Son de démarrage du quiz (montée joyeuse)
+        function playStartQuizSound() {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+            oscillator.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+            oscillator.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+            
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.4);
+        }
+
+        // Son de hover
+        function playHoverSound() {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+            
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.08);
+        }
+
+        // Ajouter son sur les boutons "Passer le quiz" (orange)
+        document.querySelectorAll('.btn-quiz').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                playStartQuizSound();
+            });
+            
+            btn.addEventListener('mouseenter', function() {
+                playHoverSound();
+            });
+        });
+
+        // Ajouter son sur les boutons "Lire le chapitre" (bleu)
+        document.querySelectorAll('.btn-modern:not(.btn-quiz)').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                playHoverSound();
+            });
+        });
+
+        // Ajouter son sur les cartes de chapitre
+        document.querySelectorAll('.chapter-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                playHoverSound();
+            });
+        });
+    </script>
 
 </body>
 </html>

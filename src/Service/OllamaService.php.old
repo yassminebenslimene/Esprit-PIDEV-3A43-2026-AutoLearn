@@ -1,0 +1,140 @@
+<?php
+
+namespace App\Service;
+
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Psr\Log\LoggerInterface;
+
+/**
+ * Service pour interagir avec Ollama (modèle IA local) - VERSION SIMPLIFIÉE
+ */
+class OllamaService
+{
+    private HttpClientInterface $httpClient;
+    private LoggerInterface $logger;
+    private string $ollamaUrl;
+    private string $model;
+
+    public function __construct(
+        HttpClientInterface $httpClient,
+        LoggerInterface $logger,
+        string $ollamaUrl = 'http://localhost:11434',
+        string $model = 'llama3.2:1b'
+    ) {
+        $this->httpClient = $httpClient;
+        $this->logger = $logger;
+        $this->ollamaUrl = $ollamaUrl;
+        $this->model = $model;
+    }
+
+    /**
+     * Génère une réponse à partir d'un prompt
+     */
+    public function generate(string $prompt, array $context = [], array $options = []): ?string
+    {
+        try {
+            $systemPrompt = $this->buildSystemPrompt($context);
+            
+            $response = $this->httpClient->request('POST', $this->ollamaUrl . '/api/generate', [
+                'json' => [
+                    'model' => $options['model'] ?? $this->model,
+                    'prompt' => $prompt,
+                    'system' => $systemPrompt,
+                    'stream' => false,
+                    'options' => [
+                        'temperature' => 0.3, // Plus bas = plus prévisible
+                        'top_p' => 0.9,
+                        'num_predict' => 100, // Réduit pour vitesse
+                    ]
+                ],
+                'timeout' => 45 // Augmenté pour sécurité
+            ]);
+
+            if ($response->getStatusCode() !== 200) {
+                $this->logger->error('Ollama API error', [
+                    'status' => $response->getStatusCode(),
+                    'response' => $response->getContent(false)
+                ]);
+                return null;
+            }
+
+            $data = $response->toArray();
+            return $data['response'] ?? null;
+
+        } catch (\Exception $e) {
+            $this->logger->error('Ollama service error', [
+                'message' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Construit le prompt système SIMPLIFIÉ
+     */
+    private function buildSystemPrompt(array $context): string
+    {
+        $userName = $context['user_name'] ?? 'Utilisateur';
+        $userRole = $context['user_role'] ?? 'ETUDIANT';
+        
+        $contextData = '';
+        if (!empty($context['data'])) {
+            $contextData = "\nDONNÉES:\n" . json_encode($context['data'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }
+
+        return "Assistant AutoLearn. ULTRA-CONCIS (1 phrase).
+
+USER: {$userName} | ROLE: {$userRole}
+{$contextData}
+
+ACTIONS ADMIN:
+create_student: ACTION:create_student|nom:X|prenom:X|email:X@mail.com|niveau:DEBUTANT
+suspend_user: ACTION:suspend_user|user_id:X|reason:Y
+get_inactive_users: ACTION:get_inactive_users|days:7
+
+ACTIONS ÉTUDIANT:
+create_team: ACTION:create_team|nom:X|evenement_id:1
+
+EXEMPLES:
+Q: \"creer etudiant nom:Rami email:rami@mail.com\"
+R: \"ACTION:create_student|nom:Rami|prenom:Rami|email:rami@mail.com|niveau:DEBUTANT\"
+
+Q: \"utilisateurs inactifs\"
+R: \"ACTION:get_inactive_users|days:7\"
+
+RÈGLES:
+- 1 phrase MAX
+- Si action demandée → génère ACTION:...
+- Sinon → réponds avec données contextuelles";
+    }
+
+    /**
+     * Vérifie si Ollama est disponible
+     */
+    public function isAvailable(): bool
+    {
+        try {
+            $response = $this->httpClient->request('GET', $this->ollamaUrl . '/api/tags', [
+                'timeout' => 5
+            ]);
+            return $response->getStatusCode() === 200;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Liste les modèles disponibles
+     */
+    public function listModels(): array
+    {
+        try {
+            $response = $this->httpClient->request('GET', $this->ollamaUrl . '/api/tags');
+            $data = $response->toArray();
+            return $data['models'] ?? [];
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to list Ollama models', ['error' => $e->getMessage()]);
+            return [];
+        }
+    }
+}

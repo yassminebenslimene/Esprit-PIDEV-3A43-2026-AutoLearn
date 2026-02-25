@@ -115,8 +115,20 @@ final class CommunauteController extends AbstractController
     public function edit(Request $request, Communaute $communaute, EntityManagerInterface $entityManager): Response
     {
         // 🔒 Vérifier que seul le propriétaire peut modifier
-        if ($communaute->getOwner() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('Vous ne pouvez pas modifier cette communauté.');
+        // Si pas de propriétaire, assigner l'utilisateur connecté comme propriétaire
+        if (!$communaute->getOwner()) {
+            $currentUser = $this->getUser();
+            if ($currentUser) {
+                $communaute->setOwner($currentUser);
+                $entityManager->flush();
+            }
+        }
+        
+        if ($communaute->getOwner() && $communaute->getOwner() !== $this->getUser()) {
+            $this->addFlash('error', 'Vous ne pouvez pas modifier cette communauté.');
+            return $this->redirectToRoute('backoffice_communaute_show', [
+                'id' => $communaute->getId()
+            ]);
         }
 
         $form = $this->createForm(CommunauteType::class, $communaute);
@@ -138,7 +150,7 @@ final class CommunauteController extends AbstractController
     public function delete(Request $request, Communaute $communaute, EntityManagerInterface $entityManager): Response
     {
         // 🔒 Vérifier que seul le propriétaire peut supprimer
-        if ($communaute->getOwner() !== $this->getUser()) {
+        if ($communaute->getOwner() && $communaute->getOwner() !== $this->getUser()) {
             throw $this->createAccessDeniedException('Vous ne pouvez pas supprimer cette communauté.');
         }
 
@@ -148,5 +160,75 @@ final class CommunauteController extends AbstractController
         }
 
         return $this->redirectToRoute('app_communaute_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/cours/{coursId}', name: 'front_communaute_cours', requirements: ['coursId' => '\d+'], methods: ['GET', 'POST'])]
+    public function showCoursCommunaute(
+        int $coursId,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        ?UserRepository $userRepository = null
+    ): Response {
+        // Récupérer le cours
+        $cours = $entityManager->getRepository(\App\Entity\GestionDeCours\Cours::class)->find($coursId);
+        
+        if (!$cours) {
+            throw $this->createNotFoundException('Cours non trouvé');
+        }
+
+        // Récupérer ou créer la communauté du cours
+        $communaute = $cours->getCommunaute();
+        
+        if (!$communaute) {
+            // Créer automatiquement une communauté pour ce cours
+            $communaute = new Communaute();
+            $communaute->setNom('Communauté - ' . $cours->getTitre());
+            $communaute->setDescription('Espace d\'échange et de discussion pour le cours : ' . $cours->getTitre());
+            
+            // Assigner l'utilisateur connecté comme owner s'il existe
+            $currentUser = $this->getUser();
+            if ($currentUser) {
+                $communaute->setOwner($currentUser);
+            }
+            
+            $cours->setCommunaute($communaute);
+            $entityManager->persist($communaute);
+            $entityManager->flush();
+        }
+
+        // Gestion de l'invitation (même logique que show())
+        if ($request->isMethod('POST') && $request->request->has('_invite_token')) {
+            if ($this->isCsrfTokenValid('invite_' . $communaute->getId(), $request->request->get('_invite_token'))) {
+                $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+                if ($communaute->getOwner() && $communaute->getOwner()->getId() === $this->getUser()?->getId()) {
+                    $email = trim((string) $request->request->get('email', ''));
+                    if ($email !== '') {
+                        $user = $userRepository->findOneBy(['email' => $email]);
+                        if (!$user) {
+                            $this->addFlash('error', 'Aucun compte trouvé avec cet email.');
+                        } elseif ($user->getId() === $communaute->getOwner()?->getId()) {
+                            $this->addFlash('error', 'Vous êtes déjà le propriétaire de cette communauté.');
+                        } elseif (!$communaute->getMembers()->exists(fn($i, $m) => $m->getId() === $user->getId())) {
+                            $communaute->addMember($user);
+                            $entityManager->flush();
+                            $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté.');
+                        } else {
+                            $this->addFlash('error', 'Cette personne est déjà membre.');
+                        }
+                    } else {
+                        $this->addFlash('error', 'Veuillez entrer un email.');
+                    }
+                } else {
+                    $this->addFlash('error', 'Seul le créateur peut inviter des membres.');
+                }
+            }
+            return $this->redirectToRoute('front_communaute_cours', ['coursId' => $coursId]);
+        }
+
+        return $this->render('frontoffice/communaute/show.html.twig', [
+            'communaute' => $communaute,
+            'canPost' => $communaute->canPost($this->getUser()),
+            'cours' => $cours,
+        ]);
     }
 }

@@ -208,9 +208,11 @@
                     
                     <!-- ***** Search Start ***** -->
                     <div class="search-input">
-                        <form id="search" action="#">
-                            <input type="text" placeholder="Type Something" id='searchText' name="searchKeyword" />
-                            <i class="fa fa-search"></i>
+                        <form id="search" action="{{ path('app_search') }}" method="GET">
+                            <input type="text" placeholder="{{ 'search.placeholder'|trans }}" id='searchText' name="q" required minlength="2" />
+                            <button type="submit" style="background: none; border: none; cursor: pointer;">
+                                <i class="fa fa-search"></i>
+                            </button>
                         </form>
                     </div>
                     <!-- ***** Search End ***** -->
@@ -218,15 +220,55 @@
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
 
-                        <li class="scroll-to-section"><a href="#top" class="active">Home</a></li>
-                        <li class="scroll-to-section"><a href="#cours">Cours</a></li>
-                        <li><a href="{{ path('app_events') }}">Events</a></li>
-                        <li class="scroll-to-section"><a href="#challenge">Challenge</a></li>
-                        <li class="scroll-to-section"><a href="#contact">Contact</a></li>
-                        <li><a href="{{ path('front_communaute') }}">Communauté</a></li>
+                        <li class="scroll-to-section"><a href="#top" class="active">{{ 'nav.home'|trans }}</a></li>
+                        <li class="scroll-to-section"><a href="#cours">{{ 'nav.courses'|trans }}</a></li>
+                        <li class="scroll-to-section"><a href="#events">{{ 'nav.events'|trans }}</a></li>
+                        <li class="scroll-to-section"><a href="#challenge">{{ 'nav.challenges'|trans }}</a></li>
+                        <li class="scroll-to-section"><a href="#contact">{{ 'nav.contact'|trans }}</a></li>
+                        <li><a href="{{ path('front_communaute') }}">{{ 'nav.community'|trans }}</a></li>
+                        
+                        {# Sélecteur de langue - VISIBLE POUR TOUS #}
+                        <li class="profile-dropdown-container">
+                            <a href="javascript:void(0);" onclick="toggleLanguageDropdown(event)" class="profile-dropdown-btn" style="padding: 0 15px;">
+                                <i class="fa fa-globe"></i>
+                                {% if app.request.locale == 'fr' %}
+                                    FR
+                                {% elseif app.request.locale == 'en' %}
+                                    EN
+                                {% elseif app.request.locale == 'es' %}
+                                    ES
+                                {% elseif app.request.locale == 'ar' %}
+                                    AR
+                                {% endif %}
+                                <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
+                            </a>
+                            <ul class="profile-dropdown-menu" id="languageDropdown">
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'fr'}) }}">
+                                        🇫🇷 {{ 'language.french'|trans }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'en'}) }}">
+                                        🇬🇧 {{ 'language.english'|trans }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'es'}) }}">
+                                        🇪🇸 {{ 'language.spanish'|trans }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'ar'}) }}">
+                                        🇸🇦 {{ 'language.arabic'|trans }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
                         {% if app.user %}
                             <!-- User Logged In - Profile Dropdown -->
-                            <li><a href="{{ path('app_mes_participations') }}">My Participations</a></li>
+                            <li><a href="{{ path('app_mes_participations') }}">{{ 'nav.my_participations'|trans }}</a></li>
 
                             <li class="profile-dropdown-container">
                                 <a href="javascript:void(0);" onclick="toggleProfileDropdown(event)" class="profile-dropdown-btn">
@@ -237,21 +279,21 @@
                                 <ul class="profile-dropdown-menu" id="profileDropdown">
                                     <li>
                                         <a href="{{ path('app_profile') }}">
-                                            <i class="fa fa-id-card"></i> Mon Profil
+                                            <i class="fa fa-id-card"></i> {{ 'nav.profile'|trans }}
                                         </a>
                                     </li>
                                     <li class="profile-dropdown-divider"></li>
                                     <li>
                                         <a href="{{ path('backoffice_logout') }}">
-                                            <i class="fa fa-sign-out"></i> Déconnexion
+                                            <i class="fa fa-sign-out"></i> {{ 'nav.logout'|trans }}
                                         </a>
                                     </li>
                                 </ul>
                             </li>
                         {% else %}
                             <!-- User Not Logged In -->
-                            <li><a href="{{ path('backoffice_login') }}">Login</a></li>
-                            <li><a href="{{ path('backoffice_register') }}">Register</a></li>
+                            <li><a href="{{ path('backoffice_login') }}">{{ 'nav.login'|trans }}</a></li>
+                            <li><a href="{{ path('backoffice_register') }}">{{ 'nav.register'|trans }}</a></li>
                         {% endif %}
                     </ul> 
                     <!-- ***** Menu End ***** -->
@@ -294,45 +336,45 @@
                 <div class="owl-carousel owl-banner">
                     <div class="item item-1">
                         <div class="header-text">
-                            <span class="category">Nos Cours</span>
-                            <h2>Apprenez la Programmation avec des Experts</h2>
-                            <p>Découvrez nos cours de programmation conçus par des professionnels. Maîtrisez les langages modernes comme Python, JavaScript, Java et bien plus encore avec des projets pratiques et des défis stimulants.</p>
+                            <span class="category">{{ 'frontoffice.banner.our_courses'|trans }}</span>
+                            <h2>{{ 'frontoffice.banner.learn_programming'|trans }}</h2>
+                            <p>{{ 'frontoffice.banner.discover_courses'|trans }}</p>
                             <div class="buttons">
                                 <div class="main-button">
-                                    <a href="#cours">Voir les Cours</a>
+                                    <a href="#cours">{{ 'frontoffice.banner.view_courses'|trans }}</a>
                                 </div>
                                 <div class="icon-button">
-                                    <a href="#courses"><i class="fa fa-play"></i> Commencer Maintenant</a>
+                                    <a href="#courses"><i class="fa fa-play"></i> {{ 'frontoffice.banner.start_now'|trans }}</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="item item-2">
                         <div class="header-text">
-                            <span class="category">Meilleurs Résultats</span>
-                            <h2>Développez vos Compétences en Programmation</h2>
-                            <p>Progressez rapidement grâce à nos méthodes d'apprentissage interactives. Des exercices pratiques, des quiz et des projets réels pour transformer vos efforts en compétences concrètes et recherchées sur le marché.</p>
+                            <span class="category">{{ 'frontoffice.banner.best_results'|trans }}</span>
+                            <h2>{{ 'frontoffice.banner.develop_skills'|trans }}</h2>
+                            <p>{{ 'frontoffice.banner.progress_fast'|trans }}</p>
                             <div class="buttons">
                                 <div class="main-button">
-                                    <a href="#challenge">Relever un Défi</a>
+                                    <a href="#challenge">{{ 'frontoffice.banner.take_challenge'|trans }}</a>
                                 </div>
                                 <div class="icon-button">
-                                    <a href="#courses"><i class="fa fa-play"></i> Explorer les Cours</a>
+                                    <a href="#courses"><i class="fa fa-play"></i> {{ 'frontoffice.banner.explore_courses'|trans }}</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="item item-3">
                         <div class="header-text">
-                            <span class="category">Apprentissage en Ligne</span>
-                            <h2>Apprenez à Coder à Votre Rythme</h2>
-                            <p>Accédez à nos cours de programmation 24/7 depuis n'importe où. Apprenez les technologies web, le développement mobile, l'intelligence artificielle et plus encore, avec un suivi personnalisé de votre progression.</p>
+                            <span class="category">{{ 'frontoffice.banner.online_learning'|trans }}</span>
+                            <h2>{{ 'frontoffice.banner.learn_at_pace'|trans }}</h2>
+                            <p>{{ 'frontoffice.banner.access_247'|trans }}</p>
                             <div class="buttons">
                                 <div class="main-button">
-                                    <a href="{{ path('backoffice_register') }}">S'inscrire Gratuitement</a>
+                                    <a href="{{ path('backoffice_register') }}">{{ 'frontoffice.banner.register_free'|trans }}</a>
                                 </div>
                                 <div class="icon-button">
-                                    <a href="#cours"><i class="fa fa-play"></i> Découvrir AutoLearn</a>
+                                    <a href="#cours"><i class="fa fa-play"></i> {{ 'frontoffice.banner.discover_autolearn'|trans }}</a>
                                 </div>
                             </div>
                         </div>
@@ -344,15 +386,22 @@
 </div>
 <!-- ***** Main Banner End ***** -->
 
-
-<!-- ***** cours Section Start ***** -->
+<!-- ***** Cours Section Start ***** -->
 <div class="services section" id="cours">
     <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="section-heading">
+                    <h6>Nos Cours</h6>
+                    <h2>Découvrez Nos Cours de Programmation</h2>
+                </div>
+            </div>
+        </div>
 
         <div class="row">
             {% if cours is empty %}
                 <div class="col-12 text-center">
-                    <p>Aucun cours disponible pour le moment.</p>
+                    <p>{{ 'courses.no_courses'|trans }}</p>
                 </div>
             {% else %}
                 {% for cour in cours %}
@@ -363,14 +412,16 @@
                             </div>
                             <div class="main-content">
                                 <h4>{{ cour.titre }}</h4>
-                                <p>{{ cour.description|slice(0, 100) ~ (cour.description|length > 100 ? '...' : '') }}</p>
+                                <p>{{ cour.description|length > 100 ? cour.description|slice(0, 100) ~ '...' : cour.description }}</p>
                                 <div class="main-button">
+
                                     <a href="{{ path('app_frontoffice_chapitre_by_cours', {'coursId': cour.id}) }}" class="btn">
-                                        Voir le cours
+                                        {{ 'courses.view'|trans }}
                                     </a>
-                                    <a href="#" class="btn" style="background: linear-gradient(135deg, #6c5ce7, #4a69bd);">
-                                        <i class="fa fa-users me-1"></i> Communauté
+                                    <a href="{{ path('front_communaute_cours', {'coursId': cour.id}) }}" class="btn" style="background: linear-gradient(135deg, #6c5ce7, #4a69bd);">
+                                        <i class="fa fa-users me-1"></i> {{ 'nav.community'|trans }}
                                     </a>
+
                                 </div>
                             </div>
                         </div>
@@ -380,7 +431,7 @@
         </div>
     </div>
 </div>
-<!-- ***** cours Section End ***** -->
+<!-- ***** Cours Section End ***** -->
 
 <!-- ***** About Us Section Start ***** -->
 <div class="section about-us">
@@ -870,28 +921,60 @@
             event.stopPropagation();
             
             var dropdown = document.getElementById('profileDropdown');
-            var allDropdowns = document.querySelectorAll('.profile-dropdown-menu');
+            var languageDropdown = document.getElementById('languageDropdown');
             
-            allDropdowns.forEach(function(menu) {
-                if (menu.id !== 'profileDropdown') {
-                    menu.classList.remove('show');
-                }
-            });
+            // Fermer le dropdown de langue
+            if (languageDropdown) {
+                languageDropdown.classList.remove('show');
+            }
+            
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+        
+        function toggleLanguageDropdown(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            var dropdown = document.getElementById('languageDropdown');
+            var profileDropdown = document.getElementById('profileDropdown');
+            
+            // Fermer le dropdown de profil
+            if (profileDropdown) {
+                profileDropdown.classList.remove('show');
+            }
             
             dropdown.classList.toggle('show');
         }
         
         document.addEventListener('click', function(event) {
             var dropdown = document.getElementById('profileDropdown');
+            var languageDropdown = document.getElementById('languageDropdown');
             var isClickInside = event.target.closest('.profile-dropdown-container');
             
-            if (!isClickInside && dropdown) {
-                dropdown.classList.remove('show');
+            if (!isClickInside) {
+                if (dropdown) {
+                    dropdown.classList.remove('show');
+                }
+                if (languageDropdown) {
+                    languageDropdown.classList.remove('show');
+                }
             }
         });
         
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Profile dropdown initialized');
+            console.log('Profile and language dropdowns initialized');
+            
+            // Force search form submission
+            var searchForm = document.getElementById('search');
+            if (searchForm) {
+                searchForm.addEventListener('submit', function(e) {
+                    // Ne pas empêcher la soumission du formulaire
+                    console.log('Search form submitted');
+                    return true;
+                });
+            }
             
             // Auto-dismiss flash messages after 5 seconds
             setTimeout(function() {
@@ -911,6 +994,9 @@
         });
     </script>
 {% endblock %}
+
+{# AI Chat Widget - Assistant Intelligent #}
+{% include 'ai_assistant/chat_widget.html.twig' %}
 
 </body>
 </html>

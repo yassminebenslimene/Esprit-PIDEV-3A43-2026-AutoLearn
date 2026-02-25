@@ -4,7 +4,6 @@
 
 {% block body %}
 
-<!-- ===== PAGE HEADING ===== -->
 <div class="page-heading header-text">
     <div class="container">
         <div class="row">
@@ -32,11 +31,6 @@
     box-shadow: 0 12px 32px rgba(0,0,0,0.08);
 }
 
-.post-form-card h4 {
-    margin-bottom: 22px;
-}
-
-/* textarea */
 .post-form-card textarea {
     width: 100%;
     min-height: 140px;
@@ -47,29 +41,10 @@
     font-size: 15px;
 }
 
-/* media fields */
 .media-field {
     margin-top: 20px;
 }
 
-.media-field label {
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 8px;
-    display: block;
-}
-
-/* text inputs */
-.media-field input[type="text"],
-.media-field input[type="url"] {
-    width: 100%;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    padding: 10px 14px;
-    font-size: 14px;
-}
-
-/* file upload */
 .media-field input[type="file"] {
     width: 100%;
     padding: 10px;
@@ -79,21 +54,10 @@
     cursor: pointer;
 }
 
-/* separator */
-.media-separator {
-    text-align: center;
-    font-size: 13px;
-    color: #999;
-    margin: 14px 0;
-}
-
-/* actions */
 .post-actions {
     display: flex;
     gap: 12px;
     margin-top: 30px;
-    position: relative;
-    z-index: 10;
 }
 
 .btn-publish {
@@ -104,13 +68,6 @@
     border-radius: 999px;
     font-weight: 500;
     cursor: pointer;
-    position: relative;
-    z-index: 10;
-}
-
-.btn-publish:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(122, 106, 216, 0.4);
 }
 
 .btn-back {
@@ -120,13 +77,6 @@
     border-radius: 999px;
     text-decoration: none;
     display: inline-block;
-    position: relative;
-    z-index: 10;
-}
-
-.btn-back:hover {
-    background: #e5e7ff;
-    color: #333;
 }
 </style>
 
@@ -136,7 +86,7 @@
 
         <h4>Créer un post</h4>
 
-        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+        {{ form_start(form) }}
 
         {# ===== TEXTE ===== #}
         {{ form_widget(form.contenu, {
@@ -144,39 +94,18 @@
         }) }}
 
         {# ================= IMAGE ================= #}
-
         <div class="media-field">
-            {{ form_label(form.imageUrl, 'Image (lien)') }}
-            {{ form_widget(form.imageUrl, {
-                attr: { placeholder: 'https://exemple.com/image.jpg' }
-            }) }}
-        </div>
-
-        <div class="media-separator">ou</div>
-
-        <div class="media-field">
-            {{ form_label(form.imageFile, 'Uploader une image') }}
-            {{ form_widget(form.imageFile) }}
+            {{ form_label(form.imageFileUpload, 'Uploader une image') }}
+            {{ form_widget(form.imageFileUpload) }}
         </div>
 
         {# ================= VIDEO ================= #}
-
         <div class="media-field">
-            {{ form_label(form.videoUrl, 'Vidéo YouTube (lien)') }}
-            {{ form_widget(form.videoUrl, {
-                attr: { placeholder: 'https://www.youtube.com/watch?v=XXXX' }
-            }) }}
-        </div>
-
-        <div class="media-separator">ou</div>
-
-        <div class="media-field">
-            {{ form_label(form.videoFile, 'Uploader une vidéo') }}
-            {{ form_widget(form.videoFile) }}
+            {{ form_label(form.videoFileUpload, 'Uploader une vidéo') }}
+            {{ form_widget(form.videoFileUpload) }}
         </div>
 
         {# ================= ACTIONS ================= #}
-
         <div class="post-actions">
             <button type="submit" class="btn-publish">
                 Publier
@@ -193,13 +122,5 @@
     </div>
 
 </div>
-
-<footer>
-    <div class="container">
-        <div class="col-lg-12">
-            <p>Copyright © 2036 Scholar Organization. All rights reserved. &nbsp;&nbsp;&nbsp; Design: <a href="https://templatemo.com" rel="nofollow" target="_blank">TemplateMo</a></p>
-        </div>
-    </div>
-</footer>
 
 {% endblock %}

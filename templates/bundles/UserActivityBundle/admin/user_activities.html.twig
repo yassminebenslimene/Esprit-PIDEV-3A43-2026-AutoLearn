@@ -1,0 +1,404 @@
+{% extends 'backoffice/base.html.twig' %}
+
+{% block title %}User Activities{% endblock %}
+
+{% block page_title %}User Activities{% endblock %}
+
+{% block body %}
+<style>
+    .activity-detail-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .activity-timeline {
+        position: relative;
+        padding-left: 40px;
+    }
+    
+    .activity-timeline::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(180deg, #667eea, #764ba2);
+    }
+    
+    .activity-item {
+        position: relative;
+        margin-bottom: 30px;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 20px;
+        border-left: 4px solid;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .activity-item.login { border-left-color: #10b981; }
+    .activity-item.suspend { border-left-color: #f59e0b; }
+    .activity-item.reactivate { border-left-color: #22c55e; }
+    .activity-item.create { border-left-color: #3b82f6; }
+    .activity-item.update { border-left-color: #8b5cf6; }
+    .activity-item.view { border-left-color: #6366f1; }
+    .activity-item.delete { border-left-color: #ef4444; }
+    
+    .activity-item::before {
+        content: '';
+        position: absolute;
+        left: -44px;
+        top: 20px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: currentColor;
+        border: 3px solid rgba(0,0,0,0.3);
+    }
+    
+    .activity-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .activity-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #1f2937;
+    }
+    
+    .activity-icon {
+        font-size: 24px;
+    }
+    
+    .activity-time {
+        color: #1f2937;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    
+    .activity-metadata {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .metadata-item {
+        background: #f3f4f6;
+        padding: 12px;
+        border-radius: 8px;
+    }
+    
+    .metadata-label {
+        color: #6b7280;
+        font-size: 12px;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+    
+    .metadata-value {
+        color: #1f2937;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .changes-list {
+        background: #f3f4f6;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+    
+    .change-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #e5e7eb;
+        color: #1f2937;
+    }
+    
+    .change-item:last-child {
+        border-bottom: none;
+    }
+    
+    .change-field {
+        color: #60a5fa;
+        font-weight: bold;
+    }
+    
+    .change-old {
+        color: #ef4444;
+        text-decoration: line-through;
+    }
+    
+    .change-new {
+        color: #22c55e;
+    }
+    
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+    
+    .back-btn:hover {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: white;
+    }
+    
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-box {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .stat-number {
+        font-size: 32px;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 5px;
+    }
+    
+    .stat-label {
+        color: #6b7280;
+        font-size: 14px;
+    }
+</style>
+
+<div style="padding: 30px;">
+    <a href="{{ path('backoffice_users') }}" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Back to Users
+    </a>
+    
+    <div class="activity-detail-card">
+        <h2 style="margin: 0 0 10px 0; color: #1f2937; font-size: 28px;">Activity History</h2>
+        <p style="color: #6b7280; margin: 0 0 20px 0;" class="subtitle">
+            {% if activities|length > 0 %}
+                User: <strong style="color: #1f2937;">{{ activities[0].user.prenom }} {{ activities[0].user.nom }}</strong> ({{ activities[0].user.email }})
+            {% else %}
+                No activities found
+            {% endif %}
+        </p>
+        
+        {% if activities|length > 0 %}
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="stat-number">{{ activities|length }}</div>
+                <div class="stat-label">Total Activities</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">{{ activities|filter(a => a.action == 'user.login' and a.success)|length }}</div>
+                <div class="stat-label">Successful Logins</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">{{ activities|filter(a => not a.success)|length }}</div>
+                <div class="stat-label">Failed Actions</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">
+                    {% if activities[0].createdAt %}
+                        {{ 'now'|date('U') - activities[0].createdAt.timestamp }}s
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </div>
+                <div class="stat-label">Last Activity</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="activity-timeline">
+        {% for activity in activities %}
+            {% set actionType = 'default' %}
+            {% if 'login' in activity.action %}
+                {% set actionType = 'login' %}
+                {% set actionIcon = '🔐' %}
+                {% set actionTitle = 'Login Attempt' %}
+            {% elseif 'suspend' in activity.action %}
+                {% set actionType = 'suspend' %}
+                {% set actionIcon = '⛔' %}
+                {% set actionTitle = 'Account Suspended' %}
+            {% elseif 'reactivat' in activity.action %}
+                {% set actionType = 'reactivate' %}
+                {% set actionIcon = '✅' %}
+                {% set actionTitle = 'Account Reactivated' %}
+            {% elseif 'created' in activity.action %}
+                {% set actionType = 'create' %}
+                {% set actionIcon = '➕' %}
+                {% set actionTitle = 'Account Created' %}
+            {% elseif 'updated' in activity.action %}
+                {% set actionType = 'update' %}
+                {% set actionIcon = '✏️' %}
+                {% set actionTitle = 'Profile Updated' %}
+            {% elseif 'viewed' in activity.action %}
+                {% set actionType = 'view' %}
+                {% set actionIcon = '👁️' %}
+                {% set actionTitle = 'Profile Viewed' %}
+            {% elseif 'deleted' in activity.action %}
+                {% set actionType = 'delete' %}
+                {% set actionIcon = '🗑️' %}
+                {% set actionTitle = 'Account Deleted' %}
+            {% else %}
+                {% set actionIcon = '📋' %}
+                {% set actionTitle = activity.action %}
+            {% endif %}
+            
+            <div class="activity-item {{ actionType }}">
+                <div class="activity-header">
+                    <div class="activity-title">
+                        <span class="activity-icon">{{ actionIcon }}</span>
+                        <span>{{ actionTitle }}</span>
+                        {% if not activity.success %}
+                            <span style="background: #ef4444; color: white; padding: 4px 10px; border-radius: 8px; font-size: 12px;">FAILED</span>
+                        {% endif %}
+                    </div>
+                    <div class="activity-time">
+                        {{ activity.createdAt|date('F d, Y - H:i:s') }}
+                    </div>
+                </div>
+                
+                {% if activity.errorMessage %}
+                    <div style="background: #fee2e2; border-left: 4px solid #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                        <strong style="color: #ef4444;">Error:</strong> <span style="color: #991b1b;">{{ activity.errorMessage }}</span>
+                    </div>
+                {% endif %}
+                
+                <div class="activity-metadata">
+                    {% if activity.ipAddress %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">IP Address</div>
+                        <div class="metadata-value" style="font-family: monospace;">{{ activity.ipAddress }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if activity.metadata is defined and activity.metadata is not empty and activity.metadata.browser is defined %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Browser</div>
+                        <div class="metadata-value">{{ activity.metadata.browser }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if activity.metadata is defined and activity.metadata is not empty and activity.metadata.platform is defined %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Platform</div>
+                        <div class="metadata-value">{{ activity.metadata.platform }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if activity.metadata is defined and activity.metadata is not empty and activity.metadata.suspended_by_name is defined %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Suspended By</div>
+                        <div class="metadata-value">{{ activity.metadata.suspended_by_name }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if activity.metadata is defined and activity.metadata is not empty and activity.metadata.reactivated_by_name is defined %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Reactivated By</div>
+                        <div class="metadata-value">{{ activity.metadata.reactivated_by_name }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if activity.metadata is defined and activity.metadata is not empty and activity.metadata.created_by_name is defined %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Created By</div>
+                        <div class="metadata-value">{{ activity.metadata.created_by_name }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if activity.metadata is defined and activity.metadata is not empty and activity.metadata.updated_by_name is defined %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Updated By</div>
+                        <div class="metadata-value">{{ activity.metadata.updated_by_name }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if activity.metadata is defined and activity.metadata is not empty and activity.metadata.viewed_by_name is defined %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Viewed By</div>
+                        <div class="metadata-value">{{ activity.metadata.viewed_by_name }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if activity.metadata is defined and activity.metadata is not empty and activity.metadata.suspension_reason is defined %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Suspension Reason</div>
+                        <div class="metadata-value">{{ activity.metadata.suspension_reason }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if activity.metadata is defined and activity.metadata is not empty and activity.metadata.suspension_duration_days is defined %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Suspension Duration</div>
+                        <div class="metadata-value">{{ activity.metadata.suspension_duration_days }} days ({{ activity.metadata.suspension_duration_hours }} hours)</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if activity.metadata is defined and activity.metadata is not empty and activity.metadata.days_since_last_login is defined %}
+                    <div class="metadata-item">
+                        <div class="metadata-label">Days Since Last Login</div>
+                        <div class="metadata-value">{{ activity.metadata.days_since_last_login }} days</div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if activity.metadata is defined and activity.metadata is not empty and activity.metadata.changes is defined and activity.metadata.changes is iterable %}
+                <div class="changes-list">
+                    <strong style="color: #1f2937; display: block; margin-bottom: 10px;">Changes Made:</strong>
+                    {% for field, change in activity.metadata.changes %}
+                        <div class="change-item">
+                            <span class="change-field">{{ field|title }}:</span>
+                            {% if change is iterable and change.old is defined %}
+                                <span class="change-old">{{ change.old }}</span>
+                                →
+                                <span class="change-new">{{ change.new }}</span>
+                            {% else %}
+                                <span class="change-new">{{ change }}</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 60px; color: #9ca3af;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 20px;">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <p style="font-size: 18px; color: #6b7280;">No activities recorded for this user</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -135,7 +135,7 @@
 
             <ul class="nav-menu">
                 <li class="nav-section">
-                    <span class="nav-section-title">Main Menu</span>
+                    <span class="nav-section-title">MAIN MENU</span>
                     <ul>
                         <li class="nav-item">
                             <a href="{{ path('app_backoffice') }}" class="nav-link">
@@ -152,31 +152,13 @@
                                     <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
                                 </svg>
                                 Analytics
-                                <span class="nav-badge">New</span>
                             </a>
                         </li>
                     </ul>
                 </li>
 
                 <li class="nav-section">
-                    <span class="nav-section-title">Gestion</span>
-                    <ul>
-                        <li class="nav-item">
-                            <a href="{{ path('backoffice_quiz_management') }}" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 3h7v7H3z"/>
-                                    <path d="M14 3h7v7h-7z"/>
-                                    <path d="M14 14h7v7h-7z"/>
-                                    <path d="M3 14h7v7H3z"/>
-                                </svg>
-                                Gestion Quiz
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-section">
-                    <span class="nav-section-title">Système</span>
+                    <span class="nav-section-title">GESTION</span>
                     <ul>
                         <li class="nav-item">
                             <a href="{{ path('app_cours_index') }}" class="nav-link">
@@ -188,66 +170,117 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ path('app_chapitre_index') }}" class="nav-link">
+                            <a href="{{ path('backoffice_quiz_management') }}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                    <polyline points="14 2 14 8 20 8"/>
-                                    <line x1="16" y1="13" x2="8" y2="13"/>
-                                    <line x1="16" y1="17" x2="8" y2="17"/>
-                                    <polyline points="10 9 9 9 8 9"/>
+                                    <path d="M3 3h7v7H3z"/>
+                                    <path d="M14 3h7v7h-7z"/>
+                                    <path d="M14 14h7v7h-7z"/>
+                                    <path d="M3 14h7v7H3z"/>
                                 </svg>
-                                Chapitres
+                                Gestion Quiz
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ path('backoffice_users') }}" class="nav-link active">
+                            <a href="{{ path('backoffice_evenements') }}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                    <line x1="16" y1="2" x2="16" y2="6"/>
+                                    <line x1="8" y1="2" x2="8" y2="6"/>
+                                    <line x1="3" y1="10" x2="21" y2="10"/>
                                 </svg>
-                                Users
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ path('backoffice_challenges') }}" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                                </svg>
-                                challenges
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ path('backoffice_exercices') }}" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                                </svg>
-                                exercices
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ path('backoffice_settings') }}" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="3"/>
-                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-                                </svg>
-                                Settings
+                                Événements
                             </a>
                         </li>
                     </ul>
                 </li>
 
                 <li class="nav-section">
-                    <span class="nav-section-title">Account</span>
+                    <span class="nav-section-title">COMMUNAUTÉ</span>
                     <ul>
+                        <li class="nav-item">
+                            <a href="{{ path('backoffice_communaute_index') }}" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                                Communauté
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ path('backoffice_post_index') }}" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                </svg>
+                                Posts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ path('backoffice_commentaire_index') }}" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                                Commentaires
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-section">
+                    <span class="nav-section-title">SYSTÈME</span>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="{{ path('backoffice_users') }}" class="nav-link active">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                                Utilisateurs
+                            </a>
+                        </li>
+                                                <li class="nav-item">
+                            <a href="{{ path('backoffice_audit_index') }}" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                    <line x1="10" y1="9" x2="8" y2="9"/>
+                                </svg>
+                                Audit
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ path('admin_user_activity_index') }}" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 20h9"/>
+                                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                                </svg>
+                                Activity Log
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-section">
+                    <span class="nav-section-title">COMPTE</span>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="{{ path('backoffice_settings') }}" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                                Mon Profil
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a href="{{ path('backoffice_logout') }}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                                     <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
                                 </svg>
-                                Logout
+                                Déconnexion
                             </a>
                         </li>
                     </ul>
@@ -336,7 +369,11 @@
                             <div class="stat-value">{{ totalUsers|default(0) }}</div>
                             <span class="stat-change positive">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
-                                +{{ ((totalUsers - totalUsers|default(0)) / totalUsers|default(1) * 100)|round(1) }}%
+                                {% if totalUsers > 0 %}
+                                    +{{ ((newTodayCount|default(0)) / totalUsers * 100)|round(1) }}%
+                                {% else %}
+                                    0%
+                                {% endif %}
                             </span>
                         </div>
                         <div class="stat-icon cyan">
@@ -479,7 +516,11 @@
                                         </td>
                                         <td>{{ user.createdAt|date('M d, Y') }}</td>
                                         <td>
-                                            <span class="status-badge completed">Active</span>
+                                            {% if user.isSuspended %}
+                                                <span class="status-badge suspended" style="background: linear-gradient(135deg, #dc3545, #c82333);">Suspendu</span>
+                                            {% else %}
+                                                <span class="status-badge completed">Actif</span>
+                                            {% endif %}
                                         </td>
                                         <td>
     <div class="action-buttons">
@@ -493,6 +534,19 @@
             View
         </a>
         
+        <!-- Activities - ONLY for students -->
+        {% if user.role == 'ETUDIANT' %}
+        <button type="button" 
+                class="card-btn small-btn" 
+                style="background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;"
+                onclick="showActivitiesModal({{ user.id }}, '{{ user.prenom }} {{ user.nom }}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            Activities
+        </button>
+        {% endif %}
+        
         <!-- Edit - ONLY for students -->
         {% if user.role == 'ETUDIANT' %}
             <a href="{{ path('backoffice_user_edit', {'id': user.id}) }}" 
@@ -505,20 +559,37 @@
             </a>
         {% endif %}
         
-        <!-- Delete - ONLY for students -->
+        <!-- Suspend/Reactivate - ONLY for students -->
         {% if user.role == 'ETUDIANT' %}
-            <form method="post" 
-                  action="{{ path('backoffice_user_delete', {'id': user.id}) }}" 
-                  onsubmit="return confirm('Delete {{ user.prenom }} {{ user.nom }}?');"
-                  style="display: inline;">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-                <button type="submit" class="card-btn small-btn danger">
+            {% if user.isSuspended %}
+                <!-- Reactivate Button -->
+                <form method="post" 
+                      action="{{ path('backoffice_user_reactivate', {'id': user.id}) }}" 
+                      onsubmit="return confirm('Réactiver le compte de {{ user.prenom }} {{ user.nom }}?');"
+                      style="display: inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('reactivate' ~ user.id) }}">
+                    <button type="submit" class="card-btn small-btn" style="background: linear-gradient(135deg, #28a745, #20c997) !important;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                        Réactiver
+                    </button>
+                </form>
+            {% else %}
+                <!-- Suspend Button -->
+                <button type="button" 
+                        class="card-btn small-btn" 
+                        style="background: linear-gradient(135deg, #ffc107, #ff9800) !important;"
+                        onclick="showSuspendModal({{ user.id }}, '{{ user.prenom }} {{ user.nom }}')">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
                     </svg>
-                    Delete
+                    Suspendre
                 </button>
-            </form>
+            {% endif %}
         {% endif %}
                                                     {% endif %}
 
@@ -559,6 +630,62 @@
         </svg>
     </button>
 
+    <!-- Suspension Modal -->
+    <div id="suspendModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 15px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+            <h2 style="margin: 0 0 20px 0; color: #333;">Suspendre le compte</h2>
+            <p style="color: #666; margin-bottom: 20px;">Étudiant: <strong id="suspendUserName"></strong></p>
+            
+            <form id="suspendForm" method="post" action="">
+                <input type="hidden" name="_token" id="suspendToken" value="">
+                
+                <label style="display: block; margin-bottom: 10px; color: #333; font-weight: bold;">Raison de la suspension:</label>
+                <select name="reason" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 20px; font-size: 14px;">
+                    <option value="Compte inactif - Inactivité prolongée">Compte inactif - Inactivité prolongée</option>
+                    <option value="Violation des règles de la plateforme">Violation des règles de la plateforme</option>
+                    <option value="Comportement inapproprié envers d'autres utilisateurs">Comportement inapproprié envers d'autres utilisateurs</option>
+                    <option value="Activité suspecte détectée sur le compte">Activité suspecte détectée sur le compte</option>
+                    <option value="Non-paiement ou problème de facturation">Non-paiement ou problème de facturation</option>
+                    <option value="Demande de suspension par l'étudiant">Demande de suspension par l'étudiant</option>
+                    <option value="Vérification d'identité requise">Vérification d'identité requise</option>
+                    <option value="Suspension temporaire pour enquête">Suspension temporaire pour enquête</option>
+                </select>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" onclick="closeSuspendModal()" style="padding: 12px 24px; border: 2px solid #e2e8f0; background: white; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                        Annuler
+                    </button>
+                    <button type="submit" style="padding: 12px 24px; border: none; background: linear-gradient(135deg, #ffc107, #ff9800); color: white; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                        Confirmer la suspension
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Activities Modal -->
+    <div id="activitiesModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 15px; padding: 30px; max-width: 1200px; width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div>
+                    <h2 style="margin: 0; color: #333;">Activity History</h2>
+                    <p style="color: #666; margin: 5px 0 0 0;">User: <strong id="activitiesUserName"></strong></p>
+                </div>
+                <button type="button" onclick="closeActivitiesModal()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #999; line-height: 1;">&times;</button>
+            </div>
+            
+            <div id="activitiesContent" style="min-height: 200px;">
+                <div style="text-align: center; padding: 40px; color: #999;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 10px;">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <p>Loading activities...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="site-footer">
         <p>Copyright © 2026 Your Company. Designed by <a href="https://templatemo.com" target="_blank" rel="nofollow">TemplateMo</a></p>
@@ -566,6 +693,246 @@
 
     <script src="{{ asset('backoffice/js/templatemo-glass-admin-script.js') }}"></script>
     <script>
+    // Store CSRF tokens for each user
+    const suspendTokens = {
+        {% for user in users %}
+        {% if user.role == 'ETUDIANT' and user.id != app.user.id %}
+        {{ user.id }}: '{{ csrf_token('suspend' ~ user.id) }}',
+        {% endif %}
+        {% endfor %}
+    };
+    
+    // Suspension Modal Functions
+    function showSuspendModal(userId, userName) {
+        const modal = document.getElementById('suspendModal');
+        const form = document.getElementById('suspendForm');
+        const userNameSpan = document.getElementById('suspendUserName');
+        const tokenInput = document.getElementById('suspendToken');
+        
+        // Set form action
+        form.action = '/backoffice/users/' + userId + '/suspend';
+        
+        // Set user name
+        userNameSpan.textContent = userName;
+        
+        // Set CSRF token
+        tokenInput.value = suspendTokens[userId] || '';
+        
+        // Show modal
+        modal.style.display = 'flex';
+    }
+    
+    function closeSuspendModal() {
+        const modal = document.getElementById('suspendModal');
+        modal.style.display = 'none';
+    }
+    
+    // Close modal on outside click
+    document.getElementById('suspendModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeSuspendModal();
+        }
+    });
+    
+    // Activities Modal Functions
+    function showActivitiesModal(userId, userName) {
+        const modal = document.getElementById('activitiesModal');
+        const userNameSpan = document.getElementById('activitiesUserName');
+        const contentDiv = document.getElementById('activitiesContent');
+        
+        // Set user name
+        userNameSpan.textContent = userName;
+        
+        // Show modal
+        modal.style.display = 'flex';
+        
+        // Load activities via AJAX
+        fetch('/backoffice/user-activity/user/' + userId + '/json')
+            .then(response => response.json())
+            .then(data => {
+                if (data.activities && data.activities.length > 0) {
+                    let html = '<div style="margin-bottom: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">';
+                    
+                    // Statistics
+                    const totalActivities = data.activities.length;
+                    const successfulLogins = data.activities.filter(a => a.action === 'user.login' && a.success).length;
+                    const failedActions = data.activities.filter(a => !a.success).length;
+                    const suspensions = data.activities.filter(a => a.action === 'user.suspended').length;
+                    
+                    html += '<div style="background: linear-gradient(135deg, #10b981, #059669); padding: 15px; border-radius: 10px; text-align: center;">';
+                    html += '<div style="font-size: 28px; font-weight: bold; color: white;">' + totalActivities + '</div>';
+                    html += '<div style="font-size: 12px; color: rgba(255,255,255,0.9);">Total Activities</div>';
+                    html += '</div>';
+                    
+                    html += '<div style="background: linear-gradient(135deg, #3b82f6, #2563eb); padding: 15px; border-radius: 10px; text-align: center;">';
+                    html += '<div style="font-size: 28px; font-weight: bold; color: white;">' + successfulLogins + '</div>';
+                    html += '<div style="font-size: 12px; color: rgba(255,255,255,0.9);">Successful Logins</div>';
+                    html += '</div>';
+                    
+                    html += '<div style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 15px; border-radius: 10px; text-align: center;">';
+                    html += '<div style="font-size: 28px; font-weight: bold; color: white;">' + suspensions + '</div>';
+                    html += '<div style="font-size: 12px; color: rgba(255,255,255,0.9);">Suspensions</div>';
+                    html += '</div>';
+                    
+                    html += '<div style="background: linear-gradient(135deg, #ef4444, #dc2626); padding: 15px; border-radius: 10px; text-align: center;">';
+                    html += '<div style="font-size: 28px; font-weight: bold; color: white;">' + failedActions + '</div>';
+                    html += '<div style="font-size: 12px; color: rgba(255,255,255,0.9);">Failed Actions</div>';
+                    html += '</div>';
+                    
+                    html += '</div>';
+                    
+                    html += '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse;">';
+                    html += '<thead><tr style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">';
+                    html += '<th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Date/Time</th>';
+                    html += '<th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Action</th>';
+                    html += '<th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Details</th>';
+                    html += '<th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Device</th>';
+                    html += '<th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Status</th>';
+                    html += '</tr></thead><tbody>';
+                    
+                    data.activities.forEach((activity, index) => {
+                        const bgColor = index % 2 === 0 ? '#f8f9fa' : 'white';
+                        html += '<tr style="background: ' + bgColor + ';">';
+                        html += '<td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #1f2937; font-weight: 500;">' + activity.createdAt + '</td>';
+                        
+                        // Action with icon
+                        let actionIcon = '';
+                        let actionColor = '#6366f1';
+                        let actionLabel = activity.action;
+                        
+                        if (activity.action.includes('login')) {
+                            actionIcon = '🔐';
+                            actionColor = '#10b981';
+                            actionLabel = 'Login';
+                        } else if (activity.action.includes('suspend')) {
+                            actionIcon = '⛔';
+                            actionColor = '#f59e0b';
+                            actionLabel = 'Suspended';
+                        } else if (activity.action.includes('reactivat')) {
+                            actionIcon = '✅';
+                            actionColor = '#22c55e';
+                            actionLabel = 'Reactivated';
+                        } else if (activity.action.includes('created')) {
+                            actionIcon = '➕';
+                            actionColor = '#3b82f6';
+                            actionLabel = 'Created';
+                        } else if (activity.action.includes('updated')) {
+                            actionIcon = '✏️';
+                            actionColor = '#8b5cf6';
+                            actionLabel = 'Updated';
+                        } else if (activity.action.includes('deleted')) {
+                            actionIcon = '🗑️';
+                            actionColor = '#ef4444';
+                            actionLabel = 'Deleted';
+                        } else if (activity.action.includes('viewed')) {
+                            actionIcon = '👁️';
+                            actionColor = '#6366f1';
+                            actionLabel = 'Viewed';
+                        }
+                        
+                        html += '<td style="padding: 12px; border-bottom: 1px solid #e2e8f0;"><span style="background: ' + actionColor + '; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block;">' + actionIcon + ' ' + actionLabel + '</span></td>';
+                        
+                        // Details column
+                        html += '<td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #1f2937;">';
+                        if (activity.metadata) {
+                            if (activity.metadata.suspended_by_name) {
+                                html += '<div><strong style="color: #374151;">By:</strong> ' + activity.metadata.suspended_by_name + '</div>';
+                            }
+                            if (activity.metadata.reactivated_by_name) {
+                                html += '<div><strong style="color: #374151;">By:</strong> ' + activity.metadata.reactivated_by_name + '</div>';
+                            }
+                            if (activity.metadata.created_by_name) {
+                                html += '<div><strong style="color: #374151;">By:</strong> ' + activity.metadata.created_by_name + '</div>';
+                            }
+                            if (activity.metadata.updated_by_name) {
+                                html += '<div><strong style="color: #374151;">By:</strong> ' + activity.metadata.updated_by_name + '</div>';
+                            }
+                            if (activity.metadata.viewed_by_name) {
+                                html += '<div><strong style="color: #374151;">By:</strong> ' + activity.metadata.viewed_by_name + '</div>';
+                            }
+                            if (activity.metadata.suspension_reason) {
+                                html += '<div style="color: #f59e0b;"><strong style="color: #374151;">Reason:</strong> ' + activity.metadata.suspension_reason.substring(0, 40) + '...</div>';
+                            }
+                            if (activity.metadata.changes_count) {
+                                html += '<div style="color: #8b5cf6;"><strong style="color: #374151;">Fields changed:</strong> ' + activity.metadata.changes_count + '</div>';
+                            }
+                            if (activity.metadata.suspension_duration_days) {
+                                html += '<div style="color: #22c55e;"><strong style="color: #374151;">Duration:</strong> ' + activity.metadata.suspension_duration_days + ' days</div>';
+                            }
+                        }
+                        if (!activity.metadata || Object.keys(activity.metadata).length === 0) {
+                            html += '<span style="color: #999;">—</span>';
+                        }
+                        html += '</td>';
+                        
+                        // Device column
+                        html += '<td style="padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 12px; color: #1f2937;">';
+                        if (activity.metadata && activity.metadata.browser) {
+                            html += '<div><strong style="color: #374151;">Browser:</strong> ' + activity.metadata.browser + '</div>';
+                        }
+                        if (activity.metadata && activity.metadata.platform) {
+                            html += '<div><strong style="color: #374151;">OS:</strong> ' + activity.metadata.platform + '</div>';
+                        }
+                        if (activity.ipAddress) {
+                            html += '<div style="font-family: monospace; color: #6366f1;"><strong style="color: #374151;">IP:</strong> ' + activity.ipAddress + '</div>';
+                        }
+                        if (!activity.metadata || (!activity.metadata.browser && !activity.metadata.platform && !activity.ipAddress)) {
+                            html += '<span style="color: #999;">—</span>';
+                        }
+                        html += '</td>';
+                        
+                        // Status
+                        if (activity.success) {
+                            html += '<td style="padding: 12px; border-bottom: 1px solid #e2e8f0;"><span style="background: #10b981; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">✓ Success</span></td>';
+                        } else {
+                            html += '<td style="padding: 12px; border-bottom: 1px solid #e2e8f0;"><span style="background: #ef4444; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">✗ Failed</span>';
+                            if (activity.errorMessage) {
+                                html += '<br><small style="color: #ef4444;">' + activity.errorMessage + '</small>';
+                            }
+                            html += '</td>';
+                        }
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table></div>';
+                    
+                    // Add link to full view
+                    html += '<div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 2px solid #e2e8f0;">';
+                    html += '<a href="/backoffice/user-activity/user/' + userId + '" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; border-radius: 10px; font-weight: bold;">';
+                    html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+                    html += 'View Full Activity Timeline';
+                    html += '</a>';
+                    html += '</div>';
+                    
+                    contentDiv.innerHTML = html;
+                } else {
+                    contentDiv.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 10px;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><p>No activities recorded for this user</p></div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading activities:', error);
+                contentDiv.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 10px;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><p>Error loading activities</p></div>';
+            });
+    }
+    
+    function closeActivitiesModal() {
+        const modal = document.getElementById('activitiesModal');
+        modal.style.display = 'none';
+    }
+    
+    function showMetadata(index) {
+        if (window.activitiesMetadata && window.activitiesMetadata[index]) {
+            alert(JSON.stringify(window.activitiesMetadata[index], null, 2));
+        }
+    }
+    
+    // Close activities modal on outside click
+    document.getElementById('activitiesModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeActivitiesModal();
+        }
+    });
+    
     document.addEventListener('DOMContentLoaded', function() {
         // Auto-hide flash messages
         setTimeout(function() {
@@ -613,5 +980,8 @@
     });
     </script>
     <!-- TemplateMo 607 Glass Admin -->
+    
+    {# AI Chat Widget - Assistant Intelligent #}
+    {% include 'ai_assistant/chat_widget.html.twig' %}
 </body>
 </html>
