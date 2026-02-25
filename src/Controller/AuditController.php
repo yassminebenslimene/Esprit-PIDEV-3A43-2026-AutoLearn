@@ -33,13 +33,26 @@ class AuditController extends AbstractController
             )->fetchOne();
             
             if ($revisionsExists) {
-                // Query 1: Admin actions on STUDENTS only
+                // Query 1: Admin actions on STUDENTS only with action type detection
                 $studentSql = "
                     SELECT 'student' as entity_type, r.id, r.timestamp, r.username, 
                            ua.userId as entity_id, ua.revtype, ua.nom, ua.prenom,
-                           ua.isSuspended, ua.suspendedAt, ua.suspensionReason
+                           ua.isSuspended, ua.suspendedAt, ua.suspensionReason,
+                           CASE 
+                               WHEN ua.revtype = 'INS' THEN 'CREATE'
+                               WHEN ua.revtype = 'DEL' THEN 'DELETE'
+                               WHEN ua.isSuspended = 1 AND ua.suspendedAt IS NOT NULL THEN 'SUSPEND'
+                               WHEN ua.isSuspended = 0 AND prev.isSuspended = 1 THEN 'REACTIVATE'
+                               ELSE 'UPDATE'
+                           END as action_type
                     FROM revisions r
                     LEFT JOIN user_audit ua ON r.id = ua.rev
+                    LEFT JOIN user_audit prev ON prev.userId = ua.userId 
+                        AND prev.rev = (
+                            SELECT MAX(ua2.rev) 
+                            FROM user_audit ua2 
+                            WHERE ua2.userId = ua.userId AND ua2.rev < ua.rev
+                        )
                     WHERE ua.userId IS NOT NULL AND ua.discr = 'etudiant'
                     ORDER BY r.timestamp DESC 
                     LIMIT 100
@@ -191,39 +204,66 @@ class AuditController extends AbstractController
         ];
         
         try {
-            // Count all revisions
+            // Count ONLY admin revisions (filter by admin role)
             $stats['total_revisions'] = $connection->executeQuery(
-                "SELECT COUNT(*) FROM revisions"
+                "SELECT COUNT(DISTINCT r.id) 
+                 FROM revisions r
+                 INNER JOIN user u ON u.email = r.username
+                 WHERE u.role = 'ADMIN'"
             )->fetchOne();
             
-            // Count all changes across all audit tables
+            // Count ONLY admin changes on students
             $stats['total_changes'] = $connection->executeQuery(
-                "SELECT (
-                    (SELECT COUNT(*) FROM user_audit) +
-                    (SELECT COUNT(*) FROM cours_audit)
-                ) as total"
+                "SELECT COUNT(*) 
+                 FROM user_audit ua
+                 INNER JOIN revisions r ON ua.rev = r.id
+                 INNER JOIN user u ON u.email = r.username
+                 WHERE u.role = 'ADMIN'"
             )->fetchOne();
             
+            // Count by action type - analyze the data to determine specific actions
+            // Use self-join to compare with previous revision to detect REACTIVATE
             $stats['by_type'] = $connection->executeQuery(
-                "SELECT 'INS' as revtype, COUNT(*) as count FROM user_audit WHERE revtype = 'INS'
-                 UNION ALL
-                 SELECT 'UPD' as revtype, COUNT(*) as count FROM user_audit WHERE revtype = 'UPD'
-                 UNION ALL
-                 SELECT 'DEL' as revtype, COUNT(*) as count FROM user_audit WHERE revtype = 'DEL'"
+                "SELECT 
+                    CASE 
+                        WHEN ua.revtype = 'INS' THEN 'CREATE'
+                        WHEN ua.revtype = 'DEL' THEN 'DELETE'
+                        WHEN ua.isSuspended = 1 AND ua.suspendedAt IS NOT NULL THEN 'SUSPEND'
+                        WHEN ua.isSuspended = 0 AND prev.isSuspended = 1 THEN 'REACTIVATE'
+                        ELSE 'UPDATE'
+                    END as revtype,
+                    COUNT(*) as count 
+                 FROM user_audit ua
+                 INNER JOIN revisions r ON ua.rev = r.id
+                 INNER JOIN user u ON u.email = r.username
+                 LEFT JOIN user_audit prev ON prev.userId = ua.userId 
+                     AND prev.rev = (
+                         SELECT MAX(ua2.rev) 
+                         FROM user_audit ua2 
+                         WHERE ua2.userId = ua.userId AND ua2.rev < ua.rev
+                     )
+                 WHERE u.role = 'ADMIN'
+                 GROUP BY 1
+                 ORDER BY count DESC"
             )->fetchAllAssociative();
             
+            // Recent activity (last 7 days) - ONLY admin actions
             $stats['recent_activity'] = $connection->executeQuery(
-                "SELECT DATE(r.timestamp) as date, COUNT(*) as count 
+                "SELECT DATE(r.timestamp) as date, COUNT(DISTINCT r.id) as count 
                  FROM revisions r
-                 WHERE r.timestamp >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                 INNER JOIN user u ON u.email = r.username
+                 WHERE u.role = 'ADMIN'
+                 AND r.timestamp >= DATE_SUB(NOW(), INTERVAL 7 DAY)
                  GROUP BY DATE(r.timestamp)
                  ORDER BY date DESC"
             )->fetchAllAssociative();
             
+            // Most active admins
             $stats['active_users'] = $connection->executeQuery(
-                "SELECT r.username, COUNT(*) as count 
-                 FROM revisions r 
-                 WHERE r.username IS NOT NULL
+                "SELECT r.username, COUNT(DISTINCT r.id) as count 
+                 FROM revisions r
+                 INNER JOIN user u ON u.email = r.username
+                 WHERE u.role = 'ADMIN'
                  GROUP BY r.username 
                  ORDER BY count DESC 
                  LIMIT 10"

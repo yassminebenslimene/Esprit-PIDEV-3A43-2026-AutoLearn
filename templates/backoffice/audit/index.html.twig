@@ -97,10 +97,11 @@
                            style="flex: 1; min-width: 200px; padding: 10px 15px; border: 2px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px;">
                     <select id="studentActionFilter" style="padding: 10px 15px; border: 2px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px; min-width: 150px;">
                         <option value="" style="background: #1f2937; color: white;">All Actions</option>
-                        <option value="INS" style="background: #1f2937; color: white;">➕ Created</option>
-                        <option value="UPD" style="background: #1f2937; color: white;">✏️ Updated</option>
-                        <option value="SUSPENDED" style="background: #1f2937; color: white;">🚫 Suspended</option>
-                        <option value="REACTIVATED" style="background: #1f2937; color: white;">✅ Reactivated</option>
+                        <option value="CREATE" style="background: #1f2937; color: white;">➕ Created</option>
+                        <option value="UPDATE" style="background: #1f2937; color: white;">✏️ Updated</option>
+                        <option value="SUSPEND" style="background: #1f2937; color: white;">🚫 Suspended</option>
+                        <option value="REACTIVATE" style="background: #1f2937; color: white;">✅ Reactivated</option>
+                        <option value="DELETE" style="background: #1f2937; color: white;">🗑️ Deleted</option>
                     </select>
                     <button onclick="clearStudentFilters()" style="padding: 10px 20px; border: none; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px;">
                         Clear Filters
@@ -121,34 +122,31 @@
                     </thead>
                     <tbody>
                         {% for revision in studentRevisions %}
-                            {% set actionType = revision.revtype %}
+                            {% set actionType = revision.action_type %}
                             {% set actionLabel = '' %}
                             {% set actionColor = '' %}
                             {% set actionIcon = '' %}
                             
-                            {% if revision.revtype == 'INS' %}
-                                {% set actionType = 'INS' %}
+                            {% if actionType == 'CREATE' %}
                                 {% set actionLabel = 'Created' %}
                                 {% set actionColor = 'linear-gradient(135deg, #22c55e, #16a34a)' %}
                                 {% set actionIcon = '➕' %}
-                            {% elseif revision.revtype == 'UPD' %}
-                                {# Check if it's a suspension or reactivation #}
-                                {% if revision.isSuspended == 1 %}
-                                    {% set actionType = 'SUSPENDED' %}
-                                    {% set actionLabel = 'Suspended' %}
-                                    {% set actionColor = 'linear-gradient(135deg, #ef4444, #dc2626)' %}
-                                    {% set actionIcon = '🚫' %}
-                                {% elseif revision.isSuspended == 0 and revision.suspendedAt is not null %}
-                                    {% set actionType = 'REACTIVATED' %}
-                                    {% set actionLabel = 'Reactivated' %}
-                                    {% set actionColor = 'linear-gradient(135deg, #10b981, #059669)' %}
-                                    {% set actionIcon = '✅' %}
-                                {% else %}
-                                    {% set actionType = 'UPD' %}
-                                    {% set actionLabel = 'Updated' %}
-                                    {% set actionColor = 'linear-gradient(135deg, #3b82f6, #2563eb)' %}
-                                    {% set actionIcon = '✏️' %}
-                                {% endif %}
+                            {% elseif actionType == 'SUSPEND' %}
+                                {% set actionLabel = 'Suspended' %}
+                                {% set actionColor = 'linear-gradient(135deg, #ef4444, #dc2626)' %}
+                                {% set actionIcon = '🚫' %}
+                            {% elseif actionType == 'REACTIVATE' %}
+                                {% set actionLabel = 'Reactivated' %}
+                                {% set actionColor = 'linear-gradient(135deg, #10b981, #059669)' %}
+                                {% set actionIcon = '✅' %}
+                            {% elseif actionType == 'DELETE' %}
+                                {% set actionLabel = 'Deleted' %}
+                                {% set actionColor = 'linear-gradient(135deg, #ef4444, #dc2626)' %}
+                                {% set actionIcon = '🗑️' %}
+                            {% else %}
+                                {% set actionLabel = 'Updated' %}
+                                {% set actionColor = 'linear-gradient(135deg, #3b82f6, #2563eb)' %}
+                                {% set actionIcon = '✏️' %}
                             {% endif %}
                             
                             <tr data-entity="{{ revision.nom|lower }}" 

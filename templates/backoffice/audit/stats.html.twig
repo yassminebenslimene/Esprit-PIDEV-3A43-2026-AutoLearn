@@ -81,12 +81,18 @@
                         <div class="type-stat-item">
                             <div class="type-stat-header">
                                 <span class="type-badge type-badge-{{ type.revtype|lower }}">
-                                    {% if type.revtype == 'INS' %}
-                                        ➕ INSERT
-                                    {% elseif type.revtype == 'UPD' %}
+                                    {% if type.revtype == 'CREATE' %}
+                                        ➕ CREATE
+                                    {% elseif type.revtype == 'UPDATE' %}
                                         ✏️ UPDATE
-                                    {% elseif type.revtype == 'DEL' %}
+                                    {% elseif type.revtype == 'SUSPEND' %}
+                                        🚫 SUSPEND
+                                    {% elseif type.revtype == 'REACTIVATE' %}
+                                        ✅ REACTIVATE
+                                    {% elseif type.revtype == 'DELETE' %}
                                         🗑️ DELETE
+                                    {% elseif type.revtype == 'VIEW' %}
+                                        👁️ VIEW
                                     {% endif %}
                                 </span>
                                 <span class="type-count">{{ type.count }}</span>
@@ -227,12 +233,14 @@
 
 .chart-container {
     padding: 30px;
+    min-height: 350px;
 }
 
 .type-stats {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    min-height: 300px;
 }
 
 .type-stat-item {
@@ -254,16 +262,28 @@
     font-weight: 600;
 }
 
-.type-badge-ins {
+.type-badge-create {
     background: linear-gradient(135deg, #22c55e, #4ade80);
 }
 
-.type-badge-upd {
+.type-badge-update {
     background: linear-gradient(135deg, #0ea5e9, #38bdf8);
 }
 
-.type-badge-del {
+.type-badge-suspend {
     background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+.type-badge-reactivate {
+    background: linear-gradient(135deg, #10b981, #34d399);
+}
+
+.type-badge-delete {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+}
+
+.type-badge-view {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
 }
 
 .type-count {
@@ -283,16 +303,28 @@
     transition: width 0.5s ease;
 }
 
-.type-bar-ins {
+.type-bar-create {
     background: linear-gradient(90deg, #22c55e, #4ade80);
 }
 
-.type-bar-upd {
+.type-bar-update {
     background: linear-gradient(90deg, #0ea5e9, #38bdf8);
 }
 
-.type-bar-del {
+.type-bar-suspend {
     background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+.type-bar-reactivate {
+    background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.type-bar-delete {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.type-bar-view {
+    background: linear-gradient(90deg, #8b5cf6, #a78bfa);
 }
 
 .type-percentage {
