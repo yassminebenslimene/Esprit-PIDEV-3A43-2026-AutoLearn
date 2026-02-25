@@ -52,3 +52,8 @@ services:
     App\Service\QuizTutorAIService:
         arguments:
             $grokApiKey: '%env(GROQ_API_KEY)%'
+    
+    # Configuration du ChapterExplainerService avec la clé API Groq
+    App\Service\ChapterExplainerService:
+        arguments:
+            $groqApiKey: '%env(GROQ_API_KEY)%'

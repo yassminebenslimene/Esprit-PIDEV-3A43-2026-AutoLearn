@@ -1,0 +1,9 @@
+Ouvrez ce lien dans votre navigateur pour autoriser le push :
+
+https://github.com/yassminebenslimene/autolearn_3A43_Brain-up/security/secret-scanning/unblock-secret/3A8bilJfEbMx5gUmxsFOJWvZ6ZF
+
+Ensuite, exécutez cette commande :
+
+git push origin yasmine
+
+C'est tout ! Aucune modification de l'historique, aucun changement du travail de vos collègues.

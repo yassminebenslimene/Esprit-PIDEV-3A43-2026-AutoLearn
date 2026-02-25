@@ -1,0 +1,278 @@
+{% extends 'frontoffice/base.html.twig' %}
+
+{% block title %}Assistant IA - {{ chapitre.titre }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('frontoffice/css/chapter-explainer.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Header avec animation -->
+            <div class="ai-header">
+                <div class="ai-header-content">
+                    <div class="robot-icon">🤖</div>
+                    <div>
+                        <h1>Assistant Pédagogique IA</h1>
+                        <p>Explication personnalisée générée par intelligence artificielle</p>
+                    </div>
+                </div>
+                <div class="chapter-title">
+                    <h2>{{ chapitre.titre }}</h2>
+                </div>
+            </div>
+
+            <!-- Contrôles -->
+            <div class="controls-card">
+                <div class="controls-grid">
+                    <div class="form-group">
+                        <label for="levelSelect">
+                            <i class="fas fa-graduation-cap me-2"></i>Niveau d'explication
+                        </label>
+                        <select id="levelSelect" class="form-select">
+                            <option value="beginner">🎓 Débutant - Langage simple et clair</option>
+                            <option value="advanced">🚀 Avancé - Technique et approfondi</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button id="generateBtn" class="btn-generate">
+                            <i class="fas fa-magic"></i>
+                            <span>Générer l'explication</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zone de chargement -->
+            <div id="loadingArea" class="loading-card" style="display: none;">
+                <div class="spinner"></div>
+                <p class="loading-text">L'IA analyse le chapitre et génère une explication personnalisée...</p>
+            </div>
+
+            <!-- Résultats -->
+            <div id="resultsArea" style="display: none;">
+                <!-- Contrôles audio -->
+                <div class="audio-card">
+                    <div class="audio-header">
+                        <div class="audio-title">
+                            <div>
+                                <h5><i class="fas fa-volume-up"></i> Synthèse vocale</h5>
+                                <small>Écoutez l'explication automatiquement</small>
+                            </div>
+                        </div>
+                        <div class="audio-controls">
+                            <button id="playBtn" class="btn-audio btn-play">
+                                <i class="fas fa-play"></i>
+                                <span>Lire</span>
+                            </button>
+                            <button id="pauseBtn" class="btn-audio btn-pause" style="display: none;">
+                                <i class="fas fa-pause"></i>
+                                <span>Pause</span>
+                            </button>
+                            <button id="stopBtn" class="btn-audio btn-stop">
+                                <i class="fas fa-stop"></i>
+                                <span>Stop</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="speed-control">
+                        <label for="speedRange">
+                            <i class="fas fa-tachometer-alt me-2"></i>Vitesse de lecture
+                        </label>
+                        <input type="range" class="speed-slider" id="speedRange" min="0.5" max="2" step="0.1" value="1">
+                        <div class="speed-value">Vitesse: <strong><span id="speedValue">1.0</span>x</strong></div>
+                    </div>
+                </div>
+
+                <!-- Résumé -->
+                <div class="result-card">
+                    <div class="card-header header-summary">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Résumé</span>
+                    </div>
+                    <div class="card-body">
+                        <p id="summaryText" class="summary-text"></p>
+                    </div>
+                </div>
+
+                <!-- Explication détaillée -->
+                <div class="result-card">
+                    <div class="card-header header-explanation">
+                        <i class="fas fa-book-open"></i>
+                        <span>Explication détaillée</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="explanationText" class="explanation-content"></div>
+                    </div>
+                </div>
+
+                <!-- Points clés -->
+                <div class="result-card">
+                    <div class="card-header header-keypoints">
+                        <i class="fas fa-key"></i>
+                        <span>Points clés à retenir</span>
+                    </div>
+                    <div class="card-body">
+                        <ul id="keyPointsList" class="keypoints-list"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bouton retour -->
+            <div class="text-center mt-4">
+                <a href="{{ path('app_chapitre_show_front', {id: chapitre.id}) }}" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Retour au chapitre</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const generateBtn = document.getElementById('generateBtn');
+    const levelSelect = document.getElementById('levelSelect');
+    const loadingArea = document.getElementById('loadingArea');
+    const resultsArea = document.getElementById('resultsArea');
+    
+    const summaryText = document.getElementById('summaryText');
+    const explanationText = document.getElementById('explanationText');
+    const keyPointsList = document.getElementById('keyPointsList');
+    
+    const playBtn = document.getElementById('playBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const speedRange = document.getElementById('speedRange');
+    const speedValue = document.getElementById('speedValue');
+    
+    let currentExplanation = '';
+    let speechSynthesis = window.speechSynthesis;
+    let utterance = null;
+    let isPaused = false;
+
+    // Générer l'explication
+    generateBtn.addEventListener('click', async function() {
+        const level = levelSelect.value;
+        
+        loadingArea.style.display = 'block';
+        resultsArea.style.display = 'none';
+        generateBtn.disabled = true;
+        
+        try {
+            const response = await fetch('{{ path('app_chapter_explainer_api', {id: chapitre.id}) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'level=' + level
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                displayResults(data.data);
+                currentExplanation = formatTextForSpeech(data.data);
+            } else {
+                alert('Erreur: ' + (data.error || 'Erreur inconnue'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Erreur de connexion à l\'API');
+        } finally {
+            loadingArea.style.display = 'none';
+            generateBtn.disabled = false;
+        }
+    });
+    
+    // Afficher les résultats
+    function displayResults(data) {
+        summaryText.textContent = data.summary;
+        explanationText.innerHTML = data.explanation.replace(/\n/g, '<br>');
+        
+        keyPointsList.innerHTML = '';
+        data.keyPoints.forEach(point => {
+            const li = document.createElement('li');
+            li.className = 'keypoint-item';
+            li.innerHTML = `
+                <div class="keypoint-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="keypoint-text">${point}</div>
+            `;
+            keyPointsList.appendChild(li);
+        });
+        
+        resultsArea.style.display = 'block';
+        resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    // Formater le texte pour la synthèse vocale
+    function formatTextForSpeech(data) {
+        let text = 'Résumé. ' + data.summary + '. ';
+        text += 'Explication détaillée. ' + data.explanation + '. ';
+        text += 'Points clés. ';
+        data.keyPoints.forEach((point, index) => {
+            text += 'Point ' + (index + 1) + '. ' + point + '. ';
+        });
+        return text;
+    }
+    
+    // Contrôles audio
+    playBtn.addEventListener('click', function() {
+        if (!currentExplanation) {
+            alert('Veuillez d\'abord générer une explication');
+            return;
+        }
+        
+        if (isPaused && utterance) {
+            speechSynthesis.resume();
+            isPaused = false;
+        } else {
+            utterance = new SpeechSynthesisUtterance(currentExplanation);
+            utterance.lang = 'fr-FR';
+            utterance.rate = parseFloat(speedRange.value);
+            
+            utterance.onstart = function() {
+                playBtn.style.display = 'none';
+                pauseBtn.style.display = 'inline-block';
+            };
+            
+            utterance.onend = function() {
+                playBtn.style.display = 'inline-block';
+                pauseBtn.style.display = 'none';
+                isPaused = false;
+            };
+            
+            speechSynthesis.speak(utterance);
+        }
+    });
+    
+    pauseBtn.addEventListener('click', function() {
+        speechSynthesis.pause();
+        isPaused = true;
+        playBtn.style.display = 'inline-block';
+        pauseBtn.style.display = 'none';
+    });
+    
+    stopBtn.addEventListener('click', function() {
+        speechSynthesis.cancel();
+        isPaused = false;
+        playBtn.style.display = 'inline-block';
+        pauseBtn.style.display = 'none';
+    });
+    
+    speedRange.addEventListener('input', function() {
+        speedValue.textContent = this.value;
+        if (utterance && speechSynthesis.speaking) {
+            utterance.rate = parseFloat(this.value);
+        }
+    });
+});
+</script>
+{% endblock %}
