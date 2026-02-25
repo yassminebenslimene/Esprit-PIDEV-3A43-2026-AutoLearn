@@ -27,3 +27,10 @@ services:
     App\Service\AiSummaryService:
         arguments:
             $groqApiKey: '%env(GROQ_API_KEY)%'
+
+    # Groq Service (Ilef)
+    App\Service\GroqService:
+        arguments:
+            $groqApiKey: '%env(GROQ_API_KEY)%'
+            $groqApiUrl: '%env(GROQ_API_URL)%'
+            $groqModel: '%env(GROQ_MODEL)%'
