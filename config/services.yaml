@@ -68,6 +68,7 @@ services:
             $quizRepository: '@App\Repository\QuizRepository'
             $chapitreRepository: '@App\Repository\Cours\ChapitreRepository'
             $postRepository: '@App\Repository\PostRepository'
+            $commentaireRepository: '@App\Repository\CommentaireRepository'
     
     # Action Executor Service (with all repositories for CRUD operations)
     App\Service\ActionExecutorService:
@@ -81,5 +82,6 @@ services:
             $challengeRepository: '@App\Repository\ChallengeRepository'
             $communauteRepository: '@App\Repository\CommunauteRepository'
             $postRepository: '@App\Repository\PostRepository'
+            $commentaireRepository: '@App\Repository\CommentaireRepository'
             $quizRepository: '@App\Repository\QuizRepository'
             $logger: '@logger'

@@ -12,6 +12,7 @@ use App\Repository\CommunauteRepository;
 use App\Repository\ChallengeRepository;
 use App\Repository\QuizRepository;
 use App\Repository\PostRepository;
+use App\Repository\CommentaireRepository;
 use App\Bundle\UserActivityBundle\Repository\UserActivityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -35,6 +36,7 @@ class AIAssistantService
     private ChallengeRepository $challengeRepository;
     private QuizRepository $quizRepository;
     private PostRepository $postRepository;
+    private CommentaireRepository $commentaireRepository;
     private ?UserActivityRepository $activityRepository;
 
     public function __construct(
@@ -52,7 +54,8 @@ class AIAssistantService
         ChallengeRepository $challengeRepository,
         QuizRepository $quizRepository,
         ChapitreRepository $chapitreRepository,
-        PostRepository $postRepository
+        PostRepository $postRepository,
+        CommentaireRepository $commentaireRepository
     ) {
         $this->groqService = $groqService;
         $this->languageDetector = $languageDetector;
@@ -69,6 +72,7 @@ class AIAssistantService
         $this->quizRepository = $quizRepository;
         $this->chapitreRepository = $chapitreRepository;
         $this->postRepository = $postRepository;
+        $this->commentaireRepository = $commentaireRepository;
     }
 
     /**
@@ -325,6 +329,35 @@ class AIAssistantService
                 }, array_slice($allPosts, 0, 10))
             ];
 
+            // ========== COMMENTS DATA (Limité à 20) ==========
+            $allComments = $this->commentaireRepository->findBy([], ['createdAt' => 'DESC'], 20);
+            $data['comments'] = [
+                'total' => $this->commentaireRepository->count([]),
+                'list' => array_map(function($c) {
+                    return [
+                        'id' => $c->getId(),
+                        'contenu' => substr($c->getContenu(), 0, 100) . '...',
+                        'auteur' => $c->getUser() ? $c->getUser()->getPrenom() . ' ' . $c->getUser()->getNom() : 'Inconnu',
+                        'post_id' => $c->getPost() ? $c->getPost()->getId() : null,
+                        'created_at' => $c->getCreatedAt()->format('Y-m-d H:i'),
+                    ];
+                }, $allComments)
+            ];
+
+            // ========== TEAMS DATA (Limité à 10) ==========
+            $allTeams = $this->equipeRepository->findAll();
+            $data['teams'] = [
+                'total' => count($allTeams),
+                'list' => array_map(function($t) {
+                    return [
+                        'id' => $t->getId(),
+                        'nom' => $t->getNom(),
+                        'evenement' => $t->getEvenement()->getTitre(),
+                        'membres_count' => $t->getEtudiants()->count(),
+                    ];
+                }, array_slice($allTeams, 0, 10))
+            ];
+
             // ========== STUDENT-SPECIFIC DATA ==========
             if (!$isAdmin && $user) {
                 // Student's enrolled courses (limité à 5)
@@ -417,6 +450,12 @@ WHAT YOU CAN DO FOR STUDENTS:
    - Recommend communities based on interests
    - Help students join communities
    - Show team members and activities
+   - ⭐ CREATE teams for events (you can do this!)
+   - View joined communities
+   - Display all available teams
+   - View team details and members
+   
+   💡 To create a team, first say "show events" then "create team [name] for event [id] with members [id1,id2,id3,id4]"
 
 5. 📊 PROGRESS TRACKING
    - Show student's learning progress
@@ -523,8 +562,12 @@ CE QUE TU PEUX FAIRE POUR LES ÉTUDIANTS:
    - Recommander des communautés selon les intérêts
    - Aider les étudiants à rejoindre des communautés
    - Montrer les membres et activités des équipes
-   - Créer des équipes pour les événements
+   - ⭐ CRÉER des équipes pour les événements (tu peux le faire!)
    - Voir les communautés rejointes
+   - Afficher toutes les équipes disponibles
+   - Voir les détails d'une équipe et ses membres
+   
+   💡 Pour créer une équipe, dis d'abord "voir les événements" puis "créer équipe [nom] pour événement [id] avec membres [id1,id2,id3,id4]"
 
 5. 📊 SUIVI DES PROGRÈS
    - Afficher les progrès d'apprentissage de l'étudiant
@@ -753,7 +796,13 @@ WHAT YOU CAN DO FOR ADMINS:
    - Monitor community activity
    - Moderate content
 
-9. 🔍 ADVANCED SEARCH & FILTERING
+9. 💬 COMMENT MANAGEMENT
+   - List all comments across posts
+   - Filter comments by post
+   - View comment details
+   - Monitor discussions
+
+10. 🔍 ADVANCED SEARCH & FILTERING
    - Filter students by multiple criteria
    - Search across all platform data
    - Generate custom reports
@@ -806,6 +855,15 @@ QUIZ MANAGEMENT:
 POST MANAGEMENT:
 - list_posts: List all posts from communities
 - get_post: Get post details
+
+COMMENT MANAGEMENT:
+- list_comments: List all comments (optionally filter by post_id)
+- get_comment: Get comment details
+
+TEAM MANAGEMENT:
+- list_teams: List all teams (optionally filter by evenement_id)
+- get_team: Get team details with members
+- list_students: List all students (for team creation)
 
 GENERAL:
 - get_popular_courses: Show most popular courses
@@ -930,9 +988,38 @@ Ta réponse COMPLÈTE:
 {"action": "suspend_user", "data": {"nom": "test"}}
 ✅ Compte suspendu
 
+⚠️ EXEMPLES POUR ÉTUDIANTS (Questions "comment"):
+
+User: "comment créer une équipe?"
+Ta réponse COMPLÈTE (PAS de JSON):
+Je peux créer une équipe pour toi! 👥 
+
+D'abord, veux-tu voir les événements disponibles? Dis "voir les événements" pour choisir.
+
+Ensuite, dis-moi:
+- Nom de l'équipe
+- ID ou nom de l'événement
+- 4 à 6 membres (IDs ou noms complets)
+
+Exemple: "créer équipe Python Masters pour événement Workshop IA avec membres ilef yousfi, ahmed ben salah, amira nefzi, test user"
+
+User: "créer équipe Python Masters pour événement Workshop IA avec membres ilef yousfi, ahmed ben salah, amira nefzi, test user"
+Ta réponse COMPLÈTE:
+{"action": "create_team", "data": {"nom": "Python Masters", "evenement_id": "Workshop IA", "membres": ["ilef yousfi", "ahmed ben salah", "amira nefzi", "test user"]}}
+✅ Équipe créée
+
+⚠️ IMPORTANT POUR LA CRÉATION D'ÉQUIPES:
+- TOUJOURS essayer de créer l'équipe - laisse le backend valider
+- Si l'utilisateur fournit des noms de membres, utilise-les DIRECTEMENT dans l'action
+- NE VÉRIFIE PAS si les membres existent dans tes données initiales - le backend le fera
+- Le système peut chercher les étudiants par nom complet (prenom nom ou nom prenom)
+- Les noms multi-parties sont supportés (ex: "baha ben kileni")
+- La recherche est insensible à la casse
+- Format: {"action": "create_team", "data": {"nom": "...", "evenement_id": "...", "membres": ["nom1", "nom2", "nom3", "nom4"]}}
+
 ⚠️ RÈGLES IMPORTANTES:
 1. Si l'utilisateur demande COMMENT faire quelque chose → Explique SANS générer de JSON
-2. Si l'utilisateur fournit des données complètes → Génère JSON + confirmation
+2. Si l'utilisateur fournit des données complètes → Génère JSON + confirmation IMMÉDIATEMENT
 3. TOUJOURS fournir une réponse en langage naturel APRÈS le JSON
 4. Garde les réponses ultra-concises (3-5 mots pour les confirmations)
 5. NE GÉNÈRE JAMAIS de JSON pour les questions "comment" ou "how to"
@@ -942,7 +1029,12 @@ Ta réponse COMPLÈTE:
    - "course" / "cours" → utilise actions COURSE (get_course, create_course, etc.)
    - "challenge" → utilise actions CHALLENGE
    - "community" / "communauté" → utilise actions COMMUNITY
+   - "team" / "équipe" → utilise actions TEAM
 7. ⚠️ RÈGLE ABSOLUE: Quand tu génères du JSON, tu DOIS TOUJOURS ajouter une réponse en langage naturel sur la ligne suivante. Format: JSON sur ligne 1, réponse naturelle sur ligne 2. JAMAIS de JSON seul!
+8. 🎯 POUR LES ÉTUDIANTS: Quand un étudiant demande "comment créer X", dis-lui que TU PEUX le faire pour lui! Exemple:
+   - User: "comment créer une équipe?"
+   - Réponse: "Je peux créer une équipe pour toi! 👥 Donne-moi: le nom de l'équipe et l'ID de l'événement. Exemple: 'créer équipe Python Masters pour événement 3'"
+9. 🚫 NE VALIDE JAMAIS les données toi-même - laisse le backend le faire! Si l'utilisateur fournit toutes les informations requises, EXÉCUTE l'action immédiatement. N'invente JAMAIS d'erreurs comme "capacité non disponible" ou "membre introuvable" - laisse le backend retourner les vraies erreurs.
 
 LANGUES SUPPORTÉES:
 - Français (FR)
@@ -1035,6 +1127,11 @@ Actions disponibles:
 - create_community: Créer une communauté
 - list_posts: Afficher tous les posts des communautés
 - get_post: Voir les détails d'un post
+- list_comments: Afficher tous les commentaires (optionnel: filtrer par post_id)
+- get_comment: Voir les détails d'un commentaire
+- list_teams: Afficher toutes les équipes (optionnel: filtrer par evenement_id)
+- get_team: Voir les détails d'une équipe avec ses membres
+- list_students: Afficher tous les étudiants (pour création d'équipe)
 
 ⚠️ RÈGLE IMPORTANTE DE LA PLATEFORME:
 La suppression d'étudiants n'est PAS autorisée sur cette plateforme.
@@ -1219,7 +1316,7 @@ PROMPT;
                 return [
                     "Quels cours pour débuter en Python?",
                     "Montre-moi les événements à venir",
-                    "Recommande-moi des exercices",
+                    "Comment créer une équipe?",
                     "Quelles communautés puis-je rejoindre?",
                     "Mes progrès d'apprentissage?"
                 ];

@@ -12,6 +12,7 @@ use App\Repository\Cours\ChapitreRepository;
 use App\Repository\ChallengeRepository;
 use App\Repository\CommunauteRepository;
 use App\Repository\PostRepository;
+use App\Repository\CommentaireRepository;
 use App\Repository\QuizRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -31,6 +32,7 @@ class ActionExecutorService
     private ChallengeRepository $challengeRepository;
     private CommunauteRepository $communauteRepository;
     private PostRepository $postRepository;
+    private CommentaireRepository $commentaireRepository;
     private QuizRepository $quizRepository;
     private LoggerInterface $logger;
 
@@ -44,6 +46,7 @@ class ActionExecutorService
         ChallengeRepository $challengeRepository,
         CommunauteRepository $communauteRepository,
         PostRepository $postRepository,
+        CommentaireRepository $commentaireRepository,
         QuizRepository $quizRepository,
         LoggerInterface $logger
     ) {
@@ -56,6 +59,7 @@ class ActionExecutorService
         $this->challengeRepository = $challengeRepository;
         $this->communauteRepository = $communauteRepository;
         $this->postRepository = $postRepository;
+        $this->commentaireRepository = $commentaireRepository;
         $this->quizRepository = $quizRepository;
         $this->logger = $logger;
     }
@@ -193,6 +197,15 @@ class ActionExecutorService
                 // POST ACTIONS
                 'list_posts' => $this->listPosts($params),
                 'get_post' => $this->getPost($params),
+                
+                // COMMENT ACTIONS
+                'list_comments' => $this->listComments($params),
+                'get_comment' => $this->getComment($params),
+                
+                // TEAM ACTIONS
+                'list_teams' => $this->listTeams($params),
+                'get_team' => $this->getTeam($params),
+                'list_students' => $this->listStudents($params),
                 
                 // STUDENT ACTIONS
                 'create_team' => $this->createTeam($params),
@@ -742,28 +755,181 @@ class ActionExecutorService
             ];
         }
 
-        // Vérifier que l'événement existe
-        $evenement = $this->evenementRepository->find($params['evenement_id']);
+        // Vérifier que l'événement existe (par ID ou par nom)
+        $evenement = null;
+        if (is_numeric($params['evenement_id'])) {
+            $evenement = $this->evenementRepository->find($params['evenement_id']);
+        } else {
+            // Chercher par titre
+            $qb = $this->em->createQueryBuilder();
+            $results = $qb->select('e')
+                ->from(\App\Entity\Evenement::class, 'e')
+                ->where('LOWER(e.titre) LIKE LOWER(:titre)')
+                ->setParameter('titre', '%' . $params['evenement_id'] . '%')
+                ->setMaxResults(1)
+                ->getQuery()
+                ->getResult();
+            
+            if (!empty($results)) {
+                $evenement = $results[0];
+            }
+        }
+        
         if (!$evenement) {
             return [
                 'success' => false,
-                'error' => 'Événement introuvable'
+                'error' => 'Événement introuvable. Utilisez "voir les événements" pour voir les événements disponibles.'
             ];
+        }
+
+        // Vérifier les membres (minimum 4, maximum 6)
+        if (empty($params['membres']) || !is_array($params['membres'])) {
+            return [
+                'success' => false,
+                'error' => 'Une équipe doit avoir au moins 4 membres. Fournissez les IDs des étudiants.'
+            ];
+        }
+
+        $membresIds = $params['membres'];
+        if (count($membresIds) < 4) {
+            return [
+                'success' => false,
+                'error' => 'Une équipe doit avoir au moins 4 membres (vous en avez fourni ' . count($membresIds) . ')'
+            ];
+        }
+
+        if (count($membresIds) > 6) {
+            return [
+                'success' => false,
+                'error' => 'Une équipe ne peut pas avoir plus de 6 membres (vous en avez fourni ' . count($membresIds) . ')'
+            ];
+        }
+
+        // Récupérer les étudiants (par ID ou par nom)
+        $etudiants = [];
+        foreach ($membresIds as $membreInput) {
+            $etudiant = null;
+            
+            // Si c'est un nombre, chercher par ID
+            if (is_numeric($membreInput)) {
+                $etudiant = $this->userRepository->find($membreInput);
+                // Verify it's a student and not suspended
+                if ($etudiant && ($etudiant->getRole() !== 'ETUDIANT' || $etudiant->getIsSuspended())) {
+                    $etudiant = null;
+                }
+            } else {
+                // Sinon, chercher par nom (format: "prenom nom" ou "nom prenom")
+                $membreInput = trim($membreInput);
+                $parts = preg_split('/\s+/', $membreInput); // Split by any whitespace
+                
+                if (count($parts) >= 2) {
+                    $qb = $this->em->createQueryBuilder();
+                    
+                    // Try different combinations for multi-part names
+                    // Example: "baha ben kileni" could be:
+                    // - prenom="baha", nom="ben kileni"
+                    // - prenom="baha ben", nom="kileni"
+                    
+                    // Strategy 1: First word = prenom, rest = nom
+                    $prenom1 = $parts[0];
+                    $nom1 = implode(' ', array_slice($parts, 1));
+                    
+                    $results = $qb->select('u')
+                        ->from(\App\Entity\User::class, 'u')
+                        ->where('LOWER(u.prenom) LIKE LOWER(:prenom)')
+                        ->andWhere('LOWER(u.nom) LIKE LOWER(:nom)')
+                        ->andWhere('u.role = :role')
+                        ->andWhere('u.isSuspended = false')
+                        ->setParameter('prenom', '%' . $prenom1 . '%')
+                        ->setParameter('nom', '%' . $nom1 . '%')
+                        ->setParameter('role', 'ETUDIANT')
+                        ->setMaxResults(1)
+                        ->getQuery()
+                        ->getResult();
+                    
+                    if (!empty($results)) {
+                        $etudiant = $results[0];
+                    } else {
+                        // Strategy 2: Last word = prenom, rest = nom (reversed)
+                        $prenom2 = $parts[count($parts) - 1];
+                        $nom2 = implode(' ', array_slice($parts, 0, -1));
+                        
+                        $qb = $this->em->createQueryBuilder();
+                        $results = $qb->select('u')
+                            ->from(\App\Entity\User::class, 'u')
+                            ->where('LOWER(u.nom) LIKE LOWER(:nom)')
+                            ->andWhere('LOWER(u.prenom) LIKE LOWER(:prenom)')
+                            ->andWhere('u.role = :role')
+                            ->andWhere('u.isSuspended = false')
+                            ->setParameter('nom', '%' . $nom2 . '%')
+                            ->setParameter('prenom', '%' . $prenom2 . '%')
+                            ->setParameter('role', 'ETUDIANT')
+                            ->setMaxResults(1)
+                            ->getQuery()
+                            ->getResult();
+                        
+                        if (!empty($results)) {
+                            $etudiant = $results[0];
+                        } else {
+                            // Strategy 3: Search by full name in both fields (fuzzy)
+                            $fullName = strtolower($membreInput);
+                            $qb = $this->em->createQueryBuilder();
+                            $results = $qb->select('u')
+                                ->from(\App\Entity\User::class, 'u')
+                                ->where('LOWER(CONCAT(u.prenom, \' \', u.nom)) LIKE :fullname')
+                                ->orWhere('LOWER(CONCAT(u.nom, \' \', u.prenom)) LIKE :fullname')
+                                ->andWhere('u.role = :role')
+                                ->andWhere('u.isSuspended = false')
+                                ->setParameter('fullname', '%' . $fullName . '%')
+                                ->setParameter('role', 'ETUDIANT')
+                                ->setMaxResults(1)
+                                ->getQuery()
+                                ->getResult();
+                            
+                            if (!empty($results)) {
+                                $etudiant = $results[0];
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (!$etudiant) {
+                return [
+                    'success' => false,
+                    'error' => "Étudiant '{$membreInput}' introuvable. Utilisez 'voir les étudiants' pour voir les noms disponibles."
+                ];
+            }
+            
+            if ($etudiant->getRole() !== 'ETUDIANT') {
+                return [
+                    'success' => false,
+                    'error' => "L'utilisateur {$etudiant->getPrenom()} {$etudiant->getNom()} n'est pas un étudiant"
+                ];
+            }
+            
+            $etudiants[] = $etudiant;
         }
 
         // Créer l'équipe
         $equipe = new Equipe();
         $equipe->setNom($params['nom']);
         $equipe->setEvenement($evenement);
+        
+        // Ajouter les membres
+        foreach ($etudiants as $etudiant) {
+            $equipe->addEtudiant($etudiant);
+        }
 
         $this->em->persist($equipe);
         $this->em->flush();
 
         return [
             'success' => true,
-            'message' => "Équipe créée avec succès: {$params['nom']}",
+            'message' => "Équipe créée avec succès: {$params['nom']} ({count($etudiants)} membres)",
             'team_id' => $equipe->getId(),
-            'event' => $evenement->getTitre()
+            'event' => $evenement->getTitre(),
+            'membres_count' => count($etudiants)
         ];
     }
 
@@ -1455,6 +1621,158 @@ class ActionExecutorService
         ];
     }
 
+    // ========== COMMENT ACTIONS ==========
+    
+    private function listComments(array $params): array
+    {
+        $limit = $params['limit'] ?? 50;
+        
+        // Filter by post if specified
+        if (!empty($params['post_id'])) {
+            $comments = $this->commentaireRepository->findBy(
+                ['post' => $params['post_id']], 
+                ['createdAt' => 'DESC'], 
+                $limit
+            );
+        } else {
+            $comments = $this->commentaireRepository->findBy([], ['createdAt' => 'DESC'], $limit);
+        }
+        
+        return [
+            'success' => true,
+            'count' => count($comments),
+            'comments' => array_map(function($c) {
+                return [
+                    'id' => $c->getId(),
+                    'contenu' => $c->getContenu(),
+                    'auteur' => $c->getUser() ? $c->getUser()->getPrenom() . ' ' . $c->getUser()->getNom() : 'Inconnu',
+                    'post_id' => $c->getPost() ? $c->getPost()->getId() : null,
+                    'post_preview' => $c->getPost() ? substr($c->getPost()->getContenu(), 0, 50) . '...' : null,
+                    'created_at' => $c->getCreatedAt()->format('d/m/Y H:i')
+                ];
+            }, $comments)
+        ];
+    }
+
+    private function getComment(array $params): array
+    {
+        if (empty($params['id'])) {
+            return ['success' => false, 'error' => 'ID commentaire requis'];
+        }
+
+        $comment = $this->commentaireRepository->find($params['id']);
+        if (!$comment) {
+            return ['success' => false, 'error' => 'Commentaire introuvable'];
+        }
+
+        return [
+            'success' => true,
+            'comment' => [
+                'id' => $comment->getId(),
+                'contenu' => $comment->getContenu(),
+                'auteur' => $comment->getUser() ? $comment->getUser()->getPrenom() . ' ' . $comment->getUser()->getNom() : 'Inconnu',
+                'post_id' => $comment->getPost() ? $comment->getPost()->getId() : null,
+                'created_at' => $comment->getCreatedAt()->format('d/m/Y H:i')
+            ]
+        ];
+    }
+
+    // ========== TEAM ACTIONS ==========
+    
+    private function listStudents(array $params): array
+    {
+        $limit = $params['limit'] ?? 50;
+        
+        // Get only students (not admins)
+        $qb = $this->em->createQueryBuilder();
+        $students = $qb->select('u')
+            ->from(\App\Entity\User::class, 'u')
+            ->where('u.role = :role')
+            ->andWhere('u.isSuspended = false')
+            ->setParameter('role', 'ETUDIANT')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+        
+        return [
+            'success' => true,
+            'count' => count($students),
+            'students' => array_map(function($s) {
+                return [
+                    'id' => $s->getId(),
+                    'nom' => $s->getNom(),
+                    'prenom' => $s->getPrenom(),
+                    'email' => $s->getEmail(),
+                    'niveau' => method_exists($s, 'getNiveau') ? $s->getNiveau() : 'N/A'
+                ];
+            }, $students)
+        ];
+    }
+    
+    private function listTeams(array $params): array
+    {
+        $limit = $params['limit'] ?? 50;
+        
+        // Filter by event if specified
+        if (!empty($params['evenement_id'])) {
+            $teams = $this->equipeRepository->findBy(
+                ['evenement' => $params['evenement_id']], 
+                ['nom' => 'ASC'], 
+                $limit
+            );
+        } else {
+            $teams = $this->equipeRepository->findBy([], ['nom' => 'ASC'], $limit);
+        }
+        
+        return [
+            'success' => true,
+            'count' => count($teams),
+            'teams' => array_map(function($t) {
+                return [
+                    'id' => $t->getId(),
+                    'nom' => $t->getNom(),
+                    'evenement' => $t->getEvenement()->getTitre(),
+                    'evenement_id' => $t->getEvenement()->getId(),
+                    'membres_count' => $t->getEtudiants()->count(),
+                    'membres' => array_map(function($e) {
+                        return $e->getPrenom() . ' ' . $e->getNom();
+                    }, $t->getEtudiants()->toArray())
+                ];
+            }, $teams)
+        ];
+    }
+
+    private function getTeam(array $params): array
+    {
+        if (empty($params['id'])) {
+            return ['success' => false, 'error' => 'ID équipe requis'];
+        }
+
+        $team = $this->equipeRepository->find($params['id']);
+        if (!$team) {
+            return ['success' => false, 'error' => 'Équipe introuvable'];
+        }
+
+        return [
+            'success' => true,
+            'team' => [
+                'id' => $team->getId(),
+                'nom' => $team->getNom(),
+                'evenement' => $team->getEvenement()->getTitre(),
+                'evenement_id' => $team->getEvenement()->getId(),
+                'membres_count' => $team->getEtudiants()->count(),
+                'membres' => array_map(function($e) {
+                    return [
+                        'id' => $e->getId(),
+                        'nom' => $e->getNom(),
+                        'prenom' => $e->getPrenom(),
+                        'email' => $e->getEmail()
+                    ];
+                }, $team->getEtudiants()->toArray())
+            ]
+        ];
+    }
+
     // ========== STUDENT ACTIONS ==========
     
     private function enrollInCourse(array $params): array
@@ -1517,7 +1835,10 @@ class ActionExecutorService
                 'list_events' => 'Lister tous les événements',
                 'list_challenges' => 'Lister tous les challenges',
                 'list_communities' => 'Lister toutes les communautés',
-                'list_posts' => 'Lister tous les posts'
+                'list_posts' => 'Lister tous les posts',
+                'list_comments' => 'Lister tous les commentaires',
+                'list_teams' => 'Lister toutes les équipes',
+                'list_students' => 'Lister tous les étudiants'
             ]
         ];
 
@@ -1542,7 +1863,11 @@ class ActionExecutorService
                 'update_community' => 'Modifier une communauté',
                 'create_quiz' => 'Créer un quiz',
                 'list_posts' => 'Lister tous les posts',
-                'get_post' => 'Voir les détails d\'un post'
+                'get_post' => 'Voir les détails d\'un post',
+                'list_comments' => 'Lister tous les commentaires',
+                'get_comment' => 'Voir les détails d\'un commentaire',
+                'list_teams' => 'Lister toutes les équipes',
+                'get_team' => 'Voir les détails d\'une équipe'
             ];
         }
 
@@ -1550,7 +1875,10 @@ class ActionExecutorService
             $actions['student'] = [
                 'create_team' => 'Créer une équipe pour un événement',
                 'enroll_in_course' => 'S\'inscrire à un cours',
-                'join_community' => 'Rejoindre une communauté'
+                'join_community' => 'Rejoindre une communauté',
+                'list_teams' => 'Voir toutes les équipes',
+                'get_team' => 'Voir les détails d\'une équipe',
+                'list_students' => 'Voir tous les étudiants'
             ];
         }
 
