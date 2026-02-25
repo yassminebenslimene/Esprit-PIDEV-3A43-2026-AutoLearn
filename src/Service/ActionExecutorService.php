@@ -7,12 +7,18 @@ use App\Entity\Equipe;
 use App\Repository\UserRepository;
 use App\Repository\EquipeRepository;
 use App\Repository\EvenementRepository;
+use App\Repository\Cours\CoursRepository;
+use App\Repository\Cours\ChapitreRepository;
+use App\Repository\ChallengeRepository;
+use App\Repository\CommunauteRepository;
+use App\Repository\PostRepository;
+use App\Repository\QuizRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
  * Service d'exécution d'actions pour l'assistant IA
- * Permet à l'IA d'effectuer des actions réelles (créer étudiant, équipe, etc.)
+ * Permet à l'IA d'effectuer des actions réelles sur TOUTES les entités
  */
 class ActionExecutorService
 {
@@ -20,6 +26,12 @@ class ActionExecutorService
     private UserRepository $userRepository;
     private EquipeRepository $equipeRepository;
     private EvenementRepository $evenementRepository;
+    private CoursRepository $coursRepository;
+    private ChapitreRepository $chapitreRepository;
+    private ChallengeRepository $challengeRepository;
+    private CommunauteRepository $communauteRepository;
+    private PostRepository $postRepository;
+    private QuizRepository $quizRepository;
     private LoggerInterface $logger;
 
     public function __construct(
@@ -27,12 +39,24 @@ class ActionExecutorService
         UserRepository $userRepository,
         EquipeRepository $equipeRepository,
         EvenementRepository $evenementRepository,
+        CoursRepository $coursRepository,
+        ChapitreRepository $chapitreRepository,
+        ChallengeRepository $challengeRepository,
+        CommunauteRepository $communauteRepository,
+        PostRepository $postRepository,
+        QuizRepository $quizRepository,
         LoggerInterface $logger
     ) {
         $this->em = $em;
         $this->userRepository = $userRepository;
         $this->equipeRepository = $equipeRepository;
         $this->evenementRepository = $evenementRepository;
+        $this->coursRepository = $coursRepository;
+        $this->chapitreRepository = $chapitreRepository;
+        $this->challengeRepository = $challengeRepository;
+        $this->communauteRepository = $communauteRepository;
+        $this->postRepository = $postRepository;
+        $this->quizRepository = $quizRepository;
         $this->logger = $logger;
     }
 
@@ -126,16 +150,54 @@ class ActionExecutorService
 
         try {
             return match($action) {
+                // USER ACTIONS
                 'create_student' => $this->createStudent($params),
                 'update_student' => $this->updateStudent($params),
                 'update_user' => $this->updateStudent($params),
                 'filter_students' => $this->filterStudents($params),
                 'get_user' => $this->getUser($params),
-                'create_team' => $this->createTeam($params),
                 'suspend_user' => $this->suspendUser($params),
                 'unsuspend_user' => $this->unsuspendUser($params),
                 'get_inactive_users' => $this->getInactiveUsers($params),
+                
+                // COURSE ACTIONS
+                'create_course' => $this->createCourse($params),
+                'update_course' => $this->updateCourse($params),
+                'get_course' => $this->getCourse($params),
+                'list_courses' => $this->listCourses($params),
+                'add_chapter' => $this->addChapter($params),
+                
+                // EVENT ACTIONS
+                'create_event' => $this->createEvent($params),
+                'update_event' => $this->updateEvent($params),
+                'delete_event' => $this->deleteEvent($params),
+                'get_event' => $this->getEvent($params),
+                'list_events' => $this->listEvents($params),
+                
+                // CHALLENGE ACTIONS
+                'create_challenge' => $this->createChallenge($params),
+                'update_challenge' => $this->updateChallenge($params),
+                'get_challenge' => $this->getChallenge($params),
+                'list_challenges' => $this->listChallenges($params),
+                
+                // COMMUNITY ACTIONS
+                'create_community' => $this->createCommunity($params),
+                'update_community' => $this->updateCommunity($params),
+                'get_community' => $this->getCommunity($params),
+                'list_communities' => $this->listCommunities($params),
+                
+                // QUIZ ACTIONS
+                'create_quiz' => $this->createQuiz($params),
+                'get_quiz' => $this->getQuiz($params),
+                
+                // STUDENT ACTIONS
+                'create_team' => $this->createTeam($params),
+                'enroll_in_course' => $this->enrollInCourse($params),
+                'join_community' => $this->joinCommunity($params),
+                
+                // GENERAL
                 'get_popular_courses' => $this->getPopularCourses($params),
+                
                 default => [
                     'success' => false,
                     'error' => "Action non autorisée ou inconnue"
@@ -162,19 +224,18 @@ class ActionExecutorService
     {
         // Actions réservées aux admins
         $adminOnlyActions = [
-            'create_student',
-            'update_student',
-            'update_user',
-            'filter_students',
-            'get_user',
-            'suspend_user',
-            'unsuspend_user',
-            'get_inactive_users'
+            'create_student', 'update_student', 'update_user', 'filter_students', 'get_user',
+            'suspend_user', 'unsuspend_user', 'get_inactive_users',
+            'create_course', 'update_course', 'add_chapter',
+            'create_event', 'update_event', 'delete_event',
+            'create_challenge', 'update_challenge',
+            'create_community', 'update_community',
+            'create_quiz'
         ];
 
         // Actions réservées aux étudiants
         $studentOnlyActions = [
-            'create_team'
+            'create_team', 'enroll_in_course', 'join_community'
         ];
 
         // Actions admin uniquement
@@ -187,7 +248,7 @@ class ActionExecutorService
             return $user->getRole() === 'ETUDIANT';
         }
 
-        // Actions publiques
+        // Actions publiques (get, list)
         return true;
     }
 
@@ -277,7 +338,7 @@ class ActionExecutorService
         if (!empty($params['nom'])) {
             $qb = $this->em->createQueryBuilder();
             $users = $qb->select('u')
-                ->from('App\Entity\User', 'u')
+                ->from(\App\Entity\User::class, 'u')
                 ->where('LOWER(u.nom) LIKE LOWER(:nom)')
                 ->setParameter('nom', '%' . $params['nom'] . '%')
                 ->setMaxResults(1)
@@ -293,7 +354,7 @@ class ActionExecutorService
         if (!empty($params['prenom'])) {
             $qb = $this->em->createQueryBuilder();
             $users = $qb->select('u')
-                ->from('App\Entity\User', 'u')
+                ->from(\App\Entity\User::class, 'u')
                 ->where('LOWER(u.prenom) LIKE LOWER(:prenom)')
                 ->setParameter('prenom', '%' . $params['prenom'] . '%')
                 ->setMaxResults(1)
@@ -554,7 +615,7 @@ class ActionExecutorService
     {
         $qb = $this->em->createQueryBuilder();
         $qb->select('u')
-            ->from('App\Entity\User', 'u')
+            ->from(\App\Entity\User::class, 'u')
             ->where('u.role = :role')
             ->setParameter('role', 'ETUDIANT');
 
@@ -741,7 +802,7 @@ class ActionExecutorService
 
         $qb = $this->em->createQueryBuilder();
         $users = $qb->select('u')
-            ->from('App\Entity\User', 'u')
+            ->from(\App\Entity\User::class, 'u')
             ->where('u.lastLoginAt < :date OR u.lastLoginAt IS NULL')
             ->andWhere('u.isSuspended = false')
             ->setParameter('date', $date)
@@ -778,7 +839,7 @@ class ActionExecutorService
         // Pour l'instant, retourner les cours avec le plus de chapitres
         $qb = $this->em->createQueryBuilder();
         $courses = $qb->select('c')
-            ->from('App\Entity\Cours\Cours', 'c')
+            ->from(\App\Entity\GestionDeCours\Cours::class, 'c')
             ->orderBy('c.id', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
@@ -800,6 +861,549 @@ class ActionExecutorService
         ];
     }
 
+    // ========== COURSE ACTIONS ==========
+    
+    private function createCourse(array $params): array
+    {
+        $required = ['titre', 'description', 'niveau'];
+        foreach ($required as $field) {
+            if (empty($params[$field])) {
+                return ['success' => false, 'error' => "Champ requis: {$field}"];
+            }
+        }
+
+        $cours = new \App\Entity\GestionDeCours\Cours();
+        $cours->setTitre($params['titre']);
+        $cours->setDescription($params['description']);
+        $cours->setNiveau($params['niveau']);
+        $cours->setDuree($params['duree'] ?? 0);
+
+        $this->em->persist($cours);
+        $this->em->flush();
+
+        return [
+            'success' => true,
+            'message' => "Cours créé: {$params['titre']}",
+            'course_id' => $cours->getId()
+        ];
+    }
+
+    private function updateCourse(array $params): array
+    {
+        if (empty($params['id'])) {
+            return ['success' => false, 'error' => 'ID cours requis'];
+        }
+
+        $cours = $this->coursRepository->find($params['id']);
+        if (!$cours) {
+            return ['success' => false, 'error' => 'Cours introuvable'];
+        }
+
+        if (isset($params['titre'])) $cours->setTitre($params['titre']);
+        if (isset($params['description'])) $cours->setDescription($params['description']);
+        if (isset($params['niveau'])) $cours->setNiveau($params['niveau']);
+        if (isset($params['duree'])) $cours->setDuree($params['duree']);
+
+        $this->em->flush();
+
+        return [
+            'success' => true,
+            'message' => "Cours modifié: {$cours->getTitre()}",
+            'course_id' => $cours->getId()
+        ];
+    }
+
+    private function getCourse(array $params): array
+    {
+        if (empty($params['id'])) {
+            return ['success' => false, 'error' => 'ID cours requis'];
+        }
+
+        $cours = $this->coursRepository->find($params['id']);
+        if (!$cours) {
+            return ['success' => false, 'error' => 'Cours introuvable'];
+        }
+
+        return [
+            'success' => true,
+            'course' => [
+                'id' => $cours->getId(),
+                'titre' => $cours->getTitre(),
+                'description' => $cours->getDescription(),
+                'niveau' => $cours->getNiveau(),
+                'duree' => $cours->getDuree(),
+                'chapitres_count' => $cours->getChapitres()->count()
+            ]
+        ];
+    }
+
+    private function listCourses(array $params): array
+    {
+        $courses = $this->coursRepository->findAll();
+        
+        return [
+            'success' => true,
+            'count' => count($courses),
+            'courses' => array_map(function($c) {
+                return [
+                    'id' => $c->getId(),
+                    'titre' => $c->getTitre(),
+                    'niveau' => $c->getNiveau(),
+                    'chapitres' => $c->getChapitres()->count()
+                ];
+            }, $courses)
+        ];
+    }
+
+    private function addChapter(array $params): array
+    {
+        $required = ['cours_id', 'titre'];
+        foreach ($required as $field) {
+            if (empty($params[$field])) {
+                return ['success' => false, 'error' => "Champ requis: {$field}"];
+            }
+        }
+
+        $cours = $this->coursRepository->find($params['cours_id']);
+        if (!$cours) {
+            return ['success' => false, 'error' => 'Cours introuvable'];
+        }
+
+        $chapitre = new \App\Entity\GestionDeCours\Chapitre();
+        $chapitre->setTitre($params['titre']);
+        $chapitre->setContenu($params['contenu'] ?? '');
+        $chapitre->setCours($cours);
+
+        $this->em->persist($chapitre);
+        $this->em->flush();
+
+        return [
+            'success' => true,
+            'message' => "Chapitre ajouté: {$params['titre']}",
+            'chapter_id' => $chapitre->getId()
+        ];
+    }
+
+    // ========== EVENT ACTIONS ==========
+    
+    private function createEvent(array $params): array
+    {
+        $required = ['titre', 'date_debut', 'date_fin', 'lieu'];
+        foreach ($required as $field) {
+            if (empty($params[$field])) {
+                return ['success' => false, 'error' => "Champ requis: {$field}"];
+            }
+        }
+
+        $event = new \App\Entity\Evenement();
+        $event->setTitre($params['titre']);
+        $event->setDescription($params['description'] ?? '');
+        $event->setDateDebut(new \DateTime($params['date_debut']));
+        $event->setDateFin(new \DateTime($params['date_fin']));
+        $event->setLieu($params['lieu']);
+        $event->setNbMax($params['capacite'] ?? $params['nbMax'] ?? 50); // Use nbMax instead of capacite
+        $event->setType(\App\Enum\TypeEvenement::WORKSHOP); // Default type
+
+        $this->em->persist($event);
+        $this->em->flush();
+
+        return [
+            'success' => true,
+            'message' => "Événement créé: {$params['titre']}",
+            'event_id' => $event->getId()
+        ];
+    }
+
+    private function updateEvent(array $params): array
+    {
+        if (empty($params['id'])) {
+            return ['success' => false, 'error' => 'ID événement requis'];
+        }
+
+        $event = $this->evenementRepository->find($params['id']);
+        if (!$event) {
+            return ['success' => false, 'error' => 'Événement introuvable'];
+        }
+
+        if (isset($params['titre'])) $event->setTitre($params['titre']);
+        if (isset($params['description'])) $event->setDescription($params['description']);
+        if (isset($params['lieu'])) $event->setLieu($params['lieu']);
+        if (isset($params['capacite'])) $event->setNbMax($params['capacite']); // Use nbMax
+        if (isset($params['nbMax'])) $event->setNbMax($params['nbMax']);
+
+        $this->em->flush();
+
+        return [
+            'success' => true,
+            'message' => "Événement modifié: {$event->getTitre()}",
+            'event_id' => $event->getId()
+        ];
+    }
+
+    private function getEvent(array $params): array
+    {
+        if (empty($params['id'])) {
+            return ['success' => false, 'error' => 'ID événement requis'];
+        }
+
+        $event = $this->evenementRepository->find($params['id']);
+        if (!$event) {
+            return ['success' => false, 'error' => 'Événement introuvable'];
+        }
+
+        return [
+            'success' => true,
+            'event' => [
+                'id' => $event->getId(),
+                'titre' => $event->getTitre(),
+                'description' => $event->getDescription(),
+                'date_debut' => $event->getDateDebut()->format('Y-m-d H:i'),
+                'date_fin' => $event->getDateFin()->format('Y-m-d H:i'),
+                'lieu' => $event->getLieu(),
+                'capacite' => $event->getNbMax()
+            ]
+        ];
+    }
+
+    private function deleteEvent(array $params): array
+    {
+        if (empty($params['id'])) {
+            return ['success' => false, 'error' => 'ID événement requis'];
+        }
+
+        $event = $this->evenementRepository->find($params['id']);
+        if (!$event) {
+            return ['success' => false, 'error' => 'Événement introuvable'];
+        }
+
+        $eventTitle = $event->getTitre();
+        
+        try {
+            $this->em->remove($event);
+            $this->em->flush();
+
+            return [
+                'success' => true,
+                'message' => "Événement supprimé: {$eventTitle}"
+            ];
+        } catch (\Exception $e) {
+            $this->logger->error('Delete event error', ['error' => $e->getMessage()]);
+            
+            return [
+                'success' => false,
+                'error' => 'Erreur lors de la suppression: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    private function listEvents(array $params): array
+    {
+        $events = $this->evenementRepository->findAll();
+        
+        return [
+            'success' => true,
+            'count' => count($events),
+            'events' => array_map(function($e) {
+                return [
+                    'id' => $e->getId(),
+                    'titre' => $e->getTitre(),
+                    'date_debut' => $e->getDateDebut()->format('Y-m-d H:i'),
+                    'lieu' => $e->getLieu()
+                ];
+            }, $events)
+        ];
+    }
+
+    // ========== CHALLENGE ACTIONS ==========
+    
+    private function createChallenge(array $params): array
+    {
+        $required = ['titre', 'description', 'niveau'];
+        foreach ($required as $field) {
+            if (empty($params[$field])) {
+                return ['success' => false, 'error' => "Champ requis: {$field}"];
+            }
+        }
+
+        $challenge = new \App\Entity\Challenge();
+        $challenge->setTitre($params['titre']);
+        $challenge->setDescription($params['description']);
+        $challenge->setNiveau($params['niveau']);
+        $challenge->setDateDebut(new \DateTime($params['date_debut'] ?? 'now'));
+        $challenge->setDateFin(new \DateTime($params['date_fin'] ?? '+7 days'));
+
+        $this->em->persist($challenge);
+        $this->em->flush();
+
+        return [
+            'success' => true,
+            'message' => "Challenge créé: {$params['titre']}",
+            'challenge_id' => $challenge->getId()
+        ];
+    }
+
+    private function updateChallenge(array $params): array
+    {
+        if (empty($params['id'])) {
+            return ['success' => false, 'error' => 'ID challenge requis'];
+        }
+
+        $challenge = $this->challengeRepository->find($params['id']);
+        if (!$challenge) {
+            return ['success' => false, 'error' => 'Challenge introuvable'];
+        }
+
+        if (isset($params['titre'])) $challenge->setTitre($params['titre']);
+        if (isset($params['description'])) $challenge->setDescription($params['description']);
+        if (isset($params['niveau'])) $challenge->setNiveau($params['niveau']);
+        if (isset($params['date_debut'])) $challenge->setDateDebut(new \DateTime($params['date_debut']));
+        if (isset($params['date_fin'])) $challenge->setDateFin(new \DateTime($params['date_fin']));
+
+        $this->em->flush();
+
+        return [
+            'success' => true,
+            'message' => "Challenge modifié: {$challenge->getTitre()}",
+            'challenge_id' => $challenge->getId()
+        ];
+    }
+
+    private function getChallenge(array $params): array
+    {
+        if (empty($params['id'])) {
+            return ['success' => false, 'error' => 'ID challenge requis'];
+        }
+
+        $challenge = $this->challengeRepository->find($params['id']);
+        if (!$challenge) {
+            return ['success' => false, 'error' => 'Challenge introuvable'];
+        }
+
+        return [
+            'success' => true,
+            'challenge' => [
+                'id' => $challenge->getId(),
+                'titre' => $challenge->getTitre(),
+                'description' => $challenge->getDescription(),
+                'niveau' => $challenge->getNiveau(),
+                'date_debut' => $challenge->getDateDebut()->format('Y-m-d'),
+                'date_fin' => $challenge->getDateFin()->format('Y-m-d')
+            ]
+        ];
+    }
+
+    private function listChallenges(array $params): array
+    {
+        $challenges = $this->challengeRepository->findAll();
+        
+        return [
+            'success' => true,
+            'count' => count($challenges),
+            'challenges' => array_map(function($ch) {
+                return [
+                    'id' => $ch->getId(),
+                    'titre' => $ch->getTitre(),
+                    'niveau' => $ch->getNiveau()
+                ];
+            }, $challenges)
+        ];
+    }
+
+    // ========== COMMUNITY ACTIONS ==========
+    
+    private function createCommunity(array $params): array
+    {
+        $required = ['nom', 'description'];
+        foreach ($required as $field) {
+            if (empty($params[$field])) {
+                return ['success' => false, 'error' => "Champ requis: {$field}"];
+            }
+        }
+
+        $community = new \App\Entity\Communaute();
+        $community->setNom($params['nom']);
+        $community->setDescription($params['description']);
+
+        $this->em->persist($community);
+        $this->em->flush();
+
+        return [
+            'success' => true,
+            'message' => "Communauté créée: {$params['nom']}",
+            'community_id' => $community->getId()
+        ];
+    }
+
+    private function updateCommunity(array $params): array
+    {
+        if (empty($params['id'])) {
+            return ['success' => false, 'error' => 'ID communauté requis'];
+        }
+
+        $community = $this->communauteRepository->find($params['id']);
+        if (!$community) {
+            return ['success' => false, 'error' => 'Communauté introuvable'];
+        }
+
+        if (isset($params['nom'])) $community->setNom($params['nom']);
+        if (isset($params['description'])) $community->setDescription($params['description']);
+
+        $this->em->flush();
+
+        return [
+            'success' => true,
+            'message' => "Communauté modifiée: {$community->getNom()}",
+            'community_id' => $community->getId()
+        ];
+    }
+
+    private function getCommunity(array $params): array
+    {
+        if (empty($params['id'])) {
+            return ['success' => false, 'error' => 'ID communauté requis'];
+        }
+
+        $community = $this->communauteRepository->find($params['id']);
+        if (!$community) {
+            return ['success' => false, 'error' => 'Communauté introuvable'];
+        }
+
+        return [
+            'success' => true,
+            'community' => [
+                'id' => $community->getId(),
+                'nom' => $community->getNom(),
+                'description' => $community->getDescription(),
+                'membres_count' => $community->getMembers()->count()
+            ]
+        ];
+    }
+
+    private function listCommunities(array $params): array
+    {
+        $communities = $this->communauteRepository->findAll();
+        
+        return [
+            'success' => true,
+            'count' => count($communities),
+            'communities' => array_map(function($c) {
+                return [
+                    'id' => $c->getId(),
+                    'nom' => $c->getNom(),
+                    'membres' => $c->getMembers()->count()
+                ];
+            }, $communities)
+        ];
+    }
+
+    // ========== QUIZ ACTIONS ==========
+    
+    private function createQuiz(array $params): array
+    {
+        $required = ['titre', 'description'];
+        foreach ($required as $field) {
+            if (empty($params[$field])) {
+                return ['success' => false, 'error' => "Champ requis: {$field}"];
+            }
+        }
+
+        $quiz = new \App\Entity\Quiz();
+        $quiz->setTitre($params['titre']);
+        $quiz->setDescription($params['description']);
+        $quiz->setEtat($params['etat'] ?? 'brouillon');
+        
+        // Optionally link to a chapter
+        if (!empty($params['chapitre_id'])) {
+            $chapitre = $this->chapitreRepository->find($params['chapitre_id']);
+            if ($chapitre) {
+                $quiz->setChapitre($chapitre);
+            }
+        }
+
+        $this->em->persist($quiz);
+        $this->em->flush();
+
+        return [
+            'success' => true,
+            'message' => "Quiz créé: {$params['titre']}",
+            'quiz_id' => $quiz->getId()
+        ];
+    }
+
+    private function getQuiz(array $params): array
+    {
+        if (empty($params['id'])) {
+            return ['success' => false, 'error' => 'ID quiz requis'];
+        }
+
+        $quiz = $this->quizRepository->find($params['id']);
+        if (!$quiz) {
+            return ['success' => false, 'error' => 'Quiz introuvable'];
+        }
+
+        return [
+            'success' => true,
+            'quiz' => [
+                'id' => $quiz->getId(),
+                'titre' => $quiz->getTitre(),
+                'description' => $quiz->getDescription(),
+                'etat' => $quiz->getEtat(),
+                'chapitre_id' => $quiz->getChapitre() ? $quiz->getChapitre()->getId() : null,
+                'questions_count' => $quiz->getQuestions()->count()
+            ]
+        ];
+    }
+
+    // ========== STUDENT ACTIONS ==========
+    
+    private function enrollInCourse(array $params): array
+    {
+        if (empty($params['cours_id']) || empty($params['user_id'])) {
+            return ['success' => false, 'error' => 'ID cours et utilisateur requis'];
+        }
+
+        $cours = $this->coursRepository->find($params['cours_id']);
+        if (!$cours) {
+            return ['success' => false, 'error' => 'Cours introuvable'];
+        }
+
+        $user = $this->userRepository->find($params['user_id']);
+        if (!$user) {
+            return ['success' => false, 'error' => 'Utilisateur introuvable'];
+        }
+
+        // Note: Course enrollment relationship not yet implemented in entities
+        return [
+            'success' => false,
+            'error' => 'Fonctionnalité d\'inscription aux cours en cours de développement'
+        ];
+    }
+
+    private function joinCommunity(array $params): array
+    {
+        if (empty($params['community_id']) || empty($params['user_id'])) {
+            return ['success' => false, 'error' => 'ID communauté et utilisateur requis'];
+        }
+
+        $community = $this->communauteRepository->find($params['community_id']);
+        if (!$community) {
+            return ['success' => false, 'error' => 'Communauté introuvable'];
+        }
+
+        $user = $this->userRepository->find($params['user_id']);
+        if (!$user) {
+            return ['success' => false, 'error' => 'Utilisateur introuvable'];
+        }
+
+        $community->addMember($user);
+        $this->em->flush();
+
+        return [
+            'success' => true,
+            'message' => "Rejoint la communauté: {$community->getNom()}"
+        ];
+    }
+
     /**
      * Liste toutes les actions disponibles pour un utilisateur
      */
@@ -807,7 +1411,11 @@ class ActionExecutorService
     {
         $actions = [
             'public' => [
-                'get_popular_courses' => 'Voir les cours populaires'
+                'get_popular_courses' => 'Voir les cours populaires',
+                'list_courses' => 'Lister tous les cours',
+                'list_events' => 'Lister tous les événements',
+                'list_challenges' => 'Lister tous les challenges',
+                'list_communities' => 'Lister toutes les communautés'
             ]
         ];
 
@@ -819,13 +1427,26 @@ class ActionExecutorService
                 'suspend_user' => 'Suspendre un utilisateur',
                 'unsuspend_user' => 'Réactiver un utilisateur',
                 'filter_students' => 'Filtrer les étudiants',
-                'get_inactive_users' => 'Lister les utilisateurs inactifs'
+                'get_inactive_users' => 'Lister les utilisateurs inactifs',
+                'create_course' => 'Créer un cours',
+                'update_course' => 'Modifier un cours',
+                'add_chapter' => 'Ajouter un chapitre',
+                'create_event' => 'Créer un événement',
+                'update_event' => 'Modifier un événement',
+                'delete_event' => 'Supprimer un événement',
+                'create_challenge' => 'Créer un challenge',
+                'update_challenge' => 'Modifier un challenge',
+                'create_community' => 'Créer une communauté',
+                'update_community' => 'Modifier une communauté',
+                'create_quiz' => 'Créer un quiz'
             ];
         }
 
         if ($user->getRole() === 'ETUDIANT') {
             $actions['student'] = [
-                'create_team' => 'Créer une équipe pour un événement'
+                'create_team' => 'Créer une équipe pour un événement',
+                'enroll_in_course' => 'S\'inscrire à un cours',
+                'join_community' => 'Rejoindre une communauté'
             ];
         }
 

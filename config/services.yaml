@@ -64,3 +64,22 @@ services:
             $evenementRepository: '@App\Repository\EvenementRepository'
             $communauteRepository: '@App\Repository\CommunauteRepository'
             $activityRepository: '@App\Bundle\UserActivityBundle\Repository\UserActivityRepository'
+            $challengeRepository: '@App\Repository\ChallengeRepository'
+            $quizRepository: '@App\Repository\QuizRepository'
+            $chapitreRepository: '@App\Repository\Cours\ChapitreRepository'
+            $postRepository: '@App\Repository\PostRepository'
+    
+    # Action Executor Service (with all repositories for CRUD operations)
+    App\Service\ActionExecutorService:
+        arguments:
+            $em: '@doctrine.orm.entity_manager'
+            $userRepository: '@App\Repository\UserRepository'
+            $equipeRepository: '@App\Repository\EquipeRepository'
+            $evenementRepository: '@App\Repository\EvenementRepository'
+            $coursRepository: '@App\Repository\Cours\CoursRepository'
+            $chapitreRepository: '@App\Repository\Cours\ChapitreRepository'
+            $challengeRepository: '@App\Repository\ChallengeRepository'
+            $communauteRepository: '@App\Repository\CommunauteRepository'
+            $postRepository: '@App\Repository\PostRepository'
+            $quizRepository: '@App\Repository\QuizRepository'
+            $logger: '@logger'
