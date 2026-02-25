@@ -14,45 +14,37 @@
             font-size: 12pt;
             line-height: 1.6;
             color: #333;
-            margin: 0;
-            padding: 0;
         }
         
-        .header {
+        /* Header fixe */
+        header {
             position: fixed;
-            top: -100px;
+            top: -80px;
             left: 0;
             right: 0;
             height: 80px;
             text-align: center;
             border-bottom: 3px solid #4A90E2;
-            padding: 10px 0;
-            background: white;
+            padding-bottom: 10px;
         }
         
-        .header img {
-            height: 50px;
+        header h1 {
+            color: #4A90E2;
+            font-size: 24pt;
+            margin: 10px 0 5px 0;
+        }
+        
+        header .logo {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #7a6ad8;
             margin-bottom: 5px;
         }
         
-        .header .logo-text {
-            font-size: 20pt;
-            font-weight: bold;
-            color: #4A90E2;
-            margin: 0;
-            padding: 5px 0;
-        }
-        
-        .header .chapter-title {
-            font-size: 14pt;
-            color: #4A90E2;
-            margin: 5px 0 0 0;
-            font-weight: normal;
-        }
-        
-        .footer {
+        /* Footer fixe */
+        footer {
             position: fixed;
-            bottom: -80px;
+            bottom: -60px;
             left: 0;
             right: 0;
             height: 50px;
@@ -61,19 +53,23 @@
             padding-top: 10px;
             font-size: 10pt;
             color: #666;
-            background: white;
         }
         
-        .footer .page-number:before {
+        footer .page-number:before {
             content: "Page " counter(page);
+        }
+        
+        /* Contenu principal */
+        .content {
+            margin-top: 20px;
         }
         
         .chapter-meta {
             background: #f8f9fa;
-            padding: 15px;
             border-left: 4px solid #4A90E2;
-            margin-bottom: 20px;
-            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 5px;
         }
         
         .chapter-meta p {
@@ -85,133 +81,133 @@
             color: #4A90E2;
         }
         
-        .content {
-            margin-top: 20px;
-        }
-        
-        .content h2 {
+        h2 {
             color: #4A90E2;
-            font-size: 16pt;
+            font-size: 18pt;
             margin-top: 25px;
             margin-bottom: 15px;
             border-bottom: 2px solid #e0e0e0;
             padding-bottom: 5px;
         }
         
-        .content h3 {
-            color: #333;
+        h3 {
+            color: #666;
             font-size: 14pt;
             margin-top: 20px;
             margin-bottom: 10px;
         }
         
-        .content p {
+        p {
             text-align: justify;
             margin-bottom: 12px;
         }
         
-        .content ul, .content ol {
+        ul, ol {
             margin-left: 20px;
             margin-bottom: 15px;
         }
         
-        .content li {
+        li {
             margin-bottom: 8px;
         }
         
-        .content pre {
+        pre, code {
             background: #f5f5f5;
-            border: 1px solid #ddd;
-            border-left: 4px solid #4A90E2;
-            padding: 15px;
-            margin: 15px 0;
-            overflow-x: auto;
+            border: 1px solid #4A90E2;
             border-radius: 4px;
-        }
-        
-        .content code {
+            padding: 10px;
             font-family: 'Courier New', monospace;
             font-size: 10pt;
-            background: #f5f5f5;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        code {
             padding: 2px 6px;
-            border-radius: 3px;
+            display: inline;
         }
         
-        .content pre code {
-            background: transparent;
-            padding: 0;
-        }
-        
-        .content a {
-            color: #4A90E2;
-            text-decoration: none;
-        }
-        
-        .content strong {
-            color: #000;
-            font-weight: bold;
+        pre {
+            display: block;
+            white-space: pre-wrap;
         }
         
         .branding {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 40px;
             padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #7a6ad8 0%, #4e3b9c 100%);
+            color: white;
+            border-radius: 10px;
         }
         
-        .branding h3 {
-            color: #4A90E2;
-            margin-bottom: 10px;
+        .branding h2 {
+            color: white;
+            border: none;
+            margin: 0;
+            font-size: 20pt;
         }
         
         .branding p {
-            font-size: 10pt;
-            color: #666;
+            margin: 10px 0 0 0;
+            font-size: 12pt;
+        }
+        
+        a {
+            color: #4A90E2;
+            text-decoration: none;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        table th {
+            background: #4A90E2;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <!-- Header fixe -->
-    <div class="header">
-        {# Logo texte - Fonctionne sans GD #}
-        <div class="logo-text">🎓 AUTOLEARN</div>
-        
-        {# Logo image - Décommenter après avoir activé GD dans php.ini #}
-        {# <img src="{{ absolute_url(asset('public/frontoffice/images/auto.png')) }}" alt="Autolearn Logo"> #}
-        
-        <div class="chapter-title">{{ chapitre.titre }}</div>
-    </div>
+    <!-- Header -->
+    <header>
+        <div class="logo">🎓 AUTOLEARN</div>
+        <h1>{{ chapitre.titre }}</h1>
+    </header>
     
-    <!-- Footer fixe -->
-    <div class="footer">
-        <div>
-            <strong>Autolearn</strong> - Plateforme d'apprentissage en ligne
-        </div>
+    <!-- Footer -->
+    <footer>
+        <div>Autolearn - Plateforme d'apprentissage</div>
         <div class="page-number"></div>
-    </div>
+    </footer>
     
-    <!-- Métadonnées du chapitre -->
-    <div class="chapter-meta">
-        <p><strong>Chapitre:</strong> {{ chapitre.ordre }}</p>
-        {% if chapitre.cours %}
+    <!-- Contenu -->
+    <div class="content">
+        <!-- Métadonnées du chapitre -->
+        <div class="chapter-meta">
+            <p><strong>Chapitre:</strong> {{ chapitre.ordre }}</p>
             <p><strong>Cours:</strong> {{ chapitre.cours.titre }}</p>
             <p><strong>Matière:</strong> {{ chapitre.cours.matiere }}</p>
             <p><strong>Niveau:</strong> {{ chapitre.cours.niveau }}</p>
-        {% endif %}
-        <p><strong>Date de génération:</strong> {{ "now"|date("d/m/Y à H:i") }}</p>
-    </div>
-    
-    <!-- Contenu du chapitre -->
-    <div class="content">
+            <p><strong>Date de génération:</strong> {{ "now"|date("d/m/Y à H:i") }}</p>
+        </div>
+        
+        <!-- Contenu du chapitre -->
         {{ chapitre.contenu|raw }}
-    </div>
-    
-    <!-- Branding Autolearn -->
-    <div class="branding">
-        <h3>🎓 Autolearn</h3>
-        <p>Votre plateforme d'apprentissage en ligne</p>
-        <p>Ce document a été généré automatiquement depuis votre cours.</p>
+        
+        <!-- Branding Autolearn -->
+        <div class="branding">
+            <h2>🎓 Autolearn</h2>
+            <p>Votre plateforme d'apprentissage en ligne</p>
+        </div>
     </div>
 </body>
 </html>
