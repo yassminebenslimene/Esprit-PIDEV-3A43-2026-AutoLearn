@@ -186,15 +186,17 @@ class Evenement
     
     /**
      * Vérifie si les participations sont ouvertes pour cet événement
-     * Les participations sont ouvertes uniquement si:
-     * - L'événement est planifié (pas encore commencé)
+     * Les participations sont ouvertes si:
+     * - L'événement est planifié (pas encore commencé) OU en cours
      * - L'événement n'est pas annulé
      * - L'événement n'est pas terminé
      */
     public function areParticipationsOpen(): bool
     {
         // Vérifier le workflow status
-        return $this->workflowStatus === 'planifie' && !$this->isCanceled;
+        // Permettre les participations pour les événements planifiés ET en cours
+        return ($this->workflowStatus === 'planifie' || $this->workflowStatus === 'en_cours') 
+               && !$this->isCanceled;
     }
     
     /**

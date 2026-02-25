@@ -56,10 +56,19 @@ class FeedbackAnalyticsService
 
     /**
      * Analyse les feedbacks par type d'événement
+     * @param string|null $filterType Type d'événement à filtrer (conference, hackathon, workshop) ou null pour tous
      */
-    public function analyzeByEventType(): array
+    public function analyzeByEventType(?string $filterType = null): array
     {
         $events = $this->evenementRepository->findAll();
+        
+        // Filtrer les événements si un type est spécifié
+        if ($filterType) {
+            $events = array_filter($events, function($event) use ($filterType) {
+                return strtolower($event->getType()->value) === strtolower($filterType);
+            });
+        }
+        
         $byType = [];
 
         foreach ($events as $event) {
@@ -206,11 +215,19 @@ class FeedbackAnalyticsService
 
     /**
      * Prépare les données pour l'AI (format structuré)
+     * @param string|null $eventType Type d'événement à filtrer (conference, hackathon, workshop) ou null pour tous
      */
-    public function prepareDataForAI(): array
+    public function prepareDataForAI(?string $eventType = null): array
     {
-        $byType = $this->analyzeByEventType();
+        $byType = $this->analyzeByEventType($eventType);
         $allEvents = $this->evenementRepository->findAll();
+        
+        // Filtrer les événements si un type est spécifié
+        if ($eventType) {
+            $allEvents = array_filter($allEvents, function($event) use ($eventType) {
+                return strtolower($event->getType()->value) === strtolower($eventType);
+            });
+        }
         
         $recentComments = [];
         foreach ($allEvents as $event) {
@@ -226,6 +243,7 @@ class FeedbackAnalyticsService
             'by_type' => $byType,
             'total_events' => count($allEvents),
             'recent_comments' => array_slice($recentComments, -50), // 50 derniers commentaires
+            'filter_type' => $eventType,
         ];
     }
 }

@@ -48,7 +48,11 @@
             </div>
         </div>
 
-
+        <div class="form-group">
+            {{ form_label(form.lieu, 'Lieu') }}
+            {{ form_widget(form.lieu, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.lieu) }}
+        </div>
 
         <div class="form-actions" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; margin-top: 30px;">
             <button type="submit" class="btn btn-primary" style="padding: 12px 24px; font-size: 15px; display: inline-flex; align-items: center; gap: 8px;">

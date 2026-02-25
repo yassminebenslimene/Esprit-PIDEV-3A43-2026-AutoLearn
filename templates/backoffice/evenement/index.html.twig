@@ -11,11 +11,27 @@
         🤖 Statistiques & Rapports AI
     </h2>
     
+    {# Filtre par type d'événement #}
+    <div style="margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05)); border-radius: 12px; border: 2px solid #667eea;">
+        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #667eea;">
+            🎯 Filtrer par type d'événement:
+        </label>
+        <select id="event-type-filter" style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; background: white; color: #2d3748; cursor: pointer;">
+            <option value="" style="color: #2d3748;">Tous les types d'événements</option>
+            <option value="conference" style="color: #2d3748;">Conférence</option>
+            <option value="hackathon" style="color: #2d3748;">Hackathon</option>
+            <option value="workshop" style="color: #2d3748;">Workshop</option>
+        </select>
+        <p style="margin-top: 10px; color: var(--text-muted); font-size: 14px;">
+            💡 Sélectionnez un type pour filtrer les statistiques et les rapports AI selon ce type d'événement.
+        </p>
+    </div>
+    
     {# Statistiques par type d'événement #}
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+    <div id="stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
         {% for type, data in stats_by_type %}
             {% if data.count > 0 %}
-            <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); padding: 20px; border-radius: 12px; border-left: 4px solid #667eea;">
+            <div class="stat-card" data-type="{{ type|lower }}" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); padding: 20px; border-radius: 12px; border-left: 4px solid #667eea;">
                 <h4 style="margin: 0 0 10px 0; color: #667eea;">{{ type }}</h4>
                 <div style="font-size: 32px; font-weight: bold; color: var(--text-primary); margin: 10px 0;">
                     {{ data.average_rating|number_format(1) }}/5
@@ -31,25 +47,43 @@
     
     {# Boutons de génération de rapports #}
     <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-        <button onclick="generateReport('analysis')" class="btn" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; flex: 1; min-width: 200px;">
-            📊 Générer Rapport d'Analyse
-        </button>
-        <button onclick="generateReport('recommendations')" class="btn" style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; flex: 1; min-width: 200px;">
-            💡 Recommandations d'Événements
-        </button>
-        <button onclick="generateReport('improvements')" class="btn" style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; flex: 1; min-width: 200px;">
-            🎯 Suggestions d'Amélioration
-        </button>
+        <div style="flex: 1; min-width: 200px; display: flex; gap: 8px;">
+            <button onclick="generateReport('analysis')" class="btn" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; flex: 1;">
+                📊 Générer Rapport d'Analyse
+            </button>
+            <button onclick="downloadReport('analysis')" class="btn" style="background: linear-gradient(135deg, #48bb78, #38a169); color: white; padding: 12px 20px;" title="Télécharger le dernier rapport">
+                📥
+            </button>
+        </div>
+        <div style="flex: 1; min-width: 200px; display: flex; gap: 8px;">
+            <button onclick="generateReport('recommendations')" class="btn" style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; flex: 1;">
+                💡 Recommandations d'Événements
+            </button>
+            <button onclick="downloadReport('recommendations')" class="btn" style="background: linear-gradient(135deg, #48bb78, #38a169); color: white; padding: 12px 20px;" title="Télécharger le dernier rapport">
+                📥
+            </button>
+        </div>
+        <div style="flex: 1; min-width: 200px; display: flex; gap: 8px;">
+            <button onclick="generateReport('improvements')" class="btn" style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; flex: 1;">
+                🎯 Suggestions d'Amélioration
+            </button>
+            <button onclick="downloadReport('improvements')" class="btn" style="background: linear-gradient(135deg, #48bb78, #38a169); color: white; padding: 12px 20px;" title="Télécharger le dernier rapport">
+                📥
+            </button>
+        </div>
     </div>
     
     {# Zone d'affichage des rapports #}
     <div id="ai-report-container" style="margin-top: 30px; display: none;">
-        <div style="background: white; padding: 25px; border-radius: 12px; border: 2px solid #667eea;">
+        <div style="background: #ffffff; padding: 25px; border-radius: 12px; border: 2px solid #667eea; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h3 id="report-title" style="margin: 0; color: #667eea;"></h3>
-                <button onclick="closeReport()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted);">×</button>
+                <button onclick="closeReport()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #718096; transition: color 0.2s;" onmouseover="this.style.color='#e53e3e'" onmouseout="this.style.color='#718096'">×</button>
             </div>
-            <div id="report-content" style="white-space: pre-wrap; line-height: 1.8; color: var(--text-primary);"></div>
+            <div id="report-filter-info" style="background: #f0f4ff; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; display: none;">
+                <small style="color: #667eea; font-weight: 600;">🎯 Filtre actif: <span id="active-filter-text"></span></small>
+            </div>
+            <div id="report-content" style="white-space: pre-line; line-height: 1.8; color: #2d3748; font-size: 15px; background: #f7fafc; padding: 20px; border-radius: 8px; min-height: 200px; max-height: 600px; overflow-y: auto;"></div>
         </div>
     </div>
     
@@ -77,6 +111,64 @@
 </style>
 
 <script>
+// Stockage des derniers rapports générés
+const lastReports = {
+    analysis: null,
+    recommendations: null,
+    improvements: null
+};
+
+// Gestion du filtre par type d'événement
+document.getElementById('event-type-filter').addEventListener('change', function() {
+    const selectedType = this.value.toLowerCase();
+    const statCards = document.querySelectorAll('.stat-card');
+    
+    statCards.forEach(card => {
+        const cardType = card.getAttribute('data-type');
+        if (selectedType === '' || cardType === selectedType) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+});
+
+// Fonction pour télécharger un rapport
+function downloadReport(type) {
+    const reportData = lastReports[type];
+    
+    if (!reportData) {
+        alert('❌ Aucun rapport disponible. Veuillez d\'abord générer un rapport.');
+        return;
+    }
+    
+    const titles = {
+        'analysis': 'Rapport_Analyse',
+        'recommendations': 'Recommandations_Evenements',
+        'improvements': 'Suggestions_Amelioration'
+    };
+    
+    // Créer un blob avec le contenu du rapport
+    const blob = new Blob([reportData.content], { type: 'text/plain;charset=utf-8' });
+    
+    // Créer un lien de téléchargement
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    
+    // Nom du fichier avec date et filtre
+    const date = new Date().toISOString().split('T')[0];
+    const filterSuffix = reportData.filter ? `_${reportData.filter}` : '';
+    link.download = `${titles[type]}${filterSuffix}_${date}.txt`;
+    
+    // Déclencher le téléchargement
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Libérer l'URL
+    URL.revokeObjectURL(link.href);
+}
+
 async function generateReport(type) {
     const titles = {
         'analysis': '📊 Rapport d\'Analyse',
@@ -90,6 +182,9 @@ async function generateReport(type) {
         'improvements': '{{ path('backoffice_evenement_ai_improvements') }}'
     };
     
+    // Récupérer le filtre sélectionné
+    const eventTypeFilter = document.getElementById('event-type-filter').value;
+    
     // Afficher le loading
     document.getElementById('ai-loading').style.display = 'block';
     document.getElementById('ai-report-container').style.display = 'none';
@@ -99,7 +194,10 @@ async function generateReport(type) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-            }
+            },
+            body: JSON.stringify({
+                event_type: eventTypeFilter || null
+            })
         });
         
         const result = await response.json();
@@ -111,16 +209,54 @@ async function generateReport(type) {
             // Afficher le rapport
             document.getElementById('report-title').textContent = titles[type];
             const content = result.report || result.recommendations || result.improvements;
-            document.getElementById('report-content').textContent = content;
+            
+            // Stocker le rapport pour le téléchargement
+            lastReports[type] = {
+                content: content,
+                filter: eventTypeFilter || null,
+                date: new Date().toISOString()
+            };
+            
+            // Nettoyer et afficher le contenu
+            const reportContent = document.getElementById('report-content');
+            reportContent.textContent = ''; // Vider d'abord
+            reportContent.innerHTML = ''; // Vider aussi le HTML
+            
+            // Créer un élément de texte pour afficher le contenu
+            const textNode = document.createTextNode(content);
+            reportContent.appendChild(textNode);
+            
+            // Forcer le style pour la visibilité
+            reportContent.style.display = 'block';
+            reportContent.style.visibility = 'visible';
+            reportContent.style.opacity = '1';
+            reportContent.style.color = '#2d3748';
+            
+            console.log('Contenu du rapport:', content); // Debug
+            console.log('Longueur du contenu:', content.length); // Debug
+            
+            // Afficher l'info du filtre si actif
+            const filterInfo = document.getElementById('report-filter-info');
+            const filterText = document.getElementById('active-filter-text');
+            if (eventTypeFilter) {
+                filterText.textContent = eventTypeFilter.charAt(0).toUpperCase() + eventTypeFilter.slice(1);
+                filterInfo.style.display = 'block';
+            } else {
+                filterInfo.style.display = 'none';
+            }
+            
             document.getElementById('ai-report-container').style.display = 'block';
             
             // Scroll vers le rapport
-            document.getElementById('ai-report-container').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            setTimeout(() => {
+                document.getElementById('ai-report-container').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         } else {
             alert('❌ ' + result.message);
         }
     } catch (error) {
         document.getElementById('ai-loading').style.display = 'none';
+        console.error('Erreur complète:', error); // Debug
         alert('❌ Erreur lors de la génération du rapport: ' + error.message);
     }
 }

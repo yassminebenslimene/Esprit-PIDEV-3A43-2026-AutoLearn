@@ -2,8 +2,55 @@
 
 {% block title %}Feedback - {{ evenement.titre }}{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Forcer l'affichage du header sur la page feedback avec le thème violet/bleu */
+        .header-area {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 9999 !important;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
+        }
+        
+        .header-area .main-nav .logo h1 {
+            color: #fff !important;
+        }
+        
+        .header-area .main-nav .nav li a {
+            color: #fff !important;
+        }
+        
+        .header-area .main-nav .nav li a:hover {
+            opacity: 0.8 !important;
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        .header-area .main-nav .search-input input {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: #fff !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+        
+        .header-area .main-nav .search-input input::placeholder {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+        
+        .header-area .main-nav .search-input i {
+            color: #fff !important;
+        }
+        
+        .header-area .main-nav .profile-dropdown-btn {
+            color: #fff !important;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
-<div class="container" style="padding-top: 140px; padding-bottom: 80px;">
+<div class="container" style="padding-top: 100px; padding-bottom: 80px;">
     <div class="row justify-content-center">
         <div class="col-lg-8">
             {# En-tête #}

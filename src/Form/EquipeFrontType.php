@@ -24,13 +24,18 @@ class EquipeFrontType extends AbstractType
             ])
             ->add('etudiants', EntityType::class, [
                 'class' => Etudiant::class,
-                'choice_label' => function(Etudiant $etudiant) {
-                    return $etudiant->getPrenom() . ' ' . $etudiant->getNom() . ' - ' . $etudiant->getNiveau();
+                'choice_label' => function(Etudiant $etudiant) use ($currentUserId) {
+                    $label = $etudiant->getPrenom() . ' ' . $etudiant->getNom() . ' - ' . $etudiant->getNiveau();
+                    // Ajouter "(You)" pour l'utilisateur connecté
+                    if ($currentUserId && $etudiant->getId() === $currentUserId) {
+                        $label .= ' (You - Required)';
+                    }
+                    return $label;
                 },
                 'choice_attr' => function(Etudiant $etudiant) use ($currentUserId) {
-                    // Pré-cocher et désactiver l'étudiant connecté
+                    // Pré-cocher l'étudiant connecté et marquer comme requis
                     if ($currentUserId && $etudiant->getId() === $currentUserId) {
-                        return ['checked' => 'checked', 'disabled' => 'disabled', 'data-current-user' => 'true'];
+                        return ['data-current-user' => 'true', 'class' => 'current-user-checkbox'];
                     }
                     return [];
                 },

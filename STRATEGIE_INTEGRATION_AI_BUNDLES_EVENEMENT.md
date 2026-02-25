@@ -784,3 +784,56 @@ class PredictionService
 
 ---
 
+
+## 📦 BUNDLES SYMFONY {#bundles-symfony}
+
+### 1. WORKFLOW BUNDLE - Gestion des états
+
+#### 🎯 Objectif
+Automatiser et sécuriser les transitions de statuts pour:
+- **Événements**: Planifié → En cours → Terminé → Annulé
+- **Participations**: En attente → Accepté / Refusé
+
+#### 📦 Installation
+```bash
+# Déjà inclus dans Symfony, juste activer
+composer require symfony/workflow
+```
+
+#### 🔧 Configuration détaillée
+
+**Étape 1: Créer config/packages/workflow.yaml**
+```yaml
+framework:
+    workflows:
+        # Workflow pour les événements
+        evenement_lifecycle:
+            type: 'state_machine'
+            audit_trail:
+                enabled: true
+            marking_store:
+                type: 'method'
+                property: 'status'
+            supports:
+                - App\Entity\Evenement
+            initial_marking: PLANIFIE
+            places:
+                - PLANIFIE
+                - EN_COURS
+                - TERMINE
+                - ANNULE
+            transitions:
+                start:
+                    from: PLANIFIE
+                    to: EN_COURS
+                    metadata:
+                        title: 'Démarrer l\'événement'
+                        description: 'L\'événement commence maintenant'
+                finish:
+                    from: EN_COURS
+                    to: TERMINE
+                    metadata:
+                        title: 'Terminer l\'événement'
+                        description: 'L\'événement est terminé'
+                cancel_from_planned:
+                    from: P

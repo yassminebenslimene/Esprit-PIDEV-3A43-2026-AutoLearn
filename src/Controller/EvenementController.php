@@ -166,10 +166,13 @@ final class EvenementController extends AbstractController
     // ===== ROUTES POUR LES RAPPORTS AI =====
     
     #[Route('/ai/generate-analysis', name: 'backoffice_evenement_ai_analysis', methods: ['POST'])]
-    public function generateAIAnalysis(AIReportService $aiReportService): JsonResponse
+    public function generateAIAnalysis(Request $request, AIReportService $aiReportService): JsonResponse
     {
         try {
-            $report = $aiReportService->generateAnalysisReport();
+            $data = json_decode($request->getContent(), true);
+            $eventType = $data['event_type'] ?? null;
+            
+            $report = $aiReportService->generateAnalysisReport($eventType);
             
             if (!$report) {
                 return new JsonResponse([
@@ -191,10 +194,13 @@ final class EvenementController extends AbstractController
     }
 
     #[Route('/ai/generate-recommendations', name: 'backoffice_evenement_ai_recommendations', methods: ['POST'])]
-    public function generateAIRecommendations(AIReportService $aiReportService): JsonResponse
+    public function generateAIRecommendations(Request $request, AIReportService $aiReportService): JsonResponse
     {
         try {
-            $recommendations = $aiReportService->generateEventRecommendations();
+            $data = json_decode($request->getContent(), true);
+            $eventType = $data['event_type'] ?? null;
+            
+            $recommendations = $aiReportService->generateEventRecommendations($eventType);
             
             if (!$recommendations) {
                 return new JsonResponse([
@@ -216,10 +222,13 @@ final class EvenementController extends AbstractController
     }
 
     #[Route('/ai/generate-improvements', name: 'backoffice_evenement_ai_improvements', methods: ['POST'])]
-    public function generateAIImprovements(AIReportService $aiReportService): JsonResponse
+    public function generateAIImprovements(Request $request, AIReportService $aiReportService): JsonResponse
     {
         try {
-            $improvements = $aiReportService->generateImprovementSuggestions();
+            $data = json_decode($request->getContent(), true);
+            $eventType = $data['event_type'] ?? null;
+            
+            $improvements = $aiReportService->generateImprovementSuggestions($eventType);
             
             if (!$improvements) {
                 return new JsonResponse([

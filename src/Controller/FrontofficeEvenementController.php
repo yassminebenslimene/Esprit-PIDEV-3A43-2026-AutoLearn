@@ -86,7 +86,6 @@ class FrontofficeEvenementController extends AbstractController
         // Vérifier si les participations sont ouvertes (workflow)
         if (!$evenement->canAcceptParticipations()) {
             $message = match($evenement->getWorkflowStatus()) {
-                'en_cours' => 'This event is currently in progress. New registrations are not accepted.',
                 'termine' => 'This event has ended. Registrations are now closed.',
                 'annule' => 'This event has been cancelled. No registrations are accepted.',
                 default => 'Registrations are not available for this event.',

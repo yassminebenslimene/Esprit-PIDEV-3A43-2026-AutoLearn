@@ -526,7 +526,7 @@
                                         This event has been cancelled. No registrations are accepted.
                                     </p>
                                 </div>
-                            {% elseif evenement.workflowStatus == 'termine' %}
+                            {% elseif evenement.workflowStatus == 'termine' or evenement.status.value == 'Passé' %}
                                 <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%); border-radius: 15px; border: 2px solid #718096;">
                                     <div style="font-size: 48px; margin-bottom: 15px;">🏁</div>
                                     <h3 style="color: #2d3748; margin-bottom: 10px; font-size: 24px;">Event Completed</h3>
@@ -534,16 +534,15 @@
                                         This event has ended. Registrations are now closed.
                                     </p>
                                 </div>
-                            {% elseif evenement.workflowStatus == 'en_cours' %}
-                                <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 15px; border: 2px solid #f59e0b;">
-                                    <div style="font-size: 48px; margin-bottom: 15px;">⏳</div>
-                                    <h3 style="color: #92400e; margin-bottom: 10px; font-size: 24px;">Event In Progress</h3>
-                                    <p style="color: #78350f; margin: 0; font-size: 16px;">
-                                        This event is currently happening. New registrations are not accepted.
-                                    </p>
-                                </div>
-                            {% elseif data.placesDisponibles > 0 %}
+                            {% elseif data.placesDisponibles > 0 and (evenement.workflowStatus == 'planifie' or evenement.workflowStatus == 'en_cours') %}
                                 <div style="text-align: center;">
+                                    {% if evenement.workflowStatus == 'en_cours' %}
+                                        <div style="background: #fef3c7; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 2px solid #f59e0b;">
+                                            <p style="margin: 0; color: #92400e; font-weight: 600;">
+                                                ⏰ Event in progress! You can still join now.
+                                            </p>
+                                        </div>
+                                    {% endif %}
                                     <a href="{{ path('app_event_participate', {'id': evenement.id}) }}" class="participate-btn">
                                         🎯 Participate in This Event
                                     </a>

@@ -88,6 +88,12 @@ class FrontofficeEquipeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // S'assurer que l'utilisateur connecté est TOUJOURS dans l'équipe
+            // (car les champs disabled ne sont pas soumis avec le formulaire)
+            if (!$equipe->getEtudiants()->contains($currentUser)) {
+                $equipe->addEtudiant($currentUser);
+            }
+            
             // Sauvegarder l'équipe
             $entityManager->persist($equipe);
             $entityManager->flush();

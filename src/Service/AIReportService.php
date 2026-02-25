@@ -28,13 +28,14 @@ class AIReportService
 
     /**
      * Génère un rapport d'analyse complet via AI
+     * @param string|null $eventType Type d'événement à filtrer (conference, hackathon, workshop) ou null pour tous
      */
-    public function generateAnalysisReport(): ?string
+    public function generateAnalysisReport(?string $eventType = null): ?string
     {
         try {
-            $data = $this->analyticsService->prepareDataForAI();
+            $data = $this->analyticsService->prepareDataForAI($eventType);
             
-            $prompt = $this->buildAnalysisPrompt($data);
+            $prompt = $this->buildAnalysisPrompt($data, $eventType);
             
             return $this->callMistralAPI($prompt);
         } catch (\Exception $e) {
@@ -45,24 +46,26 @@ class AIReportService
 
     /**
      * Génère des recommandations d'événements via AI
+     * @param string|null $eventType Type d'événement à filtrer (conference, hackathon, workshop) ou null pour tous
      */
-    public function generateEventRecommendations(): ?string
+    public function generateEventRecommendations(?string $eventType = null): ?string
     {
-        $data = $this->analyticsService->prepareDataForAI();
+        $data = $this->analyticsService->prepareDataForAI($eventType);
         
-        $prompt = $this->buildRecommendationPrompt($data);
+        $prompt = $this->buildRecommendationPrompt($data, $eventType);
         
         return $this->callMistralAPI($prompt);
     }
 
     /**
      * Génère des suggestions d'amélioration via AI
+     * @param string|null $eventType Type d'événement à filtrer (conference, hackathon, workshop) ou null pour tous
      */
-    public function generateImprovementSuggestions(): ?string
+    public function generateImprovementSuggestions(?string $eventType = null): ?string
     {
-        $data = $this->analyticsService->prepareDataForAI();
+        $data = $this->analyticsService->prepareDataForAI($eventType);
         
-        $prompt = $this->buildImprovementPrompt($data);
+        $prompt = $this->buildImprovementPrompt($data, $eventType);
         
         return $this->callMistralAPI($prompt);
     }
@@ -70,13 +73,20 @@ class AIReportService
     /**
      * Construit le prompt pour l'analyse
      */
-    private function buildAnalysisPrompt(array $data): string
+    private function buildAnalysisPrompt(array $data, ?string $eventType = null): string
     {
         $byTypeText = $this->formatByTypeData($data['by_type']);
         $commentsText = $this->formatComments($data['recent_comments']);
+        
+        $filterInfo = $eventType ? "FILTRE ACTIF: Analyse uniquement pour les événements de type '{$eventType}'" : "Analyse globale de tous les types d'événements";
+        
+        // Date actuelle au format français
+        $currentDate = (new \DateTime())->format('d/m/Y');
 
         return <<<PROMPT
 Tu es un expert en analyse de données éducatives. Analyse les données suivantes et génère un rapport professionnel en français.
+
+{$filterInfo}
 
 DONNÉES DES ÉVÉNEMENTS:
 {$byTypeText}
@@ -85,26 +95,50 @@ COMMENTAIRES RÉCENTS DES ÉTUDIANTS:
 {$commentsText}
 
 Génère un rapport d'analyse détaillé incluant:
-1. Performance globale des événements
+1. Performance globale des événements {$this->getFilterSuffix($eventType)}
 2. Types d'événements les plus appréciés (classement)
 3. Analyse par catégorie (organisation, contenu, lieu, animation)
 4. Tendances détectées dans les commentaires
 5. Taux de satisfaction général
 
-Format: Rapport professionnel avec sections claires, émojis pour la lisibilité, et données chiffrées.
+IMPORTANT - FORMAT DU RAPPORT:
+- Commence par: "📊 RAPPORT D'ANALYSE DES ÉVÉNEMENTS ÉDUCATIFS"
+- Puis: "📅 Date: {$currentDate}"
+- Puis: "📌 Référence: Analyse des feedbacks étudiants et données quantitatives"
+- Utilise des sections claires avec des titres en gras
+- Présente les données sous forme de LISTE À PUCES (pas de tableau ASCII)
+- Exemple de format pour les statistiques:
+  
+  📊 STATISTIQUES PAR TYPE D'ÉVÉNEMENT:
+  
+  🎯 Hackathon:
+  • Note moyenne: 4.0/5 ⭐
+  • Taux de satisfaction: 100%
+  • Nombre de feedbacks: 3
+  
+  🎓 Conférence:
+  • Note moyenne: 3.25/5 ⭐
+  • Taux de satisfaction: 75%
+  • Nombre de feedbacks: 4
+
+Format: Rapport professionnel avec sections claires, émojis pour la lisibilité, et données chiffrées en LISTES À PUCES.
 PROMPT;
     }
 
     /**
      * Construit le prompt pour les recommandations
      */
-    private function buildRecommendationPrompt(array $data): string
+    private function buildRecommendationPrompt(array $data, ?string $eventType = null): string
     {
         $byTypeText = $this->formatByTypeData($data['by_type']);
         $commentsText = $this->formatComments($data['recent_comments']);
+        
+        $filterInfo = $eventType ? "FILTRE ACTIF: Recommandations uniquement pour les événements de type '{$eventType}'" : "Recommandations pour tous les types d'événements";
 
         return <<<PROMPT
 Tu es un expert en planification d'événements éducatifs. Basé sur ces données, recommande 3 événements à organiser.
+
+{$filterInfo}
 
 DONNÉES DES ÉVÉNEMENTS PASSÉS:
 {$byTypeText}
@@ -113,7 +147,7 @@ COMMENTAIRES DES ÉTUDIANTS:
 {$commentsText}
 
 Pour chaque événement recommandé, fournis:
-1. Titre et type d'événement
+1. Titre et type d'événement {$this->getFilterSuffix($eventType)}
 2. Durée suggérée
 3. Capacité recommandée (nombre d'équipes)
 4. Justification détaillée (pourquoi cet événement?)
@@ -127,13 +161,17 @@ PROMPT;
     /**
      * Construit le prompt pour les améliorations
      */
-    private function buildImprovementPrompt(array $data): string
+    private function buildImprovementPrompt(array $data, ?string $eventType = null): string
     {
         $byTypeText = $this->formatByTypeData($data['by_type']);
         $commentsText = $this->formatComments($data['recent_comments']);
+        
+        $filterInfo = $eventType ? "FILTRE ACTIF: Suggestions d'amélioration uniquement pour les événements de type '{$eventType}'" : "Suggestions d'amélioration pour tous les types d'événements";
 
         return <<<PROMPT
 Tu es un consultant en amélioration continue pour des événements éducatifs. Analyse ces données et propose un plan d'amélioration.
+
+{$filterInfo}
 
 DONNÉES DES ÉVÉNEMENTS:
 {$byTypeText}
@@ -142,7 +180,7 @@ COMMENTAIRES DES ÉTUDIANTS:
 {$commentsText}
 
 Génère un plan d'amélioration incluant:
-1. Problèmes identifiés (classés par priorité: HAUTE, MOYENNE, BASSE)
+1. Problèmes identifiés {$this->getFilterSuffix($eventType)} (classés par priorité: HAUTE, MOYENNE, BASSE)
 2. Pour chaque problème:
    - Description du problème
    - Preuves (citations de commentaires si pertinent)
@@ -153,6 +191,14 @@ Génère un plan d'amélioration incluant:
 
 Format: Plan structuré, professionnel, avec émojis et priorités claires.
 PROMPT;
+    }
+    
+    /**
+     * Retourne un suffixe pour indiquer le filtre actif
+     */
+    private function getFilterSuffix(?string $eventType): string
+    {
+        return $eventType ? " (type: {$eventType})" : "";
     }
 
     /**
