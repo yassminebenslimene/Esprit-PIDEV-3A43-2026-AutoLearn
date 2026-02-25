@@ -607,10 +607,20 @@ Your COMPLETE response:
 {"action": "create_student", "data": {"nom": "Doe", "prenom": "John", "email": "john@test.com", "niveau": "DEBUTANT"}}
 ✅ Student created
 
+User: "create course Java Web Development"
+Your COMPLETE response:
+{"action": "create_course", "data": {"titre": "Java Course", "description": "Learn web development with Java", "niveau": "DEBUTANT"}}
+✅ Course created
+
 User: "créer événement Workshop IA le 2026-03-10 à 14h salle B capacité 30"
 Your COMPLETE response:
 {"action": "create_event", "data": {"titre": "Workshop IA", "date_debut": "2026-03-10 14:00", "date_fin": "2026-03-10 17:00", "lieu": "Salle B", "capacite": 30}}
 ✅ Événement créé
+
+User: "see details event Workshop IA" or "voir détails événement id 3"
+Your COMPLETE response:
+{"action": "get_event", "data": {"titre": "Workshop IA"}}
+📅 Event details displayed
 
 User: "delete event Workshop IA" or "delete event id 3"
 Your COMPLETE response:
@@ -628,6 +638,12 @@ Your COMPLETE response:
 3. ALWAYS provide a natural language response
 4. Keep responses ultra-concise (3-5 words for confirmations)
 5. NEVER generate JSON for "how to" or "comment" questions
+6. CRITICAL: Distinguish between entities:
+   - "user" / "student" / "étudiant" → use USER actions (get_user, create_student, etc.)
+   - "event" / "événement" → use EVENT actions (get_event, create_event, etc.)
+   - "course" / "cours" → use COURSE actions (get_course, create_course, etc.)
+   - "challenge" → use CHALLENGE actions
+   - "community" / "communauté" → use COMMUNITY actions
 
 SUPPORTED LANGUAGES:
 - French (FR)
@@ -864,10 +880,20 @@ Ta réponse COMPLÈTE:
 {"action": "create_student", "data": {"nom": "Dupont", "prenom": "Jean", "email": "jean@test.com", "niveau": "DEBUTANT"}}
 ✅ Étudiant créé
 
+User: "créer cours Java Développement Web"
+Ta réponse COMPLÈTE:
+{"action": "create_course", "data": {"titre": "Cours Java", "description": "Apprentissage du développement web avec Java", "niveau": "DEBUTANT"}}
+✅ Cours créé
+
 User: "créer événement Workshop IA le 2026-03-10 à 14h salle B capacité 30"
 Ta réponse COMPLÈTE:
 {"action": "create_event", "data": {"titre": "Workshop IA", "date_debut": "2026-03-10 14:00", "date_fin": "2026-03-10 17:00", "lieu": "Salle B", "capacite": 30}}
 ✅ Événement créé
+
+User: "voir détails événement Workshop IA" ou "voir événement id 3"
+Ta réponse COMPLÈTE:
+{"action": "get_event", "data": {"titre": "Workshop IA"}}
+📅 Détails de l'événement affichés
 
 User: "supprimer événement Workshop IA" ou "supprimer événement id 3"
 Ta réponse COMPLÈTE:
@@ -882,9 +908,16 @@ Ta réponse COMPLÈTE:
 ⚠️ RÈGLES IMPORTANTES:
 1. Si l'utilisateur demande COMMENT faire quelque chose → Explique SANS générer de JSON
 2. Si l'utilisateur fournit des données complètes → Génère JSON + confirmation
-3. TOUJOURS fournir une réponse en langage naturel
+3. TOUJOURS fournir une réponse en langage naturel APRÈS le JSON
 4. Garde les réponses ultra-concises (3-5 mots pour les confirmations)
 5. NE GÉNÈRE JAMAIS de JSON pour les questions "comment" ou "how to"
+6. CRITIQUE: Distingue bien les entités:
+   - "user" / "student" / "étudiant" / "utilisateur" → utilise actions USER (get_user, create_student, etc.)
+   - "event" / "événement" → utilise actions EVENT (get_event, create_event, etc.)
+   - "course" / "cours" → utilise actions COURSE (get_course, create_course, etc.)
+   - "challenge" → utilise actions CHALLENGE
+   - "community" / "communauté" → utilise actions COMMUNITY
+7. ⚠️ RÈGLE ABSOLUE: Quand tu génères du JSON, tu DOIS TOUJOURS ajouter une réponse en langage naturel sur la ligne suivante. Format: JSON sur ligne 1, réponse naturelle sur ligne 2. JAMAIS de JSON seul!
 
 LANGUES SUPPORTÉES:
 - Français (FR)
@@ -969,10 +1002,10 @@ Actions disponibles:
 - unsuspend_user: Réactiver un utilisateur suspendu
 - get_inactive_users: Lister les utilisateurs inactifs
 - get_popular_courses: Afficher les cours les plus populaires
-- create_event: Créer un événement
+- create_event: Créer un événement (titre, date_debut, date_fin, lieu, capacite)
 - update_event: Modifier un événement
 - delete_event: Supprimer un événement
-- create_course: Créer un cours
+- create_course: Créer un cours (titre, description, niveau)
 - create_challenge: Créer un challenge
 - create_community: Créer une communauté
 
@@ -1041,44 +1074,20 @@ PROMPT;
     private function postProcessResponse(string $response, array $context): string
     {
         // Supprimer le JSON d'action de la réponse visible par l'utilisateur
-        // Le JSON peut être sur une ou plusieurs lignes
-        // Pattern: cherche { ... } au début de la réponse (avec support multi-lignes)
-        $response = preg_replace('/^\s*\{[^}]*\}\s*\n*/s', '', $response);
+        // Le JSON doit être sur la PREMIÈRE ligne et commencer par {"action"
+        // Pattern: cherche {"action": "xxx", "data": {...}} au début
+        $jsonPattern = '/^\s*\{\s*"action"\s*:\s*"[^"]+"\s*,\s*"data"\s*:\s*\{[^\}]*\}\s*\}\s*\n*/s';
         
-        // Si le JSON n'a pas été complètement supprimé (cas complexe), essayer une autre approche
-        if (preg_match('/^\s*\{/', $response)) {
-            // Trouver la position de la première ligne qui ne commence pas par { ou contient du texte après }
-            $lines = explode("\n", $response);
-            $cleanLines = [];
-            $jsonEnded = false;
-            
-            foreach ($lines as $line) {
-                $trimmed = trim($line);
-                
-                // Si la ligne commence par { ou contient "action", c'est du JSON
-                if (!$jsonEnded && (strpos($trimmed, '{') === 0 || strpos($trimmed, '"action"') !== false || strpos($trimmed, '"data"') !== false)) {
-                    continue;
-                }
-                
-                // Si on trouve une ligne avec juste }, le JSON est terminé
-                if (!$jsonEnded && $trimmed === '}') {
-                    $jsonEnded = true;
-                    continue;
-                }
-                
-                // Sinon, c'est du texte normal
-                $jsonEnded = true;
-                $cleanLines[] = $line;
-            }
-            
-            $response = implode("\n", $cleanLines);
+        if (preg_match($jsonPattern, $response)) {
+            // JSON trouvé, le supprimer
+            $response = preg_replace($jsonPattern, '', $response);
         }
         
         // Nettoyer les espaces multiples
         $response = trim($response);
         
         // Si la réponse est vide après nettoyage, retourner un message par défaut
-        if (empty($response)) {
+        if (empty($response) || $response === '}') {
             return "✅ Action exécutée avec succès";
         }
         

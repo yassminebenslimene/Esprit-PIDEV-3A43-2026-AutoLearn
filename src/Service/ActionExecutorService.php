@@ -302,6 +302,47 @@ class ActionExecutorService
     }
 
     /**
+     * Trouve un événement de manière intelligente (par ID ou titre)
+     */
+    private function findEventIntelligently(array $params): ?\App\Entity\Evenement
+    {
+        // 1. Chercher par ID direct
+        if (!empty($params['id']) || !empty($params['event_id'])) {
+            $eventId = $params['id'] ?? $params['event_id'];
+            $event = $this->evenementRepository->find($eventId);
+            if ($event) {
+                return $event;
+            }
+        }
+
+        // 2. Chercher par titre exact
+        if (!empty($params['titre'])) {
+            $event = $this->evenementRepository->findOneBy(['titre' => $params['titre']]);
+            if ($event) {
+                return $event;
+            }
+        }
+
+        // 3. Chercher par titre partiel (case insensitive)
+        if (!empty($params['titre'])) {
+            $qb = $this->em->createQueryBuilder();
+            $events = $qb->select('e')
+                ->from(\App\Entity\Evenement::class, 'e')
+                ->where('LOWER(e.titre) LIKE LOWER(:titre)')
+                ->setParameter('titre', '%' . $params['titre'] . '%')
+                ->setMaxResults(1)
+                ->getQuery()
+                ->getResult();
+            
+            if (!empty($events)) {
+                return $events[0];
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Trouve un utilisateur de manière intelligente (par ID, nom, prénom, email)
      */
     private function findUserIntelligently(array $params): ?User
@@ -876,7 +917,12 @@ class ActionExecutorService
         $cours->setTitre($params['titre']);
         $cours->setDescription($params['description']);
         $cours->setNiveau($params['niveau']);
-        $cours->setDuree($params['duree'] ?? 0);
+        
+        // Set matiere with a default value if not provided
+        $cours->setMatiere($params['matiere'] ?? 'Général');
+        
+        $cours->setDuree($params['duree'] ?? 10); // Default 10 hours
+        $cours->setCreatedAt(new \DateTimeImmutable());
 
         $this->em->persist($cours);
         $this->em->flush();
