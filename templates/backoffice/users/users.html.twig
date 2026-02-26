@@ -326,6 +326,9 @@
                                    class="search-input" 
                                    placeholder="Search users..." 
                                    value="{{ search|default('') }}">
+                            {% if roleFilter %}
+                            <input type="hidden" name="role" value="{{ roleFilter }}">
+                            {% endif %}
                         </form>
                     </div>
                     <button class="nav-btn">
@@ -452,6 +455,25 @@
                             <p class="card-subtitle">Manage your user base</p>
                         </div>
                         <div class="card-actions">
+    <!-- Role Filter Buttons -->
+    <div style="display: inline-flex; gap: 8px; margin-right: 10px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 10px;">
+        <a href="{{ path('backoffice_users') }}" 
+           class="card-btn small-btn" 
+           style="{% if not roleFilter %}background: linear-gradient(135deg, var(--emerald-light), var(--emerald)) !important;{% else %}background: transparent !important; border: 1px solid rgba(255,255,255,0.2);{% endif %}">
+            All
+        </a>
+        <a href="{{ path('backoffice_users', {'role': 'ETUDIANT'}) }}" 
+           class="card-btn small-btn" 
+           style="{% if roleFilter == 'ETUDIANT' %}background: linear-gradient(135deg, var(--gold), var(--amber)) !important;{% else %}background: transparent !important; border: 1px solid rgba(255,255,255,0.2);{% endif %}">
+            Students
+        </a>
+        <a href="{{ path('backoffice_users', {'role': 'ADMIN'}) }}" 
+           class="card-btn small-btn" 
+           style="{% if roleFilter == 'ADMIN' %}background: linear-gradient(135deg, var(--danger), var(--coral)) !important;{% else %}background: transparent !important; border: 1px solid rgba(255,255,255,0.2);{% endif %}">
+            Admins
+        </a>
+    </div>
+    
     <a href="{{ path('backoffice_user_new') }}" class="card-btn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -604,6 +626,10 @@
                                             {% if search %}
                                                 for "{{ search }}"
                                             {% endif %}
+                                            {% if roleFilter %}
+                                                {% if search %} in {% endif %}
+                                                {{ roleFilter == 'ADMIN' ? 'Admins' : 'Students' }}
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 {% endif %}
@@ -613,7 +639,7 @@
                     
                     {% if search and users|length > 0 %}
                     <div style="padding: 1rem; text-align: center;">
-                        <a href="{{ path('backoffice_users') }}" class="card-btn" style="font-size: 0.9rem;">
+                        <a href="{{ path('backoffice_users', roleFilter ? {'role': roleFilter} : {}) }}" class="card-btn" style="font-size: 0.9rem;">
                             Clear search
                         </a>
                     </div>

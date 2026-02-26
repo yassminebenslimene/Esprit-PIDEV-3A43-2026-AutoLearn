@@ -118,47 +118,63 @@ class BackofficeController extends AbstractController
     }
 
     #[Route('/backoffice/users', name: 'backoffice_users')]
-    #[IsGranted('ROLE_ADMIN')]
-    public function users(UserRepository $userRepository, Request $request): Response
-    {
-        // Gérer la recherche
-        $search = $request->query->get('search');
-        
-        if ($search) {
-            try {
-                $users = $userRepository->createQueryBuilder('u')
-                    ->where('u.nom LIKE :search')
-                    ->orWhere('u.prenom LIKE :search')
-                    ->orWhere('u.email LIKE :search')
-                    ->setParameter('search', '%' . $search . '%')
-                    ->getQuery()
-                    ->getResult();
-            } catch (\Exception $e) {
-                $users = $userRepository->findAll();
+        #[IsGranted('ROLE_ADMIN')]
+        public function users(UserRepository $userRepository, Request $request): Response
+        {
+            // Get all users for statistics (always show total stats)
+            $allUsers = $userRepository->findAll();
+
+            // Calculate statistics from ALL users
+            $totalUsers = count($allUsers);
+            $students = array_filter($allUsers, fn($user) => $user->getRole() === 'ETUDIANT');
+            $admins = array_filter($allUsers, fn($user) => $user->getRole() === 'ADMIN');
+
+            // Users created today
+            $today = new \DateTime();
+            $today->setTime(0, 0, 0);
+            $newToday = array_filter($allUsers, fn($user) => $user->getCreatedAt() >= $today);
+
+            // Handle search and filter
+            $search = $request->query->get('search');
+            $roleFilter = $request->query->get('role'); // New: role filter
+
+            $users = $allUsers; // Start with all users
+
+            // Apply search filter
+            if ($search) {
+                try {
+                    $users = $userRepository->createQueryBuilder('u')
+                        ->where('u.nom LIKE :search')
+                        ->orWhere('u.prenom LIKE :search')
+                        ->orWhere('u.email LIKE :search')
+                        ->setParameter('search', '%' . $search . '%');
+
+                    // Apply role filter to search query if present
+                    if ($roleFilter && in_array($roleFilter, ['ADMIN', 'ETUDIANT'])) {
+                        $users->andWhere('u.role = :role')
+                              ->setParameter('role', $roleFilter);
+                    }
+
+                    $users = $users->getQuery()->getResult();
+                } catch (\Exception $e) {
+                    $users = $allUsers;
+                }
+            } elseif ($roleFilter && in_array($roleFilter, ['ADMIN', 'ETUDIANT'])) {
+                // Apply only role filter if no search
+                $users = array_filter($allUsers, fn($user) => $user->getRole() === $roleFilter);
             }
-        } else {
-            $users = $userRepository->findAll();
+
+            return $this->render('backoffice/users/users.html.twig', [
+                'users' => $users,
+                'search' => $search,
+                'roleFilter' => $roleFilter,
+                'totalUsers' => $totalUsers,
+                'totalStudents' => count($students),
+                'totalAdmins' => count($admins),
+                'newTodayCount' => count($newToday),
+            ]);
         }
-        
-        // Calculer les statistiques
-        $totalUsers = count($users);
-        $students = array_filter($users, fn($user) => $user->getRole() === 'ETUDIANT');
-        $admins = array_filter($users, fn($user) => $user->getRole() === 'ADMIN');
-        
-        // Utilisateurs créés aujourd'hui
-        $today = new \DateTime();
-        $today->setTime(0, 0, 0);
-        $newToday = array_filter($users, fn($user) => $user->getCreatedAt() >= $today);
-        
-        return $this->render('backoffice/users/users.html.twig', [
-            'users' => $users,
-            'search' => $search,
-            'totalUsers' => $totalUsers,
-            'totalStudents' => count($students),
-            'totalAdmins' => count($admins),
-            'newTodayCount' => count($newToday),
-        ]);
-    }
+
 
     #[Route('/backoffice/users/new', name: 'backoffice_user_new')]
     #[IsGranted('ROLE_ADMIN')]
