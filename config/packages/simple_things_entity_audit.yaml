@@ -1,0 +1,27 @@
+simple_things_entity_audit:
+    audited_entities:
+        - App\Entity\Etudiant
+        - App\Entity\Admin
+        - App\Entity\GestionDeCours\Cours
+        - App\Entity\GestionDeCours\Chapitre
+        - App\Entity\GestionDeCours\Ressource
+        - App\Entity\Exercice
+        - App\Entity\Challenge
+        - App\Entity\Quiz
+        - App\Entity\Evenement
+        - App\Entity\Communaute
+        - App\Entity\Post
+        - App\Entity\Commentaire
+        - App\Entity\Equipe
+
+    global_ignore_columns:
+        - createdAt
+        - updatedAt
+        - lastModifiedAt
+
+    table_prefix: ''
+    table_suffix: '_audit'
+    revision_table_name: 'revisions'
+    revision_field_name: 'rev'
+    revision_type_field_name: 'revtype'
+    revision_id_field_type: 'integer'
