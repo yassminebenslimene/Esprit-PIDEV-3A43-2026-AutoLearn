@@ -5,12 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     uploads_dir: '%kernel.project_dir%/public/uploads'
-<<<<<<< HEAD
+    admin_email: 'noreply@autolearn.com'
     
-=======
-    admin_email: 'noreply@scholar.com'
-
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -30,7 +26,6 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-<<<<<<< HEAD
     
     # Configuration du WeatherService avec la clé API
     App\Service\WeatherService:
@@ -55,6 +50,7 @@ services:
     App\Service\QuizCorrectorAIService:
         arguments:
             $grokApiKey: '%env(GROQ_API_KEY)%'
+
     
     # Configuration du QuizTutorAIService avec la clé API Groq
     App\Service\QuizTutorAIService:
@@ -144,8 +140,10 @@ services:
     App\Service\AiSummaryService:
         arguments:
             $groqApiKey: '%env(GROQ_API_KEY)%'
-=======
+            $groqApiUrl: '%env(GROQ_API_URL)%'
+            $groqModel: '%env(GROQ_MODEL)%'
+    
+    # Email Service
     App\Service\EmailService:
         arguments:
             $adminEmail: '%admin_email%'
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
