@@ -4,13 +4,16 @@ namespace App\Controller;
 
 use App\Entity\Post;
 use App\Entity\Communaute;
+use App\Entity\PostReaction;
 use App\Form\PostType;
+use App\Repository\PostReactionRepository;
 use App\Service\AiSummaryService;
 use App\Service\TitleSuggestionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/post')]
@@ -153,5 +156,59 @@ final class PostController extends AbstractController
         }
 
         throw $this->createAccessDeniedException();
+    }
+
+    #[Route('/{id}/react', name: 'app_post_react', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function react(
+        Post $post,
+        Request $request,
+        EntityManagerInterface $em,
+        PostReactionRepository $reactionRepo
+    ): JsonResponse {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        $data = json_decode($request->getContent(), true);
+        $reactionType = $data['type'] ?? null;
+
+        $validTypes = ['like', 'love', 'wow', 'haha', 'sad', 'angry'];
+        if (!in_array($reactionType, $validTypes)) {
+            return new JsonResponse(['error' => 'Type de réaction invalide'], 400);
+        }
+
+        $user = $this->getUser();
+        $existingReaction = $reactionRepo->findUserReaction($post, $user);
+
+        if ($existingReaction) {
+            if ($existingReaction->getType() === $reactionType) {
+                // Supprimer la réaction si c'est la même
+                $em->remove($existingReaction);
+                $em->flush();
+                
+                return new JsonResponse([
+                    'success' => true,
+                    'action' => 'removed',
+                    'counts' => $reactionRepo->countByType($post)
+                ]);
+            } else {
+                // Changer le type de réaction
+                $existingReaction->setType($reactionType);
+            }
+        } else {
+            // Créer une nouvelle réaction
+            $reaction = new PostReaction();
+            $reaction->setPost($post);
+            $reaction->setUser($user);
+            $reaction->setType($reactionType);
+            $em->persist($reaction);
+        }
+
+        $em->flush();
+
+        return new JsonResponse([
+            'success' => true,
+            'action' => 'added',
+            'type' => $reactionType,
+            'counts' => $reactionRepo->countByType($post)
+        ]);
     }
 }

@@ -18,10 +18,19 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class CommunauteController extends AbstractController
 {
     #[Route(name: 'app_communaute_index', methods: ['GET'])]
-    public function index(CommunauteRepository $communauteRepository): Response
+    public function index(Request $request, CommunauteRepository $communauteRepository): Response
     {
+        $search = $request->query->get('search', '');
+        
+        if ($search) {
+            $communautes = $communauteRepository->searchByNameOrDescription($search);
+        } else {
+            $communautes = $communauteRepository->findAll();
+        }
+        
         return $this->render('frontoffice/communaute/index.html.twig', [
-            'communautes' => $communauteRepository->findAll(),
+            'communautes' => $communautes,
+            'search' => $search,
         ]);
     }
 
@@ -134,7 +143,7 @@ final class CommunauteController extends AbstractController
     }
 
     #[Route('/{id}/accept-member/{userId}', name: 'app_communaute_accept_member', requirements: ['id' => '\d+', 'userId' => '\d+'], methods: ['POST'])]
-    public function acceptMember(Request $request, Communaute $communaute, int $userId, UserRepository $userRepository, EntityManagerInterface $em): Response
+    public function acceptMember(Request $request, Communaute $communaute, int $userId, UserRepository $userRepository, EntityManagerInterface $em, EmailService $emailService): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         
@@ -158,7 +167,21 @@ final class CommunauteController extends AbstractController
         $communaute->addMember($user);
         $em->flush();
 
-        $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté.');
+        // Envoyer un email de notification au membre accepté
+        try {
+            $communityUrl = $this->generateUrl('app_communaute_show', ['id' => $communaute->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+            $emailService->sendCommunityInvitation(
+                $user->getEmail(),
+                $user->getPrenom() . ' ' . $user->getNom(),
+                $communaute->getNom(),
+                $this->getUser()->getPrenom() . ' ' . $this->getUser()->getNom(),
+                $communityUrl
+            );
+            $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté et un email de notification a été envoyé.');
+        } catch (\Exception $e) {
+            $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté (email non envoyé).');
+        }
+
         return $this->redirectToRoute('app_communaute_show', ['id' => $communaute->getId()]);
     }
 

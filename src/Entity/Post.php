@@ -24,6 +24,12 @@ class Post
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $titre = null;
 
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    private ?string $aiReaction = null;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $aiReactionData = null;
+
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $summary = null;
 
@@ -69,6 +75,12 @@ class Post
 
     public function getSummary(): ?string { return $this->summary; }
     public function setSummary(?string $summary): self { $this->summary = $summary; return $this; }
+
+    public function getAiReaction(): ?string { return $this->aiReaction; }
+    public function setAiReaction(?string $aiReaction): self { $this->aiReaction = $aiReaction; return $this; }
+
+    public function getAiReactionData(): ?array { return $this->aiReactionData; }
+    public function setAiReactionData(?array $aiReactionData): self { $this->aiReactionData = $aiReactionData; return $this; }
 
     public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
 
