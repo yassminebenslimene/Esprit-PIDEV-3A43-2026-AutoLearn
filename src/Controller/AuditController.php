@@ -35,18 +35,29 @@ class AuditController extends AbstractController
             if ($revisionsExists) {
                 // Query 1: Admin actions on STUDENTS only with action type detection
                 $studentSql = "
-                    SELECT 'student' as entity_type, r.id, r.timestamp, r.username, 
-                           ua.userId as entity_id, ua.revtype, ua.nom, ua.prenom,
-                           ua.isSuspended, ua.suspendedAt, ua.suspensionReason,
-                           CASE 
-                               WHEN ua.revtype = 'INS' THEN 'CREATE'
-                               WHEN ua.revtype = 'DEL' THEN 'DELETE'
-                               WHEN ua.isSuspended = 1 AND ua.suspendedAt IS NOT NULL THEN 'SUSPEND'
-                               WHEN ua.isSuspended = 0 AND prev.isSuspended = 1 THEN 'REACTIVATE'
-                               ELSE 'UPDATE'
-                           END as action_type
+                    SELECT 
+                        'student' as entity_type, 
+                        r.id, 
+                        r.timestamp, 
+                        r.username, 
+                        ua.userId as entity_id, 
+                        ua.revtype, 
+                        ua.nom, 
+                        ua.prenom,
+                        ua.isSuspended, 
+                        ua.suspendedAt, 
+                        ua.suspensionReason,
+                        prev.isSuspended as prev_isSuspended,
+                        CASE 
+                            WHEN ua.revtype = 'INS' THEN 'CREATE'
+                            WHEN ua.revtype = 'DEL' THEN 'DELETE'
+                            WHEN ua.revtype = 'UPD' AND ua.isSuspended = 1 AND (prev.isSuspended IS NULL OR prev.isSuspended = 0) THEN 'SUSPEND'
+                            WHEN ua.revtype = 'UPD' AND ua.isSuspended = 0 AND prev.isSuspended = 1 THEN 'REACTIVATE'
+                            WHEN ua.revtype = 'UPD' THEN 'UPDATE'
+                            ELSE 'UPDATE'
+                        END as action_type
                     FROM revisions r
-                    LEFT JOIN user_audit ua ON r.id = ua.rev
+                    INNER JOIN user_audit ua ON r.id = ua.rev
                     LEFT JOIN user_audit prev ON prev.userId = ua.userId 
                         AND prev.rev = (
                             SELECT MAX(ua2.rev) 
@@ -228,8 +239,9 @@ class AuditController extends AbstractController
                     CASE 
                         WHEN ua.revtype = 'INS' THEN 'CREATE'
                         WHEN ua.revtype = 'DEL' THEN 'DELETE'
-                        WHEN ua.isSuspended = 1 AND ua.suspendedAt IS NOT NULL THEN 'SUSPEND'
-                        WHEN ua.isSuspended = 0 AND prev.isSuspended = 1 THEN 'REACTIVATE'
+                        WHEN ua.revtype = 'UPD' AND ua.isSuspended = 1 AND (prev.isSuspended IS NULL OR prev.isSuspended = 0) THEN 'SUSPEND'
+                        WHEN ua.revtype = 'UPD' AND ua.isSuspended = 0 AND prev.isSuspended = 1 THEN 'REACTIVATE'
+                        WHEN ua.revtype = 'UPD' THEN 'UPDATE'
                         ELSE 'UPDATE'
                     END as revtype,
                     COUNT(*) as count 
@@ -242,7 +254,7 @@ class AuditController extends AbstractController
                          FROM user_audit ua2 
                          WHERE ua2.userId = ua.userId AND ua2.rev < ua.rev
                      )
-                 WHERE u.role = 'ADMIN'
+                 WHERE u.role = 'ADMIN' AND ua.discr = 'etudiant'
                  GROUP BY 1
                  ORDER BY count DESC"
             )->fetchAllAssociative();
