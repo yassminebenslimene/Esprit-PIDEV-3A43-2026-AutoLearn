@@ -23,6 +23,28 @@
     {% endblock %}
     
     <style>
+        /* Fix navbar position */
+        .header-area {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 9999 !important;
+            background-color: rgba(122, 106, 216, 0.95) !important;
+            backdrop-filter: blur(10px) !important;
+            margin-bottom: 0 !important;
+        }
+        
+        /* Add padding to body to compensate for fixed header */
+        body {
+            padding-top: 80px !important;
+        }
+        
+        /* Remove any white space after header */
+        .header-area + * {
+            margin-top: 0 !important;
+        }
+        
         /* Profile Dropdown Styles */
         .main-nav {
             display: flex !important;

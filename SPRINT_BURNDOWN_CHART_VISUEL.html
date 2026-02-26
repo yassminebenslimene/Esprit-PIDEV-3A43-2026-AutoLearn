@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Burndown Chart - Participation aux Événements</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .chart-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .chart-title {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+        }
+        
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .metric-label {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+        
+        .user-stories-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .user-stories-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .user-stories-table th,
+        .user-stories-table td {
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .user-stories-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .user-stories-table tbody tr:hover {
+            background: #e9ecef;
+        }
+        
+        .priority-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            display: inline-block;
+        }
+        
+        .priority-critique {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .priority-haute {
+            background: #fd7e14;
+            color: white;
+        }
+        
+        .priority-moyenne {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .priority-basse {
+            background: #28a745;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            display: inline-block;
+            background: #28a745;
+            color: white;
+        }
+        
+        canvas {
+            max-height: 500px;
+        }
+        
+        .legend-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-color {
+            width: 30px;
+            height: 4px;
+            border-radius: 2px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Sprint Burndown Chart</h1>
+            <p>Processus de Participation aux Événements</p>
+        </div>
+        
+        <div class="content">
+            <!-- Métriques principales -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Story Points Planifiés</div>
+                    <div class="metric-value">60 SP</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Story Points Complétés</div>
+                    <div class="metric-value">60 SP</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Durée du Sprint</div>
+                    <div class="metric-value">10 jours</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Vélocité</div>
+                    <div class="metric-value">6 SP/jour</div>
+                </div>
+            </div>
+            
+            <!-- Graphique Burndown principal -->
+            <div class="chart-container">
+                <h2 class="chart-title">Sprint Burndown Chart - Progression Quotidienne</h2>
+                <canvas id="burndownChart"></canvas>
+                <div class="legend-container">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #dc3545;"></div>
+                        <span>Ligne Idéale</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #667eea;"></div>
+                        <span>Progression Réelle</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Graphique de vélocité -->
+            <div class="chart-container">
+                <h2 class="chart-title">Vélocité Quotidienne (Story Points Complétés)</h2>
+                <canvas id="velocityChart"></canvas>
+            </div>
+            
+            <!-- Graphique de répartition par priorité -->
+            <div class="chart-container">
+                <h2 class="chart-title">Répartition des Story Points par Priorité</h2>
+                <canvas id="priorityChart"></canvas>
+            </div>
+            
+            <!-- Graphique de répartition par complexité -->
+            <div class="chart-container">
+                <h2 class="chart-title">Répartition par Complexité</h2>
+                <canvas id="complexityChart"></canvas>
+            </div>
+            
+            <!-- Tableau des User Stories -->
+            <div class="chart-container">
+                <h2 class="chart-title">Liste des User Stories</h2>
+                <table class="user-stories-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User Story</th>
+                            <th>Story Points</th>
+                            <th>Priorité</th>
+                            <th>Jour</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>US-01</td>
+                            <td>Créer une équipe pour un événement</td>
+                            <td>5</td>
+                            <td><span class="priority-badge priority-haute">HAUTE</span></td>
+                            <td>J1</td>
+                            <td><span class="status-badge">✓ Complété</span></td>
+                        </tr>
+                        <tr>
+                            <td>US-02</td>
+                            <td>Rejoindre une équipe existante avec places disponibles</td>
+                            <td>8</td>
+                            <td><span class="priority-badge priority-haute">HAUTE</span></td>
+                            <td>J5</td>
+                            <td><span class="status-badge">✓ Complété</span></td>
+                        </tr>
+                        <tr>
+                            <td>US-03</td>
+                            <td>Soumettre la participation de mon équipe</td>
+                            <td>5</td>
+                            <td><span class="priority-badge priority-haute">HAUTE</span></td>
+                            <td>J2</td>
+                            <td><span class="status-badge">✓ Complété</span></td>
+                        </tr>
+                        <tr>
+                            <td>US-04</td>
+                            <td>Valider automatiquement les participations (3 règles)</td>
+                            <td>13</td>
+                            <td><span class="priority-badge priority-critique">CRITIQUE</span></td>
+                            <td>J3-J4</td>
+                            <td><span class="status-badge">✓ Complété</span></td>
+                        </tr>
+                        <tr>
+                            <td>US-05</td>
+                            <td>Envoyer un email de confirmation avec pièces jointes</td>
+                            <td>8</td>
+                            <td><span class="priority-badge priority-haute">HAUTE</span></td>
+                            <td>J6-J7</td>
+                            <td><span class="status-badge">✓ Complété</span></td>
+                        </tr>
+                        <tr>
+                            <td>US-06</td>
+                            <td>Afficher un message de refus en rouge avec la raison</td>
+                            <td>3</td>
+                            <td><span class="priority-badge priority-moyenne">MOYENNE</span></td>
+                            <td>J8</td>
+                            <td><span class="status-badge">✓ Complété</span></td>
+                        </tr>
+                        <tr>
+                            <td>US-07</td>
+                            <td>Voir mes participations acceptées</td>
+                            <td>3</td>
+                            <td><span class="priority-badge priority-moyenne">MOYENNE</span></td>
+                            <td>J8</td>
+                            <td><span class="status-badge">✓ Complété</span></td>
+                        </tr>
+                        <tr>
+                            <td>US-08</td>
+                            <td>Envoyer des emails lors du démarrage d'un événement</td>
+                            <td>5</td>
+                            <td><span class="priority-badge priority-moyenne">MOYENNE</span></td>
+                            <td>J9</td>
+                            <td><span class="status-badge">✓ Complété</span></td>
+                        </tr>
+                        <tr>
+                            <td>US-09</td>
+                            <td>Envoyer des emails lors de l'annulation d'un événement</td>
+                            <td>5</td>
+                            <td><span class="priority-badge priority-moyenne">MOYENNE</span></td>
+                            <td>J9</td>
+                            <td><span class="status-badge">✓ Complété</span></td>
+                        </tr>
+                        <tr>
+                            <td>US-10</td>
+                            <td>Nettoyer automatiquement les participations refusées</td>
+                            <td>5</td>
+                            <td><span class="priority-badge priority-basse">BASSE</span></td>
+                            <td>J10</td>
+                            <td><span class="status-badge">✓ Complété</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    
+    <script>
+        // Configuration globale de Chart.js
+        Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+        Chart.defaults.font.size = 14;
+        
+        // Données du sprint
+        const sprintData = {
+            days: ['J0', 'J1', 'J2', 'J3', 'J4', 'J5', 'J6', 'J7', 'J8', 'J9', 'J10'],
+            ideal: [60, 54, 48, 42, 36, 30, 24, 18, 12, 6, 0],
+            actual: [60, 55, 50, 43, 37, 29, 25, 21, 15, 5, 0],
+            completed: [0, 5, 5, 7, 6, 8, 4, 4, 6, 10, 5]
+        };
+        
+        // 1. Graphique Burndown principal
+        const burndownCtx = document.getElementById('burndownChart').getContext('2d');
+        new Chart(burndownCtx, {
+            type: 'line',
+            data: {
+                labels: sprintData.days,
+                datasets: [
+                    {
+                        label: 'Ligne Idéale',
+                        data: sprintData.ideal,
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        borderWidth: 3,
+                        borderDash: [10, 5],
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0
+                    },
+                    {
+                        label: 'Progression Réelle',
+                        data: sprintData.actual,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 4,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 16
+                        },
+                        bodyFont: {
+                            size: 14
+                        },
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y + ' SP restants';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 65,
+                        title: {
+                            display: true,
+                            text: 'Story Points Restants',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Jours du Sprint',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 2. Graphique de vélocité
+        const velocityCtx = document.getElementById('velocityChart').getContext('2d');
+        new Chart(velocityCtx, {
+            type: 'bar',
+            data: {
+                labels: sprintData.days.slice(1), // Exclure J0
+                datasets: [{
+                    label: 'Story Points Complétés',
+                    data: sprintData.completed.slice(1),
+                    backgroundColor: [
+                        '#667eea',
+                        '#667eea',
+                        '#764ba2',
+                        '#667eea',
+                        '#764ba2',
+                        '#667eea',
+                        '#667eea',
+                        '#667eea',
+                        '#764ba2',
+                        '#667eea'
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + ' Story Points complétés';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 12,
+                        title: {
+                            display: true,
+                            text: 'Story Points',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Jours',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 3. Graphique de répartition par priorité
+        const priorityCtx = document.getElementById('priorityChart').getContext('2d');
+        new Chart(priorityCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['CRITIQUE', 'HAUTE', 'MOYENNE', 'BASSE'],
+                datasets: [{
+                    data: [13, 26, 16, 5],
+                    backgroundColor: [
+                        '#dc3545',
+                        '#fd7e14',
+                        '#ffc107',
+                        '#28a745'
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 14
+                            },
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                return data.labels.map((label, i) => {
+                                    const value = data.datasets[0].data[i];
+                                    const percentage = ((value / 60) * 100).toFixed(1);
+                                    return {
+                                        text: `${label}: ${value} SP (${percentage}%)`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        hidden: false,
+                                        index: i
+                                    };
+                                });
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed;
+                                const percentage = ((value / 60) * 100).toFixed(1);
+                                return `${label}: ${value} SP (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 4. Graphique de répartition par complexité
+        const complexityCtx = document.getElementById('complexityChart').getContext('2d');
+        new Chart(complexityCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Faible (1-3 SP)', 'Moyenne (4-8 SP)', 'Élevée (9+ SP)'],
+                datasets: [{
+                    label: 'Nombre de User Stories',
+                    data: [3, 6, 1],
+                    backgroundColor: '#667eea',
+                    borderColor: '#fff',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    yAxisID: 'y'
+                }, {
+                    label: 'Story Points',
+                    data: [9, 38, 13],
+                    backgroundColor: '#764ba2',
+                    borderColor: '#fff',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Nombre de User Stories',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Story Points',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

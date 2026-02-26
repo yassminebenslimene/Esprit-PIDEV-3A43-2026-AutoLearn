@@ -1,0 +1,4 @@
+# Configuration du CalendarBundle pour le module Événement
+# La configuration se fait principalement dans le template et l'EventSubscriber
+calendar: ~
+

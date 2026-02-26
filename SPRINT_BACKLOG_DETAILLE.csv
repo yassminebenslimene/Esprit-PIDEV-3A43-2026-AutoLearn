@@ -1,0 +1,158 @@
+ID US,User Story,ID Tâche,Tâche Technique Détaillée,Estimation (min),Responsable
+US-5.1,"En tant qu'Admin, je souhaite créer un événement",T5.1.1,"Créer l'entité src/Entity/Evenement.php avec propriétés: id, titre, lieu, description, type, dateDebut, dateFin, status, isCanceled, workflowStatus, nbMax",30,Admin
+US-5.1,"En tant qu'Admin, je souhaite créer un événement",T5.1.2,"Créer l'enum src/Enum/TypeEvenement.php avec cases: Conference, Hackathon, Workshop, Seminar, Meetup, Training",10,Admin
+US-5.1,"En tant qu'Admin, je souhaite créer un événement",T5.1.3,"Créer l'enum src/Enum/StatutEvenement.php avec cases: PLANIFIE, EN_COURS, PASSE, ANNULE",10,Admin
+US-5.1,"En tant qu'Admin, je souhaite créer un événement",T5.1.4,"Ajouter validations Symfony: Assert\NotBlank, Assert\Length, Assert\GreaterThan(""today""), Assert\Expression pour dates",20,Admin
+US-5.1,"En tant qu'Admin, je souhaite créer un événement",T5.1.5,"Créer src/Repository/EvenementRepository.php avec méthodes de base",10,Admin
+US-5.1,"En tant qu'Admin, je souhaite créer un événement",T5.1.6,"Générer migration Doctrine: php bin/console make:migration puis php bin/console doctrine:migrations:migrate",15,Admin
+US-5.1,"En tant qu'Admin, je souhaite créer un événement",T5.1.7,"Créer src/Form/EvenementType.php avec champs: titre (TextType), lieu (TextType), description (TextareaType), type (EnumType), dateDebut (DateTimeType), dateFin (DateTimeType), nbMax (IntegerType)",25,Admin
+US-5.1,"En tant qu'Admin, je souhaite créer un événement",T5.1.8,"Créer src/Controller/EvenementController.php avec annotation #[Route('/backoffice/evenement')]",20,Admin
+US-5.1,"En tant qu'Admin, je souhaite créer un événement",T5.1.9,"Implémenter méthode new() avec route '/new', création formulaire, handleRequest, persist, flush, redirect",25,Admin
+US-5.1,"En tant qu'Admin, je souhaite créer un événement",T5.1.10,"Créer template templates/backoffice/evenement/new.html.twig avec form_start, form_widget, form_end, bouton submit stylisé",45,Admin
+US-5.1,"En tant qu'Admin, je souhaite créer un événement",T5.1.11,"Ajouter messages flash: $this->addFlash('success', 'Événement créé avec succès')",10,Admin
+US-5.1,"En tant qu'Admin, je souhaite créer un événement",T5.1.12,"Tester création avec données valides (titre, dates cohérentes, nbMax positif)",20,Admin
+US-5.1,"En tant qu'Admin, je souhaite créer un événement",T5.1.13,"Tester validations: titre vide, date début passée, date fin < date début, nbMax négatif",25,Admin
+US-5.2,"En tant qu'Admin, je souhaite modifier un événement",T5.2.1,"Ajouter route #[Route('/{id}/edit', name: 'backoffice_evenement_edit')] dans EvenementController",10,Admin
+US-5.2,"En tant qu'Admin, je souhaite modifier un événement",T5.2.2,"Implémenter méthode edit(Request $request, Evenement $evenement, EntityManagerInterface $entityManager)",20,Admin
+US-5.2,"En tant qu'Admin, je souhaite modifier un événement",T5.2.3,"Créer formulaire avec données existantes, handleRequest, appeler $evenement->updateStatus(), flush, redirect",15,Admin
+US-5.2,"En tant qu'Admin, je souhaite modifier un événement",T5.2.4,"Créer template templates/backoffice/evenement/edit.html.twig avec formulaire pré-rempli",35,Admin
+US-5.2,"En tant qu'Admin, je souhaite modifier un événement",T5.2.5,"Ajouter bouton ""Annuler l'événement"" (workflow) avec formulaire POST séparé",20,Admin
+US-5.2,"En tant qu'Admin, je souhaite modifier un événement",T5.2.6,"Implémenter méthode updateStatus() dans Evenement.php: comparer dates avec now(), mettre à jour status",25,Admin
+US-5.2,"En tant qu'Admin, je souhaite modifier un événement",T5.2.7,"Ajouter flash message: $this->addFlash('success', 'Événement modifié avec succès')",10,Admin
+US-5.2,"En tant qu'Admin, je souhaite modifier un événement",T5.2.8,"Tester modification avec données valides",20,Admin
+US-5.2,"En tant qu'Admin, je souhaite modifier un événement",T5.2.9,"Tester validations après modification (dates, contraintes)",20,Admin
+US-5.3,"En tant qu'Admin, je souhaite supprimer un événement",T5.3.1,"Ajouter route #[Route('/{id}/delete', name: 'backoffice_evenement_delete', methods: ['GET'])]",10,Admin
+US-5.3,"En tant qu'Admin, je souhaite supprimer un événement",T5.3.2,"Implémenter méthode delete(Evenement $evenement, EntityManagerInterface $entityManager, ParticipationRepository $participationRepository)",30,Admin
+US-5.3,"En tant qu'Admin, je souhaite supprimer un événement",T5.3.3,"Gérer suppression en cascade: 1) Récupérer équipes, 2) Supprimer participations, 3) Flush, 4) Supprimer équipes, 5) Flush, 6) Supprimer événement",35,Admin
+US-5.3,"En tant qu'Admin, je souhaite supprimer un événement",T5.3.4,"Ajouter bouton ""Supprimer"" dans templates/backoffice/evenement/index.html.twig avec confirmation JavaScript",20,Admin
+US-5.3,"En tant qu'Admin, je souhaite supprimer un événement",T5.3.5,"Styliser bouton avec gradient rouge, icône poubelle, padding 8px 16px",15,Admin
+US-5.3,"En tant qu'Admin, je souhaite supprimer un événement",T5.3.6,"Ajouter confirmation détaillée: ""Attention ! Cette action supprimera également toutes les équipes et participations""",15,Admin
+US-5.3,"En tant qu'Admin, je souhaite supprimer un événement",T5.3.7,"Ajouter flash: $this->addFlash('success', 'Événement, équipes et participations supprimés')",10,Admin
+US-5.3,"En tant qu'Admin, je souhaite supprimer un événement",T5.3.8,"Tester suppression événement sans participations",15,Admin
+US-5.3,"En tant qu'Admin, je souhaite supprimer un événement",T5.3.9,"Tester suppression en cascade (événement + équipes + participations)",25,Admin
+US-5.4,"Le système gère automatiquement les transitions d'états via Workflow",T5.4.1,"Installer symfony/workflow via composer require symfony/workflow",10,Admin
+US-5.4,"Le système gère automatiquement les transitions d'états via Workflow",T5.4.2,"Créer fichier config/packages/workflow.yaml",25,Admin
+US-5.4,"Le système gère automatiquement les transitions d'états via Workflow",T5.4.3,"Définir type: state_machine, supports: App\Entity\Evenement",15,Admin
+US-5.4,"Le système gère automatiquement les transitions d'états via Workflow",T5.4.4,"Définir marking_store avec property: workflowStatus, type: 'method'",20,Admin
+US-5.4,"Le système gère automatiquement les transitions d'états via Workflow",T5.4.5,"Définir places: planifie, en_cours, termine, annule",15,Admin
+US-5.4,"Le système gère automatiquement les transitions d'états via Workflow",T5.4.6,"Définir transition demarrer (planifie → en_cours)",15,Admin
+US-5.4,"Le système gère automatiquement les transitions d'états via Workflow",T5.4.7,"Définir transition terminer (en_cours → termine)",15,Admin
+US-5.4,"Le système gère automatiquement les transitions d'états via Workflow",T5.4.8,"Définir transition annuler (planifie/en_cours → annule)",20,Admin
+US-5.4,"Le système gère automatiquement les transitions d'états via Workflow",T5.4.9,"Activer audit trail dans workflow.yaml",20,Admin
+US-5.4,"Le système gère automatiquement les transitions d'états via Workflow",T5.4.10,"Créer src/Command/UpdateEvenementWorkflowCommand.php",45,Admin
+US-5.4,"Le système gère automatiquement les transitions d'états via Workflow",T5.4.11,"Implémenter logique de vérification des dates (dateDebut, dateFin) dans la commande",40,Admin
+US-5.4,"Le système gère automatiquement les transitions d'états via Workflow",T5.4.12,"Appliquer transitions automatiquement (demarrer si dateDebut <= now, terminer si dateFin < now)",35,Admin
+US-5.4,"Le système gère automatiquement les transitions d'états via Workflow",T5.4.13,"Ajouter route manuelle #[Route('/{id}/annuler', name: 'backoffice_evenement_annuler', methods: ['POST'])]",25,Admin
+US-5.4,"Le système gère automatiquement les transitions d'états via Workflow",T5.4.14,"Tester transitions automatiques avec dates passées/futures",30,Admin
+US-5.5,"En tant qu'Admin, je souhaite consulter la liste des événements",T5.5.1,"Créer route #[Route('/', name: 'backoffice_evenements', methods: ['GET'])]",10,Admin
+US-5.5,"En tant qu'Admin, je souhaite consulter la liste des événements",T5.5.2,"Implémenter méthode index() avec findAll()",15,Admin
+US-5.5,"En tant qu'Admin, je souhaite consulter la liste des événements",T5.5.3,"Ajouter mise à jour automatique des statuts dans index() avec foreach et updateStatus()",20,Admin
+US-5.5,"En tant qu'Admin, je souhaite consulter la liste des événements",T5.5.4,"Récupérer statistiques feedbacks via FeedbackAnalyticsService->analyzeByEventType()",15,Admin
+US-5.5,"En tant qu'Admin, je souhaite consulter la liste des événements",T5.5.5,"Créer template templates/backoffice/evenement/index.html.twig avec tableau",45,Admin
+US-5.5,"En tant qu'Admin, je souhaite consulter la liste des événements",T5.5.6,"Afficher colonnes: titre, type, dates, statut, places, actions",30,Admin
+US-5.5,"En tant qu'Admin, je souhaite consulter la liste des événements",T5.5.7,"Styliser badges de statut avec couleurs (planifié=bleu, en cours=vert, passé=gris, annulé=rouge)",25,Admin
+US-5.5,"En tant qu'Admin, je souhaite consulter la liste des événements",T5.5.8,"Ajouter boutons d'action (Voir, Modifier, Annuler, Supprimer) avec gradients",30,Admin
+US-5.5,"En tant qu'Admin, je souhaite consulter la liste des événements",T5.5.9,"Ajouter section ""Statistiques & Rapports AI"" en haut du tableau",35,Admin
+US-5.5,"En tant qu'Admin, je souhaite consulter la liste des événements",T5.5.10,"Implémenter boutons de génération de rapports AI (AJAX)",40,Admin
+US-5.5,"En tant qu'Admin, je souhaite consulter la liste des événements",T5.5.11,"Ajouter loading spinner pendant génération AI",20,Admin
+US-5.5,"En tant qu'Admin, je souhaite consulter la liste des événements",T5.5.12,"Tester affichage de la liste avec plusieurs événements",20,Admin
+US-5.5,"En tant qu'Admin, je souhaite consulter la liste des événements",T5.5.13,"Tester affichage des différents statuts",15,Admin
+US-5.6,"En tant qu'Admin, je souhaite définir un nombre maximum d'équipes",T5.6.1,"Ajouter propriété nbMax dans l'entité Evenement (déjà fait dans US-5.1)",10,Admin
+US-5.6,"En tant qu'Admin, je souhaite définir un nombre maximum d'équipes",T5.6.2,"Ajouter validations: Assert\NotBlank, Assert\Positive, Assert\Range(min: 1, max: 100)",15,Admin
+US-5.6,"En tant qu'Admin, je souhaite définir un nombre maximum d'équipes",T5.6.3,"Ajouter champ nbMax dans EvenementType (IntegerType)",10,Admin
+US-5.6,"En tant qu'Admin, je souhaite définir un nombre maximum d'équipes",T5.6.4,"Afficher champ dans new.html.twig et edit.html.twig",15,Admin
+US-5.6,"En tant qu'Admin, je souhaite définir un nombre maximum d'équipes",T5.6.5,"Afficher nbMax dans colonne ""Places Max"" du tableau index.html.twig",10,Admin
+US-5.6,"En tant qu'Admin, je souhaite définir un nombre maximum d'équipes",T5.6.6,"Tester création avec nbMax valide (ex: 10)",10,Admin
+US-5.6,"En tant qu'Admin, je souhaite définir un nombre maximum d'équipes",T5.6.7,"Tester validation (nbMax doit être entre 1 et 100)",15,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.1,"Créer src/Controller/FrontofficeEvenementController.php avec route /events",15,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.2,"Implémenter méthode index() avec récupération de tous les événements",20,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.3,"Calculer places disponibles pour chaque événement (nbMax - participations acceptées)",25,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.4,"Récupérer équipes participantes pour chaque événement",20,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.5,"Intégrer WeatherService pour afficher météo (créer service si nécessaire)",30,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.6,"Créer template templates/frontoffice/evenement/index.html.twig",60,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.7,"Styliser cartes d'événements avec design moderne (gradients, ombres)",45,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.8,"Implémenter accordéon expand/collapse pour détails",35,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.9,"Afficher countdown (jours restants) pour chaque événement",25,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.10,"Afficher météo prévue avec émojis et couleurs",30,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.11,"Afficher équipes participantes avec mini-cartes",35,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.12,"Afficher bouton ""Participer"" conditionnellement (si places disponibles)",20,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.13,"Afficher badge ""CANCELLED"" pour événements annulés",15,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.14,"Ajouter lien vers calendrier en haut de page",10,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.15,"Tester affichage avec plusieurs événements",20,Admin
+US-5.7,"En tant qu'Étudiant, je souhaite consulter les événements disponibles",T5.7.16,"Tester affichage responsive (mobile, tablette)",25,Admin
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe",T5.8.1,"Créer entité src/Entity/Equipe.php avec propriétés: id, nom, evenement, etudiants",20,Admin
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe",T5.8.2,"Ajouter relation ManyToOne avec Evenement (inversedBy: equipes)",15,Admin
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe",T5.8.3,"Ajouter relation ManyToMany avec Etudiant (table de jointure equipe_etudiant)",25,Admin
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe",T5.8.4,"Ajouter validation Assert\Count(min: 4, max: 6) sur etudiants",15,Admin
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe",T5.8.5,"Créer src/Repository/EquipeRepository.php",10,Admin
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe",T5.8.6,"Créer migration pour table equipe et equipe_etudiant",20,Admin
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe",T5.8.7,"Créer src/Form/EquipeFrontType.php avec sélection d'étudiants",30,Admin
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe",T5.8.8,"Créer src/Controller/FrontofficeEquipeController.php avec route /equipe/new",15,Admin
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe",T5.8.9,"Implémenter méthode new() avec création d'équipe",25,Admin
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe",T5.8.10,"Créer automatiquement une participation lors de création d'équipe",30,Admin
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe",T5.8.11,"Créer template templates/frontoffice/equipe/new.html.twig",45,Admin
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe",T5.8.12,"Styliser formulaire avec design moderne",35,Admin
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe",T5.8.13,"Ajouter sélection multiple d'étudiants avec recherche",40,Admin
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe",T5.8.14,"Tester création d'équipe avec 4 membres",15,Admin
+US-5.8,"En tant qu'Étudiant, je souhaite créer une équipe",T5.8.15,"Tester validation (minimum 4, maximum 6 membres)",20,Admin
+US-5.9,"En tant qu'Étudiant, je souhaite modifier mon équipe",T5.9.1,"Créer route /equipe/{id}/edit dans FrontofficeEquipeController",10,Admin
+US-5.9,"En tant qu'Étudiant, je souhaite modifier mon équipe",T5.9.2,"Implémenter méthode edit() avec modification des membres",25,Admin
+US-5.9,"En tant qu'Étudiant, je souhaite modifier mon équipe",T5.9.3,"Vérifier que l'utilisateur connecté est membre de l'équipe",20,Admin
+US-5.9,"En tant qu'Étudiant, je souhaite modifier mon équipe",T5.9.4,"Implémenter addEtudiant() et removeEtudiant() dans Equipe.php",20,Admin
+US-5.9,"En tant qu'Étudiant, je souhaite modifier mon équipe",T5.9.5,"Créer template templates/frontoffice/equipe/edit.html.twig",35,Admin
+US-5.9,"En tant qu'Étudiant, je souhaite modifier mon équipe",T5.9.6,"Afficher liste actuelle des membres avec bouton ""Retirer""",30,Admin
+US-5.9,"En tant qu'Étudiant, je souhaite modifier mon équipe",T5.9.7,"Ajouter formulaire pour ajouter nouveaux membres",30,Admin
+US-5.9,"En tant qu'Étudiant, je souhaite modifier mon équipe",T5.9.8,"Permettre modification du nom de l'équipe",15,Admin
+US-5.9,"En tant qu'Étudiant, je souhaite modifier mon équipe",T5.9.9,"Valider que l'équipe reste entre 4 et 6 membres",20,Admin
+US-5.9,"En tant qu'Étudiant, je souhaite modifier mon équipe",T5.9.10,"Tester ajout d'un membre à une équipe de 4",15,Admin
+US-5.9,"En tant qu'Étudiant, je souhaite modifier mon équipe",T5.9.11,"Tester qu'on ne peut pas dépasser 6 membres",15,Admin
+US-5.9,"En tant qu'Étudiant, je souhaite modifier mon équipe",T5.9.12,"Tester modification du nom d'équipe",15,Admin
+US-5.10,"En tant qu'Étudiant, je souhaite supprimer mon équipe",T5.10.1,"Créer route /equipe/{id}/delete dans FrontofficeEquipeController",10,Admin
+US-5.10,"En tant qu'Étudiant, je souhaite supprimer mon équipe",T5.10.2,"Implémenter méthode delete() avec suppression de la participation associée",25,Admin
+US-5.10,"En tant qu'Étudiant, je souhaite supprimer mon équipe",T5.10.3,"Vérifier que l'utilisateur est membre de l'équipe avant suppression",15,Admin
+US-5.10,"En tant qu'Étudiant, je souhaite supprimer mon équipe",T5.10.4,"Ajouter bouton ""Supprimer mon équipe"" dans edit.html.twig",15,Admin
+US-5.10,"En tant qu'Étudiant, je souhaite supprimer mon équipe",T5.10.5,"Ajouter confirmation JavaScript avant suppression",15,Admin
+US-5.10,"En tant qu'Étudiant, je souhaite supprimer mon équipe",T5.10.6,"Tester suppression d'une équipe",15,Admin
+US-5.10,"En tant qu'Étudiant, je souhaite supprimer mon équipe",T5.10.7,"Vérifier que la participation est aussi supprimée",15,Admin
+US-5.11,"En tant qu'Étudiant, je souhaite inscrire mon équipe à un événement",T5.11.1,"Créer entité src/Entity/Participation.php avec relations (equipe, evenement, statut)",20,Admin
+US-5.11,"En tant qu'Étudiant, je souhaite inscrire mon équipe à un événement",T5.11.2,"Créer enum src/Enum/StatutParticipation.php avec cases: EN_ATTENTE, ACCEPTE, REFUSE",10,Admin
+US-5.11,"En tant qu'Étudiant, je souhaite inscrire mon équipe à un événement",T5.11.3,"Ajouter colonne feedbacks (JSON) dans Participation",15,Admin
+US-5.11,"En tant qu'Étudiant, je souhaite inscrire mon équipe à un événement",T5.11.4,"Créer src/Repository/ParticipationRepository.php",10,Admin
+US-5.11,"En tant qu'Étudiant, je souhaite inscrire mon équipe à un événement",T5.11.5,"Créer migration pour table participation",15,Admin
+US-5.11,"En tant qu'Étudiant, je souhaite inscrire mon équipe à un événement",T5.11.6,"Créer route /events/{id}/participate dans FrontofficeEvenementController",10,Admin
+US-5.11,"En tant qu'Étudiant, je souhaite inscrire mon équipe à un événement",T5.11.7,"Implémenter méthode participate() avec affichage des options",30,Admin
+US-5.11,"En tant qu'Étudiant, je souhaite inscrire mon équipe à un événement",T5.11.8,"Créer template templates/frontoffice/evenement/participate.html.twig",50,Admin
+US-5.11,"En tant qu'Étudiant, je souhaite inscrire mon équipe à un événement",T5.11.9,"Afficher 2 options (créer équipe / rejoindre équipe)",35,Admin
+US-5.11,"En tant qu'Étudiant, je souhaite inscrire mon équipe à un événement",T5.11.10,"Styliser cartes d'options avec design moderne",30,Admin
+US-5.11,"En tant qu'Étudiant, je souhaite inscrire mon équipe à un événement",T5.11.11,"Afficher liste des équipes disponibles (< 6 membres)",30,Admin
+US-5.11,"En tant qu'Étudiant, je souhaite inscrire mon équipe à un événement",T5.11.12,"Implémenter création automatique de participation lors de création d'équipe",25,Admin
+US-5.11,"En tant qu'Étudiant, je souhaite inscrire mon équipe à un événement",T5.11.13,"Tester inscription d'une équipe à un événement",20,Admin
+US-5.12,"Le système accepte automatiquement la participation",T5.12.1,"Implémenter méthode validateParticipation() dans Participation.php",40,Admin
+US-5.12,"Le système accepte automatiquement la participation",T5.12.2,"Vérifier si événement est annulé → refuser",15,Admin
+US-5.12,"Le système accepte automatiquement la participation",T5.12.3,"Compter participations acceptées (ne pas compter celle en cours)",25,Admin
+US-5.12,"Le système accepte automatiquement la participation",T5.12.4,"Comparer avec nbMax de l'événement",15,Admin
+US-5.12,"Le système accepte automatiquement la participation",T5.12.5,"Si < nbMax → accepter automatiquement (setStatut ACCEPTE)",15,Admin
+US-5.12,"Le système accepte automatiquement la participation",T5.12.6,"Si >= nbMax → refuser automatiquement (setStatut REFUSE)",15,Admin
+US-5.12,"Le système accepte automatiquement la participation",T5.12.7,"Retourner tableau avec 'accepted' (bool) et 'message' (string)",15,Admin
+US-5.12,"Le système accepte automatiquement la participation",T5.12.8,"Appeler validateParticipation() dans FrontofficeParticipationController->new()",20,Admin
+US-5.12,"Le système accepte automatiquement la participation",T5.12.9,"Afficher message de succès/erreur via flash",10,Admin
+US-5.12,"Le système accepte automatiquement la participation",T5.12.10,"Tester acceptation automatique (places disponibles)",20,Admin
+US-5.12,"Le système accepte automatiquement la participation",T5.12.11,"Tester refus automatique (capacité atteinte)",20,Admin
+US-5.13,"Le système refuse si doublon étudiant",T5.13.1,"Ajouter vérification de doublon dans validateParticipation()",35,Admin
+US-5.13,"Le système refuse si doublon étudiant",T5.13.2,"Parcourir toutes participations acceptées de l'événement",20,Admin
+US-5.13,"Le système refuse si doublon étudiant",T5.13.3,"Pour chaque participation, récupérer étudiants de l'équipe",15,Admin
+US-5.13,"Le système refuse si doublon étudiant",T5.13.4,"Comparer avec étudiants de l'équipe actuelle",25,Admin
+US-5.13,"Le système refuse si doublon étudiant",T5.13.5,"Si doublon trouvé → refuser avec message explicite (nom étudiant + équipe)",20,Admin
+US-5.13,"Le système refuse si doublon étudiant",T5.13.6,"Tester refus avec un étudiant dans 2 équipes",25,Admin
+US-5.13,"Le système refuse si doublon étudiant",T5.13.7,"Vérifier que message indique quel étudiant et quelle équipe",15,Admin
+US-5.14,"En tant qu'Étudiant, je souhaite consulter le statut de ma participation",T5.14.1,"Créer route /mes-participations dans FrontofficeParticipationController",10,Admin
+US-5.14,"En tant qu'Étudiant, je souhaite consulter le statut de ma participation",T5.14.2,"Implémenter méthode mesParticipations() avec filtrage par étudiant",30,Admin
+US-5.14,"En tant qu'Étudiant, je souhaite consulter le statut de ma participation",T5.14.3,"Récupérer toutes équipes de l'étudiant connecté",20,Admin
+US-5.14,"En tant qu'Étudiant, je souhaite consulter le statut de ma participation",T5.14.4,"Pour chaque équipe, récupérer participation associée",25,Admin
+US-5.14,"En tant qu'Étudiant, je souhaite consulter le statut de ma participation",T5.14.5,"Créer template templates/frontoffice/participation/mes_participations.html.twig",45,Admin
+US-5.14,"En tant qu'Étudiant, je souhaite consulter le statut de ma participation",T5.14.6,"Afficher cartes de participations avec statut (badge coloré)",35,Admin
+US-5.14,"En tant qu'Étudiant, je souhaite consulter le statut de ma participation",T5.14.7,"Afficher détails (événement, équipe, date, lieu)",30,Admin
+US-5.14,"En tant qu'Étudiant, je souhaite consulter le statut de ma participation",T5.14.8,"Ajouter bouton ""Donner mon feedback"" pour participations acceptées",20,Admin
+US-5.14,"En tant qu'Étudiant, je souhaite consulter le statut de ma participation",T5.14.9,"Styliser avec design moderne (gradients, ombres)",25,Admin
+US-5.14,"En tant qu'Étudiant, je souhaite consulter le statut de ma participation",T5.14.10,"Tester affichage avec participations acceptées",15,Admin
+US-5.14,"En tant qu'Étudiant, je souhaite consulter le statut de ma participation",T5.14.11,"Tester affichage avec participations refusées",15,Admin

@@ -17,9 +17,9 @@ class FeedbackController extends AbstractController
     #[Route('/participation/{id}', name: 'app_feedback_form', methods: ['GET'])]
     public function showFeedbackForm(Participation $participation): Response
     {
-        // Vérifier que l'événement est terminé
+        // Vérifier que l'événement est terminé (date ET heure)
         $now = new \DateTime();
-        if ($participation->getEvenement()->getDateFin() >= $now) {
+        if ($participation->getEvenement()->getDateFin() > $now) {
             $this->addFlash('error', 'Vous ne pouvez donner votre feedback qu\'après la fin de l\'événement.');
             return $this->redirectToRoute('app_events');
         }
@@ -57,9 +57,9 @@ class FeedbackController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager
     ): JsonResponse {
-        // Vérifier que l'événement est terminé
+        // Vérifier que l'événement est terminé (date ET heure)
         $now = new \DateTime();
-        if ($participation->getEvenement()->getDateFin() >= $now) {
+        if ($participation->getEvenement()->getDateFin() > $now) {
             return new JsonResponse([
                 'success' => false,
                 'message' => 'L\'événement n\'est pas encore terminé.'
