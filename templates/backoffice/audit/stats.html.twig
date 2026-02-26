@@ -59,7 +59,7 @@
                 </svg>
             </div>
             <div class="stat-content">
-                <h3>{{ stats.active_users|length }}</h3>
+                <h3>{{ (stats.active_admins|length) + (stats.active_students|length) }}</h3>
                 <p>Active Users</p>
             </div>
         </div>
