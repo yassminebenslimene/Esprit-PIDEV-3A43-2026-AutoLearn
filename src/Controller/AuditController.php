@@ -229,11 +229,27 @@ class AuditController extends AbstractController
             )->fetchOne();
             
             $stats['by_type'] = $connection->executeQuery(
-                "SELECT 'INS' as revtype, COUNT(*) as count FROM user_audit WHERE revtype = 'INS'
-                 UNION ALL
-                 SELECT 'UPD' as revtype, COUNT(*) as count FROM user_audit WHERE revtype = 'UPD'
-                 UNION ALL
-                 SELECT 'DEL' as revtype, COUNT(*) as count FROM user_audit WHERE revtype = 'DEL'"
+                "SELECT 
+                    CASE 
+                        WHEN ua.revtype = 'INS' THEN 'CREATE'
+                        WHEN ua.revtype = 'DEL' THEN 'DELETE'
+                        WHEN ua.revtype = 'UPD' AND ua.isSuspended = 1 AND (prev.isSuspended IS NULL OR prev.isSuspended = 0) THEN 'SUSPEND'
+                        WHEN ua.revtype = 'UPD' AND ua.isSuspended = 0 AND prev.isSuspended = 1 THEN 'REACTIVATE'
+                        WHEN ua.revtype = 'UPD' THEN 'UPDATE'
+                        ELSE 'UPDATE'
+                    END as revtype,
+                    COUNT(*) as count 
+                 FROM user_audit ua
+                 LEFT JOIN user_audit prev ON prev.userId = ua.userId 
+                     AND prev.rev = (
+                         SELECT MAX(ua2.rev) 
+                         FROM user_audit ua2 
+                         WHERE ua2.userId = ua.userId AND ua2.rev < ua.rev
+                     )
+                 WHERE ua.discr = 'etudiant'
+                 GROUP BY 1
+                 HAVING count > 0
+                 ORDER BY count DESC"
             )->fetchAllAssociative();
             
             $stats['recent_activity'] = $connection->executeQuery(
