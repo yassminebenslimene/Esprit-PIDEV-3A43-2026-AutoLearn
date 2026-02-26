@@ -60,7 +60,12 @@
                     </div>
                 </div>
 
+                {# Affichage de la liste des quiz avec pagination KnpPaginator #}
+                {# L'objet 'pagination' contient les quiz de la page actuelle #}
+                {# KnpPaginator gère automatiquement le découpage des résultats #}
                 <div id="quiz-list">
+                    {# Boucle sur les quiz de la page actuelle uniquement (5 quiz par page) #}
+                    {# 'pagination' est un objet iterable qui contient les éléments de la page #}
                     {% for quiz in pagination %}
                     <div class="quiz-item mb-3" data-quiz-id="{{ quiz.id }}">
                         <!-- Ligne du Quiz -->
@@ -139,6 +144,7 @@
                             </div>
                         </div>
                     </div>
+                    {# Clause 'else' : affichée si aucun quiz n'existe dans la base de données #}
                     {% else %}
                     <div class="text-center text-white-50 py-4">
                         <p>Aucun quiz disponible</p>
@@ -146,8 +152,16 @@
                     {% endfor %}
                 </div>
 
-                {# Pagination KnpPaginator #}
+                {# Widget de pagination fourni par KnpPaginatorBundle #}
+                {# knp_pagination_render() génère automatiquement les liens de navigation #}
+                {# Affiche : Précédent | 1 2 3 4 5 | Suivant #}
                 <div class="pagination-wrapper mt-4">
+                    {# La fonction knp_pagination_render() crée les liens HTML de pagination #}
+                    {# Elle utilise l'objet pagination pour connaître : #}
+                    {# - Le nombre total de pages #}
+                    {# - La page actuelle #}
+                    {# - Le nombre d'éléments par page #}
+                    {# Les liens générés incluent automatiquement le paramètre ?page=X dans l'URL #}
                     {{ knp_pagination_render(pagination) }}
                 </div>
             </div>
@@ -502,13 +516,20 @@
     transform: rotate(180deg);
 }
 
-/* Pagination Styling */
+/* ========================================
+   STYLES DE PAGINATION - KnpPaginatorBundle
+   ======================================== */
+
+/* Container principal de la pagination */
+/* Centre les liens de pagination horizontalement */
 .pagination-wrapper {
     display: flex;
     justify-content: center;
     padding: 1.5rem 0;
 }
 
+/* Liste des liens de pagination générée par knp_pagination_render() */
+/* Structure HTML générée : <ul class="pagination"><li><a>1</a></li>...</ul> */
 .pagination {
     display: flex;
     gap: 0.5rem;
@@ -517,10 +538,13 @@
     margin: 0;
 }
 
+/* Chaque élément de la liste (numéro de page, précédent, suivant) */
 .pagination li {
     display: inline-block;
 }
 
+/* Style des liens et spans de pagination */
+/* Les spans sont utilisés pour la page active et les boutons désactivés */
 .pagination a,
 .pagination span {
     display: inline-flex;
@@ -539,6 +563,8 @@
     transition: all 0.3s ease;
 }
 
+/* Effet hover sur les liens cliquables */
+/* Ajoute un effet visuel pour indiquer l'interactivité */
 .pagination a:hover {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
     border-color: rgba(99, 102, 241, 0.3);
@@ -547,6 +573,8 @@
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
+/* Style de la page active/courante */
+/* KnpPaginator ajoute la classe 'active' ou 'current' à la page actuelle */
 .pagination .active span,
 .pagination .current {
     background: linear-gradient(135deg, #6366f1, #a855f7);
@@ -556,6 +584,8 @@
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }
 
+/* Style des boutons désactivés (première/dernière page) */
+/* KnpPaginator ajoute la classe 'disabled' quand on ne peut pas aller plus loin */
 .pagination .disabled span,
 .pagination .disabled a {
     opacity: 0.4;
@@ -563,15 +593,18 @@
     pointer-events: none;
 }
 
+/* Style spécifique pour les boutons Précédent et Suivant */
 .pagination .previous a,
 .pagination .next a {
     font-weight: 600;
 }
 
+/* Ajoute une flèche avant le texte "Précédent" */
 .pagination .previous a::before {
     content: "← ";
 }
 
+/* Ajoute une flèche après le texte "Suivant" */
 .pagination .next a::after {
     content: " →";
 }

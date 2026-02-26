@@ -1,35 +1,70 @@
+# Configuration du bundle VichUploader pour gérer les uploads de fichiers
+# VichUploader automatise la gestion des fichiers uploadés (images, audio, vidéo)
 vich_uploader:
+    # Utilise Doctrine ORM pour persister les métadonnées des fichiers
     db_driver: orm
     
+    # Définition des mappings : chaque mapping correspond à un type d'upload
     mappings:
+        # Mapping pour les images des quiz (utilisé dans l'entité Quiz)
         quiz_images:
+            # Préfixe d'URL pour accéder aux images depuis le navigateur
+            # Les images seront accessibles via : http://domain.com/uploads/quiz/images/nom-fichier.jpg
             uri_prefix: /uploads/quiz/images
+            # Chemin physique où les fichiers seront stockés sur le serveur
+            # %kernel.project_dir% = racine du projet Symfony
             upload_destination: '%kernel.project_dir%/public/uploads/quiz/images'
+            # Générateur de noms de fichiers : crée des noms uniques pour éviter les conflits
+            # SmartUniqueNamer ajoute un hash unique au nom original du fichier
             namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            # Ne pas charger automatiquement le fichier lors de la lecture de l'entité (optimisation)
             inject_on_load: false
+            # Supprimer l'ancien fichier quand un nouveau est uploadé (évite l'accumulation)
             delete_on_update: true
+            # Supprimer le fichier quand l'entité est supprimée (nettoyage automatique)
             delete_on_remove: true
         
+        # Mapping pour les images des questions (utilisé dans l'entité Question)
         question_images:
+            # URL publique pour accéder aux images de questions
             uri_prefix: /uploads/questions/images
+            # Dossier de stockage physique des images de questions
             upload_destination: '%kernel.project_dir%/public/uploads/questions/images'
+            # Génère des noms uniques pour éviter les doublons
             namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            # Optimisation : ne charge pas le fichier automatiquement
             inject_on_load: false
+            # Supprime l'ancienne image lors d'un remplacement
             delete_on_update: true
+            # Supprime l'image lors de la suppression de la question
             delete_on_remove: true
         
+        # Mapping pour les fichiers audio des questions (questions audio/podcast)
         question_audio:
+            # URL publique pour accéder aux fichiers audio
             uri_prefix: /uploads/questions/audio
+            # Dossier de stockage des fichiers audio
             upload_destination: '%kernel.project_dir%/public/uploads/questions/audio'
+            # Génère des noms uniques pour les fichiers audio
             namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            # Ne charge pas automatiquement le fichier (optimisation mémoire)
             inject_on_load: false
+            # Remplace l'ancien fichier audio lors d'un nouvel upload
             delete_on_update: true
+            # Supprime le fichier audio lors de la suppression de la question
             delete_on_remove: true
         
+        # Mapping pour les fichiers vidéo des questions (questions vidéo/tutoriels)
         question_video:
+            # URL publique pour accéder aux vidéos
             uri_prefix: /uploads/questions/video
+            # Dossier de stockage des fichiers vidéo
             upload_destination: '%kernel.project_dir%/public/uploads/questions/video'
+            # Génère des noms uniques pour les fichiers vidéo
             namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            # Ne charge pas automatiquement le fichier (optimisation pour gros fichiers)
             inject_on_load: false
+            # Remplace l'ancienne vidéo lors d'un nouvel upload
             delete_on_update: true
+            # Supprime la vidéo lors de la suppression de la question
             delete_on_remove: true
