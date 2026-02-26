@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\AiModerationService;
+use App\Service\SentimentAnalysisService;
 
 final class CommentaireController extends AbstractController
 {
@@ -19,7 +20,8 @@ final class CommentaireController extends AbstractController
         Post $post,
         Request $request,
         EntityManagerInterface $em,
-        AiModerationService $aiModeration
+        AiModerationService $aiModeration,
+        SentimentAnalysisService $sentimentAnalysis
     ): Response {
 
         $communaute = $post->getCommunaute();
@@ -52,6 +54,15 @@ final class CommentaireController extends AbstractController
 
         if ($this->getUser()) {
             $commentaire->setUser($this->getUser());
+        }
+
+        // 🤖 Analyse de sentiment avec Groq AI
+        try {
+            $sentimentResult = $sentimentAnalysis->analyzeSentiment($data['contenu']);
+            $commentaire->setSentiment($sentimentResult['sentiment']);
+            $commentaire->setSentimentScore($sentimentResult['score']);
+        } catch (\Exception $e) {
+            // Si l'analyse échoue, on continue sans sentiment
         }
 
         $em->persist($commentaire);

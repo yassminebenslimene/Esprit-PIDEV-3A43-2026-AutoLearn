@@ -23,6 +23,12 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    App\Service\SentimentAnalysisService:
+        arguments:
+            $groqApiKey: '%env(GROQ_API_KEY)%'
+            $groqApiUrl: '%env(GROQ_API_URL)%'
+            $groqModel: '%env(GROQ_MODEL)%'
+
     # AI Summary Service
     App\Service\AiSummaryService:
         arguments:
