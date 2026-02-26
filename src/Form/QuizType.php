@@ -4,6 +4,7 @@
 // Définition du namespace pour les formulaires
 namespace App\Form;
 
+<<<<<<< HEAD
 // Import de l'entité Chapitre pour le champ de sélection
 use App\Entity\GestionDeCours\Chapitre;
 // Import de l'entité Quiz que ce formulaire va gérer
@@ -11,6 +12,9 @@ use App\Entity\Quiz;
 // Import du type EntityType pour les champs de relation
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 // Import de la classe de base pour créer des formulaires
+=======
+use App\Entity\Quiz;
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 use Symfony\Component\Form\AbstractType;
 // Import du type ChoiceType pour les listes déroulantes
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -92,6 +96,7 @@ class QuizType extends AbstractType
                 ],
                 // Champ obligatoire
                 'required' => true,
+<<<<<<< HEAD
                 // Texte d'aide
                 'help' => 'Définissez le statut du quiz'
             ])
@@ -178,6 +183,11 @@ class QuizType extends AbstractType
                 'help' => 'Formats acceptés: JPG, PNG, GIF (max 2MB)'
             ])
             */
+=======
+                'placeholder' => 'Sélectionnez un état',
+                'help' => 'Définissez le statut du quiz'
+            ])
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
         ;
         // Fin de la construction du formulaire
     }

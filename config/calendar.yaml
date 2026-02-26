@@ -1,0 +1,4 @@
+fc_load_events:
+    path: /fc-load-events
+    controller: CalendarBundle:Calendar:load
+    methods: [POST]

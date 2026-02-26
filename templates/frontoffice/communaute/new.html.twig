@@ -1,9 +1,13 @@
 {% extends 'base_front.html.twig' %}
 
-{% block title %}Nouvelle communauté | Scholar{% endblock %}
+
+
+{% block title %}New Communaute{% endblock %}
 
 {% block body %}
+    <h1>Create new Communaute</h1>
 
+<<<<<<< HEAD
 
 <!-- ===== PAGE HEADING ===== -->
 <div class="page-heading header-text">
@@ -103,6 +107,11 @@
     </div>
 </div>
 
+=======
+    {{ include('communaute/_form.html.twig') }}
+
+    <a href="{{ path('app_communaute_index') }}">back to list</a>
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 {% endblock %}
 
 

@@ -22,18 +22,15 @@ security:
             form_login:
                 login_path: backoffice_login
                 check_path: backoffice_login
-                success_handler: App\Security\AuthenticationSuccessHandler  # ✅ Use custom handler
-                
+                default_target_path: app_frontoffice
+
             logout:
                 path: backoffice_logout
-                target: backoffice_login 
+                target: app_frontoffice
 
     access_control:
-        - { path: ^/backoffice, roles: ROLE_ADMIN }  # ✅ Seulement admin
-        - { path: ^/login, roles: PUBLIC_ACCESS }
-        - { path: ^/register, roles: PUBLIC_ACCESS }
-        - { path: ^/home, roles: PUBLIC_ACCESS }    # ✅ Page d'accueil publique
-        - { path: ^/$, roles: PUBLIC_ACCESS }   
+        - { path: ^/backoffice, roles: ROLE_ADMIN }
+        # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
     security:
@@ -59,15 +56,13 @@ when@test:
             form_login:
                 login_path: backoffice_login
                 check_path: backoffice_login
-                default_target_path: app_backoffice
-                always_use_default_target_path: false
+                default_target_path: app_frontoffice
+                always_use_default_target_path: true
             logout:
                 path: backoffice_logout
-                target: backoffice_login
+                target: app_frontoffice
 
     access_control:
         - { path: ^/backoffice, roles: ROLE_ADMIN }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
-        - { path: ^/home, roles: PUBLIC_ACCESS }
-        - { path: ^/$, roles: PUBLIC_ACCESS }

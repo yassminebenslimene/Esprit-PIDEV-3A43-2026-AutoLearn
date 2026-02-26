@@ -10,9 +10,28 @@
     {% block stylesheets %}
         <!-- Bootstrap -->
         <link rel="stylesheet" href="{{ asset('frontoffice/vendor/bootstrap/css/bootstrap.min.css') }}">
+<<<<<<< HEAD
         <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
         <link rel="stylesheet" href="{{ asset('frontoffice/css/templatemo-scholar.css') }}">
         
+=======
+        
+        <!-- Font Awesome (obligatoire pour le bundle) -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        
+        <!-- CSS du bundle StarRating -->
+        <link rel="stylesheet" href="{{ asset('bundles/starrating/css/rating.css') }}">
+        
+        <!-- FrontOffice CSS -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/animate.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/flex-slider.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/owl.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/templatemo-scholar.css') }}">
+        
+        <!-- Swiper -->
+        <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
+        
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
         <style>
             .completion-page {
                 margin-top: 120px;
@@ -147,6 +166,115 @@
                 color: #7fb77e;
             }
             
+<<<<<<< HEAD
+=======
+            /* Styles pour la section rating */
+            .rating-section {
+                margin-top: 30px;
+                padding: 30px;
+                background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+                border-radius: 20px;
+                border: 1px solid rgba(0,0,0,0.05);
+            }
+            
+            .rating-title {
+                font-size: 20px;
+                font-weight: 600;
+                color: #2a2a2a;
+                margin-bottom: 15px;
+            }
+            
+            .rating-stars {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                margin: 20px 0;
+            }
+            
+            .rating-stars .rating-input {
+                display: none;
+            }
+            
+            .rating-stars .rating-star {
+                cursor: pointer;
+                font-size: 40px;
+                color: #ddd;
+                transition: all 0.2s ease;
+            }
+            
+            .rating-stars .rating-star:hover,
+            .rating-stars .rating-star:hover ~ .rating-star,
+            .rating-stars .rating-input:checked ~ .rating-star {
+                color: #ffc107;
+            }
+            
+            .rating-value {
+                font-size: 18px;
+                color: #7a7a7a;
+                margin: 15px 0;
+            }
+            
+            .rating-value span {
+                font-weight: 700;
+                color: #ffc107;
+                font-size: 24px;
+            }
+            
+            .btn-rating {
+                background: linear-gradient(105deg, #7fb77e 0%, #4a9b4a 100%);
+                color: white;
+                border: none;
+                padding: 12px 40px;
+                border-radius: 25px;
+                font-weight: 600;
+                font-size: 16px;
+                cursor: pointer;
+                transition: all 0.3s;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 10px;
+            }
+            
+            .btn-rating:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(127, 183, 126, 0.3);
+            }
+            
+            .btn-rating i {
+                font-size: 18px;
+            }
+            
+            .rating-message {
+                margin-top: 15px;
+                padding: 10px;
+                border-radius: 8px;
+                font-size: 14px;
+                display: none;
+            }
+            
+            .rating-message.success {
+                display: block;
+                background: rgba(127, 183, 126, 0.1);
+                color: #7fb77e;
+                border: 1px solid #7fb77e;
+            }
+            
+            .rating-message.error {
+                display: block;
+                background: rgba(241, 123, 123, 0.1);
+                color: #f17b7b;
+                border: 1px solid #f17b7b;
+            }
+            
+            .rating-message.warning {
+                display: block;
+                background: rgba(243, 181, 98, 0.1);
+                color: #f3b562;
+                border: 1px solid #f3b562;
+            }
+            
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
             .action-buttons {
                 display: flex;
                 gap: 20px;
@@ -188,6 +316,25 @@
                 transform: translateX(5px);
             }
             
+<<<<<<< HEAD
+=======
+            /* Message si déjà noté */
+            .already-rated {
+                background: #f9f9f9;
+                padding: 15px;
+                border-radius: 10px;
+                margin-top: 15px;
+                font-size: 14px;
+                color: #7a7a7a;
+                border-left: 4px solid #7fb77e;
+            }
+            
+            .already-rated i {
+                color: #7fb77e;
+                margin-right: 8px;
+            }
+            
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
             @media (max-width: 768px) {
                 .completion-card {
                     padding: 40px 20px;
@@ -201,6 +348,13 @@
                     padding: 12px 40px;
                     font-size: 16px;
                 }
+<<<<<<< HEAD
+=======
+                
+                .rating-stars .rating-star {
+                    font-size: 30px;
+                }
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
             }
         </style>
     {% endblock %}
@@ -275,6 +429,70 @@
                 <div class="score-percentage">{{ percentage }}% de réussite</div>
                 <div class="score-message {{ colorClass }}">{{ message }}</div>
             </div>
+<<<<<<< HEAD
+=======
+
+            <!-- Section Rating 5 étoiles avec le bundle -->
+            <div class="rating-section">
+                <h3 class="rating-title">
+                    <i class="fa fa-star" style="color: #ffc107;"></i>
+                    Évaluez ce challenge
+                </h3>
+                <p class="text-muted">Donnez votre avis sur ce challenge</p>
+                
+                {% if userVote is defined and userVote %}
+                    <div class="already-rated">
+                        <i class="fa fa-check-circle"></i>
+                        Vous avez déjà noté ce challenge : 
+                        <span style="color: #ffc107; font-weight: 700;">
+                            {% for i in 1..userVote.valeur %}★{% endfor %}
+                            {% for i in userVote.valeur..4 %}☆{% endfor %}
+                        </span>
+                        ({{ userVote.valeur }}/5)
+                    </div>
+                {% else %}
+                    <div class="rating-stars text-center">
+                        <input type="radio" id="star5" name="rating" value="5" class="rating-input" data-value="5" />
+                        <label for="star5" class="rating-star" title="5 étoiles">
+                            <i class="fa fa-star-o"></i>
+                        </label>
+                        
+                        <input type="radio" id="star4" name="rating" value="4" class="rating-input" data-value="4" />
+                        <label for="star4" class="rating-star" title="4 étoiles">
+                            <i class="fa fa-star-o"></i>
+                        </label>
+                        
+                        <input type="radio" id="star3" name="rating" value="3" class="rating-input" data-value="3" />
+                        <label for="star3" class="rating-star" title="3 étoiles">
+                            <i class="fa fa-star-o"></i>
+                        </label>
+                        
+                        <input type="radio" id="star2" name="rating" value="2" class="rating-input" data-value="2" />
+                        <label for="star2" class="rating-star" title="2 étoiles">
+                            <i class="fa fa-star-o"></i>
+                        </label>
+                        
+                        <input type="radio" id="star1" name="rating" value="1" class="rating-input" data-value="1" />
+                        <label for="star1" class="rating-star" title="1 étoile">
+                            <i class="fa fa-star-o"></i>
+                        </label>
+                    </div>
+                    
+                    <div class="rating-value" id="ratingValue" style="margin: 15px 0; font-size: 16px; color: #7a7a7a;">
+                        Sélectionnez une note
+                    </div>
+                    
+                    <input type="hidden" id="selectedRating" value="0">
+                    <input type="hidden" id="challengeId" value="{{ challenge.id }}">
+                    
+                    <button class="btn-rating" id="submitRating" onclick="submitRating()">
+                        <i class="fa fa-star"></i> Noter ce challenge
+                    </button>
+                    
+                    <div id="ratingMessage" class="rating-message"></div>
+                {% endif %}
+            </div>
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
             
             <div class="action-buttons">
                 <a href="{{ path('app_frontoffice') }}#challenge" class="btn-action btn-primary">
@@ -297,6 +515,154 @@
     <script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('frontoffice/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('frontoffice/js/custom.js') }}"></script>
+<<<<<<< HEAD
+=======
+    
+    <!-- JS du bundle StarRating -->
+    <script src="{{ asset('bundles/starrating/js/rating.js') }}"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const stars = document.querySelectorAll('.rating-input');
+            const labels = document.querySelectorAll('.rating-star');
+            const ratingValue = document.getElementById('ratingValue');
+            const selectedRating = document.getElementById('selectedRating');
+            
+            console.log('Nombre d\'étoiles trouvées:', stars.length); // Pour déboguer
+            
+            // Gérer le survol et le clic des étoiles
+            stars.forEach((star, index) => {
+                // Survol
+                star.addEventListener('mouseenter', function() {
+                    const value = this.value;
+                    highlightStars(value);
+                });
+                
+                // Clic
+                star.addEventListener('change', function() {
+                    const value = this.value;
+                    selectedRating.value = value;
+                    
+                    // Mettre à jour le texte
+                    updateRatingText(value);
+                    
+                    // Marquer comme actif
+                    stars.forEach(s => {
+                        const label = document.querySelector('label[for="' + s.id + '"]');
+                        const icon = label.querySelector('i');
+                        if (s.value <= value) {
+                            icon.classList.remove('fa-star-o');
+                            icon.classList.add('fa-star');
+                        } else {
+                            icon.classList.remove('fa-star');
+                            icon.classList.add('fa-star-o');
+                        }
+                    });
+                });
+            });
+            
+            // Quitter le survol
+            document.querySelector('.rating-stars').addEventListener('mouseleave', function() {
+                const value = selectedRating.value;
+                if (value > 0) {
+                    highlightStars(value);
+                } else {
+                    stars.forEach(s => {
+                        const label = document.querySelector('label[for="' + s.id + '"]');
+                        const icon = label.querySelector('i');
+                        icon.classList.remove('fa-star');
+                        icon.classList.add('fa-star-o');
+                    });
+                }
+            });
+        });
+        
+        function highlightStars(value) {
+            const stars = document.querySelectorAll('.rating-input');
+            stars.forEach(s => {
+                const label = document.querySelector('label[for="' + s.id + '"]');
+                const icon = label.querySelector('i');
+                if (s.value <= value) {
+                    icon.classList.remove('fa-star-o');
+                    icon.classList.add('fa-star');
+                } else {
+                    icon.classList.remove('fa-star');
+                    icon.classList.add('fa-star-o');
+                }
+            });
+        }
+        
+        function updateRatingText(value) {
+            const ratingValue = document.getElementById('ratingValue');
+            if (value == 1) ratingValue.innerHTML = '<span style="color: #ffc107;">★</span> 1 étoile - Très décevant';
+            else if (value == 2) ratingValue.innerHTML = '<span style="color: #ffc107;">★★</span> 2 étoiles - Passable';
+            else if (value == 3) ratingValue.innerHTML = '<span style="color: #ffc107;">★★★</span> 3 étoiles - Bien';
+            else if (value == 4) ratingValue.innerHTML = '<span style="color: #ffc107;">★★★★</span> 4 étoiles - Très bien';
+            else if (value == 5) ratingValue.innerHTML = '<span style="color: #ffc107;">★★★★★</span> 5 étoiles - Excellent';
+        }
+        
+        function submitRating() {
+            const rating = document.getElementById('selectedRating').value;
+            const challengeId = document.getElementById('challengeId').value;
+            const messageDiv = document.getElementById('ratingMessage');
+            const submitBtn = document.getElementById('submitRating');
+            
+            if (rating == 0) {
+                messageDiv.className = 'rating-message warning';
+                messageDiv.innerHTML = '<i class="fa fa-exclamation-triangle"></i> Veuillez sélectionner une note';
+                return;
+            }
+            
+            // Désactiver le bouton pendant l'envoi
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Envoi en cours...';
+            
+            // Envoyer le vote
+            fetch('{{ path('frontchallenge_vote') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    challengeId: challengeId,
+                    valeur: rating
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur HTTP: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    messageDiv.className = 'rating-message success';
+                    messageDiv.innerHTML = '<i class="fa fa-check-circle"></i> ' + data.message;
+                    
+                    // Recharger après 2 secondes pour afficher la note
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    messageDiv.className = 'rating-message error';
+                    messageDiv.innerHTML = '<i class="fa fa-exclamation-circle"></i> ' + data.error;
+                    
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fa fa-star"></i> Noter ce challenge';
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                messageDiv.className = 'rating-message error';
+                messageDiv.innerHTML = '<i class="fa fa-exclamation-circle"></i> Erreur: ' + error.message;
+                
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa fa-star"></i> Noter ce challenge';
+            });
+        }
+    </script>
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 {% endblock %}
 
 </body>

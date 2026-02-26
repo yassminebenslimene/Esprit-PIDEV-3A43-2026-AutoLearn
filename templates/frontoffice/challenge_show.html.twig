@@ -114,9 +114,49 @@
                 transform: translateY(-2px);
             }
             
+<<<<<<< HEAD
             .btn-start i {
                 margin-left: 10px;
             }
+=======
+            .btn-start:disabled, .btn-start.disabled {
+                background: #cccccc;
+                cursor: not-allowed;
+                transform: none;
+                opacity: 0.6;
+            }
+            
+            .btn-start i {
+                margin-left: 10px;
+            }
+            
+            .result-container {
+                background: #f9f9f9;
+                padding: 30px;
+                border-radius: 15px;
+                margin-top: 30px;
+                text-align: center;
+            }
+            
+            .result-score {
+                font-size: 48px;
+                font-weight: 700;
+                color: #7fb77e;
+                margin: 10px 0;
+            }
+            
+            .result-date {
+                color: #7a7a7a;
+                font-size: 14px;
+                margin-top: 10px;
+            }
+            
+            .result-message {
+                font-size: 18px;
+                color: #2a2a2a;
+                margin-bottom: 20px;
+            }
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
         </style>
     {% endblock %}
 </head>
@@ -146,7 +186,10 @@
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#top">Home</a></li>
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#services">Services</a></li>
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#courses">Courses</a></li>
+<<<<<<< HEAD
                         
+=======
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#team">Team</a></li>
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#events">Events</a></li>
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#challenge" class="active">Challenge</a></li>
@@ -202,7 +245,11 @@
                 <div class="info-value">
                     <i class="fa fa-signal"></i>
                     <span class="niveau-badge 
+<<<<<<< HEAD
                         {% if challenge.niveau == 'Facile' %}niveau-facile
+=======
+                        {% if challenge.niveau == 'Débutant' %}niveau-facile
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
                         {% elseif challenge.niveau == 'Intermédiaire' %}niveau-intermediaire
                         {% else %}niveau-difficile
                         {% endif %}">
@@ -211,10 +258,30 @@
                 </div>
             </div>
             
+<<<<<<< HEAD
             <!-- Bouton commencer -->
             <a href="{{ path('frontchallenge_play', {'id': challenge.id}) }}" class="btn-start">
                 Commencer <i class="fa fa-arrow-right"></i>
             </a>
+=======
+            {% if userChallenge and userChallenge.completed %}
+                <!-- Résultat du challenge terminé -->
+                <div class="result-container">
+                    <div class="result-message">Vous avez déjà complété ce challenge</div>
+                    <div class="result-score">{{ userChallenge.score }}/{{ userChallenge.totalPoints }}</div>
+                    <div class="result-date">Terminé le {{ userChallenge.completedAt|date('d M Y à H:i') }}</div>
+                </div>
+            {% else %}
+                <!-- Bouton commencer ou continuer -->
+                <a href="{{ path('frontchallenge_play', {'id': challenge.id}) }}" class="btn-start">
+                    {% if userChallenge and userChallenge.currentIndex > 0 %}
+                        Continuer <i class="fa fa-arrow-right"></i>
+                    {% else %}
+                        Commencer <i class="fa fa-arrow-right"></i>
+                    {% endif %}
+                </a>
+            {% endif %}
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
         </div>
     </div>
 </div>

@@ -64,6 +64,7 @@ https://templatemo.com/tm-607-glass-admin
                     <span class="nav-section-title">GESTION</span>
                     <ul>
                         <li class="nav-item">
+<<<<<<< HEAD:templates/backoffice/users/settings.html.twig
                             <a href="{{ path('app_cours_index') }}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
@@ -85,6 +86,9 @@ https://templatemo.com/tm-607-glass-admin
                         </li>
                         <li class="nav-item">
                             <a href="{{ path('backoffice_evenements') }}" class="nav-link">
+=======
+                            <a href="{{ path('backoffice_users') }}" class="nav-link">
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f:templates/backoffice/settings.html.twig
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                                     <line x1="16" y1="2" x2="16" y2="6"/>
@@ -345,7 +349,14 @@ https://templatemo.com/tm-607-glass-admin
             {{ form_errors(form.email) }}
         </div>
         
-       
+        {# Niveau field will automatically appear here ONLY if user is Etudiant #}
+        {% if form.niveau is defined %}
+        <div class="form-group-settings">
+            {{ form_label(form.niveau, 'Niveau') }}
+            {{ form_widget(form.niveau, {'attr': {'class': 'settings-select'}}) }}
+            {{ form_errors(form.niveau) }}
+        </div>
+        {% endif %}
     </div>
 </div>
 

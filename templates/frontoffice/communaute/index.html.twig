@@ -1,9 +1,11 @@
-{% extends 'base_front.html.twig' %}
+{% extends 'base.html.twig' %}
 
-{% block title %}Communautés | Scholar{% endblock %}
+{% block title %}Communaute index{% endblock %}
 
 {% block body %}
+    <h1>Communaute index</h1>
 
+<<<<<<< HEAD
 <div class="page-heading header-text">
     <div class="container">
         <div class="row">
@@ -424,4 +426,35 @@
 
 </div>
 
+=======
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for communaute in communautes %}
+            <tr>
+                <td>{{ communaute.id }}</td>
+                <td>{{ communaute.nom }}</td>
+                <td>{{ communaute.description }}</td>
+                <td>
+                    <a href="{{ path('app_communaute_show', {'id': communaute.id}) }}">show</a>
+                    <a href="{{ path('app_communaute_edit', {'id': communaute.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_communaute_new') }}">Create new</a>
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 {% endblock %}

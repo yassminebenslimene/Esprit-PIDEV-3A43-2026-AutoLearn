@@ -119,7 +119,7 @@
                     </div>
 
                     {# NIVEAU - Masqué par défaut, validation serveur seulement #}
-                    <div class="form-group" id="niveau-group" style="display: none; ">
+                    <div class="form-group" id="niveau-group" style="display: none;">
                         {{ form_label(form.niveau, 'Niveau', {'label_attr': {'class': 'form-label'}}) }}
                         {{ form_widget(form.niveau, {'attr': {
                             'class': 'form-input' ~ (form.niveau.vars.errors|length > 0 ? ' input-error' : ''),

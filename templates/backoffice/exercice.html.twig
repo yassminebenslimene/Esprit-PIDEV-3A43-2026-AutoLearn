@@ -242,7 +242,17 @@ https://templatemo.com/tm-607-glass-admin
             </nav>
 
             <!-- Content -->
-            <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 20px;">
+                <button onclick="openAIModal()" 
+                   class="btn btn-primary" 
+                   style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 8v8M8 12h8"/>
+                        <path d="M4 4 L20 20 M20 4 L4 20"/>
+                    </svg>
+                    🤖 Générer avec IA
+                </button>
                 <a href="{{ path('backoffice_exercice_add') }}" 
                    class="btn btn-primary" 
                    style="background: linear-gradient(135deg, var(--emerald-light), var(--emerald)); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
@@ -351,7 +361,202 @@ https://templatemo.com/tm-607-glass-admin
         <p>Copyright © 2026 Your Company. Designed by <a href="https://templatemo.com" target="_blank" rel="nofollow">TemplateMo</a></p>
     </footer>
 
+    <!-- Modal pour la génération IA -->
+    <div id="aiModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: var(--bg-card); border-radius: 15px; padding: 30px; max-width: 500px; width: 90%; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <button onclick="closeAIModal()" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--text); font-size: 20px; cursor: pointer;">✕</button>
+            
+            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9b59b6" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 8v8M8 12h8"/>
+                    <path d="M4 4 L20 20 M20 4 L4 20"/>
+                </svg>
+                Générer un exercice avec l'IA
+            </h3>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Thème</label>
+                <input type="text" id="aiTheme" class="filter-input" placeholder="Ex: Boucles en PHP, Révolution française..." style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--text);">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Niveau</label>
+                <select id="aiNiveau" class="filter-select" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--text);">
+                    <option value="Débutant">Débutant</option>
+                    <option value="Intermédiaire">Intermédiaire</option>
+                    <option value="Avancé">Avancé</option>
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Type</label>
+                <select id="aiType" class="filter-select" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--text);">
+                    <option value="open">Question ouverte</option>
+                    <option value="qcm">QCM</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button onclick="generateExercise()" class="btn btn-primary" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4 L20 20 M20 4 L4 20"/>
+                        <circle cx="12" cy="12" r="10"/>
+                    </svg>
+                    Générer
+                </button>
+                <button onclick="closeAIModal()" class="btn btn-secondary" style="background: rgba(255,255,255,0.1); color: var(--text); padding: 12px 24px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-weight: 500; cursor: pointer;">
+                    Annuler
+                </button>
+            </div>
+            
+            <div id="aiResult" style="margin-top: 20px; display: none;">
+                <h4 style="margin-bottom: 10px;">Résultat :</h4>
+                <div id="aiResultContent" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border-left: 4px solid #9b59b6;"></div>
+                <button onclick="saveGeneratedExercise()" class="btn btn-success" style="background: linear-gradient(135deg, var(--emerald-light), var(--emerald)); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                        <polyline points="17 21 17 13 7 13 7 21"/>
+                        <polyline points="7 3 7 8 15 8"/>
+                    </svg>
+                    Enregistrer cet exercice
+                </button>
+            </div>
+            
+            <div id="aiLoading" style="display: none; text-align: center; margin-top: 20px;">
+                <div class="loading-spinner" style="width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #9b59b6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                <p style="margin-top: 10px; color: var(--text-muted);">Génération en cours...</p>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        #aiModal {
+            transition: all 0.3s ease;
+        }
+        .btn-primary, .btn-secondary, .btn-success {
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover, .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.3);
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,255,255,0.1);
+        }
+    </style>
+
     <script src="{{ asset('backoffice/js/templatemo-glass-admin-script.js') }}"></script>
+    <script>
+        let lastGeneratedExercise = null;
+
+        function openAIModal() {
+            document.getElementById('aiModal').style.display = 'flex';
+        }
+
+        function closeAIModal() {
+            document.getElementById('aiModal').style.display = 'none';
+            document.getElementById('aiResult').style.display = 'none';
+            document.getElementById('aiLoading').style.display = 'none';
+            document.getElementById('aiTheme').value = '';
+        }
+
+        function generateExercise() {
+            const theme = document.getElementById('aiTheme').value;
+            const niveau = document.getElementById('aiNiveau').value;
+            const type = document.getElementById('aiType').value;
+            
+            if (!theme) {
+                alert('Veuillez entrer un thème');
+                return;
+            }
+            
+            // Afficher le loader
+            document.getElementById('aiLoading').style.display = 'block';
+            document.getElementById('aiResult').style.display = 'none';
+            
+            // Appel AJAX
+            fetch('{{ path('backoffice_exercice_ai_generate') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    theme: theme,
+                    niveau: niveau,
+                    type: type
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('aiLoading').style.display = 'none';
+                
+                if (data.success) {
+                    lastGeneratedExercise = data.exercise;
+                    const resultDiv = document.getElementById('aiResultContent');
+                    
+                    if (data.exercise.type === 'qcm') {
+                        let optionsHtml = '';
+                        data.exercise.options.forEach((opt, index) => {
+                            const isCorrect = index === data.exercise.bonneReponse;
+                            optionsHtml += `<div style="margin: 8px 0; padding: 8px; background: ${isCorrect ? 'rgba(16, 185, 129, 0.1)' : 'transparent'}; border-radius: 5px; ${isCorrect ? 'color: var(--emerald-light); font-weight: bold;' : ''}">
+                                ${String.fromCharCode(65 + index)}. ${opt} ${isCorrect ? '✓' : ''}
+                            </div>`;
+                        });
+                        resultDiv.innerHTML = `
+                            <p><strong style="color: #9b59b6;">Question :</strong> ${data.exercise.question}</p>
+                            <p><strong style="color: #9b59b6;">Options :</strong></p>
+                            ${optionsHtml}
+                            <p><strong style="color: #9b59b6;">Points :</strong> ${data.exercise.points}</p>
+                        `;
+                    } else {
+                        resultDiv.innerHTML = `
+                            <p><strong style="color: #9b59b6;">Question :</strong> ${data.exercise.question}</p>
+                            <p><strong style="color: #9b59b6;">Réponse :</strong> <span style="color: var(--emerald-light);">${data.exercise.reponse}</span></p>
+                            <p><strong style="color: #9b59b6;">Points :</strong> ${data.exercise.points}</p>
+                        `;
+                    }
+                    
+                    document.getElementById('aiResult').style.display = 'block';
+                } else {
+                    alert('Erreur : ' + data.error);
+                }
+            })
+            .catch(error => {
+                document.getElementById('aiLoading').style.display = 'none';
+                alert('Erreur : ' + error.message);
+            });
+        }
+
+        function saveGeneratedExercise() {
+            if (!lastGeneratedExercise) return;
+            
+            fetch('{{ path('backoffice_exercice_ai_save') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(lastGeneratedExercise)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Exercice enregistré avec succès !');
+                    closeAIModal();
+                    location.reload(); // Recharger pour voir le nouvel exercice
+                } else {
+                    alert('Erreur : ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Erreur : ' + error.message);
+            });
+        }
+    </script>
     <!-- TemplateMo 607 Glass Admin -->
     
     {# AI Chat Widget - Assistant Intelligent #}

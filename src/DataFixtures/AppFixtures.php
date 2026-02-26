@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+<<<<<<< HEAD
 use App\Entity\Evenement;
 use App\Entity\Equipe;
 use App\Entity\Participation;
@@ -10,6 +11,8 @@ use App\Entity\Etudiant;
 use App\Enum\TypeEvenement;
 use App\Enum\StatutEvenement;
 use App\Enum\StatutParticipation;
+=======
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -17,6 +20,7 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
+<<<<<<< HEAD
         // Créer des événements de test
         $evenement1 = new Evenement();
         $evenement1->setNom('Hackathon IA 2026');
@@ -87,6 +91,10 @@ class AppFixtures extends Fixture
         $feedback1->setDateCreation(new \DateTime());
         $manager->persist($feedback1);
         */
+=======
+        // $product = new Product();
+        // $manager->persist($product);
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 
         $manager->flush();
     }

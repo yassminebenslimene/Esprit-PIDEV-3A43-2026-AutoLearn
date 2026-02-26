@@ -409,28 +409,109 @@ https://templatemo.com/tm-607-glass-admin
                         {% endif %}
                     </h2>
                 </div>
-
-                {{ form_start(form, {'attr': {'style': 'display: flex; flex-direction: column; gap: 20px;'}}) }}
-
+                    {{ form_start(form,{'attr': {'novalidate': 'novalidate'}} ) }}
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div>
-                        {{ form_row(form.titre, {'attr': {'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;'}}) }}
+                        {{ form_row(form.titre, {'attr': {
+                            'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;'
+                        }}) }}
+                        {{form_errors(form.titre)}}
                     </div>
                     <div>
-                        {{ form_row(form.niveau, {'attr': {'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;'}}) }}
+                        {{ form_row(form.niveau, {'attr': {
+                            'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;'
+                        }}) }}
+                        {{form_errors(form.niveau) }}
                     </div>
                 </div>
 
                 <div>
-                    {{ form_row(form.description, {'attr': {'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit; min-height: 100px;'}}) }}
+                    {{ form_row(form.description, {'attr': {
+                        'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit; min-height: 100px;'
+                    }}) }}
+                    {{form_errors(form.description) }}
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div>
-                        {{ form_row(form.dateDebut, {'attr': {'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;'}}) }}
+                        {{ form_row(form.dateDebut, {'attr': {
+                            'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;'
+                        }}) }}
                     </div>
                     <div>
-                        {{ form_row(form.dateFin, {'attr': {'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;'}}) }}
+                        {{ form_row(form.dateFin, {'attr': {
+                            'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;'
+                        }}) }}
+                        {{form_errors(form.dateFin) }}
+                    </div>
+                </div>
+
+                <!-- Section de sélection des exercices et quiz -->
+                <div class="selection-section">
+                    <div class="selection-header">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Contenu du challenge</h3>
+                        <div class="selected-count">
+                            <span id="selectedCount">0</span> élément(s) sélectionné(s)
+                        </div>
+                    </div>
+                    
+                    <div class="selection-tabs">
+                        <div class="selection-tab active" data-type="exercices">Exercices</div>
+                        <div class="selection-tab" data-type="quiz">Quiz</div>
+                    </div>
+                    
+                    <!-- Liste des exercices -->
+                    <div id="exercicesList" class="items-grid">
+                        {% if exercices is defined and exercices|length > 0 %}
+                            {% for exercice in exercices %}
+                                <div class="item-card {% if exerciceIds is defined and exercice.id in exerciceIds %}selected{% endif %}" 
+                                     data-id="{{ exercice.id }}" 
+                                     data-type="exercice"
+                                     onclick="toggleSelection(this, 'exercice_{{ exercice.id }}')">
+                                    <div class="item-title">{{ exercice.question }}</div>
+                                    <div class="item-details">
+                                        <span class="item-badge">{{ exercice.points }} pts</span>
+                                        <span class="item-type">Exercice</span>
+                                    </div>
+                                    <div class="item-question">Réponse: {{ exercice.reponse }}</div>
+                                    <input type="checkbox" 
+                                           name="exercices[]" 
+                                           id="exercice_{{ exercice.id }}" 
+                                           value="{{ exercice.id }}" 
+                                           {% if exerciceIds is defined and exercice.id in exerciceIds %}checked{% endif %}
+                                           style="display: none;">
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p style="grid-column: 1/-1; text-align: center; padding: 30px; color: var(--text-muted);">Aucun exercice disponible</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Liste des quiz -->
+                    <div id="quizList" class="items-grid" style="display: none;">
+                        {% if quizs is defined and quizs|length > 0 %}
+                            {% for quiz in quizs %}
+                                <div class="item-card {% if quizIds is defined and quiz.id in quizIds %}selected{% endif %}" 
+                                     data-id="{{ quiz.id }}" 
+                                     data-type="quiz"
+                                     onclick="toggleSelection(this, 'quiz_{{ quiz.id }}')">
+                                    <div class="item-title">{{ quiz.titre }}</div>
+                                    <div class="item-details">
+                                        <span class="item-badge">{{ quiz.questions|length }} question(s)</span>
+                                        <span class="item-type">Quiz</span>
+                                    </div>
+                                    <div class="item-question">État: {{ quiz.etat }}</div>
+                                    <input type="checkbox" 
+                                           name="quizs[]" 
+                                           id="quiz_{{ quiz.id }}" 
+                                           value="{{ quiz.id }}" 
+                                           {% if quizIds is defined and quiz.id in quizIds %}checked{% endif %}
+                                           style="display: none;">
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p style="grid-column: 1/-1; text-align: center; padding: 30px; color: var(--text-muted);">Aucun quiz disponible</p>
+                        {% endif %}
                     </div>
                 </div>
 

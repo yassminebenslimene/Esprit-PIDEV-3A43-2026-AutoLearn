@@ -50,6 +50,7 @@ class Quiz
     )]
     private ?string $etat = null;
 
+<<<<<<< HEAD
     #[ORM\Column(nullable: true)]
     #[Assert\Positive(message: "La durée doit être un nombre positif.")]
     private ?int $dureeMaxMinutes = null;
@@ -74,11 +75,16 @@ class Quiz
     #[ORM\JoinColumn(name: 'challenge_id', referencedColumnName: 'id', nullable: true)]
     private ?Challenge $challenge = null;
 
+=======
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     /**
      * @var Collection<int, Question>
      */
     #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz', orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $questions;
+
+    #[ORM\ManyToOne(inversedBy: 'quizzes')]
+    private ?Challenge $challenge = null;
 
     public function __construct()
     {
@@ -147,14 +153,15 @@ class Quiz
         return $this;
     }
 
-    public function getChapitre(): ?Chapitre
+    public function getChallenge(): ?Challenge
     {
-        return $this->chapitre;
+        return $this->challenge;
     }
 
-    public function setChapitre(?Chapitre $chapitre): static
+    public function setChallenge(?Challenge $challenge): static
     {
-        $this->chapitre = $chapitre;
+        $this->challenge = $challenge;
+
         return $this;
     }
 

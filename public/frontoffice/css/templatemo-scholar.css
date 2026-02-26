@@ -1906,3 +1906,61 @@ body {
     width: 95%;
   }
 }
+.rating-stars {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.stars-display {
+  display: inline-flex;
+  align-items: center;
+}
+
+.stars-display .fa-star,
+.stars-display .fa-star-half-o,
+.stars-display .fa-star-o {
+  margin-right: 2px;
+  font-size: 16px;
+}
+
+.stars-display .fa-star {
+  color: #ffc107;
+}
+
+.stars-display .fa-star-half-o {
+  color: #ffc107;
+}
+
+.stars-display .fa-star-o {
+  color: #ddd;
+}
+/* Style pour les étoiles du formulaire */
+.star-rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  gap: 5px;
+}
+
+.star-rating input[type="radio"] {
+  display: none;
+}
+
+.star-rating label {
+  cursor: pointer;
+  font-size: 30px;
+  color: #ddd;
+  transition: color 0.2s;
+  font-family: 'FontAwesome';
+}
+
+.star-rating label:before {
+  content: "\f006"; /* étoile vide */
+}
+
+.star-rating input[type="radio"]:checked ~ label:before,
+.star-rating label:hover:before,
+.star-rating label:hover ~ label:before {
+  content: "\f005"; /* étoile pleine */
+  color: #ffc107;
+}

@@ -309,15 +309,26 @@ input[type="text"] {
 
         <h4>✏️ Informations de la communauté</h4>
 
-        {{ include('frontoffice/communaute/_form.html.twig', {
+        {{ include('communaute/_form.html.twig', {
             'button_label': 'Enregistrer les modifications'
         }) }}
 
+<<<<<<< HEAD
         <a href="{{ path('app_communaute_show', { id: communaute.id }) }}" class="btn-link">
             ← Retour à la communauté
         </a>
 
         {{ include('frontoffice/communaute/_delete_form.html.twig') }}
+=======
+        <a href="{{ path('app_communaute_show', { id: communaute.id }) }}"
+           class="btn-link">
+            ← Retour à la communauté
+        </a>
+
+        <hr>
+
+        {{ include('communaute/_delete_form.html.twig') }}
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 
     </div>
 

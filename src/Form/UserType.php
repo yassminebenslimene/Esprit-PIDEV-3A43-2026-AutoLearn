@@ -13,60 +13,54 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class UserType extends AbstractType
 {
-  // In UserType.php - buildForm method
-public function buildForm(FormBuilderInterface $builder, array $options): void
-{
-    $builder
-        ->add('nom', TextType::class, [
-            'attr' => [
-                'placeholder' => 'Ex: Dupont',
-                'title' => 'Lettres, espaces et apostrophes seulement'
-            ]
-        ])
-        ->add('prenom', TextType::class, [
-            'attr' => [
-                'placeholder' => 'Ex: Jean',
-                'title' => 'Lettres, espaces et apostrophes seulement'
-            ]
-        ])
-        ->add('email', EmailType::class, [
-            'attr' => [
-                'placeholder' => 'exemple@domaine.com',
-                'title' => 'Format: nom.prenom@domaine.com'
-            ]
-        ])
-        ->add('password', PasswordType::class, [
-            'required' => !$options['is_edit'],
-            'attr' => [
-                'placeholder' => 'Minimum 8 caractères',
-                'title' => 'Majuscule, minuscule, chiffre et caractère spécial (@$!%*?&)'
-            ],
-            'help' => '8 caractères min avec : majuscule, minuscule, chiffre, caractère spécial (@$!%*?&)'
-        ]);
-
-    // 🔥 ADD ROLE ONLY IF NOT EDIT MODE
-    if (!$options['is_edit']) {
-        $builder->add('role', ChoiceType::class, [
-            'choices' => [
-                'Administrateur' => 'ADMIN',
-                'Étudiant' => 'ETUDIANT',
-            ],
-            'placeholder' => 'Sélectionnez un rôle',
-            'attr' => ['class' => 'form-select']
-        ]);
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('nom', TextType::class, [
+                'attr' => [
+                    'placeholder' => 'Ex: Dupont',
+                    'title' => 'Lettres, espaces et apostrophes seulement'
+                ]
+            ])
+            ->add('prenom', TextType::class, [
+                'attr' => [
+                    'placeholder' => 'Ex: Jean',
+                    'title' => 'Lettres, espaces et apostrophes seulement'
+                ]
+            ])
+            ->add('email', EmailType::class, [
+                'attr' => [
+                    'placeholder' => 'exemple@domaine.com',
+                    'title' => 'Format: nom.prenom@domaine.com'
+                ]
+            ])
+            ->add('password', PasswordType::class, [
+                'required' => !$options['is_edit'],
+                'attr' => [
+                    'placeholder' => 'Minimum 8 caractères',
+                    'title' => 'Majuscule, minuscule, chiffre et caractère spécial (@$!%*?&)'
+                ],
+                'help' => '8 caractères min avec : majuscule, minuscule, chiffre, caractère spécial (@$!%*?&)'
+            ])
+            ->add('role', ChoiceType::class, [
+                'choices' => [
+                    'Administrateur' => 'ADMIN',
+                    'Étudiant' => 'ETUDIANT',
+                ],
+                'placeholder' => 'Sélectionnez un rôle',
+                'attr' => ['class' => 'form-select']
+            ])
+            ->add('niveau', ChoiceType::class, [
+                'choices' => [
+                    'Débutant' => 'DEBUTANT',
+                    'Intermédiaire' => 'INTERMEDIAIRE',
+                    'Avancé' => 'AVANCE',
+                ],
+                'required' => false,
+                'placeholder' => 'Sélectionnez un niveau',
+                'attr' => ['class' => 'form-select']
+            ]);
     }
-
-    $builder->add('niveau', ChoiceType::class, [
-        'choices' => [
-            'Débutant' => 'DEBUTANT',
-            'Intermédiaire' => 'INTERMEDIAIRE',
-            'Avancé' => 'AVANCE',
-        ],
-        'required' => false,
-        'placeholder' => 'Sélectionnez un niveau',
-        'attr' => ['class' => 'form-select']
-    ]);
-}
 
     public function configureOptions(OptionsResolver $resolver): void
     {

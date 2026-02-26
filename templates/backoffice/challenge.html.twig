@@ -13,6 +13,172 @@
 TemplateMo 607 Glass Admin
 https://templatemo.com/tm-607-glass-admin
 -->
+    <style>
+        /* Styles pour les filtres */
+        .filter-section {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .filter-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        
+        .filter-input {
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 13px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .filter-input:focus {
+            border-color: var(--emerald-light);
+            outline: none;
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .filter-input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        
+        .filter-select {
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 13px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        
+        .filter-select option {
+            background: #1a1a2e;
+            color: var(--text);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .filter-btn i {
+            font-size: 14px;
+        }
+        
+        .filter-btn.apply {
+            background: linear-gradient(135deg, var(--emerald-light), var(--emerald));
+            color: white;
+        }
+        
+        .filter-btn.reset {
+            background: rgba(255,255,255,0.1);
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .filter-btn.apply:hover, .filter-btn.reset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* Indicateur de chargement */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(3px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            z-index: 10;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: var(--emerald-light);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .table-wrapper {
+            position: relative;
+            min-height: 200px;
+        }
+        
+        /* Compteur de résultats */
+        .results-count {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 10px;
+            text-align: right;
+        }
+        
+        .results-count span {
+            color: var(--emerald-light);
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
     <!-- Animated Background -->
@@ -250,8 +416,45 @@ https://templatemo.com/tm-607-glass-admin
                     </a>
                 </div>
 
-                <div class="table-wrapper">
-                    <table class="data-table">
+                <!-- Section de filtres -->
+                <div class="filter-section">
+                    <div class="filter-title">
+                        <i class="fas fa-filter" style="margin-right: 5px;"></i> Filtres
+                    </div>
+                    <div class="filter-grid">
+                        <div class="filter-group">
+                            <label for="searchTitle">Recherche par titre</label>
+                            <input type="text" id="searchTitle" class="filter-input" placeholder="Titre du challenge...">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterNiveau">Niveau</label>
+                            <select id="filterNiveau" class="filter-select">
+                                <option value="">Tous les niveaux</option>
+                                <option value="Débutant">Débutant</option>
+                                <option value="Intermédiaire">Intermédiaire</option>
+                                <option value="Avancé">Avancé</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="searchCreatedBy">Créé par</label>
+                            <input type="text" id="searchCreatedBy" class="filter-input" placeholder="Nom du créateur...">
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="filter-btn reset" id="resetFilters">
+                            <i class="fas fa-undo"></i> Réinitialiser
+                        </button>
+                        <button class="filter-btn apply" id="applyFilters">
+                            <i class="fas fa-search"></i> Appliquer les filtres
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-wrapper" id="tableWrapper">
+                    <div class="loading-overlay" id="loadingOverlay">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    <table class="data-table" id="challengesTable">
                         <thead>
                             <tr>
                                 <th>Titre</th>
@@ -263,15 +466,15 @@ https://templatemo.com/tm-607-glass-admin
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                        {% for challenge in challenges %}
+                        <tbody id="challengesTableBody">
+                            {% for challenge in challenges %}
                             <tr>
                                 <td>{{ challenge.titre }}</td>
                                 <td>{{ challenge.description }}</td>
                                 <td>{{ challenge.dateDebut|date('Y-m-d') }}</td>
                                 <td>{{ challenge.dateFin|date('Y-m-d') }}</td>
                                 <td>
-                                    <span class="status-badge {% if challenge.niveau == 'Facile' %}completed{% elseif challenge.niveau == 'Intermédiaire' %}processing{% else %}pending{% endif %}">
+                                    <span class="status-badge {% if challenge.niveau == 'Débutant' %}completed{% elseif challenge.niveau == 'Intermédiaire' %}processing{% else %}pending{% endif %}">
                                         {{ challenge.niveau }}
                                     </span>
                                 </td>
@@ -292,15 +495,20 @@ https://templatemo.com/tm-607-glass-admin
                                     </div>
                                 </td>
                             </tr>
-                        {% else %}
+                            {% else %}
                             <tr>
                                 <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
                                     Aucun challenge trouvé
                                 </td>
                             </tr>
-                        {% endfor %}
+                            {% endfor %}
                         </tbody>
                     </table>
+                </div>
+                
+                <!-- Compteur de résultats -->
+                <div class="results-count" id="resultsCount">
+                    <span>{{ challenges|length }}</span> résultat(s) trouvé(s)
                 </div>
             </div>
         </main>
@@ -321,6 +529,196 @@ https://templatemo.com/tm-607-glass-admin
     </footer>
 
     <script src="{{ asset('backoffice/js/templatemo-glass-admin-script.js') }}"></script>
+    <script>
+        // Variables pour les filtres
+        let searchTimeout;
+        
+        // Éléments DOM
+        const searchTitle = document.getElementById('searchTitle');
+        const filterNiveau = document.getElementById('filterNiveau');
+        const searchCreatedBy = document.getElementById('searchCreatedBy');
+        const applyBtn = document.getElementById('applyFilters');
+        const resetBtn = document.getElementById('resetFilters');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const tableBody = document.getElementById('challengesTableBody');
+        const resultsCount = document.getElementById('resultsCount');
+        
+        // Fonction pour charger les challenges filtrés via AJAX
+        function loadFilteredChallenges() {
+            // Afficher le loader
+            loadingOverlay.classList.add('active');
+            
+            // Récupérer les valeurs des filtres
+            const filters = {
+                titre: searchTitle.value,
+                niveau: filterNiveau.value,
+                createdBy: searchCreatedBy.value
+            };
+            
+            // Envoyer la requête AJAX
+            fetch('{{ path('backoffice_challenges_filter') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(filters)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Mettre à jour le tableau
+                updateTable(data.challenges);
+                // Mettre à jour le compteur
+                resultsCount.innerHTML = `<span>${data.count}</span> résultat(s) trouvé(s)`;
+            })
+            .catch(error => {
+                console.error('Erreur lors du filtrage:', error);
+            })
+            .finally(() => {
+                // Cacher le loader
+                loadingOverlay.classList.remove('active');
+            });
+        }
+        
+        // Fonction pour mettre à jour le tableau
+        function updateTable(challenges) {
+            if (challenges.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            Aucun challenge trouvé
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            challenges.forEach(challenge => {
+                const niveauClass = challenge.niveau === 'Débutant' ? 'completed' : 
+                                   (challenge.niveau === 'Intermédiaire' ? 'processing' : 'pending');
+                
+                html += `
+                    <tr>
+                        <td>${escapeHtml(challenge.titre)}</td>
+                        <td>${escapeHtml(challenge.description)}</td>
+                        <td>${challenge.dateDebut}</td>
+                        <td>${challenge.dateFin}</td>
+                        <td>
+                            <span class="status-badge ${niveauClass}">
+                                ${escapeHtml(challenge.niveau)}
+                            </span>
+                        </td>
+                        <td>${challenge.createdBy ? escapeHtml(challenge.createdBy.nom) : 'N/A'}</td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <a href="/backoffice/challenge/edit/${challenge.id}" 
+                                   class="btn btn-warning btn-sm" 
+                                   style="background: linear-gradient(135deg, var(--gold), var(--amber)); color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px;">
+                                    ✏ Edit
+                                </a>
+                                <a href="/backoffice/challenge/delete/${challenge.id}" 
+                                   class="btn btn-danger btn-sm" 
+                                   onclick="return confirm('Confirmer la suppression ?')"
+                                   style="background: linear-gradient(135deg, var(--coral), var(--gold)); color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px;">
+                                    🗑 Delete
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableBody.innerHTML = html;
+        }
+        
+        // Fonction pour échapper les caractères HTML
+        function escapeHtml(unsafe) {
+            if (!unsafe) return unsafe;
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        
+        // Fonction pour réinitialiser les filtres
+        function resetFilters() {
+            searchTitle.value = '';
+            filterNiveau.value = '';
+            searchCreatedBy.value = '';
+            loadFilteredChallenges();
+        }
+        
+        // Événements
+        applyBtn.addEventListener('click', loadFilteredChallenges);
+        resetBtn.addEventListener('click', resetFilters);
+        
+        // Filtrage en temps réel avec debounce
+        [searchTitle, filterNiveau, searchCreatedBy].forEach(input => {
+            if (input) {
+                input.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(loadFilteredChallenges, 500);
+                });
+                // Pour le select, on utilise 'change' au lieu de 'input'
+                if (input.tagName === 'SELECT') {
+                    input.addEventListener('change', function() {
+                        clearTimeout(searchTimeout);
+                        searchTimeout = setTimeout(loadFilteredChallenges, 500);
+                    });
+                }
+            }
+        });
+        
+        // Initialisation du compteur
+        document.addEventListener('DOMContentLoaded', function() {
+            const initialCount = {{ challenges|length }};
+            resultsCount.innerHTML = `<span>${initialCount}</span> résultat(s) trouvé(s)`;
+        });
+        function loadFilteredChallenges() {
+    // Afficher le loader
+    loadingOverlay.classList.add('active');
+    
+    // Récupérer les valeurs des filtres
+    const filters = {
+        titre: searchTitle.value,
+        niveau: filterNiveau.value,
+        createdBy: searchCreatedBy.value
+    };
+    
+    console.log('🔍 Filtres envoyés:', filters); // Vérifiez dans la console F12
+    
+    // Envoyer la requête AJAX
+    fetch('{{ path('backoffice_challenges_filter') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(filters)
+    })
+    .then(response => {
+        console.log('📡 Statut réponse:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('✅ Données reçues:', data); // Vérifiez ce que le serveur renvoie
+        // Mettre à jour le tableau
+        updateTable(data.challenges);
+        // Mettre à jour le compteur
+        resultsCount.innerHTML = `<span>${data.count}</span> résultat(s) trouvé(s)`;
+    })
+    .catch(error => {
+        console.error('❌ Erreur lors du filtrage:', error);
+    })
+    .finally(() => {
+        // Cacher le loader
+        loadingOverlay.classList.remove('active');
+    });
+}
+    </script>
     <!-- TemplateMo 607 Glass Admin -->
     
     {# AI Chat Widget - Assistant Intelligent #}

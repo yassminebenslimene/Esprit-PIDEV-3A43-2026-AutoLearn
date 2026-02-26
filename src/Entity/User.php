@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Entity;
+
+use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -21,6 +22,7 @@ use App\Bundle\UserActivityBundle\Entity\UserActivity;
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé!')]
 abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+<<<<<<< HEAD
 
 #[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Challenge::class)]
 private Collection $challenges;
@@ -28,9 +30,11 @@ private Collection $challenges;
 #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserActivity::class, cascade: ['persist', 'remove'])]
 private Collection $activities;
 
+=======
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'userId', type: 'integer')]
+    #[ORM\Column(name: 'userId', type: "integer")]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
@@ -106,6 +110,7 @@ private Collection $activities;
     #[ORM\Column(name: 'createdAt', type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
 
+<<<<<<< HEAD
     #[ORM\Column(name: 'isSuspended', type: 'boolean', options: ['default' => false])]
     private bool $isSuspended = false;
 
@@ -133,6 +138,31 @@ private Collection $activities;
         $this->lastLoginAt = new \DateTime(); // Initialize with current time
         $this->lastActivityAt = new \DateTime(); // Initialize with current time
         $this->activities = new ArrayCollection();
+=======
+    /**
+     * @var Collection<int, Challenge>
+     */
+    #[ORM\OneToMany(targetEntity: Challenge::class, mappedBy: 'createdby', orphanRemoval: true)]
+    private Collection $Challenges;
+
+    /**
+     * @var Collection<int, UserChallenge>
+     */
+    #[ORM\OneToMany(targetEntity: UserChallenge::class, mappedBy: 'user')]
+    private Collection $userChallenges;
+
+    /**
+     * @var Collection<int, Vote>
+     */
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'user')]
+    private Collection $votes;
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+        $this->Challenges = new ArrayCollection();
+        $this->userChallenges = new ArrayCollection();
+        $this->votes = new ArrayCollection();
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     }
 
     public function getRoles(): array
@@ -245,29 +275,104 @@ public function isEtudiant(): bool {
     return $this instanceof Etudiant;
 }
 
+<<<<<<< HEAD
 
 
+=======
+/**
+ * @return Collection<int, Challenge>
+ */
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 public function getChallenges(): Collection
 {
-    return $this->challenges;
+    return $this->Challenges;
 }
 
 public function addChallenge(Challenge $challenge): static
 {
-    if (!$this->challenges->contains($challenge)) {
-        $this->challenges->add($challenge);
-        $challenge->setCreatedBy($this);
+    if (!$this->Challenges->contains($challenge)) {
+        $this->Challenges->add($challenge);
+        $challenge->setCreatedby($this);
     }
+
     return $this;
 }
 
 public function removeChallenge(Challenge $challenge): static
 {
+<<<<<<< HEAD
     if ($this->challenges->removeElement($challenge)) {
         if ($challenge->getCreatedBy() === $this) {
             $challenge->setCreatedBy(null);
+=======
+    if ($this->Challenges->removeElement($challenge)) {
+        // set the owning side to null (unless already changed)
+        if ($challenge->getCreatedby() === $this) {
+            $challenge->setCreatedby(null);
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
         }
     }
+
+    return $this;
+}
+
+/**
+ * @return Collection<int, UserChallenge>
+ */
+public function getUserChallenges(): Collection
+{
+    return $this->userChallenges;
+}
+
+public function addUserChallenge(UserChallenge $userChallenge): static
+{
+    if (!$this->userChallenges->contains($userChallenge)) {
+        $this->userChallenges->add($userChallenge);
+        $userChallenge->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removeUserChallenge(UserChallenge $userChallenge): static
+{
+    if ($this->userChallenges->removeElement($userChallenge)) {
+        // set the owning side to null (unless already changed)
+        if ($userChallenge->getUser() === $this) {
+            $userChallenge->setUser(null);
+        }
+    }
+
+    return $this;
+}
+
+/**
+ * @return Collection<int, Vote>
+ */
+public function getVotes(): Collection
+{
+    return $this->votes;
+}
+
+public function addVote(Vote $vote): static
+{
+    if (!$this->votes->contains($vote)) {
+        $this->votes->add($vote);
+        $vote->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removeVote(Vote $vote): static
+{
+    if ($this->votes->removeElement($vote)) {
+        // set the owning side to null (unless already changed)
+        if ($vote->getUser() === $this) {
+            $vote->setUser(null);
+        }
+    }
+
     return $this;
 }
 

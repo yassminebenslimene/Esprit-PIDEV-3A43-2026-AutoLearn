@@ -29,6 +29,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
+<<<<<<< HEAD
     public function new(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -36,12 +37,21 @@ class UserController extends AbstractController
         BrevoMailService $mailService // 👈 USE BrevoMailService (WORKING)
     ): Response {
         $dto = new UserCreateDTO();
+=======
+public function new(
+    Request $request,
+    EntityManagerInterface $entityManager,
+    UserPasswordHasherInterface $passwordHasher
+): Response {
+    $dto = new UserCreateDTO();
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 
-        $form = $this->createForm(UserType::class, $dto, [
-            'is_edit' => false,
-        ]);
-        $form->handleRequest($request);
+    $form = $this->createForm(UserType::class, $dto, [
+        'is_edit' => false,
+    ]);
+    $form->handleRequest($request);
 
+<<<<<<< HEAD
         if ($form->isSubmitted() && $form->isValid()) {
             $plainPassword = $dto->password;
             if (empty($plainPassword)) {
@@ -89,8 +99,38 @@ class UserController extends AbstractController
             'form' => $form->createView(),
             'hide_role' => false,
         ]);
+=======
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Vérifier si l'email existe déjà (la contrainte UniqueEntity s'en charge)
+        // Créer l'utilisateur
+        if ($dto->role === 'ADMIN') {
+            $user = new Admin();
+        } else {
+            $user = new Etudiant();
+            $user->setNiveau($dto->niveau);
+        }
+
+        $user->setNom($dto->nom);
+        $user->setPrenom($dto->prenom);
+        $user->setEmail($dto->email);
+        $user->setRole($dto->role);
+
+        $user->setPassword(
+            $passwordHasher->hashPassword($user, $dto->password)
+        );
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Utilisateur créé avec succès');
+        return $this->redirectToRoute('app_user_index');
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     }
-    
+
+    return $this->render('backoffice/user/new.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
     #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
     public function show(?User $user): Response
     {
@@ -137,7 +177,10 @@ class UserController extends AbstractController
                     return $this->render('backoffice/user/edit.html.twig', [
                         'user' => $user,
                         'form' => $form->createView(),
+<<<<<<< HEAD
                         'hide_role' => false,
+=======
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
                     ]);
                 }
             }
@@ -147,7 +190,10 @@ class UserController extends AbstractController
                 return $this->render('backoffice/user/edit.html.twig', [
                     'user' => $user,
                     'form' => $form->createView(),
+<<<<<<< HEAD
                     'hide_role' => false,
+=======
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
                 ]);
             }
 
@@ -202,7 +248,10 @@ class UserController extends AbstractController
         return $this->render('backoffice/user/edit.html.twig', [
             'user' => $user,
             'form' => $form->createView(),
+<<<<<<< HEAD
             'hide_role' => false,
+=======
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
         ]);
     }
 

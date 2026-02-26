@@ -24,6 +24,7 @@ class SecurityController extends AbstractController
     #[Route('/login', name: 'backoffice_login')]
     public function login(AuthenticationUtils $authUtils): Response
     {
+<<<<<<< HEAD
         if ($this->getUser()) {
             $user = $this->getUser();
             if (in_array('ROLE_ADMIN', $user->getRoles())) {
@@ -33,6 +34,22 @@ class SecurityController extends AbstractController
         }
 
         return $this->render('backoffice/cnx/login.html.twig', [
+=======
+        // Si déjà connecté, rediriger selon le rôle
+        if ($this->getUser()) {
+            $user = $this->getUser();
+            
+            // Vérifier si l'utilisateur est un Admin
+            if ($user instanceof Admin || $user->getRole() === 'ADMIN') {
+                return $this->redirectToRoute('app_backoffice');
+            }
+            
+            // Sinon, rediriger vers le frontoffice (pour les étudiants)
+            return $this->redirectToRoute('app_frontoffice');
+        }
+
+        return $this->render('backoffice/login.html.twig', [
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
             'last_username' => $authUtils->getLastUsername(),
             'error' => $authUtils->getLastAuthenticationError()
         ]);
