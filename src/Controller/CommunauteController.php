@@ -92,7 +92,7 @@ final class CommunauteController extends AbstractController
                                 );
                                 $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté et un email d\'invitation a été envoyé.');
                             } catch (\Exception $e) {
-                                $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté (email non envoyé).');
+                                $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté.');
                             }
                         } else {
                             $this->addFlash('error', 'Cette personne est déjà membre.');
@@ -179,7 +179,7 @@ final class CommunauteController extends AbstractController
             );
             $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté et un email de notification a été envoyé.');
         } catch (\Exception $e) {
-            $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté (email non envoyé).');
+            $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté.');
         }
 
         return $this->redirectToRoute('app_communaute_show', ['id' => $communaute->getId()]);
@@ -350,7 +350,7 @@ final class CommunauteController extends AbstractController
                                 );
                                 $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté et un email d\'invitation a été envoyé.');
                             } catch (\Exception $e) {
-                                $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté (email non envoyé).');
+                                $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté.');
                             }
                         } else {
                             $this->addFlash('error', 'Cette personne est déjà membre.');
