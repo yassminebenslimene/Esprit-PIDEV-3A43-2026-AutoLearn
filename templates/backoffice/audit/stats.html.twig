@@ -1,0 +1,419 @@
+{% extends 'backoffice/base.html.twig' %}
+
+{% block title %}Admin Actions Statistics{% endblock %}
+{% block page_title %}📊 Admin Actions Statistics{% endblock %}
+
+{% block body %}
+<div class="audit-container">
+    <!-- Back Button -->
+    <div style="margin-bottom: 20px;">
+        <a href="{{ path('backoffice_audit_index') }}" class="btn btn-secondary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"/>
+                <polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Back to Audit Trail
+        </a>
+    </div>
+    
+    <!-- Info Banner -->
+    <div style="background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.3); border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+        <p style="margin: 0; color: #60a5fa;">
+            ℹ️ These statistics show ONLY administrator actions on students. 
+            For student activity analytics, visit the <a href="{{ path('admin_user_activity_index') }}" style="color: #60a5fa; text-decoration: underline;">User Activity Dashboard</a>.
+        </p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #059669, #34d399);">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 20h9"/>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <h3>{{ stats.total_revisions }}</h3>
+                <p>Admin Actions</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #d4a574, #e8c9a0);">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <h3>{{ stats.total_changes }}</h3>
+                <p>Total Changes</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #0ea5e9, #38bdf8);">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <h3>{{ stats.active_users|length }}</h3>
+                <p>Active Users</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Changes by Type -->
+    <div class="glass-card" style="margin-top: 30px;">
+        <div class="card-header">
+            <h3>📈 Changes by Type</h3>
+        </div>
+        <div class="chart-container">
+            {% if stats.by_type is empty %}
+                <div class="empty-state">
+                    <p>No data available yet</p>
+                </div>
+            {% else %}
+                <div class="type-stats">
+                    {% for type in stats.by_type %}
+                        <div class="type-stat-item">
+                            <div class="type-stat-header">
+                                <span class="type-badge type-badge-{{ type.revtype|lower }}">
+                                    {% if type.revtype == 'INS' %}
+                                        ➕ INSERT
+                                    {% elseif type.revtype == 'UPD' %}
+                                        ✏️ UPDATE
+                                    {% elseif type.revtype == 'DEL' %}
+                                        🗑️ DELETE
+                                    {% endif %}
+                                </span>
+                                <span class="type-count">{{ type.count }}</span>
+                            </div>
+                            <div class="type-bar">
+                                <div class="type-bar-fill type-bar-{{ type.revtype|lower }}" 
+                                     style="width: {{ (type.count / stats.total_changes * 100)|round }}%">
+                                </div>
+                            </div>
+                            <div class="type-percentage">
+                                {{ (type.count / stats.total_changes * 100)|round(1) }}%
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="glass-card" style="margin-top: 30px;">
+        <div class="card-header">
+            <h3>📅 Recent Activity (Last 7 Days)</h3>
+        </div>
+        <div class="activity-chart">
+            {% if stats.recent_activity is empty %}
+                <div class="empty-state">
+                    <p>No recent activity</p>
+                </div>
+            {% else %}
+                <div class="activity-bars">
+                    {% set max_count = 0 %}
+                    {% for activity in stats.recent_activity %}
+                        {% if activity.count > max_count %}
+                            {% set max_count = activity.count %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for activity in stats.recent_activity %}
+                        <div class="activity-bar-item">
+                            <div class="activity-bar-label">{{ activity.date|date('M d') }}</div>
+                            <div class="activity-bar-wrapper">
+                                <div class="activity-bar-fill" 
+                                     style="height: {{ max_count > 0 ? (activity.count / max_count * 100) : 0 }}%">
+                                </div>
+                            </div>
+                            <div class="activity-bar-count">{{ activity.count }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Most Active Users -->
+    <div class="glass-card" style="margin-top: 30px;">
+        <div class="card-header">
+            <h3>👨‍💼 Most Active Admins</h3>
+            <span class="badge badge-info">Who performed the most actions</span>
+        </div>
+        <div class="active-users-list">
+            {% if stats.active_users is empty %}
+                <div class="empty-state">
+                    <p>No admin activity recorded yet</p>
+                </div>
+            {% else %}
+                {% for user in stats.active_users %}
+                    <div class="active-user-item">
+                        <div class="user-rank">{{ loop.index }}</div>
+                        <div class="user-details">
+                            {% if user.admin %}
+                                <span class="user-name">
+                                    🔑 {{ user.admin.prenom }} {{ user.admin.nom }}
+                                </span>
+                                <span class="user-email">{{ user.username }}</span>
+                            {% else %}
+                                <span class="user-name">{{ user.username }}</span>
+                            {% endif %}
+                            <span class="user-actions">{{ user.count }} actions</span>
+                        </div>
+                        <div class="user-progress">
+                            <div class="user-progress-bar" 
+                                 style="width: {{ (user.count / stats.active_users[0].count * 100)|round }}%">
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--glass-border);
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    transition: all var(--transition-normal);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px var(--glass-shadow);
+}
+
+.stat-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.stat-content h3 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.stat-content p {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.chart-container {
+    padding: 30px;
+}
+
+.type-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.type-stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.type-stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.type-badge {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.type-badge-ins {
+    background: linear-gradient(135deg, #22c55e, #4ade80);
+}
+
+.type-badge-upd {
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+}
+
+.type-badge-del {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+.type-count {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.type-bar {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.type-bar-fill {
+    height: 100%;
+    transition: width 0.5s ease;
+}
+
+.type-bar-ins {
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+
+.type-bar-upd {
+    background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+}
+
+.type-bar-del {
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+.type-percentage {
+    text-align: right;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.activity-chart {
+    padding: 30px;
+}
+
+.activity-bars {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 250px;
+    gap: 15px;
+}
+
+.activity-bar-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.activity-bar-wrapper {
+    width: 100%;
+    height: 180px;
+    display: flex;
+    align-items: flex-end;
+}
+
+.activity-bar-fill {
+    width: 100%;
+    background: linear-gradient(180deg, var(--emerald-light), var(--emerald));
+    border-radius: 8px 8px 0 0;
+    transition: height 0.5s ease;
+    min-height: 4px;
+}
+
+.activity-bar-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.activity-bar-count {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.active-users-list {
+    padding: 20px;
+}
+
+.active-user-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    transition: all var(--transition-fast);
+}
+
+.active-user-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateX(5px);
+}
+
+.user-rank {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--emerald), var(--gold));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.user-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.user-name {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.user-email {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.user-actions {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.user-progress {
+    flex: 2;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.user-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--emerald), var(--emerald-light));
+    transition: width 0.5s ease;
+}
+</style>
+{% endblock %}

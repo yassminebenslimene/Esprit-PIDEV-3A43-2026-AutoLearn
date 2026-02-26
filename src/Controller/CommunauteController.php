@@ -125,7 +125,10 @@ final class CommunauteController extends AbstractController
         }
         
         if ($communaute->getOwner() && $communaute->getOwner() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('Vous ne pouvez pas modifier cette communauté.');
+            $this->addFlash('error', 'Vous ne pouvez pas modifier cette communauté.');
+            return $this->redirectToRoute('backoffice_communaute_show', [
+                'id' => $communaute->getId()
+            ]);
         }
 
         $form = $this->createForm(CommunauteType::class, $communaute);

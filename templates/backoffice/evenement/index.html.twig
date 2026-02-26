@@ -4,6 +4,123 @@
 {% block page_title %}Gestion des Événements{% endblock %}
 
 {% block body %}
+
+{# Section Statistiques & Rapports AI #}
+<div class="glass-card" style="margin-bottom: 30px;">
+    <h2 class="card-title" style="margin-bottom: 20px;">
+        🤖 Statistiques & Rapports AI
+    </h2>
+    
+    {# Statistiques par type d'événement #}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+        {% for type, data in stats_by_type %}
+            {% if data.count > 0 %}
+            <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); padding: 20px; border-radius: 12px; border-left: 4px solid #667eea;">
+                <h4 style="margin: 0 0 10px 0; color: #667eea;">{{ type }}</h4>
+                <div style="font-size: 32px; font-weight: bold; color: var(--text-primary); margin: 10px 0;">
+                    {{ data.average_rating|number_format(1) }}/5
+                </div>
+                <div style="color: var(--text-muted); font-size: 14px;">
+                    📊 {{ data.total_feedbacks }} feedbacks<br>
+                    ✅ {{ data.satisfaction_rate|number_format(0) }}% satisfaction
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    
+    {# Boutons de génération de rapports #}
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+        <button onclick="generateReport('analysis')" class="btn" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; flex: 1; min-width: 200px;">
+            📊 Générer Rapport d'Analyse
+        </button>
+        <button onclick="generateReport('recommendations')" class="btn" style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; flex: 1; min-width: 200px;">
+            💡 Recommandations d'Événements
+        </button>
+        <button onclick="generateReport('improvements')" class="btn" style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; flex: 1; min-width: 200px;">
+            🎯 Suggestions d'Amélioration
+        </button>
+    </div>
+    
+    {# Zone d'affichage des rapports #}
+    <div id="ai-report-container" style="margin-top: 30px; display: none;">
+        <div style="background: white; padding: 25px; border-radius: 12px; border: 2px solid #667eea;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 id="report-title" style="margin: 0; color: #667eea;"></h3>
+                <button onclick="closeReport()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted);">×</button>
+            </div>
+            <div id="report-content" style="white-space: pre-wrap; line-height: 1.8; color: var(--text-primary);"></div>
+        </div>
+    </div>
+    
+    {# Loading spinner #}
+    <div id="ai-loading" style="display: none; text-align: center; margin-top: 30px;">
+        <div style="display: inline-block; width: 50px; height: 50px; border: 5px solid rgba(102, 126, 234, 0.2); border-top-color: #667eea; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <p style="margin-top: 15px; color: var(--text-muted);">Génération du rapport en cours... (peut prendre 30-60 secondes)</p>
+    </div>
+</div>
+
+<style>
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+
+<script>
+async function generateReport(type) {
+    const titles = {
+        'analysis': '📊 Rapport d\'Analyse',
+        'recommendations': '💡 Recommandations d\'Événements',
+        'improvements': '🎯 Suggestions d\'Amélioration'
+    };
+    
+    const urls = {
+        'analysis': '{{ path('backoffice_evenement_ai_analysis') }}',
+        'recommendations': '{{ path('backoffice_evenement_ai_recommendations') }}',
+        'improvements': '{{ path('backoffice_evenement_ai_improvements') }}'
+    };
+    
+    // Afficher le loading
+    document.getElementById('ai-loading').style.display = 'block';
+    document.getElementById('ai-report-container').style.display = 'none';
+    
+    try {
+        const response = await fetch(urls[type], {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        const result = await response.json();
+        
+        // Cacher le loading
+        document.getElementById('ai-loading').style.display = 'none';
+        
+        if (result.success) {
+            // Afficher le rapport
+            document.getElementById('report-title').textContent = titles[type];
+            const content = result.report || result.recommendations || result.improvements;
+            document.getElementById('report-content').textContent = content;
+            document.getElementById('ai-report-container').style.display = 'block';
+            
+            // Scroll vers le rapport
+            document.getElementById('ai-report-container').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+            alert('❌ ' + result.message);
+        }
+    } catch (error) {
+        document.getElementById('ai-loading').style.display = 'none';
+        alert('❌ Erreur lors de la génération du rapport: ' + error.message);
+    }
+}
+
+function closeReport() {
+    document.getElementById('ai-report-container').style.display = 'none';
+}
+</script>
+
+{# Section Liste des Événements (existante) #}
 <div class="glass-card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2 class="card-title">Liste des Événements</h2>

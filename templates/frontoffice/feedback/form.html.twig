@@ -1,0 +1,401 @@
+{% extends 'frontoffice/base.html.twig' %}
+
+{% block title %}Feedback - {{ evenement.titre }}{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            {# En-tête #}
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-body text-center py-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px 10px 0 0;">
+                    <h2 class="mb-2">📝 Votre Feedback</h2>
+                    <h4 class="mb-0">{{ evenement.titre }}</h4>
+                    <p class="mb-0 mt-2"><small>{{ evenement.dateDebut|date('d/m/Y') }} - {{ evenement.lieu }}</small></p>
+                </div>
+            </div>
+
+            {# Message si déjà soumis #}
+            {% if existing_feedback %}
+            <div class="alert alert-success shadow-sm">
+                <h5>✅ Feedback déjà soumis</h5>
+                <p class="mb-0">Vous avez déjà donné votre feedback pour cet événement le {{ existing_feedback.created_at }}. Vous pouvez le modifier ci-dessous.</p>
+            </div>
+            {% endif %}
+
+            {# Formulaire de feedback #}
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4">
+                    <form id="feedbackForm">
+                        {# 1. Rating Global #}
+                        <div class="mb-5">
+                            <h5 class="mb-3">⭐ Évaluation Globale</h5>
+                            <p class="text-muted small">Comment évaluez-vous cet événement dans son ensemble?</p>
+                            <div class="rating-container text-center">
+                                <div class="star-rating" data-rating="rating_global">
+                                    <span class="star" data-value="1">⭐</span>
+                                    <span class="star" data-value="2">⭐</span>
+                                    <span class="star" data-value="3">⭐</span>
+                                    <span class="star" data-value="4">⭐</span>
+                                    <span class="star" data-value="5">⭐</span>
+                                </div>
+                                <input type="hidden" name="rating_global" id="rating_global" value="{{ existing_feedback.rating_global ?? 0 }}">
+                                <p class="rating-text mt-2 text-muted" id="rating_global_text">Cliquez sur les étoiles</p>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        {# 2. Ratings par Catégorie #}
+                        <div class="mb-5">
+                            <h5 class="mb-4">📊 Évaluation Détaillée</h5>
+                            
+                            {# Organisation #}
+                            <div class="category-rating mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="fw-bold">🎯 Organisation</label>
+                                    <span class="badge bg-primary" id="rating_organisation_badge">-</span>
+                                </div>
+                                <div class="star-rating small-stars" data-rating="rating_organisation">
+                                    <span class="star" data-value="1">⭐</span>
+                                    <span class="star" data-value="2">⭐</span>
+                                    <span class="star" data-value="3">⭐</span>
+                                    <span class="star" data-value="4">⭐</span>
+                                    <span class="star" data-value="5">⭐</span>
+                                </div>
+                                <input type="hidden" name="rating_organisation" id="rating_organisation" value="{{ existing_feedback.rating_categories.organisation ?? 0 }}">
+                            </div>
+
+                            {# Contenu #}
+                            <div class="category-rating mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="fw-bold">📚 Contenu</label>
+                                    <span class="badge bg-primary" id="rating_contenu_badge">-</span>
+                                </div>
+                                <div class="star-rating small-stars" data-rating="rating_contenu">
+                                    <span class="star" data-value="1">⭐</span>
+                                    <span class="star" data-value="2">⭐</span>
+                                    <span class="star" data-value="3">⭐</span>
+                                    <span class="star" data-value="4">⭐</span>
+                                    <span class="star" data-value="5">⭐</span>
+                                </div>
+                                <input type="hidden" name="rating_contenu" id="rating_contenu" value="{{ existing_feedback.rating_categories.contenu ?? 0 }}">
+                            </div>
+
+                            {# Lieu #}
+                            <div class="category-rating mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="fw-bold">📍 Lieu / Infrastructure</label>
+                                    <span class="badge bg-primary" id="rating_lieu_badge">-</span>
+                                </div>
+                                <div class="star-rating small-stars" data-rating="rating_lieu">
+                                    <span class="star" data-value="1">⭐</span>
+                                    <span class="star" data-value="2">⭐</span>
+                                    <span class="star" data-value="3">⭐</span>
+                                    <span class="star" data-value="4">⭐</span>
+                                    <span class="star" data-value="5">⭐</span>
+                                </div>
+                                <input type="hidden" name="rating_lieu" id="rating_lieu" value="{{ existing_feedback.rating_categories.lieu ?? 0 }}">
+                            </div>
+
+                            {# Animation #}
+                            <div class="category-rating mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="fw-bold">🎤 Animation / Intervenants</label>
+                                    <span class="badge bg-primary" id="rating_animation_badge">-</span>
+                                </div>
+                                <div class="star-rating small-stars" data-rating="rating_animation">
+                                    <span class="star" data-value="1">⭐</span>
+                                    <span class="star" data-value="2">⭐</span>
+                                    <span class="star" data-value="3">⭐</span>
+                                    <span class="star" data-value="4">⭐</span>
+                                    <span class="star" data-value="5">⭐</span>
+                                </div>
+                                <input type="hidden" name="rating_animation" id="rating_animation" value="{{ existing_feedback.rating_categories.animation ?? 0 }}">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        {# 3. Sentiment #}
+                        <div class="mb-5">
+                            <h5 class="mb-3">😊 Votre Ressenti</h5>
+                            <p class="text-muted small">Comment vous êtes-vous senti pendant cet événement?</p>
+                            <div class="sentiment-selector">
+                                <div class="row g-2">
+                                    <div class="col">
+                                        <input type="radio" class="btn-check" name="sentiment" id="sentiment_tres_satisfait" value="tres_satisfait" data-emoji="😍">
+                                        <label class="btn btn-outline-success w-100 sentiment-btn" for="sentiment_tres_satisfait">
+                                            <div class="emoji-large">😍</div>
+                                            <small>Très satisfait</small>
+                                        </label>
+                                    </div>
+                                    <div class="col">
+                                        <input type="radio" class="btn-check" name="sentiment" id="sentiment_satisfait" value="satisfait" data-emoji="😊">
+                                        <label class="btn btn-outline-success w-100 sentiment-btn" for="sentiment_satisfait">
+                                            <div class="emoji-large">😊</div>
+                                            <small>Satisfait</small>
+                                        </label>
+                                    </div>
+                                    <div class="col">
+                                        <input type="radio" class="btn-check" name="sentiment" id="sentiment_neutre" value="neutre" data-emoji="😐">
+                                        <label class="btn btn-outline-secondary w-100 sentiment-btn" for="sentiment_neutre">
+                                            <div class="emoji-large">😐</div>
+                                            <small>Neutre</small>
+                                        </label>
+                                    </div>
+                                    <div class="col">
+                                        <input type="radio" class="btn-check" name="sentiment" id="sentiment_decu" value="decu" data-emoji="😞">
+                                        <label class="btn btn-outline-warning w-100 sentiment-btn" for="sentiment_decu">
+                                            <div class="emoji-large">😞</div>
+                                            <small>Déçu</small>
+                                        </label>
+                                    </div>
+                                    <div class="col">
+                                        <input type="radio" class="btn-check" name="sentiment" id="sentiment_tres_decu" value="tres_decu" data-emoji="😢">
+                                        <label class="btn btn-outline-danger w-100 sentiment-btn" for="sentiment_tres_decu">
+                                            <div class="emoji-large">😢</div>
+                                            <small>Très déçu</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        {# 4. Commentaire #}
+                        <div class="mb-4">
+                            <h5 class="mb-3">💬 Votre Commentaire</h5>
+                            <p class="text-muted small">Partagez vos impressions, suggestions ou remarques (optionnel)</p>
+                            <textarea 
+                                class="form-control" 
+                                name="comment" 
+                                id="comment" 
+                                rows="5" 
+                                placeholder="Qu'avez-vous aimé? Qu'est-ce qui pourrait être amélioré?"
+                                maxlength="1000"
+                            >{{ existing_feedback.comment ?? '' }}</textarea>
+                            <div class="form-text text-end">
+                                <span id="comment_count">0</span>/1000 caractères
+                            </div>
+                        </div>
+
+                        {# Boutons #}
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                <span id="submit_text">{{ existing_feedback ? '✏️ Modifier mon feedback' : '📤 Envoyer mon feedback' }}</span>
+                                <span id="submit_loading" class="d-none">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>Envoi en cours...
+                                </span>
+                            </button>
+                            <a href="{{ path('app_events') }}" class="btn btn-outline-secondary">Retour aux événements</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Styles pour les étoiles */
+.star-rating {
+    font-size: 3rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.star-rating.small-stars {
+    font-size: 1.5rem;
+}
+
+.star-rating .star {
+    opacity: 0.3;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.star-rating .star:hover,
+.star-rating .star.active {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.star-rating .star.active {
+    filter: drop-shadow(0 0 5px gold);
+}
+
+/* Styles pour les sentiments */
+.sentiment-btn {
+    padding: 1rem 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.sentiment-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.emoji-large {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.btn-check:checked + .sentiment-btn {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.star-rating .star:hover {
+    animation: pulse 0.5s ease-in-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .emoji-large {
+        font-size: 2rem;
+    }
+    .sentiment-btn small {
+        font-size: 0.7rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion des étoiles
+    document.querySelectorAll('.star-rating').forEach(container => {
+        const ratingName = container.dataset.rating;
+        const input = document.getElementById(ratingName);
+        const stars = container.querySelectorAll('.star');
+        
+        // Initialiser avec la valeur existante
+        const currentValue = parseInt(input.value) || 0;
+        updateStars(stars, currentValue);
+        
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const value = parseInt(this.dataset.value);
+                input.value = value;
+                updateStars(stars, value);
+                
+                // Mettre à jour le badge pour les catégories
+                const badge = document.getElementById(ratingName + '_badge');
+                if (badge) {
+                    badge.textContent = value + '/5';
+                }
+                
+                // Mettre à jour le texte pour le rating global
+                if (ratingName === 'rating_global') {
+                    const texts = ['', 'Très mauvais', 'Mauvais', 'Moyen', 'Bon', 'Excellent'];
+                    document.getElementById('rating_global_text').textContent = texts[value];
+                }
+            });
+            
+            star.addEventListener('mouseenter', function() {
+                const value = parseInt(this.dataset.value);
+                updateStars(stars, value, true);
+            });
+        });
+        
+        container.addEventListener('mouseleave', function() {
+            const value = parseInt(input.value) || 0;
+            updateStars(stars, value);
+        });
+    });
+    
+    function updateStars(stars, value, hover = false) {
+        stars.forEach((star, index) => {
+            if (index < value) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+    }
+    
+    // Compteur de caractères
+    const commentField = document.getElementById('comment');
+    const commentCount = document.getElementById('comment_count');
+    
+    commentField.addEventListener('input', function() {
+        commentCount.textContent = this.value.length;
+    });
+    commentCount.textContent = commentField.value.length;
+    
+    // Soumission du formulaire
+    document.getElementById('feedbackForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Validation
+        const ratingGlobal = parseInt(document.getElementById('rating_global').value);
+        if (!ratingGlobal || ratingGlobal < 1) {
+            alert('⚠️ Veuillez donner une évaluation globale');
+            return;
+        }
+        
+        const sentiment = document.querySelector('input[name="sentiment"]:checked');
+        if (!sentiment) {
+            alert('⚠️ Veuillez sélectionner votre ressenti');
+            return;
+        }
+        
+        // Préparer les données
+        const formData = {
+            rating_global: ratingGlobal,
+            rating_organisation: parseInt(document.getElementById('rating_organisation').value) || 3,
+            rating_contenu: parseInt(document.getElementById('rating_contenu').value) || 3,
+            rating_lieu: parseInt(document.getElementById('rating_lieu').value) || 3,
+            rating_animation: parseInt(document.getElementById('rating_animation').value) || 3,
+            sentiment: sentiment.value,
+            emoji: sentiment.dataset.emoji,
+            comment: commentField.value.trim()
+        };
+        
+        // Afficher le loading
+        document.getElementById('submit_text').classList.add('d-none');
+        document.getElementById('submit_loading').classList.remove('d-none');
+        
+        try {
+            const response = await fetch('{{ path('app_feedback_submit', {id: participation.id}) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('✅ ' + result.message);
+                window.location.href = '{{ path('app_events') }}';
+            } else {
+                alert('❌ ' + result.message);
+                document.getElementById('submit_text').classList.remove('d-none');
+                document.getElementById('submit_loading').classList.add('d-none');
+            }
+        } catch (error) {
+            alert('❌ Une erreur est survenue. Veuillez réessayer.');
+            document.getElementById('submit_text').classList.remove('d-none');
+            document.getElementById('submit_loading').classList.add('d-none');
+        }
+    });
+    
+    // Pré-sélectionner le sentiment existant
+    {% if existing_feedback %}
+    const existingSentiment = document.getElementById('sentiment_{{ existing_feedback.sentiment }}');
+    if (existingSentiment) {
+        existingSentiment.checked = true;
+    }
+    {% endif %}
+});
+</script>
+{% endblock %}

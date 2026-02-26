@@ -1,0 +1,85 @@
+{# Navbar Component - Reusable across all backoffice pages #}
+<nav class="navbar">
+    <h1 class="page-title">{% block page_title %}{{ 'dashboard.title'|trans }}{% endblock %}</h1>
+    <div class="navbar-right">
+        <div class="search-box">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" class="search-input" placeholder="{{ 'actions.search'|trans }}...">
+        </div>
+        
+        {# Sélecteur de langue #}
+        <div class="language-selector" style="position: relative; margin-right: 10px;">
+            <button class="nav-btn" id="language-toggle" title="{{ 'language.select'|trans }}" onclick="toggleLanguageMenu(event)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+            </button>
+            <div id="languageMenu" class="language-menu" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 10px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border-radius: 12px; padding: 10px; min-width: 150px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); z-index: 1000;">
+                <a href="{{ path('app_change_language', {'locale': 'fr'}) }}" style="display: block; padding: 10px 15px; color: white; text-decoration: none; border-radius: 8px; transition: all 0.3s; {% if app.request.locale == 'fr' %}background: rgba(255, 255, 255, 0.2);{% endif %}">
+                    🇫🇷 {{ 'language.french'|trans }}
+                </a>
+                <a href="{{ path('app_change_language', {'locale': 'en'}) }}" style="display: block; padding: 10px 15px; color: white; text-decoration: none; border-radius: 8px; transition: all 0.3s; {% if app.request.locale == 'en' %}background: rgba(255, 255, 255, 0.2);{% endif %}">
+                    🇬🇧 {{ 'language.english'|trans }}
+                </a>
+                <a href="{{ path('app_change_language', {'locale': 'es'}) }}" style="display: block; padding: 10px 15px; color: white; text-decoration: none; border-radius: 8px; transition: all 0.3s; {% if app.request.locale == 'es' %}background: rgba(255, 255, 255, 0.2);{% endif %}">
+                    🇪🇸 {{ 'language.spanish'|trans }}
+                </a>
+                <a href="{{ path('app_change_language', {'locale': 'ar'}) }}" style="display: block; padding: 10px 15px; color: white; text-decoration: none; border-radius: 8px; transition: all 0.3s; {% if app.request.locale == 'ar' %}background: rgba(255, 255, 255, 0.2);{% endif %}">
+                    🇸🇦 {{ 'language.arabic'|trans }}
+                </a>
+            </div>
+        </div>
+        
+        <button class="nav-btn" id="theme-toggle" title="Toggle Light/Dark Mode">
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 2v2"/><path d="M12 20v2"/>
+                <path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/>
+                <path d="M2 12h2"/><path d="M20 12h2"/>
+                <path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/>
+            </svg>
+        </button>
+    </div>
+</nav>
+
+<script>
+    // Toggle language menu
+    function toggleLanguageMenu(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const menu = document.getElementById('languageMenu');
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    // Close language menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById('languageMenu');
+        const toggle = document.getElementById('language-toggle');
+        
+        if (menu && !menu.contains(event.target) && !toggle.contains(event.target)) {
+            menu.style.display = 'none';
+        }
+    });
+    
+    // Hover effect for language menu items
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuItems = document.querySelectorAll('.language-menu a');
+        menuItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.background = 'rgba(255, 255, 255, 0.2)';
+            });
+            item.addEventListener('mouseleave', function() {
+                if (!this.style.background.includes('0.2') || this.getAttribute('href').includes('{{ app.request.locale }}')) {
+                    return;
+                }
+                this.style.background = 'transparent';
+            });
+        });
+    });
+</script>

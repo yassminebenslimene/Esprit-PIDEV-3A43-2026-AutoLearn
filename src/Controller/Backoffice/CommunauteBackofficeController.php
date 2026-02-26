@@ -44,8 +44,11 @@ final class CommunauteBackofficeController extends AbstractController
     #[Route('/{id}', name: 'backoffice_communaute_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function show(Communaute $communaute): Response
     {
+        $isOwner = $communaute->getOwner() && $communaute->getOwner() === $this->getUser();
+        
         return $this->render('backoffice/communaute/show.html.twig', [
             'communaute' => $communaute,
+            'isOwner' => $isOwner,
         ]);
     }
 

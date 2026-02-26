@@ -1,0 +1,776 @@
+{# Widget Chat IA - Version Optimisée et Moderne #}
+{# Exclure le widget des pages de quiz #}
+{% set currentRoute = app.request.attributes.get('_route') %}
+{% set isQuizPage = currentRoute starts with 'quiz_' or currentRoute starts with 'app_quiz' or 'quiz' in currentRoute %}
+
+{% if app.user and not isQuizPage %}
+<div id="ai-chat-widget" class="ai-chat-widget">
+    <!-- Bouton flottant -->
+    <button id="ai-chat-toggle" class="ai-chat-toggle" title="Assistant IA" aria-label="Ouvrir l'assistant IA">
+        <div class="ai-toggle-icon">
+            <svg class="ai-icon ai-icon-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <svg class="ai-icon ai-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </div>
+        <span class="ai-pulse-ring"></span>
+    </button>
+
+    <!-- Fenêtre de chat -->
+    <div id="ai-chat-window" class="ai-chat-window" style="display: none;">
+        <!-- Header -->
+        <div class="ai-chat-header">
+            <div class="ai-chat-header-content">
+                <div class="ai-avatar">🤖</div>
+                <div class="ai-header-text">
+                    <h3>Assistant AutoLearn</h3>
+                    <p class="ai-status" id="ai-status">
+                        <span class="ai-status-dot"></span>
+                        En ligne
+                    </p>
+                </div>
+            </div>
+            <button id="ai-chat-close" class="ai-close-btn" title="Fermer" aria-label="Fermer le chat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Messages -->
+        <div id="ai-chat-messages" class="ai-chat-messages">
+            <!-- Message de bienvenue -->
+            <div class="ai-message ai-message-bot">
+                <div class="ai-message-avatar">🤖</div>
+                <div class="ai-message-content">
+                    {% if app.user.role == 'ADMIN' %}
+                        {# Message pour Admin #}
+                        <p><strong>Bonjour {{ app.user.prenom }}! 👋</strong></p>
+                        <p>Je suis votre assistant administrateur. Je peux vous aider à:</p>
+                        <ul>
+                            <li>👥 Gérer les étudiants (créer, modifier, rechercher)</li>
+                            <li>📊 Voir les statistiques de la plateforme</li>
+                            <li>🔍 Filtrer et rechercher des utilisateurs</li>
+                            <li>📚 Gérer le contenu (cours, exercices, événements)</li>
+                            <li>📈 Analyser les données et générer des rapports</li>
+                        </ul>
+                        <p>Que souhaitez-vous faire?</p>
+                    {% else %}
+                        {# Message pour Étudiant #}
+                        <p><strong>Bonjour {{ app.user.prenom }}! 👋</strong></p>
+                        <p>Je suis votre assistant d'apprentissage. Je peux vous aider à:</p>
+                        <ul>
+                            <li>📚 Trouver des cours adaptés à votre niveau</li>
+                            <li>💪 Découvrir des exercices et challenges</li>
+                            <li>📅 Voir les événements et workshops à venir</li>
+                            <li>👥 Rejoindre des communautés et équipes</li>
+                            <li>📊 Suivre vos progrès et obtenir des feedbacks</li>
+                        </ul>
+                        <p>Posez-moi une question!</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Suggestions -->
+            <div class="ai-suggestions" id="ai-suggestions">
+                <p class="ai-suggestions-title">💡 Suggestions:</p>
+                <div class="ai-suggestions-buttons" id="ai-suggestions-buttons">
+                    <!-- Chargées dynamiquement -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Typing indicator -->
+        <div id="ai-typing-indicator" class="ai-typing-indicator" style="display: none;">
+            <div class="ai-message-avatar">🤖</div>
+            <div class="ai-typing-dots">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+
+        <!-- Input -->
+        <div class="ai-chat-input">
+            <textarea 
+                id="ai-chat-textarea" 
+                class="ai-textarea" 
+                placeholder="Posez votre question..."
+                rows="1"
+                maxlength="500"
+                aria-label="Message pour l'assistant"
+            ></textarea>
+            <button id="ai-chat-send" class="ai-send-btn" title="Envoyer" aria-label="Envoyer le message">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Character counter -->
+        <div class="ai-char-counter">
+            <span id="ai-char-count">0</span>/500
+        </div>
+    </div>
+</div>
+
+<style>
+/* Widget Chat IA - Design Moderne et Optimisé */
+.ai-chat-widget {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 999999;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Bouton flottant amélioré */
+.ai-chat-toggle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+    overflow: visible;
+}
+
+.ai-chat-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 32px rgba(102, 126, 234, 0.6);
+}
+
+.ai-chat-toggle:active {
+    transform: scale(0.95);
+}
+
+.ai-toggle-icon {
+    position: relative;
+    width: 28px;
+    height: 28px;
+}
+
+.ai-icon {
+    width: 28px;
+    height: 28px;
+    color: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s;
+}
+
+.ai-icon-chat {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+.ai-icon-close {
+    opacity: 0;
+    transform: rotate(90deg) scale(0);
+}
+
+.ai-chat-toggle.active .ai-icon-chat {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0);
+}
+
+.ai-chat-toggle.active .ai-icon-close {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+    display: block !important;
+}
+
+/* Animation de pulsation */
+.ai-pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid #667eea;
+    animation: pulse 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+    opacity: 0;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Fenêtre de chat améliorée */
+.ai-chat-window {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 400px;
+    max-width: calc(100vw - 48px);
+    height: 600px;
+    max-height: calc(100vh - 120px);
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: chatSlideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+@keyframes chatSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Header */
+.ai-chat-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.ai-chat-header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-avatar {
+    font-size: 28px;
+    line-height: 1;
+}
+
+.ai-header-text h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.ai-status {
+    margin: 4px 0 0 0;
+    font-size: 12px;
+    opacity: 0.95;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ai-status-dot {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: statusPulse 2s infinite;
+}
+
+@keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.ai-close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    border-radius: 8px;
+}
+
+.ai-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.ai-close-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Messages */
+.ai-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background: #f8f9fa;
+    scroll-behavior: smooth;
+}
+
+.ai-chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ai-chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ai-chat-messages::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+.ai-chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+.ai-message {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.ai-message-avatar {
+    font-size: 24px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.ai-message-content {
+    background: white;
+    padding: 12px 14px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    max-width: 80%;
+    color: #2d3748;
+    word-wrap: break-word;
+}
+
+.ai-message-user {
+    flex-direction: row-reverse;
+}
+
+.ai-message-user .ai-message-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.ai-message-content p {
+    margin: 0 0 8px 0;
+    line-height: 1.5;
+    color: inherit;
+}
+
+.ai-message-content p:last-child {
+    margin-bottom: 0;
+}
+
+.ai-message-content strong {
+    font-weight: 600;
+}
+
+.ai-message-content ul {
+    margin: 8px 0 0 0;
+    padding-left: 20px;
+    color: inherit;
+}
+
+.ai-message-content li {
+    margin: 4px 0;
+    line-height: 1.5;
+    color: inherit;
+}
+
+.ai-message-content a {
+    color: #667eea;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.ai-message-user .ai-message-content a {
+    color: white;
+}
+
+/* Suggestions */
+.ai-suggestions {
+    margin-top: 12px;
+}
+
+.ai-suggestions-title {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.ai-suggestions-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ai-suggestion-btn {
+    background: white;
+    border: 1px solid #e5e7eb;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    color: #1f2937;
+    font-weight: 500;
+}
+
+.ai-suggestion-btn:hover {
+    background: #f3f4f6;
+    border-color: #667eea;
+    color: #4f46e5;
+    transform: translateX(2px);
+}
+
+/* Typing indicator */
+.ai-typing-indicator {
+    display: flex;
+    gap: 10px;
+    padding: 0 16px 16px 16px;
+    background: #f8f9fa;
+}
+
+.ai-typing-dots {
+    background: white;
+    padding: 12px 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    gap: 4px;
+}
+
+.ai-typing-dots span {
+    width: 8px;
+    height: 8px;
+    background: #667eea;
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+
+.ai-typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.ai-typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.7; }
+    30% { transform: translateY(-8px); opacity: 1; }
+}
+
+/* Input */
+.ai-chat-input {
+    display: flex;
+    gap: 8px;
+    padding: 14px;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    flex-shrink: 0;
+}
+
+.ai-textarea {
+    flex: 1;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: none;
+    max-height: 100px;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+}
+
+.ai-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.ai-send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.ai-send-btn:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: scale(1.05);
+}
+
+.ai-send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ai-send-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.ai-char-counter {
+    padding: 0 14px 12px 14px;
+    text-align: right;
+    font-size: 11px;
+    color: #9ca3af;
+    background: white;
+    flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ai-chat-widget {
+        bottom: 16px;
+        right: 16px;
+    }
+    
+    .ai-chat-window {
+        width: calc(100vw - 32px);
+        height: calc(100vh - 100px);
+        bottom: 70px;
+    }
+    
+    .ai-chat-toggle {
+        width: 56px;
+        height: 56px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ai-message-content {
+        max-width: 85%;
+    }
+}
+</style>
+
+<script>
+// AI Chat Widget JavaScript - Version Optimisée
+(function() {
+    'use strict';
+    
+    const widget = document.getElementById('ai-chat-widget');
+    const toggle = document.getElementById('ai-chat-toggle');
+    const chatWindow = document.getElementById('ai-chat-window');
+    const closeBtn = document.getElementById('ai-chat-close');
+    const messages = document.getElementById('ai-chat-messages');
+    const textarea = document.getElementById('ai-chat-textarea');
+    const sendBtn = document.getElementById('ai-chat-send');
+    const typingIndicator = document.getElementById('ai-typing-indicator');
+    const charCount = document.getElementById('ai-char-count');
+    const suggestionsContainer = document.getElementById('ai-suggestions-buttons');
+
+    let isOpen = false;
+    let suggestionsLoaded = false;
+
+    // Toggle chat window
+    toggle.addEventListener('click', () => {
+        isOpen = !isOpen;
+        chatWindow.style.display = isOpen ? 'flex' : 'none';
+        toggle.classList.toggle('active', isOpen);
+        
+        if (isOpen) {
+            textarea.focus();
+            if (!suggestionsLoaded) {
+                loadSuggestions();
+                suggestionsLoaded = true;
+            }
+        }
+    });
+
+    closeBtn.addEventListener('click', () => {
+        isOpen = false;
+        chatWindow.style.display = 'none';
+        toggle.classList.remove('active');
+    });
+
+    // Auto-resize textarea
+    textarea.addEventListener('input', () => {
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+        charCount.textContent = textarea.value.length;
+        
+        // Activer/désactiver le bouton d'envoi
+        sendBtn.disabled = textarea.value.trim().length === 0;
+    });
+
+    // Send message on Enter (Shift+Enter for new line)
+    textarea.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    sendBtn.addEventListener('click', sendMessage);
+
+    // Load suggestions
+    function loadSuggestions() {
+        fetch('/ai-assistant/suggestions', {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('Network response was not ok');
+            return res.json();
+        })
+        .then(data => {
+            if (data.success && suggestionsContainer) {
+                suggestionsContainer.innerHTML = '';
+                data.suggestions.forEach(suggestion => {
+                    const btn = document.createElement('button');
+                    btn.className = 'ai-suggestion-btn';
+                    btn.textContent = suggestion;
+                    btn.onclick = () => {
+                        textarea.value = suggestion;
+                        sendMessage();
+                    };
+                    suggestionsContainer.appendChild(btn);
+                });
+            }
+        })
+        .catch(err => {
+            console.error('Error loading suggestions:', err);
+        });
+    }
+
+    // Send message
+    function sendMessage() {
+        const question = textarea.value.trim();
+        if (!question) return;
+
+        // Disable input
+        textarea.disabled = true;
+        sendBtn.disabled = true;
+
+        // Add user message
+        addMessage(question, 'user');
+        textarea.value = '';
+        textarea.style.height = 'auto';
+        charCount.textContent = '0';
+
+        // Show typing indicator
+        typingIndicator.style.display = 'flex';
+        messages.scrollTop = messages.scrollHeight;
+
+        // Send to API
+        fetch('/ai-assistant/ask', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ question })
+        })
+        .then(res => {
+            const contentType = res.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('La réponse n\'est pas du JSON. Vérifiez que vous êtes connecté.');
+            }
+            if (!res.ok) {
+                if (res.status === 429) {
+                    throw new Error('Limite de requêtes Groq atteinte (6000 tokens/min). Attendez 10-15 secondes.');
+                }
+                throw new Error(`Erreur HTTP ${res.status}: ${res.statusText}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            typingIndicator.style.display = 'none';
+            textarea.disabled = false;
+            sendBtn.disabled = false;
+            textarea.focus();
+            
+            if (data.success) {
+                addMessage(data.response, 'bot');
+            } else {
+                // Show the actual error from the server
+                const errorMsg = data.error || 'Erreur inconnue';
+                addMessage('❌ ' + errorMsg, 'bot');
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            typingIndicator.style.display = 'none';
+            textarea.disabled = false;
+            sendBtn.disabled = false;
+            textarea.focus();
+            
+            // Show the actual error message to help debugging
+            let errorMsg = '❌ Erreur: ';
+            if (err.message.includes('JSON')) {
+                errorMsg += 'Réponse invalide du serveur. Veuillez vous reconnecter.';
+            } else if (err.message.includes('429')) {
+                errorMsg += 'Limite de requêtes atteinte. Attendez 10 secondes et réessayez.';
+            } else if (err.message.includes('timeout')) {
+                errorMsg += 'Délai d\'attente dépassé. Réessayez.';
+            } else {
+                errorMsg += err.message || 'Erreur inconnue';
+            }
+            addMessage(errorMsg, 'bot');
+        });
+    }
+
+    // Add message to chat
+    function addMessage(text, type) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `ai-message ai-message-${type}`;
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'ai-message-avatar';
+        avatar.textContent = type === 'bot' ? '🤖' : '👤';
+        
+        const content = document.createElement('div');
+        content.className = 'ai-message-content';
+        content.innerHTML = text.replace(/\n/g, '<br>');
+        
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(content);
+        
+        messages.appendChild(messageDiv);
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    // Initialiser le bouton d'envoi comme désactivé
+    sendBtn.disabled = true;
+})();
+</script>
+{% endif %}
