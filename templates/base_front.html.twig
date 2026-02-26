@@ -30,6 +30,60 @@
             .nav-user-name strong { white-space: nowrap; }
             .nav-logout-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: rgba(244, 67, 54, 0.12); color: #c62828; border-radius: 8px; font-weight: 500; }
             .nav-logout-btn:hover { background: rgba(244, 67, 54, 0.2); color: #b71c1c; }
+            
+            /* Language dropdown and profile button - BLACK COLOR */
+            .main-nav .nav .profile-dropdown-btn {
+                color: #1e1e1e !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-btn:hover {
+                color: #000 !important;
+            }
+            
+            /* Language dropdown styles */
+            .main-nav .nav li {
+                position: relative;
+            }
+            
+            .main-nav .nav .profile-dropdown-menu {
+                display: none;
+                position: absolute !important;
+                top: 100% !important;
+                right: 0 !important;
+                z-index: 999999 !important;
+                min-width: 180px !important;
+                background: white !important;
+                border-radius: 8px !important;
+                box-shadow: 0 5px 25px rgba(0,0,0,0.15) !important;
+                padding: 10px 0 !important;
+                margin-top: 5px !important;
+                list-style: none !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-menu.show {
+                display: block !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-menu li {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: block !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-menu a {
+                display: block !important;
+                padding: 12px 20px !important;
+                color: #333 !important;
+                text-decoration: none !important;
+                font-size: 15px !important;
+                transition: all 0.2s !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-menu a:hover {
+                background: linear-gradient(105deg, #7a6ad8 0%, #4e3b9c 100%) !important;
+                color: white !important;
+            }
         </style>
     {% endblock %}
 </head>
@@ -71,16 +125,16 @@
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
 
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#top">Accueil</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#cours">Cours</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#events">Événements</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#challenge">Défis</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#contact">Contact</a></li>
-                        <li><a href="{{ path('app_communaute_index') }}">Communauté</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#top">{{ 'nav.home'|trans }}</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#cours">{{ 'nav.courses'|trans }}</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#events">{{ 'nav.events'|trans }}</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#challenge">{{ 'nav.challenges'|trans }}</a></li>
+                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#contact">{{ 'nav.contact'|trans }}</a></li>
+                        <li><a href="{{ path('app_communaute_index') }}">{{ 'nav.community'|trans }}</a></li>
                         
                         {# Sélecteur de langue #}
-                        <li style="position: relative;">
-                            <a href="javascript:void(0);" onclick="toggleLanguageDropdown(event)" style="display: flex; align-items: center; gap: 5px;">
+                        <li class="profile-dropdown-container" style="position: relative;">
+                            <a href="javascript:void(0);" onclick="toggleLanguageDropdown(event)" class="profile-dropdown-btn" style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
                                 <i class="fa fa-globe"></i>
                                 {% if app.request.locale == 'fr' %}
                                     FR
@@ -95,45 +149,56 @@
                                 {% endif %}
                                 <i class="fa fa-chevron-down" style="font-size: 10px;"></i>
                             </a>
-                            <ul id="languageDropdown" style="display: none; position: absolute; top: 100%; right: 0; background: white; border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); padding: 10px 0; min-width: 180px; z-index: 9999; list-style: none;">
-                                <li style="margin: 0;">
-                                    <a href="{{ path('app_change_language', {'locale': 'fr'}) }}" style="display: block; padding: 12px 20px; color: #333; text-decoration: none;">
-                                        🇫🇷 Français
+                            <ul class="profile-dropdown-menu" id="languageDropdown">
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'fr'}) }}">
+                                        🇫🇷 {{ 'language.french'|trans }}
                                     </a>
                                 </li>
-                                <li style="margin: 0;">
-                                    <a href="{{ path('app_change_language', {'locale': 'en'}) }}" style="display: block; padding: 12px 20px; color: #333; text-decoration: none;">
-                                        🇬🇧 English
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'en'}) }}">
+                                        🇬🇧 {{ 'language.english'|trans }}
                                     </a>
                                 </li>
-                                <li style="margin: 0;">
-                                    <a href="{{ path('app_change_language', {'locale': 'es'}) }}" style="display: block; padding: 12px 20px; color: #333; text-decoration: none;">
-                                        🇪🇸 Español
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'es'}) }}">
+                                        🇪🇸 {{ 'language.spanish'|trans }}
                                     </a>
                                 </li>
-                                <li style="margin: 0;">
-                                    <a href="{{ path('app_change_language', {'locale': 'ar'}) }}" style="display: block; padding: 12px 20px; color: #333; text-decoration: none;">
-                                        🇸🇦 العربية
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'ar'}) }}">
+                                        🇸🇦 {{ 'language.arabic'|trans }}
                                     </a>
                                 </li>
                             </ul>
                         </li>
                         
                         {% if app.user %}
-                            <li><a href="{{ path('app_mes_participations') }}">Mes Participations</a></li>
-                            <li class="nav-user-name">
-                                <span class="nav-account-label">Mon compte :</span>
-                                <strong>{{ app.user.prenom }} {{ app.user.nom }}</strong>
-                            </li>
-                            <li><a href="{{ path('app_profile') }}">Mon profil</a></li>
-                            <li>
-                                <a href="{{ path('backoffice_logout') }}" class="nav-logout-btn">
-                                    <i class="fa fa-sign-out-alt"></i> Déconnexion
+                            <li><a href="{{ path('app_mes_participations') }}">{{ 'nav.my_participations'|trans }}</a></li>
+                            
+                            <li class="profile-dropdown-container" style="position: relative;">
+                                <a href="javascript:void(0);" onclick="toggleProfileDropdown(event)" class="profile-dropdown-btn" style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                    <i class="fa fa-user-circle"></i>
+                                    {{ app.user.prenom }} {{ app.user.nom }}
+                                    <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
                                 </a>
+                                <ul class="profile-dropdown-menu" id="profileDropdown">
+                                    <li>
+                                        <a href="{{ path('app_profile') }}">
+                                            <i class="fa fa-id-card"></i> {{ 'nav.profile'|trans }}
+                                        </a>
+                                    </li>
+                                    <li class="profile-dropdown-divider" style="height: 1px; background: #eeeeee; margin: 8px 0;"></li>
+                                    <li>
+                                        <a href="{{ path('backoffice_logout') }}">
+                                            <i class="fa fa-sign-out"></i> {{ 'nav.logout'|trans }}
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                         {% else %}
-                            <li><a href="{{ path('backoffice_login') }}">Connexion</a></li>
-                            <li><a href="{{ path('backoffice_register') }}">Inscription</a></li>
+                            <li><a href="{{ path('backoffice_login') }}">{{ 'nav.login'|trans }}</a></li>
+                            <li><a href="{{ path('backoffice_register') }}">{{ 'nav.register'|trans }}</a></li>
                         {% endif %}
                     </ul>
                     <a class='menu-trigger'>
@@ -276,16 +341,59 @@
             function toggleLanguageDropdown(event) {
                 event.preventDefault();
                 event.stopPropagation();
-                const dropdown = document.getElementById('languageDropdown');
-                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+                
+                var dropdown = document.getElementById('languageDropdown');
+                var profileDropdown = document.getElementById('profileDropdown');
+                
+                // Fermer le dropdown de profil
+                if (profileDropdown) {
+                    profileDropdown.classList.remove('show');
+                }
+                
+                dropdown.classList.toggle('show');
             }
             
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(event) {
-                const dropdown = document.getElementById('languageDropdown');
-                if (dropdown && !event.target.closest('li')) {
-                    dropdown.style.display = 'none';
+            function toggleProfileDropdown(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                var dropdown = document.getElementById('profileDropdown');
+                var languageDropdown = document.getElementById('languageDropdown');
+                
+                // Fermer le dropdown de langue
+                if (languageDropdown) {
+                    languageDropdown.classList.remove('show');
                 }
+                
+                dropdown.classList.toggle('show');
+            }
+            
+            document.addEventListener('click', function(event) {
+                var dropdown = document.getElementById('profileDropdown');
+                var languageDropdown = document.getElementById('languageDropdown');
+                var isClickInside = event.target.closest('.profile-dropdown-container');
+                
+                if (!isClickInside) {
+                    if (dropdown) {
+                        dropdown.classList.remove('show');
+                    }
+                    if (languageDropdown) {
+                        languageDropdown.classList.remove('show');
+                    }
+                }
+            });
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                // Auto-dismiss flash messages after 5 seconds
+                setTimeout(function() {
+                    var alerts = document.querySelectorAll('.alert');
+                    alerts.forEach(function(alert) {
+                        if (bootstrap && bootstrap.Alert) {
+                            var bsAlert = new bootstrap.Alert(alert);
+                            bsAlert.close();
+                        }
+                    });
+                }, 5000);
             });
         </script>
     {% endblock %}
