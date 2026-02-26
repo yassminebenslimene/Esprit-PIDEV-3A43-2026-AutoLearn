@@ -6,6 +6,7 @@ use App\Entity\Post;
 use App\Entity\Communaute;
 use App\Form\PostType;
 use App\Service\AiSummaryService;
+use App\Service\TitleSuggestionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +21,8 @@ final class PostController extends AbstractController
         Communaute $communaute,
         Request $request,
         EntityManagerInterface $em,
-        AiSummaryService $aiSummary
+        AiSummaryService $aiSummary,
+        TitleSuggestionService $titleSuggestion
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -50,6 +52,12 @@ final class PostController extends AbstractController
                 $post->setSummary($summary);
             }
 
+            // Générer le titre AI automatiquement
+            $titleResult = $titleSuggestion->suggestPostTitle($post->getContenu());
+            if (isset($titleResult['title'])) {
+                $post->setTitre($titleResult['title']);
+            }
+
             $em->persist($post);
             $em->flush();
 
@@ -77,7 +85,8 @@ final class PostController extends AbstractController
         Request $request,
         Post $post,
         EntityManagerInterface $em,
-        AiSummaryService $aiSummary
+        AiSummaryService $aiSummary,
+        TitleSuggestionService $titleSuggestion
     ): Response {
         if ($post->getUser() !== $this->getUser()) {
             $this->addFlash('error', 'Vous ne pouvez modifier que vos propres posts.');
@@ -97,6 +106,12 @@ final class PostController extends AbstractController
             $summary = $aiSummary->generateSummary($post->getContenu());
             if ($summary) {
                 $post->setSummary($summary);
+            }
+
+            // Régénérer le titre AI si le contenu a changé
+            $titleResult = $titleSuggestion->suggestPostTitle($post->getContenu());
+            if (isset($titleResult['title'])) {
+                $post->setTitre($titleResult['title']);
             }
 
             $em->flush();

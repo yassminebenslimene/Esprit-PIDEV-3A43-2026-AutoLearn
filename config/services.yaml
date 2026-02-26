@@ -29,6 +29,12 @@ services:
             $groqApiUrl: '%env(GROQ_API_URL)%'
             $groqModel: '%env(GROQ_MODEL)%'
 
+    App\Service\TitleSuggestionService:
+        arguments:
+            $groqApiKey: '%env(GROQ_API_KEY)%'
+            $groqApiUrl: '%env(GROQ_API_URL)%'
+            $groqModel: '%env(GROQ_MODEL)%'
+
     # AI Summary Service
     App\Service\AiSummaryService:
         arguments:

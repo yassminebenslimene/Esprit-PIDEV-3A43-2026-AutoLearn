@@ -21,6 +21,9 @@ class Post
     #[ORM\Column(type: 'text')]
     private ?string $contenu = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $titre = null;
+
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $summary = null;
 
@@ -60,6 +63,9 @@ class Post
 
     public function getContenu(): ?string { return $this->contenu; }
     public function setContenu(?string $contenu): self { $this->contenu = $contenu ?? ''; return $this; }
+
+    public function getTitre(): ?string { return $this->titre; }
+    public function setTitre(?string $titre): self { $this->titre = $titre; return $this; }
 
     public function getSummary(): ?string { return $this->summary; }
     public function setSummary(?string $summary): self { $this->summary = $summary; return $this; }
