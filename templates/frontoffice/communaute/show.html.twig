@@ -643,6 +643,19 @@
             </div>
             {% endif %}
 
+            <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">
+                <strong style="color: #667eea; font-size: 1rem;">
+                    {% if post.user %}
+                        {{ post.user.prenom }} {{ post.user.nom }}
+                    {% else %}
+                        Anonyme
+                    {% endif %}
+                </strong>
+                <small style="color: #999; margin-left: 8px;">
+                    • {{ post.createdAt|date('d/m/Y H:i') }}
+                </small>
+            </div>
+
             {% if post.summary %}
                 <div class="post-summary" style="background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%); padding: 15px 20px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #667eea;">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
@@ -664,15 +677,6 @@
         <img src="{{ asset('uploads/images/' ~ post.imageFile) }}" alt="Image du post">
     </div>
 {% endif %}
-
-            <small>
-                Posté le {{ post.createdAt|date('d/m/Y H:i') }}
-                {% if post.user %}
-                    par {{ post.user.prenom }}
-                {% endif %}
-            </small>
-
-            <a href="/post/{{ post.id }}" class="btn-see-post">Voir le post →</a>
 
             <hr>
 
@@ -696,7 +700,14 @@
                     </div>
                     {% endif %}
 
-                    {{ commentaire.contenu }}<br>
+                    <strong style="color: #667eea; font-size: 0.95rem;">
+                        {% if commentaire.user %}
+                            {{ commentaire.user.prenom }} {{ commentaire.user.nom }}
+                        {% else %}
+                            Anonyme
+                        {% endif %}
+                    </strong>
+                    <p style="margin: 8px 0 0 0;">{{ commentaire.contenu }}</p>
                     <small>
                         {{ commentaire.createdAt|date('d/m/Y H:i') }}
                     </small>

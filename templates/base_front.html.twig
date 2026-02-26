@@ -78,8 +78,50 @@
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#contact">Contact</a></li>
                         <li><a href="{{ path('app_communaute_index') }}">Communauté</a></li>
                         
+                        {# Sélecteur de langue #}
+                        <li style="position: relative;">
+                            <a href="javascript:void(0);" onclick="toggleLanguageDropdown(event)" style="display: flex; align-items: center; gap: 5px;">
+                                <i class="fa fa-globe"></i>
+                                {% if app.request.locale == 'fr' %}
+                                    FR
+                                {% elseif app.request.locale == 'en' %}
+                                    EN
+                                {% elseif app.request.locale == 'es' %}
+                                    ES
+                                {% elseif app.request.locale == 'ar' %}
+                                    AR
+                                {% else %}
+                                    FR
+                                {% endif %}
+                                <i class="fa fa-chevron-down" style="font-size: 10px;"></i>
+                            </a>
+                            <ul id="languageDropdown" style="display: none; position: absolute; top: 100%; right: 0; background: white; border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); padding: 10px 0; min-width: 180px; z-index: 9999; list-style: none;">
+                                <li style="margin: 0;">
+                                    <a href="{{ path('app_change_language', {'locale': 'fr'}) }}" style="display: block; padding: 12px 20px; color: #333; text-decoration: none;">
+                                        🇫🇷 Français
+                                    </a>
+                                </li>
+                                <li style="margin: 0;">
+                                    <a href="{{ path('app_change_language', {'locale': 'en'}) }}" style="display: block; padding: 12px 20px; color: #333; text-decoration: none;">
+                                        🇬🇧 English
+                                    </a>
+                                </li>
+                                <li style="margin: 0;">
+                                    <a href="{{ path('app_change_language', {'locale': 'es'}) }}" style="display: block; padding: 12px 20px; color: #333; text-decoration: none;">
+                                        🇪🇸 Español
+                                    </a>
+                                </li>
+                                <li style="margin: 0;">
+                                    <a href="{{ path('app_change_language', {'locale': 'ar'}) }}" style="display: block; padding: 12px 20px; color: #333; text-decoration: none;">
+                                        🇸🇦 العربية
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
                         {% if app.user %}
-                            <li class="scroll-to-section nav-user-name">
+                            <li><a href="{{ path('app_mes_participations') }}">Mes Participations</a></li>
+                            <li class="nav-user-name">
                                 <span class="nav-account-label">Mon compte :</span>
                                 <strong>{{ app.user.prenom }} {{ app.user.nom }}</strong>
                             </li>
@@ -229,6 +271,23 @@
         <script src="{{ asset('frontoffice/js/owl-carousel.js') }}"></script>
         <script src="{{ asset('frontoffice/js/counter.js') }}"></script>
         <script src="{{ asset('frontoffice/js/custom.js') }}"></script>
+        
+        <script>
+            function toggleLanguageDropdown(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                const dropdown = document.getElementById('languageDropdown');
+                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            }
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                const dropdown = document.getElementById('languageDropdown');
+                if (dropdown && !event.target.closest('li')) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        </script>
     {% endblock %}
 
 </body>
