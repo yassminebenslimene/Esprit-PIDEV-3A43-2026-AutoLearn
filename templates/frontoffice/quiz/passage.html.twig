@@ -234,6 +234,33 @@
             gap: 20px;
         }
         
+        /* Bouton pour activer/désactiver le son */
+        .sound-toggle {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            color: #46178f;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .sound-toggle:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+        
+        .sound-toggle.muted {
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+        }
+        
         .timer-container {
             display: flex;
             align-items: center;
@@ -590,6 +617,11 @@
                 {% endif %}
             </div>
             <div class="quiz-info">
+                {# Bouton pour activer/désactiver le son #}
+                <button type="button" class="sound-toggle" id="sound-toggle" title="Activer/Désactiver le son">
+                    <i class="fa fa-volume-up"></i>
+                </button>
+                
                 {# Affichage du chronomètre si une durée maximale est définie #}
                 {% if dureeMaxMinutes %}
                 <div class="timer-container" id="timer">
@@ -670,9 +702,13 @@
         // ========== SYSTÈME DE SONS - Effets sonores pour l'interactivité ==========
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
+        
+        // Variable globale pour activer/désactiver le son
+        let soundEnabled = true;
 
         // Son de démarrage (montée joyeuse)
         function playStartSound() {
+            if (!soundEnabled) return;
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             
@@ -693,6 +729,7 @@
 
         // Son de clic sur une réponse (pop court)
         function playClickSound() {
+            if (!soundEnabled) return;
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             
@@ -711,6 +748,7 @@
 
         // Son de sélection (confirmation)
         function playSelectSound() {
+            if (!soundEnabled) return;
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             
@@ -729,6 +767,7 @@
 
         // Son de soumission (fanfare)
         function playSubmitSound() {
+            if (!soundEnabled) return;
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             
@@ -753,6 +792,43 @@
         setTimeout(() => {
             playStartSound();
         }, 100);
+        
+        // ========== GESTION DU BOUTON SON ==========
+        const soundToggle = document.getElementById('sound-toggle');
+        
+        // Charger la préférence de son depuis localStorage
+        const savedSoundPreference = localStorage.getItem('quizSoundEnabled');
+        if (savedSoundPreference !== null) {
+            soundEnabled = savedSoundPreference === 'true';
+            updateSoundButton();
+        }
+        
+        // Fonction pour mettre à jour l'apparence du bouton
+        function updateSoundButton() {
+            const icon = soundToggle.querySelector('i');
+            if (soundEnabled) {
+                soundToggle.classList.remove('muted');
+                icon.className = 'fa fa-volume-up';
+                soundToggle.title = 'Désactiver le son';
+            } else {
+                soundToggle.classList.add('muted');
+                icon.className = 'fa fa-volume-mute';
+                soundToggle.title = 'Activer le son';
+            }
+        }
+        
+        // Gérer le clic sur le bouton son
+        soundToggle.addEventListener('click', function() {
+            soundEnabled = !soundEnabled;
+            updateSoundButton();
+            // Sauvegarder la préférence dans localStorage
+            localStorage.setItem('quizSoundEnabled', soundEnabled);
+            
+            // Jouer un son de confirmation si le son est activé
+            if (soundEnabled) {
+                playClickSound();
+            }
+        });
 
         // ========== FIN SYSTÈME DE SONS ==========
 
