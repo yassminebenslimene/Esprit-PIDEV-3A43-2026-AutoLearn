@@ -160,6 +160,45 @@
             backdrop-filter: blur(10px);
         }
         
+        /* Conteneur de l'image du quiz dans le header */
+        .quiz-image-container {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            flex-shrink: 0;
+        }
+        
+        /* Image du quiz dans le header */
+        .quiz-header-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        /* Conteneur de l'image principale du quiz au centre de la page */
+        .quiz-image-display {
+            width: 100%;
+            max-width: 600px;
+            margin: 30px auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        /* Image principale du quiz - Grande et centrée */
+        .quiz-main-image {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: contain;
+            display: block;
+            background: white;
+        }
+        
         .quiz-title {
             color: white;
             font-size: 24px;
@@ -542,6 +581,7 @@
                     <i class="fa fa-chevron-left"></i>
                 </a>
                 {% endif %}
+                
                 <h1 class="quiz-title">{{ quiz.titre }}</h1>
                 {% if nextQuiz %}
                 <a href="{{ path('app_quiz_start', {'id': nextQuiz.id}) }}" class="nav-quiz-btn" title="Quiz suivant">
@@ -567,6 +607,14 @@
             {# Carte de question avec numéro, texte, points et options #}
             <div class="question-card {% if loop.first %}active{% endif %}" data-question-index="{{ loop.index0 }}" data-question-id="{{ question.id }}">
                 <span class="question-number">Question {{ loop.index }} / {{ quizData|length }}</span>
+                
+                {# Image du quiz si elle existe - Affichée au centre pour que l'étudiant puisse répondre en se basant sur l'image #}
+                {% if quiz.imageName %}
+                <div class="quiz-image-display">
+                    <img src="{{ vich_uploader_asset(quiz, 'imageFile') }}" alt="{{ quiz.titre }}" class="quiz-main-image">
+                </div>
+                {% endif %}
+                
                 <div class="question-text">{{ question.texte }}</div>
                 <div class="question-points">
                     <i class="fa fa-star"></i> {{ question.points }} point{{ question.points > 1 ? 's' : '' }}

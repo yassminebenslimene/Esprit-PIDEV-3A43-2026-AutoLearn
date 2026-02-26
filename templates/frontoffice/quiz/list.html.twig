@@ -3,18 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {# Titre dynamique avec le nom du chapitre #}
     <title>Quiz - {{ chapitre.titre }}</title>
 
+    {# Importation des styles Bootstrap et FontAwesome #}
     <link rel="stylesheet" href="{{ asset('frontoffice/vendor/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
+    {# Police Inter pour un design moderne #}
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* === STYLES GÉNÉRAUX === */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         
+        /* Fond violet avec motif diagonal */
         body {
             font-family: 'Inter', sans-serif;
             background: #46178f;
@@ -25,13 +30,15 @@
             padding: 0;
         }
         
-        /* Header avec retour */
+        /* === HEADER AVEC BOUTON RETOUR === */
+        /* Barre supérieure avec effet de flou */
         .quiz-list-header {
             background: rgba(0, 0, 0, 0.3);
             padding: 20px 40px;
             backdrop-filter: blur(10px);
         }
         
+        /* Lien de retour avec icône et effet hover */
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -46,19 +53,23 @@
             font-size: 16px;
         }
         
+        /* Animation de déplacement au hover */
         .back-link:hover {
             background: rgba(255, 255, 255, 0.3);
             color: white;
             transform: translateX(-5px);
         }
         
+        /* === CONTENEUR PRINCIPAL === */
+        /* Conteneur centré avec padding */
         .quiz-list-container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 40px 20px;
         }
         
-        /* Quiz Grid - Style Kahoot */
+        /* === GRILLE DE QUIZ === */
+        /* Grille responsive avec cartes de quiz style Kahoot */
         .quiz-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
@@ -66,6 +77,8 @@
             margin-bottom: 30px;
         }
         
+        /* === CARTE DE QUIZ === */
+        /* Carte blanche avec ombre et animations */
         .quiz-card {
             background: white;
             border-radius: 20px;
@@ -80,6 +93,7 @@
             animation-fill-mode: both;
         }
         
+        /* Barre colorée style Kahoot en haut de chaque carte */
         .quiz-card::before {
             content: '';
             position: absolute;
@@ -90,17 +104,20 @@
             background: linear-gradient(90deg, #e74c3c 0%, #3498db 25%, #f39c12 50%, #2ecc71 75%, #e74c3c 100%);
         }
         
+        /* Effet de levée et agrandissement au hover */
         .quiz-card:hover {
             transform: translateY(-10px) scale(1.02);
             box-shadow: 0 15px 45px rgba(0,0,0,0.3);
         }
         
+        /* Délais d'animation pour effet cascade sur les cartes */
         {% for i in 1..20 %}
         .quiz-card:nth-child({{ i }}) {
             animation-delay: {{ i * 0.1 }}s;
         }
         {% endfor %}
         
+        /* Animation de montée avec fondu */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -112,6 +129,8 @@
             }
         }
         
+        /* === ICÔNE DU QUIZ === */
+        /* Icône colorée en haut de chaque carte */
         .quiz-icon {
             font-size: 56px;
             margin-bottom: 20px;
@@ -131,7 +150,7 @@
             font-size: 40px;
         }
         
-        /* Couleurs variées pour les icônes de quiz */
+        /* Couleurs variées pour les icônes (rotation de 4 couleurs) */
         .quiz-card:nth-child(4n+1) .quiz-icon {
             background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
         }
@@ -148,6 +167,7 @@
             background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
         }
         
+        /* Titre du quiz en gras et centré */
         .quiz-title {
             font-size: 26px;
             font-weight: 800;
@@ -157,6 +177,7 @@
             text-align: center;
         }
         
+        /* Description du quiz avec flex-grow pour pousser le contenu en bas */
         .quiz-description {
             color: #6b7280;
             margin-bottom: 25px;
@@ -166,7 +187,8 @@
             font-size: 15px;
         }
         
-        /* Meta Info - Style Kahoot */
+        /* === MÉTADONNÉES DU QUIZ === */
+        /* Affiche nombre de questions, points et durée */
         .quiz-meta {
             display: flex;
             justify-content: center;
@@ -177,6 +199,7 @@
             border-radius: 15px;
         }
         
+        /* Chaque élément de métadonnée (icône + valeur + label) */
         .meta-item {
             display: flex;
             flex-direction: column;
@@ -184,6 +207,7 @@
             gap: 5px;
         }
         
+        /* Icône circulaire colorée pour chaque métadonnée */
         .meta-icon {
             width: 40px;
             height: 40px;
@@ -195,6 +219,7 @@
             color: white;
         }
         
+        /* Couleurs différentes pour chaque type de métadonnée */
         .meta-item:nth-child(1) .meta-icon {
             background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
         }
@@ -207,6 +232,7 @@
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
         }
         
+        /* Valeur numérique en gros et gras */
         .meta-value {
             font-size: 18px;
             font-weight: 800;
@@ -221,7 +247,8 @@
             letter-spacing: 0.5px;
         }
         
-        /* Bouton Start - Style Kahoot */
+        /* === BOUTON DÉMARRER === */
+        /* Bouton vert style Kahoot pour commencer le quiz */
         .btn-start-quiz {
             background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
             color: white;
@@ -239,12 +266,14 @@
             border: none;
         }
         
+        /* Effet de levée au hover */
         .btn-start-quiz:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 30px rgba(46, 204, 113, 0.6);
             color: white;
         }
         
+        /* Bouton orange pour nouvelle tentative */
         .btn-start-quiz.retry {
             background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
             box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
@@ -254,6 +283,7 @@
             box-shadow: 0 10px 30px rgba(243, 156, 18, 0.6);
         }
         
+        /* Bouton bleu pour quiz déjà réussi */
         .btn-start-quiz.success {
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
             box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
@@ -263,6 +293,7 @@
             box-shadow: 0 10px 30px rgba(52, 152, 219, 0.6);
         }
         
+        /* Bouton gris désactivé pour tentatives épuisées */
         .btn-start-quiz.disabled {
             background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
             box-shadow: 0 6px 20px rgba(149, 165, 166, 0.4);
@@ -275,7 +306,8 @@
             box-shadow: 0 6px 20px rgba(149, 165, 166, 0.4);
         }
         
-        /* Informations sur les tentatives */
+        /* === INFORMATIONS SUR LES TENTATIVES === */
+        /* Carte affichant l'historique des tentatives de l'utilisateur */
         .quiz-attempts-info {
             background: rgba(70, 23, 143, 0.05);
             border-radius: 15px;
@@ -284,6 +316,7 @@
             border-left: 4px solid #46178f;
         }
         
+        /* En-tête de la section tentatives */
         .attempts-header {
             display: flex;
             align-items: center;
@@ -294,6 +327,7 @@
             font-size: 16px;
         }
         
+        /* Statistiques des tentatives (nombre et score) */
         .attempts-stats {
             display: flex;
             justify-content: space-around;
@@ -301,6 +335,7 @@
             margin-bottom: 15px;
         }
         
+        /* Chaque statistique individuelle */
         .stat-item {
             display: flex;
             flex-direction: column;
@@ -308,12 +343,14 @@
             gap: 5px;
         }
         
+        /* Valeur de la statistique en gros */
         .stat-value {
             font-size: 24px;
             font-weight: 800;
             color: #1f2937;
         }
         
+        /* Couleurs selon le résultat */
         .stat-value.success {
             color: #2ecc71;
         }
@@ -322,6 +359,7 @@
             color: #e74c3c;
         }
         
+        /* Label de la statistique en petit */
         .stat-label {
             font-size: 12px;
             color: #6b7280;
@@ -331,6 +369,7 @@
             text-align: center;
         }
         
+        /* Badge vert "Quiz réussi !" */
         .success-badge {
             display: flex;
             align-items: center;
@@ -345,7 +384,8 @@
             box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
         }
         
-        /* Empty State */
+        /* === ÉTAT VIDE === */
+        /* Affiché quand aucun quiz n'est disponible */
         .empty-state {
             background: white;
             border-radius: 20px;
@@ -355,6 +395,7 @@
             animation: fadeInUp 0.6s ease-out;
         }
         
+        /* Icône grise pour l'état vide */
         .empty-state-icon {
             font-size: 100px;
             margin-bottom: 25px;
@@ -374,6 +415,7 @@
             font-size: 60px;
         }
         
+        /* Titre de l'état vide */
         .empty-state-title {
             font-size: 32px;
             font-weight: 800;
@@ -381,13 +423,15 @@
             margin-bottom: 15px;
         }
         
+        /* Texte explicatif de l'état vide */
         .empty-state-text {
             font-size: 18px;
             color: #6b7280;
             line-height: 1.8;
         }
         
-        /* Flash Messages */
+        /* === MESSAGES FLASH === */
+        /* Messages de succès, erreur ou avertissement */
         .flash-message {
             background: white;
             padding: 20px 30px;
@@ -400,6 +444,7 @@
             animation: slideDown 0.5s ease-out;
         }
         
+        /* Types de messages avec bordures colorées */
         .flash-message.error {
             border-left: 6px solid #ef4444;
             background: #fef2f2;
@@ -415,6 +460,7 @@
             background: #f0fdf4;
         }
         
+        /* Icônes colorées selon le type de message */
         .flash-message i {
             font-size: 28px;
         }
@@ -431,6 +477,7 @@
             color: #10b981;
         }
         
+        /* Texte du message flash */
         .flash-message-text {
             flex: 1;
             font-size: 16px;
@@ -438,7 +485,8 @@
             color: #1f2937;
         }
         
-        /* Responsive */
+        /* === RESPONSIVE === */
+        /* Adaptations pour mobile et tablette */
         @media (max-width: 768px) {
             .quiz-list-header {
                 padding: 15px 20px;
@@ -464,14 +512,19 @@
     </style>
 </head>
 <body>
+    {# === HEADER AVEC BOUTON RETOUR === #}
     <div class="quiz-list-header">
+        {# Lien pour retourner à la liste des chapitres #}
         <a href="{{ path('app_chapitre_index_front') }}" class="back-link">
             <i class="fa fa-arrow-left"></i>
             <span>Retour aux chapitres</span>
         </a>
     </div>
 
+    {# === CONTENEUR PRINCIPAL === #}
     <div class="quiz-list-container">
+        {# === MESSAGES FLASH === #}
+        {# Affiche les messages de succès, erreur ou avertissement #}
         {% for type, messages in app.flashes %}
             {% for message in messages %}
                 <div class="flash-message {{ type }}">
@@ -486,7 +539,9 @@
             {% endfor %}
         {% endfor %}
 
+        {# === VÉRIFICATION SI AUCUN QUIZ === #}
         {% if quizzes is empty %}
+            {# État vide avec icône et message #}
             <div class="empty-state">
                 <div class="empty-state-icon">
                     <i class="fa fa-inbox"></i>
@@ -498,9 +553,14 @@
                 </p>
             </div>
         {% else %}
+            {# === GRILLE DES QUIZ === #}
+            {# Affiche tous les quiz disponibles pour ce chapitre #}
             <div class="quiz-grid">
+                {# === BOUCLE SUR CHAQUE QUIZ === #}
                 {% for quiz in quizzes %}
                     <div class="quiz-card">
+                        {# === ICÔNE DU QUIZ === #}
+                        {# Rotation de 8 icônes différentes #}
                         <div class="quiz-icon">
                             {% set iconIndex = loop.index % 8 %}
                             {% if iconIndex == 1 %}
@@ -521,9 +581,12 @@
                                 <i class="fa fa-star"></i>
                             {% endif %}
                         </div>
+                        {# Titre et description du quiz #}
                         <h2 class="quiz-title">{{ quiz.titre }}</h2>
                         <p class="quiz-description">{{ quiz.description }}</p>
                         
+                        {# === MÉTADONNÉES === #}
+                        {# Nombre de questions, points total et durée #}
                         <div class="quiz-meta">
                             <div class="meta-item">
                                 <div class="meta-icon">
@@ -556,6 +619,8 @@
                             {% endif %}
                         </div>
                         
+                        {# === STATISTIQUES DES TENTATIVES === #}
+                        {# Affiche l'historique si l'utilisateur a déjà passé le quiz #}
                         {% if quizStatistiques[quiz.id] is defined %}
                             {% set stats = quizStatistiques[quiz.id] %}
                             
@@ -597,6 +662,8 @@
                             {% endif %}
                         {% endif %}
                         
+                        {# === BOUTON D'ACTION === #}
+                        {# Bouton adapté selon l'état: désactivé, nouvelle tentative, refaire, ou commencer #}
                         {% if quizStatistiques[quiz.id] is defined %}
                             {% set stats = quizStatistiques[quiz.id] %}
                             
@@ -639,13 +706,15 @@
         {% endif %}
     </div>
 
+    {# === JAVASCRIPT === #}
+    {# Système de sons pour les interactions #}
     <script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
     <script>
-        // Système de sons
+        // Initialisation du contexte audio pour les sons
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
-        // Son de démarrage du quiz (montée joyeuse)
+        // Son de démarrage du quiz (montée joyeuse en 3 notes)
         function playStartQuizSound() {
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
@@ -665,7 +734,7 @@
             oscillator.stop(audioCtx.currentTime + 0.4);
         }
 
-        // Son de hover sur les cartes
+        // Son subtil au survol des cartes et boutons
         function playHoverSound() {
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
@@ -683,18 +752,20 @@
             oscillator.stop(audioCtx.currentTime + 0.08);
         }
 
-        // Ajouter son sur les boutons "Commencer le quiz"
+        // Ajouter les sons aux boutons "Commencer le quiz"
         document.querySelectorAll('.btn-start-quiz').forEach(btn => {
+            // Son au clic
             btn.addEventListener('click', function(e) {
                 playStartQuizSound();
             });
             
+            // Son au survol
             btn.addEventListener('mouseenter', function() {
                 playHoverSound();
             });
         });
 
-        // Ajouter son sur les cartes de quiz
+        // Ajouter son au survol des cartes de quiz
         document.querySelectorAll('.quiz-card').forEach(card => {
             card.addEventListener('mouseenter', function() {
                 playHoverSound();
