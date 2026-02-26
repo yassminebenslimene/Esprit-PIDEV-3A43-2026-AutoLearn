@@ -1,7 +1,8 @@
+{# Template de résultats de quiz avec analyse IA - Étend le template de résultats de base #}
 {% extends 'frontoffice/quiz/result.html.twig' %}
 
 {% block after_result_header %}
-    {# Résumé pédagogique IA #}
+    {# Carte de résumé pédagogique généré par l'IA - Affiche l'analyse globale de la performance #}
     {% if resumePedagogique is defined and resumePedagogique %}
         <div class="ai-summary-card">
             <div class="ai-summary-header">
@@ -15,6 +16,7 @@
                     <p class="summary-message">{{ resumePedagogique.message_general }}</p>
                 </div>
                 
+                {# Section des points forts identifiés par l'IA #}
                 {% if resumePedagogique.points_forts %}
                     <div class="summary-section">
                         <h4><i class="fa fa-check-circle"></i> Points forts</h4>
@@ -26,6 +28,7 @@
                     </div>
                 {% endif %}
                 
+                {# Section des points à améliorer suggérés par l'IA #}
                 {% if resumePedagogique.points_amelioration %}
                     <div class="summary-section">
                         <h4><i class="fa fa-chart-line"></i> Points à améliorer</h4>
@@ -37,6 +40,7 @@
                     </div>
                 {% endif %}
                 
+                {# Section des conseils de révision personnalisés #}
                 {% if resumePedagogique.conseils_revision %}
                     <div class="summary-section">
                         <h4><i class="fa fa-lightbulb"></i> Conseils de révision</h4>
@@ -56,7 +60,7 @@
         </div>
     {% endif %}
     
-    {# Bouton flottant animé pour ouvrir le chat IA #}
+    {# Bouton flottant animé pour ouvrir le chat avec le tuteur IA #}
     <div class="ai-assistant-button" id="aiAssistantBtn">
         <div class="assistant-avatar">
             <i class="fa fa-robot"></i>
@@ -68,7 +72,7 @@
         <div class="pulse-ring"></div>
     </div>
 
-    {# Section Chat avec le tuteur IA #}
+    {# Fenêtre de chat avec le tuteur IA - Interface conversationnelle pour poser des questions #}
     <div class="ai-tutor-chat" id="aiTutorChat" style="display: none;">
         <div class="chat-header">
             <div class="chat-header-left">
@@ -86,6 +90,7 @@
             </button>
         </div>
         
+        {# Zone de messages du chat - Affiche la conversation avec l'IA #}
         <div class="chat-messages" id="chatMessages">
             <div class="chat-empty">
                 <i class="fa fa-comments"></i>
@@ -93,6 +98,7 @@
             </div>
         </div>
         
+        {# Suggestions de questions prédéfinies pour faciliter l'interaction #}
         <div class="chat-suggestions">
             <div class="suggestions-title">💡 Suggestions de questions</div>
             <div class="suggestions-list" id="suggestionsList">
