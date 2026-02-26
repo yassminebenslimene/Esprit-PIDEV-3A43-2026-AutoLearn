@@ -34,10 +34,17 @@ class Communaute
     #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'userId', onDelete: 'CASCADE')]
     private Collection $members;
 
+    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\JoinTable(name: 'communaute_pending_members')]
+    #[ORM\JoinColumn(name: 'communaute_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'userId', onDelete: 'CASCADE')]
+    private Collection $pendingMembers;
+
     public function __construct()
     {
         $this->posts = new ArrayCollection();
         $this->members = new ArrayCollection();
+        $this->pendingMembers = new ArrayCollection();
     }
 
     public function getId(): ?int { return $this->id; }
@@ -108,5 +115,30 @@ class Communaute
     public function __toString(): string
     {
         return (string) $this->nom;
+    }
+
+    public function getPendingMembers(): Collection 
+    { 
+        return $this->pendingMembers; 
+    }
+
+    public function addPendingMember(User $user): self
+    {
+        if (!$this->pendingMembers->contains($user) && !$this->members->contains($user) && $user !== $this->owner) {
+            $this->pendingMembers->add($user);
+        }
+        return $this;
+    }
+
+    public function removePendingMember(User $user): self
+    {
+        $this->pendingMembers->removeElement($user);
+        return $this;
+    }
+
+    public function hasPendingRequest(?User $user): bool
+    {
+        if (!$user) return false;
+        return $this->pendingMembers->contains($user);
     }
 }

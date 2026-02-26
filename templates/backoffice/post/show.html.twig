@@ -31,12 +31,12 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">G</div>
-                <span class="logo-text">GlassDash</span>
+                <span class="logo-text">AutoLearn</span>
             </div>
 
             <ul class="nav-menu">
                 <li class="nav-section">
-                    <span class="nav-section-title">MAIN MENU</span>
+                    <span class="nav-section-title">Main Menu</span>
                     <ul>
                         <li class="nav-item">
                             <a href="{{ path('app_backoffice') }}" class="nav-link">
@@ -57,13 +57,14 @@
                                     <path d="M2 12l10 5 10-5"/>
                                 </svg>
                                 Analytics
+                                <span class="nav-badge">New</span>
                             </a>
                         </li>
                     </ul>
                 </li>
 
                 <li class="nav-section">
-                    <span class="nav-section-title">GESTION</span>
+                    <span class="nav-section-title">Gestion</span>
                     <ul>
                         <li class="nav-item">
                             <a href="{{ path('app_cours_index') }}" class="nav-link">
@@ -100,7 +101,7 @@
                 </li>
 
                 <li class="nav-section">
-                    <span class="nav-section-title">COMMUNAUTÉ</span>
+                    <span class="nav-section-title">Communauté</span>
                     <ul>
                         <li class="nav-item">
                             <a href="{{ path('backoffice_communaute_index') }}" class="nav-link">
@@ -110,11 +111,11 @@
                                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
                                     <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                                 </svg>
-                                Communauté
+                                Communautés
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ path('backoffice_post_index') }}" class="nav-link">
+                            <a href="{{ path('backoffice_post_index') }}" class="nav-link active">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                                     <polyline points="14 2 14 8 20 8"/>
@@ -134,7 +135,7 @@
                 </li>
 
                 <li class="nav-section">
-                    <span class="nav-section-title">SYSTÈME</span>
+                    <span class="nav-section-title">Système</span>
                     <ul>
                         <li class="nav-item">
                             <a href="{{ path('backoffice_users') }}" class="nav-link">
@@ -143,20 +144,15 @@
                                     <circle cx="9" cy="7" r="4"/>
                                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
                                     <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                                </svg>
-                                Utilisateurs
+                                </svg>Users
                             </a>
                         </li>
-                                                <li class="nav-item">
-                            <a href="{{ path('backoffice_audit_index') }}" class="nav-link">
+                        <li class="nav-item">
+                            <a href="{{ path('admin_audit_index') }}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                                     <polyline points="14 2 14 8 20 8"/>
-                                    <line x1="16" y1="13" x2="8" y2="13"/>
-                                    <line x1="16" y1="17" x2="8" y2="17"/>
-                                    <line x1="10" y1="9" x2="8" y2="9"/>
-                                </svg>
-                                Audit
+                                </svg>Audit
                             </a>
                         </li>
                         <li class="nav-item">
@@ -164,8 +160,7 @@
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 20h9"/>
                                     <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                                </svg>
-                                Activity Log
+                                </svg>Activity Log
                             </a>
                         </li>
                     </ul>
@@ -179,8 +174,7 @@
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                                     <circle cx="12" cy="7" r="4"/>
-                                </svg>
-                                Mon Profil
+                                </svg>Mon Profil
                             </a>
                         </li>
                         <li class="nav-item">
@@ -189,26 +183,12 @@
                                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                                     <polyline points="16 17 21 12 16 7"/>
                                     <line x1="21" y1="12" x2="9" y2="12"/>
-                                </svg>
-                                Déconnexion
+                                </svg>Déconnexion
                             </a>
                         </li>
                     </ul>
                 </li>
             </ul>
-
-            <div class="sidebar-footer">
-                <div class="user-profile">
-                    <div class="user-avatar">AD</div>
-                    <div class="user-info">
-                        <div class="user-name">Admin</div>
-                        <div class="user-role">Administrator</div>
-                    </div>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"/>
-                    </svg>
-                </div>
-            </div>
         </aside>
 
         <main class="main-content">
@@ -268,20 +248,32 @@
                         <div class="info-value" style="white-space: pre-wrap;">{{ post.contenu }}</div>
                     </div>
 
-                    {% if post.imageFile %}
+                    {% if post.imageFile or post.imageUrl %}
                     <div style="margin-top: 1.5rem;">
                         <div class="info-label">Image</div>
-                        <img src="{{ asset('uploads/images/' ~ post.imageFile) }}" alt="Image du post" style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
+                        {% if post.imageFile %}
+                            <img src="{{ asset('uploads/' ~ post.imageFile) }}" alt="Image du post" style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
+                        {% elseif post.imageUrl %}
+                            <img src="{{ post.imageUrl }}" alt="Image du post" style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
+                        {% endif %}
                     </div>
                     {% endif %}
 
-                    {% if post.videoFile %}
+                    {% if post.videoFile or post.videoUrl %}
                     <div style="margin-top: 1.5rem;">
                         <div class="info-label">Vidéo</div>
-                        <video controls style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
-                            <source src="{{ asset('uploads/videos/' ~ post.videoFile) }}" type="video/mp4">
-                            Votre navigateur ne supporte pas la lecture de vidéos.
-                        </video>
+                        {% if post.videoFile %}
+                            <video controls style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
+                                <source src="{{ asset('uploads/' ~ post.videoFile) }}" type="video/mp4">
+                                Votre navigateur ne supporte pas la lecture de vidéos.
+                            </video>
+                        {% elseif post.videoUrl %}
+                            {% set videoId = post.videoUrl|split('v=')[1]|split('&')[0] %}
+                            <iframe width="100%" height="400" style="border-radius: 12px; margin-top: 0.5rem;"
+                                src="https://www.youtube.com/embed/{{ videoId }}" 
+                                frameborder="0" allowfullscreen>
+                            </iframe>
+                        {% endif %}
                     </div>
                     {% endif %}
                 </div>
@@ -318,8 +310,5 @@
         </main>
     </div>
     <script src="{{ asset('backoffice/js/templatemo-glass-admin-script.js') }}"></script>
-
-    {# AI Chat Widget - Assistant Intelligent #}
-    {% include 'ai_assistant/chat_widget.html.twig' %}
 </body>
 </html>

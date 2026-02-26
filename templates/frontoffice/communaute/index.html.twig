@@ -36,16 +36,25 @@
     gap: 20px;
 }
 
+.communities-header-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
 .communities-header h2 {
     font-size: 2rem;
     font-weight: 700;
     color: #333;
-    margin: 0;
+    margin: 0 0 10px 0;
 }
 
 .communities-stats {
     color: #999;
     font-size: 0.95rem;
+    margin-bottom: 25px;
 }
 
 /* Bouton nouvelle communauté */
@@ -281,12 +290,39 @@
 
 <div class="community-container">
 
-    <div class="communities-header">
-        <div>
-            <h2>Mes Communautés</h2>
-            <p class="communities-stats">{{ communautes|length }} communauté(s) disponible(s)</p>
-        </div>
-        <a href="/communaute/new" class="btn-main">
+    <div class="communities-header-center">
+        <h2>Mes Communautés</h2>
+        <p class="communities-stats">{{ communautes|length }} communauté(s) disponible(s)</p>
+        
+        {# Barre de recherche #}
+        <form method="get" action="{{ path('app_communaute_index') }}" style="width: 100%; max-width: 600px; margin: 20px 0;">
+            <div style="position: relative;">
+                <input 
+                    type="text" 
+                    name="search" 
+                    value="{{ search }}" 
+                    placeholder="🔍 Rechercher une communauté par nom ou description..."
+                    style="width: 100%; padding: 14px 50px 14px 20px; border: 2px solid #e0e0e0; border-radius: 50px; font-size: 1rem; transition: all 0.3s;"
+                    onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'"
+                    onblur="this.style.borderColor='#e0e0e0'; this.style.boxShadow='none'"
+                >
+                <button 
+                    type="submit" 
+                    style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; font-weight: 600;"
+                >
+                    Rechercher
+                </button>
+            </div>
+        </form>
+        
+        {% if search %}
+            <p style="color: #667eea; font-size: 0.9rem; margin-top: 10px;">
+                Résultats pour "{{ search }}" 
+                <a href="{{ path('app_communaute_index') }}" style="color: #999; text-decoration: underline; margin-left: 10px;">Effacer</a>
+            </p>
+        {% endif %}
+        
+        <a href="/communaute/new" class="btn-main" style="margin-top: 20px;">
             ➕ Nouvelle communauté
         </a>
     </div>
@@ -326,9 +362,29 @@
                     </div>
 
                     <div class="community-actions">
-                        <a href="/communaute/{{ communaute.id }}" class="btn-outline">
-                            👁️ Voir
-                        </a>
+                        {% set isMember = app.user and (communaute.members.contains(app.user) or (communaute.owner and communaute.owner.id == app.user.id)) %}
+                        {% set hasPendingRequest = app.user and communaute.hasPendingRequest(app.user) %}
+                        
+                        {% if isMember %}
+                            <a href="/communaute/{{ communaute.id }}" class="btn-outline">
+                                👁️ Voir
+                            </a>
+                        {% elseif hasPendingRequest %}
+                            <button class="btn-outline" disabled style="opacity: 0.6; cursor: not-allowed;">
+                                ⏳ Demande en attente
+                            </button>
+                        {% elseif app.user %}
+                            <form method="post" action="{{ path('app_communaute_request_join', {id: communaute.id}) }}" style="display: inline-block;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('join_' ~ communaute.id) }}">
+                                <button type="submit" class="btn-outline">
+                                    ➕ Rejoindre
+                                </button>
+                            </form>
+                        {% else %}
+                            <a href="{{ path('app_login') }}" class="btn-outline">
+                                🔒 Connexion requise
+                            </a>
+                        {% endif %}
 
                         {% if app.user and communaute.owner and communaute.owner.id == app.user.id %}
                             <a href="/communaute/{{ communaute.id }}/edit" class="btn-outline btn-edit">
@@ -350,11 +406,19 @@
     {% else %}
         <div class="empty-state">
             <div class="empty-state-icon">📭</div>
-            <h3>Aucune communauté pour le moment</h3>
-            <p>Créez votre première communauté pour commencer à échanger avec d'autres membres</p>
-            <a href="/communaute/new" class="btn-main">
-                ➕ Créer ma première communauté
-            </a>
+            {% if search %}
+                <h3>Aucun résultat trouvé</h3>
+                <p>Aucune communauté ne correspond à votre recherche "{{ search }}"</p>
+                <a href="{{ path('app_communaute_index') }}" class="btn-main">
+                    ← Voir toutes les communautés
+                </a>
+            {% else %}
+                <h3>Aucune communauté pour le moment</h3>
+                <p>Créez votre première communauté pour commencer à échanger avec d'autres membres</p>
+                <a href="/communaute/new" class="btn-main">
+                    ➕ Créer ma première communauté
+                </a>
+            {% endif %}
         </div>
     {% endif %}
 

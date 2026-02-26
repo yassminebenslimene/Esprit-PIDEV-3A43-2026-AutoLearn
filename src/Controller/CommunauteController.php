@@ -6,20 +6,31 @@ use App\Entity\Communaute;
 use App\Form\CommunauteType;
 use App\Repository\CommunauteRepository;
 use App\Repository\UserRepository;
+use App\Service\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[Route('/communaute')]
 final class CommunauteController extends AbstractController
 {
     #[Route(name: 'app_communaute_index', methods: ['GET'])]
-    public function index(CommunauteRepository $communauteRepository): Response
+    public function index(Request $request, CommunauteRepository $communauteRepository): Response
     {
+        $search = $request->query->get('search', '');
+        
+        if ($search) {
+            $communautes = $communauteRepository->searchByNameOrDescription($search);
+        } else {
+            $communautes = $communauteRepository->findAll();
+        }
+        
         return $this->render('frontoffice/communaute/index.html.twig', [
-            'communautes' => $communauteRepository->findAll(),
+            'communautes' => $communautes,
+            'search' => $search,
         ]);
     }
 
@@ -51,7 +62,7 @@ final class CommunauteController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_communaute_show', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function show(Request $request, Communaute $communaute, ?UserRepository $userRepository = null, ?EntityManagerInterface $em = null): Response
+    public function show(Request $request, Communaute $communaute, ?UserRepository $userRepository = null, ?EntityManagerInterface $em = null, ?EmailService $emailService = null): Response
     {
         // Gestion de l'invitation en POST sur la même URL
         if ($request->isMethod('POST') && $request->request->has('_invite_token')) {
@@ -68,7 +79,21 @@ final class CommunauteController extends AbstractController
                         } elseif (!$communaute->getMembers()->exists(fn($i, $m) => $m->getId() === $user->getId())) {
                             $communaute->addMember($user);
                             $em->flush();
-                            $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté.');
+                            
+                            // 📧 Envoyer l'email d'invitation
+                            try {
+                                $communityUrl = $this->generateUrl('app_communaute_show', ['id' => $communaute->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+                                $emailService->sendCommunityInvitation(
+                                    $user->getEmail(),
+                                    $user->getPrenom() . ' ' . $user->getNom(),
+                                    $communaute->getNom(),
+                                    $this->getUser()->getPrenom() . ' ' . $this->getUser()->getNom(),
+                                    $communityUrl
+                                );
+                                $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté et un email d\'invitation a été envoyé.');
+                            } catch (\Exception $e) {
+                                $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté (email non envoyé).');
+                            }
                         } else {
                             $this->addFlash('error', 'Cette personne est déjà membre.');
                         }
@@ -86,6 +111,106 @@ final class CommunauteController extends AbstractController
             'communaute' => $communaute,
             'canPost' => $communaute->canPost($this->getUser()),
         ]);
+    }
+
+    #[Route('/{id}/request-join', name: 'app_communaute_request_join', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function requestJoin(Request $request, Communaute $communaute, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        
+        if (!$this->isCsrfTokenValid('join_' . $communaute->getId(), $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token de sécurité invalide.');
+            return $this->redirectToRoute('app_communaute_index');
+        }
+
+        $user = $this->getUser();
+        
+        if ($communaute->getMembers()->contains($user) || $communaute->getOwner() === $user) {
+            $this->addFlash('error', 'Vous êtes déjà membre de cette communauté.');
+            return $this->redirectToRoute('app_communaute_index');
+        }
+
+        if ($communaute->hasPendingRequest($user)) {
+            $this->addFlash('error', 'Vous avez déjà envoyé une demande pour cette communauté.');
+            return $this->redirectToRoute('app_communaute_index');
+        }
+
+        $communaute->addPendingMember($user);
+        $em->flush();
+
+        $this->addFlash('success', 'Votre demande a été envoyée au créateur de la communauté.');
+        return $this->redirectToRoute('app_communaute_index');
+    }
+
+    #[Route('/{id}/accept-member/{userId}', name: 'app_communaute_accept_member', requirements: ['id' => '\d+', 'userId' => '\d+'], methods: ['POST'])]
+    public function acceptMember(Request $request, Communaute $communaute, int $userId, UserRepository $userRepository, EntityManagerInterface $em, EmailService $emailService): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        
+        if ($communaute->getOwner() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Seul le créateur peut accepter les demandes.');
+        }
+
+        if (!$this->isCsrfTokenValid('accept_member_' . $userId, $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token de sécurité invalide.');
+            return $this->redirectToRoute('app_communaute_show', ['id' => $communaute->getId()]);
+        }
+
+        $user = $userRepository->find($userId);
+        
+        if (!$user || !$communaute->getPendingMembers()->contains($user)) {
+            $this->addFlash('error', 'Demande introuvable.');
+            return $this->redirectToRoute('app_communaute_show', ['id' => $communaute->getId()]);
+        }
+
+        $communaute->removePendingMember($user);
+        $communaute->addMember($user);
+        $em->flush();
+
+        // Envoyer un email de notification au membre accepté
+        try {
+            $communityUrl = $this->generateUrl('app_communaute_show', ['id' => $communaute->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+            $emailService->sendCommunityInvitation(
+                $user->getEmail(),
+                $user->getPrenom() . ' ' . $user->getNom(),
+                $communaute->getNom(),
+                $this->getUser()->getPrenom() . ' ' . $this->getUser()->getNom(),
+                $communityUrl
+            );
+            $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté et un email de notification a été envoyé.');
+        } catch (\Exception $e) {
+            $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté (email non envoyé).');
+        }
+
+        return $this->redirectToRoute('app_communaute_show', ['id' => $communaute->getId()]);
+    }
+
+    #[Route('/{id}/reject-member/{userId}', name: 'app_communaute_reject_member', requirements: ['id' => '\d+', 'userId' => '\d+'], methods: ['POST'])]
+    public function rejectMember(Request $request, Communaute $communaute, int $userId, UserRepository $userRepository, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        
+        if ($communaute->getOwner() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Seul le créateur peut refuser les demandes.');
+        }
+
+        if (!$this->isCsrfTokenValid('reject_member_' . $userId, $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token de sécurité invalide.');
+            return $this->redirectToRoute('app_communaute_show', ['id' => $communaute->getId()]);
+        }
+
+        $user = $userRepository->find($userId);
+        
+        if (!$user || !$communaute->getPendingMembers()->contains($user)) {
+            $this->addFlash('error', 'Demande introuvable.');
+            return $this->redirectToRoute('app_communaute_show', ['id' => $communaute->getId()]);
+        }
+
+        $communaute->removePendingMember($user);
+        $em->flush();
+
+        $this->addFlash('success', 'La demande a été refusée.');
+        return $this->redirectToRoute('app_communaute_show', ['id' => $communaute->getId()]);
     }
 
     /** Retirer un membre (réservé au propriétaire). */
@@ -167,7 +292,8 @@ final class CommunauteController extends AbstractController
         int $coursId,
         Request $request,
         EntityManagerInterface $entityManager,
-        ?UserRepository $userRepository = null
+        ?UserRepository $userRepository = null,
+        ?EmailService $emailService = null
     ): Response {
         // Récupérer le cours
         $cours = $entityManager->getRepository(\App\Entity\GestionDeCours\Cours::class)->find($coursId);
@@ -211,7 +337,21 @@ final class CommunauteController extends AbstractController
                         } elseif (!$communaute->getMembers()->exists(fn($i, $m) => $m->getId() === $user->getId())) {
                             $communaute->addMember($user);
                             $entityManager->flush();
-                            $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté.');
+                            
+                            // 📧 Envoyer l'email d'invitation
+                            try {
+                                $communityUrl = $this->generateUrl('front_communaute_cours', ['coursId' => $coursId], UrlGeneratorInterface::ABSOLUTE_URL);
+                                $emailService->sendCommunityInvitation(
+                                    $user->getEmail(),
+                                    $user->getPrenom() . ' ' . $user->getNom(),
+                                    $communaute->getNom(),
+                                    $this->getUser()->getPrenom() . ' ' . $this->getUser()->getNom(),
+                                    $communityUrl
+                                );
+                                $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté et un email d\'invitation a été envoyé.');
+                            } catch (\Exception $e) {
+                                $this->addFlash('success', $user->getPrenom() . ' ' . $user->getNom() . ' a été ajouté(e) à la communauté (email non envoyé).');
+                            }
                         } else {
                             $this->addFlash('error', 'Cette personne est déjà membre.');
                         }

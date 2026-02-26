@@ -27,6 +27,12 @@ class Commentaire
     #[ORM\JoinColumn(referencedColumnName: 'userId', nullable: true)]
     private ?User $user = null;
 
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $sentiment = null;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $sentimentScore = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -44,6 +50,12 @@ class Commentaire
 
     public function getUser(): ?User { return $this->user; }
     public function setUser(?User $user): self { $this->user = $user; return $this; }
+
+    public function getSentiment(): ?string { return $this->sentiment; }
+    public function setSentiment(?string $sentiment): self { $this->sentiment = $sentiment; return $this; }
+
+    public function getSentimentScore(): ?float { return $this->sentimentScore; }
+    public function setSentimentScore(?float $sentimentScore): self { $this->sentimentScore = $sentimentScore; return $this; }
 
     public function __toString(): string
     {

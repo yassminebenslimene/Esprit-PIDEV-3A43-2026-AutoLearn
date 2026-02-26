@@ -20,8 +20,9 @@ class PostType extends AbstractType
                 'label' => 'Texte du post',
                 'required' => false,
                 'attr' => [
-                    'rows' => 4,
-                    'placeholder' => 'Écrivez votre message ici...'
+                    'rows' => 8,
+                    'placeholder' => 'Écrivez votre message ici...',
+                    'class' => 'rich-editor'
                 ],
             ])
 
