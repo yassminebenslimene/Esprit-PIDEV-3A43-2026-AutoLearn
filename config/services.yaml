@@ -113,3 +113,22 @@ services:
 
     # Workflow service alias for Evenement
     Symfony\Component\Workflow\WorkflowInterface $evenementPublishingStateMachine: '@state_machine.evenement_publishing'
+
+    # Configuration des services AI de Baha (Community features)
+    App\Service\AiReactionService:
+        arguments:
+            $groqApiKey: '%env(GROQ_API_KEY)%'
+            $groqApiUrl: '%env(GROQ_API_URL)%'
+            $groqModel: '%env(GROQ_MODEL)%'
+    
+    App\Service\SentimentAnalysisService:
+        arguments:
+            $groqApiKey: '%env(GROQ_API_KEY)%'
+            $groqApiUrl: '%env(GROQ_API_URL)%'
+            $groqModel: '%env(GROQ_MODEL)%'
+    
+    App\Service\TitleSuggestionService:
+        arguments:
+            $groqApiKey: '%env(GROQ_API_KEY)%'
+            $groqApiUrl: '%env(GROQ_API_URL)%'
+            $groqModel: '%env(GROQ_MODEL)%'
