@@ -252,6 +252,18 @@
                             <div class="info-label">Posts</div>
                             <div class="info-value">{{ communaute.posts|length }}</div>
                         </div>
+                        {% if communaute.createdAt %}
+                        <div class="info-item">
+                            <div class="info-label">📅 Created At</div>
+                            <div class="info-value">{{ communaute.createdAt|date('d/m/Y H:i') }}</div>
+                        </div>
+                        {% endif %}
+                        {% if communaute.updatedAt %}
+                        <div class="info-item">
+                            <div class="info-label">🔄 Last Updated</div>
+                            <div class="info-value">{{ communaute.updatedAt|date('d/m/Y H:i') }}</div>
+                        </div>
+                        {% endif %}
                     </div>
                     <div style="margin-top: 1rem;">
                         <div class="info-label">Description</div>
