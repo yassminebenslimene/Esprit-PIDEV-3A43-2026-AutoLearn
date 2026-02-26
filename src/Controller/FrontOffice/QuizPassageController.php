@@ -70,7 +70,9 @@ class QuizPassageController extends AbstractController
             'quizData' => $quizData,
             'chapitre' => $quiz->getChapitre(),
             'dureeMaxMinutes' => $quiz->getDureeMaxMinutes(),
-            'timestampDebut' => $dateDebut->getTimestamp()
+            'timestampDebut' => $dateDebut->getTimestamp(),
+            'previousQuiz' => null,
+            'nextQuiz' => null
         ]);
     }
 
@@ -146,6 +148,29 @@ class QuizPassageController extends AbstractController
             $this->addFlash('warning', 'Les explications IA ne sont pas disponibles pour le moment.');
         }
         
+        // Stocker le résultat en session pour le tuteur IA
+        $resultKey = 'quiz_result_' . $quiz->getId() . '_' . $etudiant->getId();
+        $session->set($resultKey, [
+            'score' => $result['score'],
+            'totalPoints' => $result['totalPoints'],
+            'percentage' => $result['percentage'],
+            'details' => $result['details'],
+            'timestamp' => time()
+        ]);
+        
+        // Préparer les statistiques
+        $statistiques = [
+            'nombreTentatives' => 1, // TODO: Implémenter le comptage réel des tentatives
+            'maxTentatives' => $quiz->getMaxTentatives(),
+            'derniersResultats' => [
+                'percentage' => $result['percentage'],
+                'score' => $result['score']
+            ],
+            'aReussi' => $statut === 'VALIDÉ',
+            'seuilReussite' => $seuilReussite,
+            'peutRecommencer' => true // TODO: Vérifier selon les règles du quiz
+        ];
+        
         return $this->render('frontoffice/quiz/result_with_ai.html.twig', [
             'quiz' => $quiz,
             'result' => $result,
@@ -155,7 +180,8 @@ class QuizPassageController extends AbstractController
             'dureeReelle' => $dureeReelleMinutes,
             'tempsDepasse' => $tempsDepasse,
             'explications' => $explications,
-            'resumePedagogique' => $resumePedagogique
+            'resumePedagogique' => $resumePedagogique,
+            'statistiques' => $statistiques
         ]);
     }
 

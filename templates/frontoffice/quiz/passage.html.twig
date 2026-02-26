@@ -640,12 +640,13 @@
             <div class="question-card {% if loop.first %}active{% endif %}" data-question-index="{{ loop.index0 }}" data-question-id="{{ question.id }}">
                 <span class="question-number">Question {{ loop.index }} / {{ quizData|length }}</span>
                 
-                {# Image du quiz si elle existe - Affichée au centre pour que l'étudiant puisse répondre en se basant sur l'image #}
+                {# Image du quiz désactivée - propriété imageName n'existe pas dans l'entité Quiz
                 {% if quiz.imageName %}
                 <div class="quiz-image-display">
                     <img src="{{ vich_uploader_asset(quiz, 'imageFile') }}" alt="{{ quiz.titre }}" class="quiz-main-image">
                 </div>
                 {% endif %}
+                #}
                 
                 <div class="question-text">{{ question.texte }}</div>
                 <div class="question-points">

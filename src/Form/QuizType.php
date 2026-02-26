@@ -165,32 +165,19 @@ class QuizType extends AbstractType
                 // Texte d'aide
                 'help' => 'Laissez vide pour un nombre illimité de tentatives'
             ])
-            // Ajoute le champ "imageFile" pour l'upload d'image via VichUploaderBundle
-            // VichImageType est un type de champ spécialisé fourni par VichUploader
-            // Il gère automatiquement l'upload, le stockage et la suppression des images
+            // Image désactivée - propriété imageFile n'existe pas dans l'entité Quiz
+            /*
             ->add('imageFile', VichImageType::class, [
-                // Label affiché au-dessus du champ
                 'label' => 'Image du quiz (optionnel)',
-                // Champ optionnel (l'utilisateur peut créer un quiz sans image)
                 'required' => false,
-                // Permet d'afficher une checkbox pour supprimer l'image existante
-                // Si cochée, l'image sera supprimée lors de la sauvegarde
                 'allow_delete' => true,
-                // Texte du label de la checkbox de suppression
                 'delete_label' => 'Supprimer l\'image',
-                // Ne pas afficher le lien de téléchargement de l'image actuelle
-                // (on préfère juste afficher l'image)
                 'download_uri' => false,
-                // Afficher l'image actuelle dans le formulaire (aperçu visuel)
-                // VichUploader génère automatiquement une balise <img> avec l'image
                 'image_uri' => true,
-                // Utiliser l'asset helper de Symfony pour générer les URLs des images
-                // Cela permet d'utiliser les fonctionnalités de versioning et CDN
                 'asset_helper' => true,
-                // Texte d'aide affiché sous le champ
-                // Informe l'utilisateur des formats acceptés et de la taille maximale
                 'help' => 'Formats acceptés: JPG, PNG, GIF (max 2MB)'
             ])
+            */
         ;
         // Fin de la construction du formulaire
     }
