@@ -124,13 +124,6 @@ private Collection $activities;
     #[ORM\Column(name: 'lastActivityAt', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $lastActivityAt = null;
 
-    #[ORM\Column(name: 'phoneNumber', type: 'string', length: 20, nullable: true)]
-    #[Assert\Regex(
-        pattern: "/^\+?[0-9]{8,15}$/",
-        message: 'Le numéro de téléphone doit contenir entre 8 et 15 chiffres'
-    )]
-    private ?string $phoneNumber = null;
-
    
     public function __construct()
     {
@@ -341,17 +334,6 @@ public function getLastActivityAt(): ?\DateTimeInterface
 public function setLastActivityAt(?\DateTimeInterface $lastActivityAt): static
 {
     $this->lastActivityAt = $lastActivityAt;
-    return $this;
-}
-
-public function getPhoneNumber(): ?string
-{
-    return $this->phoneNumber;
-}
-
-public function setPhoneNumber(?string $phoneNumber): static
-{
-    $this->phoneNumber = $phoneNumber;
     return $this;
 }
 

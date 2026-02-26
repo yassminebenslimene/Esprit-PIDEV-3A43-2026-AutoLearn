@@ -241,7 +241,12 @@
                         <li><a href="{{ path('app_frontoffice') }}">{{ 'nav.home'|trans }}</a></li>
                         <li><a href="{{ path('app_frontoffice') }}#cours">{{ 'nav.courses'|trans }}</a></li>
                         {% if app.user %}
-                            <li><a href="{{ path('app_notifications_index') }}" style="color: #FFD700; font-weight: bold;">🔔 Notifications</a></li>
+                            <li style="position: relative; display: inline-block;">
+                                <a href="{{ path('app_notifications_index') }}" style="position: relative; display: inline-block; color: #FFD700; font-weight: bold; text-decoration: none;">
+                                    🔔 Notifications
+                                    <span id="notification-badge" style="display: none; position: absolute; top: -8px; right: -12px; background: #ff4444; color: white; border-radius: 50%; min-width: 20px; height: 20px; padding: 2px 4px; font-size: 11px; font-weight: bold; text-align: center; line-height: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid white;"></span>
+                                </a>
+                            </li>
                         {% endif %}
                         <li><a href="{{ path('app_events') }}">{{ 'nav.events'|trans }}</a></li>
                         <li><a href="{{ path('app_frontoffice') }}#challenge">{{ 'nav.challenges'|trans }}</a></li>
@@ -412,11 +417,13 @@
                 .then(response => response.json())
                 .then(data => {
                     var badge = document.getElementById('notification-badge');
-                    if (data.count > 0) {
-                        badge.textContent = data.count > 9 ? '9+' : data.count;
-                        badge.style.display = 'flex';
-                    } else {
-                        badge.style.display = 'none';
+                    if (badge) {
+                        if (data.count > 0) {
+                            badge.textContent = data.count > 9 ? '9+' : data.count;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
                     }
                 })
                 .catch(error => console.error('Erreur lors du chargement des notifications:', error));

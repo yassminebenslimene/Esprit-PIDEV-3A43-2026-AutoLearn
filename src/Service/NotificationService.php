@@ -33,7 +33,7 @@ class NotificationService
         $this->entityManager->flush();
 
         $this->logger->info('Notification created', [
-            'user_id' => $user->getUserId(),
+            'user_id' => $user->getId(),
             'type' => $type,
             'title' => $title
         ]);
@@ -55,7 +55,7 @@ class NotificationService
             return ['internal' => true, 'success' => true];
         } catch (\Exception $e) {
             $this->logger->error('Failed to send inactivity reminder', [
-                'user_id' => $user->getUserId(),
+                'user_id' => $user->getId(),
                 'error' => $e->getMessage()
             ]);
             return ['internal' => false, 'success' => false, 'error' => $e->getMessage()];
@@ -78,7 +78,7 @@ class NotificationService
             return ['internal' => true, 'success' => true];
         } catch (\Exception $e) {
             $this->logger->error('Failed to send notification', [
-                'user_id' => $user->getUserId(),
+                'user_id' => $user->getId(),
                 'type' => $type,
                 'error' => $e->getMessage()
             ]);
