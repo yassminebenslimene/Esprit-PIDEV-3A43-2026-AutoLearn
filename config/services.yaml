@@ -132,3 +132,7 @@ services:
             $groqApiKey: '%env(GROQ_API_KEY)%'
             $groqApiUrl: '%env(GROQ_API_URL)%'
             $groqModel: '%env(GROQ_MODEL)%'
+
+    App\Service\AiSummaryService:
+        arguments:
+            $groqApiKey: '%env(GROQ_API_KEY)%'
