@@ -251,7 +251,7 @@
                     {% if post.imageFile %}
                     <div style="margin-top: 1.5rem;">
                         <div class="info-label">Image</div>
-                        <img src="{{ asset('uploads/' ~ post.imageFile) }}" alt="Image du post" style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
+                        <img src="{{ asset('uploads/images/' ~ post.imageFile) }}" alt="Image du post" style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
                     </div>
                     {% endif %}
 
@@ -259,7 +259,7 @@
                     <div style="margin-top: 1.5rem;">
                         <div class="info-label">Vidéo</div>
                         <video controls style="max-width: 100%; border-radius: 12px; margin-top: 0.5rem;">
-                            <source src="{{ asset('uploads/' ~ post.videoFile) }}" type="video/mp4">
+                            <source src="{{ asset('uploads/videos/' ~ post.videoFile) }}" type="video/mp4">
                             Votre navigateur ne supporte pas la lecture de vidéos.
                         </video>
                     </div>
