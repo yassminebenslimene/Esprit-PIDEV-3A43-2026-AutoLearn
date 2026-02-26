@@ -14,17 +14,10 @@ return [
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
     Symfony\Bundle\MakerBundle\MakerBundle::class => ['dev' => true],
     SymfonyCasts\Bundle\ResetPassword\SymfonyCastsResetPasswordBundle::class => ['all' => true],
-<<<<<<< HEAD
     CalendarBundle\CalendarBundle::class => ['all' => true],
     App\Bundle\UserActivityBundle\UserActivityBundle::class => ['all' => true],
     Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['dev' => true, 'test' => true],
     SimpleThings\EntityAudit\SimpleThingsEntityAuditBundle::class => ['all' => true],
     Vich\UploaderBundle\VichUploaderBundle::class => ['all' => true],
     Knp\Bundle\PaginatorBundle\KnpPaginatorBundle::class => ['all' => true],
-=======
-    Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['dev' => true, 'test' => true],
-    CalendarBundle\CalendarBundle::class => ['all' => true],
-    OpenAI\Symfony\OpenAIBundle::class => ['all' => true],
-    Sbyaute\StarRatingBundle\StarRatingBundle::class => ['all' => true],
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 ];
