@@ -211,7 +211,8 @@ class AuditController extends AbstractController
             'total_changes' => 0,
             'by_type' => [],
             'recent_activity' => [],
-            'active_users' => []
+            'active_admins' => [],
+            'active_students' => []
         ];
         
         try {
@@ -260,20 +261,39 @@ class AuditController extends AbstractController
                  ORDER BY date DESC"
             )->fetchAllAssociative();
             
-            $stats['active_users'] = $connection->executeQuery(
+            // Most active admins
+            $stats['active_admins'] = $connection->executeQuery(
                 "SELECT r.username, COUNT(*) as count 
                  FROM revisions r
-                 WHERE r.username IS NOT NULL
+                 INNER JOIN user u ON u.email = r.username
+                 WHERE r.username IS NOT NULL AND u.role = 'ADMIN'
                  GROUP BY r.username 
                  ORDER BY count DESC 
                  LIMIT 10"
             )->fetchAllAssociative();
             
-            // Get admin info for active users
-            foreach ($stats['active_users'] as &$activeUser) {
+            // Get admin info for active admins
+            foreach ($stats['active_admins'] as &$activeAdmin) {
                 $admin = $this->entityManager->getRepository(User::class)
-                    ->findOneBy(['email' => $activeUser['username']]);
-                $activeUser['admin'] = $admin;
+                    ->findOneBy(['email' => $activeAdmin['username']]);
+                $activeAdmin['admin'] = $admin;
+            }
+            
+            // Most active students (students who were modified the most)
+            $stats['active_students'] = $connection->executeQuery(
+                "SELECT ua.userId, ua.nom, ua.prenom, COUNT(*) as count 
+                 FROM user_audit ua
+                 WHERE ua.discr = 'etudiant'
+                 GROUP BY ua.userId, ua.nom, ua.prenom
+                 ORDER BY count DESC 
+                 LIMIT 10"
+            )->fetchAllAssociative();
+            
+            // Get student info for active students
+            foreach ($stats['active_students'] as &$activeStudent) {
+                $student = $this->entityManager->getRepository(User::class)
+                    ->find($activeStudent['userId']);
+                $activeStudent['student'] = $student;
             }
         } catch (\Exception $e) {
             // Tables don't exist yet
