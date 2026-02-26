@@ -49,11 +49,22 @@
             {{ form_errors(form.maxTentatives) }}
         </div>
         
+        {# Champ d'upload d'image géré par VichUploaderBundle #}
+        {# VichImageType génère automatiquement : #}
+        {# - Un input file pour sélectionner une nouvelle image #}
+        {# - Un aperçu de l'image actuelle (si elle existe) #}
+        {# - Une checkbox pour supprimer l'image existante #}
         <div>
+            {# Label du champ généré par Symfony Form #}
             {{ form_label(form.imageFile) }}
+            {# Widget du champ : input file + aperçu + checkbox suppression #}
+            {# VichUploader gère automatiquement l'affichage de ces éléments #}
             {{ form_widget(form.imageFile) }}
+            {# Message d'aide défini dans QuizType.php #}
             {{ form_help(form.imageFile) }}
+            {# Affichage des erreurs de validation (taille, format, etc.) #}
             {{ form_errors(form.imageFile) }}
+            {# Texte d'information supplémentaire pour l'utilisateur #}
             <small style="color: rgba(255, 255, 255, 0.6); display: block; margin-top: 0.5rem;">
                 Formats acceptés: JPG, PNG, GIF (max 2MB)
             </small>

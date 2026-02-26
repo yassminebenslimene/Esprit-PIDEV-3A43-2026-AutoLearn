@@ -31,27 +31,47 @@ class BackofficeController extends AbstractController
         return $this->render('backoffice/index.html.twig');
     }
 
+    /**
+     * Page de gestion des quiz avec pagination
+     * 
+     * Utilise le bundle KnpPaginator pour afficher les quiz par pages
+     * Cela améliore les performances en ne chargeant que quelques quiz à la fois
+     */
     #[Route('/backoffice/quiz-management', name: 'backoffice_quiz_management')]
     public function quizManagement(
         \App\Repository\QuizRepository $quizRepository,
         Request $request,
+        // Injection du service PaginatorInterface fourni par KnpPaginatorBundle
+        // Ce service permet de paginer n'importe quelle requête Doctrine
         \Knp\Component\Pager\PaginatorInterface $paginator
     ): Response
     {
-        // Créer la requête de base
+        // Créer la requête de base avec QueryBuilder
+        // QueryBuilder permet de construire des requêtes SQL complexes de manière orientée objet
         $queryBuilder = $quizRepository->createQueryBuilder('q')
+            // Jointure avec l'entité Chapitre pour éviter les requêtes N+1
             ->leftJoin('q.chapitre', 'c')
+            // Ajouter le chapitre dans le SELECT pour le charger en une seule requête
             ->addSelect('c')
+            // Trier les quiz par ID décroissant (les plus récents en premier)
             ->orderBy('q.id', 'DESC');
 
-        // Paginer les résultats
+        // Utiliser KnpPaginator pour paginer les résultats
+        // Le bundle transforme automatiquement le QueryBuilder en requête paginée
         $pagination = $paginator->paginate(
+            // La requête à paginer (QueryBuilder, Query, ou tableau)
             $queryBuilder,
+            // Numéro de page actuel (récupéré depuis l'URL ?page=X, défaut: 1)
             $request->query->getInt('page', 1),
-            5 // Nombre d'éléments par page (modifié de 10 à 5)
+            // Nombre d'éléments par page (5 quiz par page)
+            // Modifié de 10 à 5 pour un affichage plus compact
+            5
         );
 
+        // Passer l'objet pagination au template Twig
+        // Le template utilisera knp_pagination_render() pour afficher les liens de pagination
         return $this->render('backoffice/quiz_management.html.twig', [
+            // L'objet pagination contient les quiz de la page actuelle + métadonnées (total, pages, etc.)
             'pagination' => $pagination,
         ]);
     }
