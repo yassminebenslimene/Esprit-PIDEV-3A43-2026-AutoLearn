@@ -215,67 +215,39 @@ class AuditController extends AbstractController
         ];
         
         try {
-            // Count ONLY admin revisions (filter by admin role)
+            // Count all revisions
             $stats['total_revisions'] = $connection->executeQuery(
-                "SELECT COUNT(DISTINCT r.id) 
-                 FROM revisions r
-                 INNER JOIN user u ON u.email = r.username
-                 WHERE u.role = 'ADMIN'"
+                "SELECT COUNT(*) FROM revisions"
             )->fetchOne();
             
-            // Count ONLY admin changes on students
+            // Count all changes across all audit tables
             $stats['total_changes'] = $connection->executeQuery(
-                "SELECT COUNT(*) 
-                 FROM user_audit ua
-                 INNER JOIN revisions r ON ua.rev = r.id
-                 INNER JOIN user u ON u.email = r.username
-                 WHERE u.role = 'ADMIN'"
+                "SELECT (
+                    (SELECT COUNT(*) FROM user_audit) +
+                    (SELECT COUNT(*) FROM cours_audit)
+                ) as total"
             )->fetchOne();
             
-            // Count by action type - analyze the data to determine specific actions
-            // Use self-join to compare with previous revision to detect REACTIVATE
             $stats['by_type'] = $connection->executeQuery(
-                "SELECT 
-                    CASE 
-                        WHEN ua.revtype = 'INS' THEN 'CREATE'
-                        WHEN ua.revtype = 'DEL' THEN 'DELETE'
-                        WHEN ua.revtype = 'UPD' AND ua.isSuspended = 1 AND (prev.isSuspended IS NULL OR prev.isSuspended = 0) THEN 'SUSPEND'
-                        WHEN ua.revtype = 'UPD' AND ua.isSuspended = 0 AND prev.isSuspended = 1 THEN 'REACTIVATE'
-                        WHEN ua.revtype = 'UPD' THEN 'UPDATE'
-                        ELSE 'UPDATE'
-                    END as revtype,
-                    COUNT(*) as count 
-                 FROM user_audit ua
-                 INNER JOIN revisions r ON ua.rev = r.id
-                 INNER JOIN user u ON u.email = r.username
-                 LEFT JOIN user_audit prev ON prev.userId = ua.userId 
-                     AND prev.rev = (
-                         SELECT MAX(ua2.rev) 
-                         FROM user_audit ua2 
-                         WHERE ua2.userId = ua.userId AND ua2.rev < ua.rev
-                     )
-                 WHERE u.role = 'ADMIN' AND ua.discr = 'etudiant'
-                 GROUP BY 1
-                 ORDER BY count DESC"
+                "SELECT 'INS' as revtype, COUNT(*) as count FROM user_audit WHERE revtype = 'INS'
+                 UNION ALL
+                 SELECT 'UPD' as revtype, COUNT(*) as count FROM user_audit WHERE revtype = 'UPD'
+                 UNION ALL
+                 SELECT 'DEL' as revtype, COUNT(*) as count FROM user_audit WHERE revtype = 'DEL'"
             )->fetchAllAssociative();
             
-            // Recent activity (last 7 days) - ONLY admin actions
             $stats['recent_activity'] = $connection->executeQuery(
-                "SELECT DATE(r.timestamp) as date, COUNT(DISTINCT r.id) as count 
+                "SELECT DATE(r.timestamp) as date, COUNT(*) as count 
                  FROM revisions r
-                 INNER JOIN user u ON u.email = r.username
-                 WHERE u.role = 'ADMIN'
-                 AND r.timestamp >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                 WHERE r.timestamp >= DATE_SUB(NOW(), INTERVAL 7 DAY)
                  GROUP BY DATE(r.timestamp)
                  ORDER BY date DESC"
             )->fetchAllAssociative();
             
-            // Most active admins
             $stats['active_users'] = $connection->executeQuery(
-                "SELECT r.username, COUNT(DISTINCT r.id) as count 
+                "SELECT r.username, COUNT(*) as count 
                  FROM revisions r
-                 INNER JOIN user u ON u.email = r.username
-                 WHERE u.role = 'ADMIN'
+                 WHERE r.username IS NOT NULL
                  GROUP BY r.username 
                  ORDER BY count DESC 
                  LIMIT 10"
