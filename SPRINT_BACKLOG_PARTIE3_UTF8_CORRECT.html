@@ -1,0 +1,2156 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Backlog Détaillé - Partie 3 (US-5.16 Ã  US-5.40)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px;
+        }
+        .us-section {
+            margin-bottom: 50px;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+        }
+        .us-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+        }
+        .us-header h2 {
+            font-size: 1.5em;
+            margin-bottom: 8px;
+        }
+        .us-header p {
+            font-size: 1.05em;
+            opacity: 0.95;
+            line-height: 1.5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background: #f8f9fa;
+        }
+        th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            font-size: 0.95em;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.92em;
+            vertical-align: top;
+        }
+        tbody tr:hover {
+            background-color: #f5f7fa;
+        }
+        .task-id {
+            font-weight: 600;
+            color: #667eea;
+            white-space: nowrap;
+        }
+        .estimation {
+            font-weight: 600;
+            color: #2ed573;
+            white-space: nowrap;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; }
+            .us-section { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ðŸ“‹ SPRINT BACKLOG DÉTAILLÉ</h1>
+            <div class="subtitle">Module Gestion des Événements - Partie 3 (US-5.16 Ã  US-5.40)</div>
+            <div class="subtitle" style="margin-top: 10px; font-size: 1em;">Basé sur l'analyse complète du code source</div>
+        </div>
+        
+        <div class="content">
+            <p style="background: #fff3cd; padding: 20px; border-left: 5px solid #ffc107; margin-bottom: 30px; border-radius: 5px;">
+                <strong>ðŸ“Œ Note:</strong> Cette partie contient les User Stories US-5.16 Ã  US-5.40 incluant les validations système, emails automatiques, certificats, calendrier, météo, feedbacks et rapports AI.
+            </p>
+
+            <!-- US-5.16 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.16 - Le système empêche participation Ã  événement annulé</h2>
+                    <p>Le système empêche toute nouvelle participation Ã  un événement annulé afin de garantir la cohérence des données</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.16.1</td>
+                            <td>Vérification déjÃ  implémentée dans <code>validateParticipation()</code> de Participation.php (T5.12.2): <code>if ($this->evenement->getIsCanceled()) { $this->setStatut(StatutParticipation::REFUSE); return ['accepted' => false, 'message' => 'Event is cancelled']; }</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.16.2</td>
+                            <td>Vérification supplémentaire dans <code>participate()</code> de FrontofficeEvenementController: <code>if (!$evenement->canAcceptParticipations())</code> qui vérifie <code>!$this->isCanceled</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.16.3</td>
+                            <td>Tester avec événement annulé: tenter de créer équipe/participation â†’ vérifier message "Event is cancelled" et redirection</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.17 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.17 - Le système limite Ã  capacité maximale</h2>
+                    <p>Le système limite le nombre d'équipes acceptées Ã  la capacité maximale définie afin de respecter les contraintes de l'événement</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.17.1</td>
+                            <td>Logique déjÃ  implémentée dans <code>validateParticipation()</code> (US-5.12): comparaison <code>$nbAcceptees < $nbMax</code></td>
+                            <td class="estimation">5 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.17.2</td>
+                            <td>Tests supplémentaires de cas limites: événement avec nbMax=5, créer 5 participations acceptées, tenter 6ème â†’ vérifier refus</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.18 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.18 - Le système vérifie taille d'équipe (4-6)</h2>
+                    <p>Le système vérifie que chaque équipe respecte le nombre minimum et maximum de membres (4-6) afin d'assurer une participation valide</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.18.1</td>
+                            <td>Validation déjÃ  implémentée dans Equipe.php (US-5.8): <code>Assert\Count(min: 4, max: 6, minMessage: "Une équipe doit avoir au moins {{ limit }} étudiants", maxMessage: "Une équipe ne peut pas avoir plus de {{ limit }} étudiants")</code></td>
+                            <td class="estimation">5 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.18.2</td>
+                            <td>Messages d'erreur personnalisés déjÃ  configurés avec {{ limit }} pour afficher le nombre</td>
+                            <td class="estimation">5 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.18.3</td>
+                            <td>Tests complets: créer équipe avec 3 membres â†’ erreur "au moins 4", 4 membres â†’ succès, 6 membres â†’ succès, 7 membres â†’ erreur "pas plus de 6"</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.19 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.19 - Le système envoie email confirmation avec QR code et badge PDF</h2>
+                    <p>Le système envoie automatiquement un email de confirmation avec QR code et badge PDF lorsqu'une participation est acceptée</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.19.1</td>
+                            <td>Installer SendGrid: <code>composer require symfony/sendgrid-mailer</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.2</td>
+                            <td>Configurer dans <code>.env.local</code>: <code>MAILER_DSN=sendgrid://KEY@default</code> avec clé API SendGrid obtenue sur sendgrid.com</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.3</td>
+                            <td>Créer <code>src/Service/EmailService.php</code> avec injection <code>MailerInterface $mailer</code>, <code>BadgeService $badgeService</code>, <code>string $mailerFrom</code> dans __construct</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.4</td>
+                            <td>Implémenter méthode <code>sendParticipationConfirmation(Participation $participation, Equipe $equipe, Evenement $evenement): void</code></td>
+                            <td class="estimation">45 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.5</td>
+                            <td>Installer endroid/qr-code: <code>composer require endroid/qr-code</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.6</td>
+                            <td>Générer QR code dans sendParticipationConfirmation: <code>$qrCode = QrCode::create($data)->setSize(300)->setMargin(10); $writer = new PngWriter(); $result = $writer->write($qrCode); $qrCodeData = $result->getString();</code> avec data = JSON contenant ID participation, événement, équipe</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.7</td>
+                            <td>Créer <code>src/Service/BadgeService.php</code> avec injection <code>Dompdf $dompdf</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.8</td>
+                            <td>Installer dompdf: <code>composer require dompdf/dompdf</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.9</td>
+                            <td>Implémenter méthode <code>generateBadge(Etudiant $etudiant, Evenement $evenement, string $qrCodeData): string</code> qui retourne PDF en string</td>
+                            <td class="estimation">60 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.10</td>
+                            <td>Design badge HTML/CSS: logo en haut, nom événement, nom étudiant, QR code, date, lieu, style professionnel avec gradients</td>
+                            <td class="estimation">50 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.11</td>
+                            <td>Créer template <code>templates/emails/participation_confirmation.html.twig</code> avec design moderne, informations événement, message personnalisé</td>
+                            <td class="estimation">50 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.12</td>
+                            <td>Générer fichier .ics: implémenter <code>generateIcsFile(Evenement $evenement): string</code> avec format iCalendar (BEGIN:VCALENDAR, VERSION:2.0, VEVENT avec DTSTART, DTEND, SUMMARY, LOCATION, DESCRIPTION, UID)</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.13</td>
+                            <td>Dans sendParticipationConfirmation: créer email avec <code>$email = (new Email())->from($this->mailerFrom)->to($etudiant->getEmail())->subject('Participation Confirmed')->htmlTemplate('emails/participation_confirmation.html.twig')</code></td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.14</td>
+                            <td>Attacher fichiers: <code>$email->attach($qrCodeData, 'qrcode.png', 'image/png')->attach($badgePdf, 'badge.pdf', 'application/pdf')->attach($icsFile, 'event.ics', 'text/calendar')</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.15</td>
+                            <td>Envoyer email: <code>$this->mailer->send($email)</code> avec gestion erreurs try/catch</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.16</td>
+                            <td>Appeler sendParticipationConfirmation() dans FrontofficeParticipationController après <code>$result = $participation->validateParticipation()</code> si <code>$result['accepted'] === true</code>, boucle sur tous étudiants de l'équipe</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.17</td>
+                            <td>Tester envoi email: créer participation acceptée â†’ vérifier email reçu avec 3 pièces jointes (QR code PNG, badge PDF, event.ics)</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.18</td>
+                            <td>Tester QR code: scanner avec smartphone â†’ vérifier données décodées (ID participation, événement, équipe)</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.19</td>
+                            <td>Tester badge PDF: ouvrir fichier â†’ vérifier design professionnel, toutes informations présentes, QR code visible</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.19.20</td>
+                            <td>Tester fichier .ics: importer dans Google Calendar/Outlook â†’ vérifier événement ajouté avec dates, lieu, description corrects</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.20 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.20 - Le système envoie email annulation événement</h2>
+                    <p>Le système envoie automatiquement un email d'annulation Ã  tous les participants lorsqu'un événement est annulé</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.20.1</td>
+                            <td>Créer méthode <code>sendEventCancellation(Evenement $evenement, Equipe $equipe): void</code> dans EmailService</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.20.2</td>
+                            <td>Créer template <code>templates/emails/event_cancelled.html.twig</code> avec message d'excuses, informations événement annulé, design professionnel</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.20.3</td>
+                            <td>Créer <code>src/EventSubscriber/EvenementWorkflowSubscriber.php</code> avec <code>implements EventSubscriberInterface</code></td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.20.4</td>
+                            <td>Injecter dépendances: <code>EmailService $emailService</code>, <code>LoggerInterface $logger</code> dans __construct</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.20.5</td>
+                            <td>Implémenter <code>getSubscribedEvents(): array</code> retournant <code>['workflow.evenement_publishing.entered.annule' => 'onAnnule']</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.20.6</td>
+                            <td>Implémenter méthode <code>onAnnule(Event $event): void</code> qui récupère événement: <code>$evenement = $event->getSubject()</code></td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.20.7</td>
+                            <td>Parcourir participations acceptées: <code>foreach ($evenement->getParticipations() as $participation) { if ($participation->getStatut()->value === 'Accepté') { $equipe = $participation->getEquipe(); foreach ($equipe->getEtudiants() as $etudiant) { try { $this->emailService->sendEventCancellation($evenement, $equipe); $this->logger->info('Email sent'); } catch (\Exception $e) { $this->logger->error('Email failed: ' . $e->getMessage()); } } } }</code></td>
+                            <td class="estimation">45 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.20.8</td>
+                            <td>Logger succès/échecs avec contexte (ID événement, email étudiant)</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.20.9</td>
+                            <td>Tester: créer événement avec 2 équipes acceptées (8 étudiants total) â†’ annuler événement â†’ vérifier 8 emails envoyés, consulter logs</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.21 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.21 - Le système envoie email démarrage événement</h2>
+                    <p>Le système envoie automatiquement un email de démarrage Ã  tous les participants lorsqu'un événement commence</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.21.1</td>
+                            <td>Créer méthode <code>sendEventStarted(Evenement $evenement, Equipe $equipe): void</code> dans EmailService</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.21.2</td>
+                            <td>Créer template <code>templates/emails/event_started.html.twig</code> avec message de bienvenue, rappel lieu/horaires</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.21.3</td>
+                            <td>Ajouter dans getSubscribedEvents(): <code>'workflow.evenement_publishing.entered.en_cours' => 'onEnCours'</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.21.4</td>
+                            <td>Implémenter méthode <code>onEnCours(Event $event): void</code> avec même logique que onAnnule mais appel sendEventStarted()</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.21.5</td>
+                            <td>Tester: événement avec dateDebut = maintenant â†’ exécuter commande workflow â†’ vérifier emails envoyés</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.22 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.22 - Le système envoie email rappel 3 jours avant</h2>
+                    <p>Le système envoie automatiquement un email de rappel 3 jours avant l'événement</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.22.1</td>
+                            <td>Créer <code>src/Command/SendEventRemindersCommand.php</code> avec <code>#[AsCommand(name: 'app:send-event-reminders')]</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.22.2</td>
+                            <td>Injecter: <code>EvenementRepository $evenementRepository</code>, <code>EmailService $emailService</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.22.3</td>
+                            <td>Récupérer événements dans 3 jours: <code>$targetDate = (new \DateTime())->modify('+3 days'); $evenements = $evenementRepository->createQueryBuilder('e')->where('DATE(e.dateDebut) = :targetDate')->setParameter('targetDate', $targetDate->format('Y-m-d'))->getQuery()->getResult();</code></td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.22.4</td>
+                            <td>Créer méthode <code>sendEventReminder(Evenement $evenement, Equipe $equipe): void</code> dans EmailService</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.22.5</td>
+                            <td>Créer template <code>templates/emails/event_reminder.html.twig</code> avec countdown "3 days left!", checklist préparation</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.22.6</td>
+                            <td>Envoyer Ã  tous participants: boucle sur événements, participations, équipes, étudiants</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.22.7</td>
+                            <td>Configurer cron job: documentation pour exécuter commande quotidiennement Ã  9h00: <code>0 9 * * * php /path/to/project/bin/console app:send-event-reminders</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.22.8</td>
+                            <td>Tester commande manuellement: créer événement dans 3 jours â†’ exécuter <code>php bin/console app:send-event-reminders</code> â†’ vérifier emails</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.23 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.23 - Le système génère et envoie certificats PDF</h2>
+                    <p>Le système génère et envoie automatiquement des certificats PDF après la fin d'un événement</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.23.1</td>
+                            <td>Créer <code>src/Service/CertificateService.php</code> avec injection Dompdf</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.23.2</td>
+                            <td>Implémenter <code>generateCertificate(Etudiant $etudiant, Evenement $evenement): string</code> retournant PDF en string</td>
+                            <td class="estimation">60 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.23.3</td>
+                            <td>Design template certificat HTML/CSS: bordure décorative, logo plateforme en haut, titre "Certificate of Participation", texte "This certifies that [Nom Étudiant] has successfully participated in [Nom Événement]", date, signature digitale, QR code vérification</td>
+                            <td class="estimation">80 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.23.4</td>
+                            <td>Styliser avec CSS professionnel: police élégante (serif), couleurs or/bleu, background pattern subtil</td>
+                            <td class="estimation">50 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.23.5</td>
+                            <td>Ajouter QR code de vérification contenant URL: <code>https://platform.com/verify/certificate/{uniqueId}</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.23.6</td>
+                            <td>Créer méthode <code>sendCertificate(Etudiant $etudiant, Evenement $evenement, string $certificatePdf): void</code> dans EmailService</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.23.7</td>
+                            <td>Créer <code>src/Command/SendCertificatesCommand.php</code> pour envoyer certificats événements terminés</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.23.8</td>
+                            <td>Récupérer événements terminés: <code>$evenements = $evenementRepository->createQueryBuilder('e')->where('e.workflowStatus = :status')->setParameter('status', 'termine')->getQuery()->getResult();</code></td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.23.9</td>
+                            <td>Pour chaque événement, générer et envoyer certificat Ã  chaque participant accepté</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.23.10</td>
+                            <td>Tester: événement terminé avec 2 équipes â†’ exécuter commande â†’ vérifier certificats PDF reçus, design professionnel, QR code présent</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.24 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.24 - Consulter un calendrier visuel</h2>
+                    <p>En tant qu'Étudiant, je souhaite consulter un calendrier visuel des événements afin de voir les dates importantes</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.24.1</td>
+                            <td>Installer tattali/calendar-bundle: <code>composer require tattali/calendar-bundle</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.24.2</td>
+                            <td>Créer <code>config/packages/calendar.yaml</code> avec configuration de base</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.24.3</td>
+                            <td>Créer <code>src/EventSubscriber/CalendarSubscriber.php</code> implements EventSubscriberInterface</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.24.4</td>
+                            <td>Injecter <code>EvenementRepository $evenementRepository</code> dans __construct</td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.24.5</td>
+                            <td>Implémenter <code>getSubscribedEvents(): array</code> retournant <code>[CalendarEvents::SET_DATA => 'onCalendarSetData']</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.24.6</td>
+                            <td>Implémenter <code>onCalendarSetData(CalendarEvent $calendar): void</code> qui récupère événements entre start et end dates du calendrier</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.24.7</td>
+                            <td>Convertir chaque Evenement en CalendarEvent: <code>$calendarEvent = new CalendarEvent($evenement->getTitre(), $evenement->getDateDebut(), $evenement->getDateFin()); $calendarEvent->addOption('url', $this->router->generate('app_event_participate', ['id' => $evenement->getId()])); $calendarEvent->addOption('backgroundColor', $this->getColorByType($evenement->getType())); $calendar->addEvent($calendarEvent);</code></td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.24.8</td>
+                            <td>Ajouter route <code>#[Route('/calendar', name: 'app_events_calendar', methods: ['GET'])]</code> dans FrontofficeEvenementController</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.24.9</td>
+                            <td>Créer template <code>templates/frontoffice/evenement/calendar.html.twig</code> extends 'frontoffice/base.html.twig'</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.24.10</td>
+                            <td>Intégrer FullCalendar v6.1.10 via CDN: <code>&lt;link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet"&gt;</code>, <code>&lt;script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"&gt;&lt;/script&gt;</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.24.11</td>
+                            <td>Initialiser FullCalendar avec JavaScript: <code>var calendar = new FullCalendar.Calendar(calendarEl, { initialView: 'dayGridMonth', headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth' }, events: '{{ path('calendar_feed') }}', eventClick: function(info) { window.location.href = info.event.url; } });</code></td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.24.12</td>
+                            <td>Configurer 4 vues: Month (dayGridMonth), Week (timeGridWeek), Day (timeGridDay), List (listMonth)</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.24.13</td>
+                            <td>Styliser avec couleurs par type: Conference=bleu, Hackathon=rouge, Workshop=vert, Seminar=orange, Meetup=violet, Training=cyan</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.24.14</td>
+                            <td>Ajouter modal popup au clic: afficher détails événement (titre, type, dates, lieu, description, places disponibles), bouton "Participate"</td>
+                            <td class="estimation">50 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.24.15</td>
+                            <td>Intégrer navbar frontoffice avec lien retour vers liste événements</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.24.16</td>
+                            <td>Tester affichage calendrier: créer 5 événements différentes dates â†’ vérifier affichage dans calendrier, changement vues, clic événement</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.25 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.25 - Voir la météo prévue</h2>
+                    <p>En tant qu'Étudiant, je souhaite voir la météo prévue pour l'événement afin de me préparer en conséquence</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.25.1</td>
+                            <td>Créer compte OpenWeatherMap API sur openweathermap.org, obtenir clé API gratuite</td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.25.2</td>
+                            <td>Configurer dans <code>.env.local</code>: <code>WEATHER_API_KEY=your_openweathermap_key</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.25.3</td>
+                            <td>Créer <code>src/Service/WeatherService.php</code> avec injection <code>HttpClientInterface $httpClient</code>, <code>string $weatherApiKey</code></td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.25.4</td>
+                            <td>Implémenter <code>getWeatherForEvent(string $city, \DateTimeInterface $eventDate): ?array</code></td>
+                            <td class="estimation">50 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.25.5</td>
+                            <td>Calculer jours jusqu'Ã  événement: <code>$now = new \DateTime(); $diff = $now->diff($eventDate); $daysUntilEvent = (int) $diff->format('%R%a');</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.25.6</td>
+                            <td>Si événement > 5 jours OU passé: appeler API météo actuelle <code>https://api.openweathermap.org/data/2.5/weather?q={city}&appid={apiKey}&units=metric&lang=en</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.25.7</td>
+                            <td>Si événement dans 0-5 jours: appeler API prévisions <code>https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={apiKey}&units=metric&lang=en</code>, trouver prévision la plus proche de eventDate</td>
+                            <td class="estimation">45 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.25.8</td>
+                            <td>Retourner tableau: <code>['available' => true, 'is_forecast' => bool, 'temperature' => int, 'feels_like' => int, 'description' => string, 'icon' => string, 'humidity' => int, 'wind_speed' => float, 'city' => string]</code></td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.25.9</td>
+                            <td>Créer méthode <code>getWeatherEmoji(string $icon): string</code> avec mapping: '01d'=>'â˜€ï¸', '01n'=>'ðŸŒ™', '02d'=>'â›…', '09d'=>'ðŸŒ§ï¸', '10d'=>'ðŸŒ¦ï¸', '11d'=>'â›ˆï¸', '13d'=>'â„ï¸', '50d'=>'ðŸŒ«ï¸'</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.25.10</td>
+                            <td>Intégrer dans FrontofficeEvenementController->index(): appeler <code>$weather = $weatherService->getWeatherForEvent('Tunis,TN', $evenement->getDateDebut())</code> pour chaque événement (déjÃ  fait dans US-5.7)</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.25.11</td>
+                            <td>Afficher section météo dans index.html.twig (déjÃ  fait dans US-5.7): emoji, température, description, humidité, vent</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.25.12</td>
+                            <td>Styliser avec gradients selon température: <code>{% if weather.temperature > 25 %} background: linear-gradient(135deg, #ff6b6b, #feca57) {% elseif weather.temperature < 10 %} background: linear-gradient(135deg, #48dbfb, #0abde3) {% else %} background: linear-gradient(135deg, #2ed573, #1e90ff) {% endif %}</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.25.13</td>
+                            <td>Messages personnalisés: "Perfect weather for the event! â˜€ï¸", "Bring an umbrella! ðŸŒ§ï¸", "Dress warmly! â„ï¸"</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.25.14</td>
+                            <td>Gérer erreurs API: try/catch, retourner <code>['available' => false, 'error' => true, 'message' => 'Unable to fetch weather']</code> si timeout ou clé invalide</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.25.15</td>
+                            <td>Tester avec événement dans 2 jours: vérifier prévisions affichées, emoji correct, température, description</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.25.16</td>
+                            <td>Tester avec événement dans 10 jours: vérifier météo actuelle affichée avec note "Current weather (forecast not available)"</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.26 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.26 - Donner mon feedback</h2>
+                    <p>En tant qu'Étudiant, je souhaite donner mon feedback après un événement afin de partager mon expérience</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.26.1</td>
+                            <td>Colonne feedbacks (JSON) déjÃ  ajoutée dans Participation.php (US-5.11): <code>#[ORM\Column(type: 'json', nullable: true)]</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.2</td>
+                            <td>Migration déjÃ  générée (US-5.11)</td>
+                            <td class="estimation">5 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.3</td>
+                            <td>Créer <code>src/Enum/SentimentFeedback.php</code> avec cases: <code>TRES_SATISFAIT</code>, <code>SATISFAIT</code>, <code>NEUTRE</code>, <code>DECU</code>, <code>TRES_DECU</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.4</td>
+                            <td>Implémenter <code>addFeedback(int $etudiantId, string $etudiantName, int $ratingGlobal, array $ratingCategories, string $sentiment, string $emoji, ?string $comment): void</code> dans Participation.php</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.5</td>
+                            <td>Structure feedback JSON: <code>['etudiant_id' => int, 'etudiant_name' => string, 'rating_global' => int, 'rating_categories' => ['organisation' => int, 'contenu' => int, 'lieu' => int, 'animation' => int], 'sentiment' => string, 'emoji' => string, 'comment' => string|null, 'created_at' => datetime]</code></td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.6</td>
+                            <td>Implémenter <code>getFeedbackByEtudiant(int $etudiantId): ?array</code> qui parcourt feedbacks et retourne feedback de l'étudiant ou null</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.7</td>
+                            <td>Créer <code>src/Controller/FeedbackController.php</code> avec <code>#[Route('/feedback')]</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.8</td>
+                            <td>Ajouter route <code>#[Route('/participation/{id}', name: 'app_feedback_form', methods: ['GET'])]</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.9</td>
+                            <td>Implémenter méthode <code>showFeedbackForm(Participation $participation): Response</code> avec vérifications: événement terminé (<code>$participation->getEvenement()->getDateFin() >= $now</code>), utilisateur membre équipe, feedback déjÃ  donné</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.10</td>
+                            <td>Ajouter route POST <code>#[Route('/submit/{id}', name: 'app_feedback_submit', methods: ['POST'])]</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.11</td>
+                            <td>Implémenter <code>submitFeedback(Participation $participation, Request $request, EntityManagerInterface $entityManager): JsonResponse</code> qui récupère données JSON, valide, appelle addFeedback(), flush, retourne JSON success</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.12</td>
+                            <td>Créer template <code>templates/frontoffice/feedback/form.html.twig</code> avec design moderne</td>
+                            <td class="estimation">60 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.13</td>
+                            <td>Système notation par étoiles (1-5): HTML avec 5 étoiles cliquables, JavaScript pour gérer sélection, CSS pour hover/selected states (étoiles jaunes)</td>
+                            <td class="estimation">45 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.14</td>
+                            <td>Sélection sentiment avec émojis: 5 boutons radio stylisés avec émojis (ðŸ˜ Très satisfait, ðŸ˜Š Satisfait, ðŸ˜ Neutre, ðŸ˜ž Déçu, ðŸ˜¡ Très déçu), effet hover scale</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.15</td>
+                            <td>Champ commentaire libre: <code>&lt;textarea rows="5" placeholder="Share your experience..."&gt;</code> avec compteur caractères (max 500)</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.16</td>
+                            <td>Styliser avec design moderne: gradients, ombres, animations, responsive</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.17</td>
+                            <td>Soumettre via AJAX: <code>fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)})</code>, afficher message succès/erreur</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.26.18</td>
+                            <td>Tester soumission feedback: événement terminé, participation acceptée â†’ donner feedback â†’ vérifier sauvegardé en BDD (JSON), message succès affiché</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.27 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.27 - Modifier ou supprimer mon feedback</h2>
+                    <p>En tant qu'Étudiant, je souhaite modifier ou supprimer mon feedback afin de corriger ou retirer mon avis</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.27.1</td>
+                            <td>Ajouter route <code>#[Route('/{participationId}/edit', name: 'app_feedback_edit', methods: ['GET', 'POST'])]</code> dans FeedbackController</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.27.2</td>
+                            <td>Implémenter méthode edit() qui récupère feedback existant via <code>getFeedbackByEtudiant()</code>, affiche formulaire pré-rempli</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.27.3</td>
+                            <td>Pré-remplir formulaire: étoiles sélectionnées, sentiment coché, commentaire affiché, JavaScript pour initialiser état</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.27.4</td>
+                            <td>Modifier feedback: supprimer ancien feedback du tableau JSON, ajouter nouveau avec <code>addFeedback()</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.27.5</td>
+                            <td>Ajouter route DELETE <code>#[Route('/{participationId}/delete', name: 'app_feedback_delete', methods: ['DELETE'])]</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.27.6</td>
+                            <td>Implémenter méthode delete() qui supprime feedback de l'étudiant du tableau JSON, flush</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.27.7</td>
+                            <td>Ajouter boutons "Edit Feedback" et "Delete Feedback" dans mes_participations.html.twig si feedback existe</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.27.8</td>
+                            <td>Confirmation JavaScript pour suppression: <code>if (confirm('Delete your feedback?'))</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                  
+
+                        <tr>
+                            <td class="task-id">T5.27.9</td>
+                            <td>Tester modification feedback: changer note, sentiment, commentaire → vérifier modifications sauvegardées</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.27.10</td>
+                            <td>Tester suppression feedback: supprimer → vérifier feedback retiré de JSON en BDD</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.28 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.28 - Consulter les feedbacks (Admin)</h2>
+                    <p>En tant qu'Admin, je souhaite consulter tous les feedbacks d'un événement afin d'évaluer sa qualité</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.28.1</td>
+                            <td>Ajouter section "Feedbacks" dans <code>templates/backoffice/evenement/show.html.twig</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.28.2</td>
+                            <td>Afficher liste de tous les feedbacks: parcourir participations, extraire feedbacks JSON, afficher avec nom étudiant, note globale, sentiment, commentaire</td>
+                            <td class="estimation">45 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.28.3</td>
+                            <td>Styliser avec cartes colorées selon sentiment: Très satisfait=vert, Satisfait=bleu, Neutre=gris, Déçu=orange, Très déçu=rouge</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.28.4</td>
+                            <td>Calculer et afficher statistiques: note moyenne globale, distribution des sentiments (pourcentages), nombre total feedbacks</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.28.5</td>
+                            <td>Ajouter filtres JavaScript: boutons pour filtrer par sentiment, afficher/cacher feedbacks selon sélection</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.28.6</td>
+                            <td>Afficher graphique distribution notes avec Chart.js: bar chart avec notes 1-5 sur axe X, nombre feedbacks sur axe Y</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.28.7</td>
+                            <td>Tester affichage avec événement ayant 10 feedbacks variés (différentes notes, sentiments, commentaires) → vérifier statistiques correctes</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.29 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.29 - Générer rapport statistiques AI</h2>
+                    <p>En tant qu'Admin, je souhaite générer un rapport statistiques via AI afin d'obtenir des insights détaillés sur l'événement</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.29.1</td>
+                            <td>Créer <code>src/Service/AIReportService.php</code> avec injection <code>HttpClientInterface $httpClient</code>, <code>string $huggingfaceApiKey</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.29.2</td>
+                            <td>Configurer dans <code>.env.local</code>: <code>HUGGINGFACE_API_KEY=your_huggingface_key</code> (obtenir sur huggingface.co)</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.29.3</td>
+                            <td>Installer symfony/http-client si pas déjà fait: <code>composer require symfony/http-client</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.29.4</td>
+                            <td>Implémenter méthode <code>generateStatisticsReport(Evenement $evenement): string</code> qui retourne rapport texte généré par AI</td>
+                            <td class="estimation">60 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.29.5</td>
+                            <td>Construire prompt détaillé: "Analyze this event: Title: {titre}, Type: {type}, Participants: {nbParticipants}, Accepted: {nbAccepted}, Refused: {nbRefused}, Average Rating: {avgRating}. Generate a comprehensive statistical report with insights, trends, and recommendations."</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.29.6</td>
+                            <td>Appeler API Hugging Face: <code>POST https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2</code> avec headers <code>Authorization: Bearer {apiKey}</code>, body JSON <code>{"inputs": prompt, "parameters": {"max_new_tokens": 500, "temperature": 0.7}}</code></td>
+                            <td class="estimation">45 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.29.7</td>
+                            <td>Parser réponse JSON: <code>$response = $httpClient->request('POST', $url, ['headers' => [...], 'json' => [...]]); $data = $response->toArray(); $generatedText = $data[0]['generated_text'];</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.29.8</td>
+                            <td>Gérer erreurs API: try/catch, retourner message d'erreur si timeout, quota dépassé, ou clé invalide</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.29.9</td>
+                            <td>Ajouter route <code>#[Route('/backoffice/evenement/{id}/ai/generate-report', name: 'backoffice_evenement_ai_report', methods: ['POST'])]</code> dans EvenementController</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.29.10</td>
+                            <td>Implémenter méthode qui appelle AIReportService, retourne JsonResponse avec rapport généré</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.29.11</td>
+                            <td>Ajouter bouton "Generate AI Report" dans <code>templates/backoffice/evenement/index.html.twig</code> avec icône robot 🤖</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.29.12</td>
+                            <td>Implémenter appel AJAX: <code>fetch(url, {method: 'POST'})</code>, afficher loading spinner pendant génération</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.29.13</td>
+                            <td>Afficher rapport dans modal Bootstrap: titre "AI-Generated Report", contenu avec formatage markdown, bouton fermer</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.29.14</td>
+                            <td>Styliser modal avec design professionnel: gradient header, icône AI, texte bien formaté avec sections</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.29.15</td>
+                            <td>Tester génération rapport: événement terminé avec participations et feedbacks → cliquer bouton → vérifier rapport généré pertinent et détaillé</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.30 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.30 - Générer analyse sentiments AI</h2>
+                    <p>En tant qu'Admin, je souhaite générer une analyse sentiments via AI afin de comprendre les retours participants</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.30.1</td>
+                            <td>Créer méthode <code>generateSentimentAnalysis(Evenement $evenement): string</code> dans AIReportService</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.30.2</td>
+                            <td>Extraire tous commentaires feedbacks: parcourir participations, récupérer feedbacks JSON, extraire champ 'comment'</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.30.3</td>
+                            <td>Construire prompt: "Analyze these participant feedbacks: [liste commentaires]. Provide: 1) Overall sentiment (positive/negative/neutral), 2) Recurring themes, 3) Strengths, 4) Weaknesses, 5) Actionable recommendations."</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.30.4</td>
+                            <td>Appeler API Hugging Face avec prompt, parser réponse (même logique que US-5.29)</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.30.5</td>
+                            <td>Ajouter route <code>#[Route('/backoffice/evenement/{id}/ai/analyze-sentiment', name: 'backoffice_evenement_ai_sentiment', methods: ['POST'])]</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.30.6</td>
+                            <td>Ajouter bouton "Analyze Sentiment" dans index.html.twig avec icône 💭</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.30.7</td>
+                            <td>Afficher analyse dans modal avec sections: Sentiment Global (badge coloré), Thèmes Récurrents (liste), Points Forts (liste verte), Points Faibles (liste rouge), Recommandations (liste bleue)</td>
+                            <td class="estimation">50 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.30.8</td>
+                            <td>Styliser avec badges colorés: positif=vert (#2ed573), négatif=rouge (#ff4757), neutre=gris (#95a5a6)</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.30.9</td>
+                            <td>Ajouter graphique pie chart avec Chart.js: distribution sentiments (% positif, négatif, neutre)</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.30.10</td>
+                            <td>Tester avec événement ayant feedbacks variés (5 positifs, 3 neutres, 2 négatifs) → vérifier analyse pertinente, thèmes identifiés</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.31 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.31 - Générer recommandations événements AI</h2>
+                    <p>En tant qu'Admin, je souhaite générer recommandations d'événements via AI afin d'améliorer la planification future</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.31.1</td>
+                            <td>Créer méthode <code>buildRecommendationPrompt(array $evenementsData): string</code> dans AIReportService</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.31.2</td>
+                            <td>Structurer prompt: "Based on past events data [résumé événements avec taux participation, feedbacks], recommend 3 new event ideas. For each: 1) Event type, 2) Target audience, 3) Expected outcomes, 4) Justification based on data."</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.31.3</td>
+                            <td>Inclure données historiques: types événements populaires, taux participation moyens, feedbacks positifs/négatifs</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.31.4</td>
+                            <td>Implémenter méthode <code>generateEventRecommendations(): string</code> qui appelle API avec prompt</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.31.5</td>
+                            <td>Ajouter route <code>#[Route('/backoffice/evenement/ai/generate-recommendations', name: 'backoffice_evenement_ai_recommendations', methods: ['POST'])]</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.31.6</td>
+                            <td>Ajouter bouton "Recommandations AI" dans index.html.twig avec icône 💡</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.31.7</td>
+                            <td>Implémenter appel AJAX et affichage dans modal avec loading state</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.31.8</td>
+                            <td>Styliser avec cartes pour chaque recommandation: titre événement, type, audience cible, justification, icône selon type</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.31.9</td>
+                            <td>Tester génération recommandations: base de 10 événements passés → vérifier 3 recommandations pertinentes avec justifications basées sur données</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.32 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.32 - Générer suggestions d'amélioration AI</h2>
+                    <p>En tant qu'Admin, je souhaite générer suggestions d'amélioration via AI afin d'optimiser les événements futurs</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.32.1</td>
+                            <td>Créer méthode <code>buildImprovementPrompt(Evenement $evenement): string</code> dans AIReportService</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.32.2</td>
+                            <td>Structurer prompt: "Analyze this event [données événement + feedbacks]. Generate an improvement plan with: 1) Issues identified, 2) Suggested improvements, 3) Priority level (HIGH/MEDIUM/LOW), 4) Expected impact."</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.32.3</td>
+                            <td>Inclure dans prompt: taux participation, feedbacks négatifs, problèmes récurrents mentionnés</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.32.4</td>
+                            <td>Implémenter méthode <code>generateImprovementSuggestions(Evenement $evenement): string</code></td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.32.5</td>
+                            <td>Ajouter route <code>#[Route('/backoffice/evenement/{id}/ai/generate-improvements', name: 'backoffice_evenement_ai_improvements', methods: ['POST'])]</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.32.6</td>
+                            <td>Ajouter bouton "Suggestions d'Amélioration AI" dans index.html.twig avec icône 🎯</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.32.7</td>
+                            <td>Implémenter appel AJAX et affichage dans modal</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.32.8</td>
+                            <td>Styliser avec badges de priorité colorés: HAUTE=rouge (#ff4757), MOYENNE=orange (#ffa502), BASSE=bleu (#1e90ff)</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.32.9</td>
+                            <td>Afficher suggestions en liste avec: problème identifié, amélioration suggérée, priorité (badge), impact attendu</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.32.10</td>
+                            <td>Tester génération suggestions: événement avec feedbacks négatifs → vérifier suggestions pertinentes avec priorités appropriées</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.33 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.33 - Le système empêche participations aux événements en cours ou terminés</h2>
+                    <p>Le système empêche toute nouvelle participation aux événements en cours, terminés ou annulés afin de garantir la cohérence</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.33.1</td>
+                            <td>Implémenter méthode <code>areParticipationsOpen(): bool</code> dans Evenement.php</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.33.2</td>
+                            <td>Vérifier <code>$this->workflowStatus === 'planifie'</code> (seuls événements planifiés acceptent participations)</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.33.3</td>
+                            <td>Vérifier <code>!$this->isCanceled</code> (événements annulés n'acceptent pas participations)</td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.33.4</td>
+                            <td>Créer méthode alias <code>canAcceptParticipations(): bool</code> qui appelle areParticipationsOpen()</td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.33.5</td>
+                            <td>Modifier <code>FrontofficeEvenementController->participate()</code>: ajouter vérification au début de la méthode</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.33.6</td>
+                            <td>Vérifier <code>if (!$evenement->canAcceptParticipations())</code> avant affichage formulaire participation</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.33.7</td>
+                            <td>Rediriger avec message d'erreur: <code>$this->addFlash('error', 'Participations are closed for this event'); return $this->redirectToRoute('app_events');</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.33.8</td>
+                            <td>Modifier <code>templates/frontoffice/evenement/index.html.twig</code>: cacher bouton "Participer" si <code>!evenement.canAcceptParticipations()</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.33.9</td>
+                            <td>Afficher messages conditionnels: "Event In Progress" (orange) si en_cours, "Event Completed" (gris) si termine, "Event Cancelled" (rouge) si annule</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.33.10</td>
+                            <td>Styliser messages avec couleurs appropriées et icônes: ⏳ En cours, ✅ Terminé, ❌ Annulé</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.33.11</td>
+                            <td>Tester blocage participations (en_cours): événement avec workflowStatus='en_cours' → vérifier bouton caché, message "In Progress" affiché</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.33.12</td>
+                            <td>Tester blocage participations (termine): événement avec workflowStatus='termine' → vérifier bouton caché, message "Completed" affiché</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.33.13</td>
+                            <td>Tester blocage participations (annule): événement avec isCanceled=true → vérifier bouton caché, message "Cancelled" affiché</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.34 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.34 - Le système log toutes les transitions d'états avec traçabilité</h2>
+                    <p>Le système log automatiquement toutes les transitions d'états des événements pour assurer la traçabilité complète</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.34.1</td>
+                            <td>EvenementWorkflowSubscriber déjà créé dans US-5.20 (emails annulation)</td>
+                            <td class="estimation">5 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.34.2</td>
+                            <td>Modifier <code>getSubscribedEvents()</code> pour ajouter écoute de toutes transitions</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.34.3</td>
+                            <td>Ajouter <code>'workflow.evenement_publishing.transition' => 'onTransition'</code> pour écouter TOUTES les transitions</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.34.4</td>
+                            <td>Implémenter méthode <code>onTransition(Event $event): void</code> pour logger chaque transition</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.34.5</td>
+                            <td>Logger informations: <code>$evenement = $event->getSubject(); $transition = $event->getTransition(); $this->logger->info('Event workflow transition', ['event_id' => $evenement->getId(), 'event_title' => $evenement->getTitre(), 'transition' => $transition->getName(), 'from' => $event->getMarking()->getPlaces(), 'to' => $transition->getTos()]);</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.34.6</td>
+                            <td>Logger timestamp et user si disponible: <code>'timestamp' => (new \DateTime())->format('Y-m-d H:i:s'), 'user' => $this->security->getUser()?->getUserIdentifier()</code></td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.34.7</td>
+                            <td>Écouter événements spécifiques: <code>'workflow.evenement_publishing.entered.en_cours' => 'onEnCours', 'workflow.evenement_publishing.entered.termine' => 'onTermine', 'workflow.evenement_publishing.entered.annule' => 'onAnnule'</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.34.8</td>
+                            <td>Implémenter méthodes spécifiques avec logs détaillés: <code>onEnCours()</code> log "Event started", <code>onTermine()</code> log "Event completed", <code>onAnnule()</code> log "Event cancelled" (déjà fait pour emails)</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.34.9</td>
+                            <td>Logs écrits dans <code>var/log/dev.log</code> avec niveau INFO, contexte complet pour traçabilité</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.34.10</td>
+                            <td>Tester: créer événement → exécuter commande workflow pour transitions → consulter <code>var/log/dev.log</code> → vérifier logs présents avec toutes informations (ID, titre, transition, from, to, timestamp)</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.35 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.35 - Rejoindre une équipe existante (Étudiant)</h2>
+                    <p>En tant qu'Étudiant, je souhaite rejoindre une équipe existante afin de participer sans créer nouvelle équipe</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.35.1</td>
+                            <td>Créer route <code>#[Route('/events/{equipeId}/join/{eventId}', name: 'app_equipe_join', methods: ['POST'])]</code> dans FrontofficeEquipeController</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.35.2</td>
+                            <td>Implémenter méthode <code>joinEquipe(int $equipeId, int $eventId, EntityManagerInterface $entityManager, EquipeRepository $equipeRepository, EvenementRepository $evenementRepository): Response</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.35.3</td>
+                            <td>Vérifier que équipe existe et appartient à l'événement: <code>$equipe = $equipeRepository->find($equipeId); if (!$equipe || $equipe->getEvenement()->getId() !== $eventId) { throw $this->createNotFoundException(); }</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.35.4</td>
+                            <td>Vérifier que équipe a moins de 6 membres: <code>if (count($equipe->getEtudiants()) >= 6) { $this->addFlash('error', 'Team is full'); return $this->redirectToRoute('app_event_participate', ['id' => $eventId]); }</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.35.5</td>
+                            <td>Vérifier que étudiant connecté n'est pas déjà dans l'équipe: <code>$user = $this->getUser(); if ($equipe->getEtudiants()->contains($user)) { $this->addFlash('warning', 'You are already in this team'); return $this->redirectToRoute(...); }</code></td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.35.6</td>
+                            <td>Ajouter étudiant à l'équipe: <code>$equipe->addEtudiant($user); $entityManager->flush(); $this->addFlash('success', 'You joined the team successfully');</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.35.7</td>
+                            <td>Afficher liste des équipes disponibles dans <code>templates/frontoffice/evenement/participate.html.twig</code>: section "Available Teams" avec cartes</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.35.8</td>
+                            <td>Afficher nombre de membres actuels: <code>{{ equipe.etudiants|length }}/6</code> avec barre de progression visuelle</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.35.9</td>
+                            <td>Ajouter bouton "Rejoindre" pour chaque équipe: <code>&lt;form method="POST" action="{{ path('app_equipe_join', {equipeId: equipe.id, eventId: evenement.id}) }}"&gt;&lt;button type="submit"&gt;Join Team&lt;/button&gt;&lt;/form&gt;</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.35.10</td>
+                            <td>Styliser cartes d'équipes avec design moderne: gradient background, icône équipe 👥, nom équipe en gros, liste membres avec avatars, bouton "Join" stylisé</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.35.11</td>
+                            <td>Désactiver bouton "Join" si équipe complète (6 membres) ou si utilisateur déjà membre: <code>{% if equipe.etudiants|length >= 6 or user in equipe.etudiants %} disabled {% endif %}</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.35.12</td>
+                            <td>Tester rejoindre équipe avec places disponibles: équipe de 4 membres → cliquer "Join" → vérifier étudiant ajouté, message succès, équipe a 5 membres</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.35.13</td>
+                            <td>Tester refus si équipe complète: équipe de 6 membres → cliquer "Join" → vérifier message erreur "Team is full", étudiant non ajouté</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.36 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.36 - Voir les équipes participantes (Étudiant)</h2>
+                    <p>En tant qu'Étudiant, je souhaite voir les équipes participantes à un événement afin de connaître les autres participants</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.36.1</td>
+                            <td>Récupérer participations acceptées dans <code>FrontofficeEvenementController->index()</code>: déjà fait dans US-5.7</td>
+                            <td class="estimation">5 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.36.2</td>
+                            <td>Pour chaque participation acceptée, récupérer l'équipe: <code>$equipe = $participation->getEquipe()</code> (déjà fait dans US-5.7)</td>
+                            <td class="estimation">5 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.36.3</td>
+                            <td>Passer les équipes au template dans tableau evenementsData (déjà fait dans US-5.7)</td>
+                            <td class="estimation">5 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.36.4</td>
+                            <td>Créer section "Équipes Participantes" dans <code>templates/frontoffice/evenement/index.html.twig</code> (déjà fait dans US-5.7)</td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.36.5</td>
+                            <td>Afficher mini-cartes pour chaque équipe avec design compact (déjà fait dans US-5.7)</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.36.6</td>
+                            <td>Afficher nom équipe + nombre de membres: <code>{{ equipe.nom }} ({{ equipe.etudiants|length }} members)</code> (déjà fait dans US-5.7)</td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.36.7</td>
+                            <td>Styliser avec gradients et icônes: icône 👥, gradient bleu/violet, border-radius 10px (déjà fait dans US-5.7)</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.36.8</td>
+                            <td>Afficher dans accordéon expand/collapse: cliquer pour voir liste complète des membres avec noms (déjà fait dans US-5.7)</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.36.9</td>
+                            <td>Tester affichage équipes: événement avec 3 équipes participantes → vérifier 3 cartes affichées, noms corrects, nombres membres corrects</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.37 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.37 - Voir détails d'un événement (Admin)</h2>
+                    <p>En tant qu'Admin, je souhaite voir tous les détails d'un événement afin d'avoir une vue complète</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.37.1</td>
+                            <td>Créer route <code>#[Route('/{id}', name: 'backoffice_evenement_show', methods: ['GET'])]</code> dans EvenementController</td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.37.2</td>
+                            <td>Implémenter méthode <code>show(Evenement $evenement, ParticipationRepository $participationRepository): Response</code></td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.37.3</td>
+                            <td>Récupérer toutes participations de l'événement: <code>$participations = $participationRepository->findBy(['evenement' => $evenement])</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.37.4</td>
+                            <td>Calculer statistiques: <code>$nbAcceptees = count(array_filter($participations, fn($p) => $p->getStatut()->value === 'Accepté')); $nbRefusees = count(array_filter($participations, fn($p) => $p->getStatut()->value === 'Refusé')); $nbEnAttente = count(array_filter($participations, fn($p) => $p->getStatut()->value === 'En attente')); $tauxAcceptation = $nbAcceptees / count($participations) * 100;</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.37.5</td>
+                            <td>Récupérer feedbacks si disponibles: parcourir participations, extraire feedbacks JSON, calculer note moyenne</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.37.6</td>
+                            <td>Créer template <code>templates/backoffice/evenement/show.html.twig</code> extends 'backoffice/base.html.twig'</td>
+                            <td class="estimation">50 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.37.7</td>
+                            <td>Section informations générales: carte avec titre, type (badge coloré), dates (début/fin formatées), lieu, description, statut workflow (badge), nbMax, places disponibles</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.37.8</td>
+                            <td>Section participations avec tableau: colonnes (ID, Équipe, Statut, Date soumission), filtres par statut, pagination si > 20 participations</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.37.9</td>
+                            <td>Section équipes avec détails membres: pour chaque équipe acceptée, afficher nom équipe, liste membres (nom, prénom, email), nombre membres</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.37.10</td>
+                            <td>Section statistiques avec graphiques: pie chart distribution statuts (Chart.js), bar chart notes feedbacks, KPIs (taux acceptation, note moyenne, taux participation)</td>
+                            <td class="estimation">45 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.37.11</td>
+                            <td>Boutons d'action en haut: "Modifier" (lien vers edit), "Annuler" (si can_annuler), "Supprimer" (avec confirmation), "Retour à la liste"</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.37.12</td>
+                            <td>Styliser avec design professionnel: sections avec cartes, gradients, icônes, responsive design</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.37.13</td>
+                            <td>Tester affichage détails: événement avec 5 participations (3 acceptées, 1 refusée, 1 en attente), 10 feedbacks → vérifier toutes sections affichées, statistiques correctes</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.38 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.38 - Le système supprime automatiquement participations refusées</h2>
+                    <p>Le système supprime automatiquement les participations refusées pour nettoyer la base de données</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.38.1</td>
+                            <td>Créer <code>src/Command/CleanupRefusedParticipationsCommand.php</code> avec <code>#[AsCommand(name: 'app:cleanup-refused-participations', description: 'Supprime les participations refusées')]</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.38.2</td>
+                            <td>Injecter <code>ParticipationRepository $participationRepository</code>, <code>EntityManagerInterface $entityManager</code>, <code>LoggerInterface $logger</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.38.3</td>
+                            <td>Récupérer toutes participations avec statut REFUSE: <code>$participations = $participationRepository->createQueryBuilder('p')->where('p.statut = :statut')->setParameter('statut', StatutParticipation::REFUSE)->getQuery()->getResult();</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.38.4</td>
+                            <td>Supprimer chaque participation refusée: <code>foreach ($participations as $participation) { $entityManager->remove($participation); } $entityManager->flush();</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.38.5</td>
+                            <td>Logger les suppressions: <code>$this->logger->info('Cleaned up refused participations', ['count' => count($participations), 'ids' => array_map(fn($p) => $p->getId(), $participations)]);</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.38.6</td>
+                            <td>Configurer cron job pour exécution quotidienne: documentation <code>0 2 * * * php /path/to/project/bin/console app:cleanup-refused-participations</code> (2h du matin)</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.38.7</td>
+                            <td>Tester suppression automatique: créer 5 participations refusées â†’ exécuter commande â†’ vérifier participations supprimées de BDD, log présent</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.39 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.39 - Le système génère fichier .ics calendrier</h2>
+                    <p>Le système génère fichier .ics pour permettre import dans calendriers (Google Calendar, Outlook, etc.)</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.39.1</td>
+                            <td>Implémenter méthode <code>generateIcsFile(Evenement $evenement): string</code> dans EmailService (déjÃ  fait dans US-5.19)</td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.39.2</td>
+                            <td>Format iCalendar: <code>$ics = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//AutoLearn//Event Calendar//EN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n";</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.39.3</td>
+                            <td>Ajouter VEVENT: <code>$ics .= "BEGIN:VEVENT\r\n"; $ics .= "DTSTART:" . $evenement->getDateDebut()->format('Ymd\THis\Z') . "\r\n"; $ics .= "DTEND:" . $evenement->getDateFin()->format('Ymd\THis\Z') . "\r\n"; $ics .= "SUMMARY:" . $evenement->getTitre() . "\r\n"; $ics .= "LOCATION:" . $evenement->getLieu() . "\r\n";</code></td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.39.4</td>
+                            <td>Ajouter DESCRIPTION avec détails événement: <code>$ics .= "DESCRIPTION:" . str_replace(["\r\n", "\n"], "\\n", $evenement->getDescription()) . "\r\n";</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.39.5</td>
+                            <td>Ajouter UID unique pour chaque événement: <code>$ics .= "UID:event-" . $evenement->getId() . "@autolearn.com\r\n"; $ics .= "DTSTAMP:" . (new \DateTime())->format('Ymd\THis\Z') . "\r\n";</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.39.6</td>
+                            <td>Fermer VEVENT et VCALENDAR: <code>$ics .= "END:VEVENT\r\n"; $ics .= "END:VCALENDAR\r\n"; return $ics;</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.39.7</td>
+                            <td>Attacher fichier .ics Ã  l'email de confirmation (déjÃ  fait dans US-5.19): <code>$email->attach($icsFile, 'event.ics', 'text/calendar')</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.39.8</td>
+                            <td>Tester génération fichier .ics: créer événement, générer .ics â†’ vérifier format correct, dates en UTC, toutes informations présentes</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.39.9</td>
+                            <td>Tester import dans Google Calendar: télécharger .ics, importer dans Google Calendar â†’ vérifier événement ajouté avec dates, lieu, description corrects</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.39.10</td>
+                            <td>Tester import dans Outlook: importer .ics dans Outlook â†’ vérifier événement ajouté correctement</td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.40 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.40 - Le système valide contraintes de dates</h2>
+                    <p>Le système valide automatiquement que les dates sont cohérentes (date fin >= date début, date début future)</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.40.1</td>
+                            <td>Ajouter <code>Assert\Expression</code> dans Evenement.php (déjÃ  fait dans US-5.1): <code>#[Assert\Expression("this.getDateFin() >= this.getDateDebut()", message: "La date de fin doit être après ou égale Ã  la date de début")]</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.40.2</td>
+                            <td>Expression déjÃ  configurée dans US-5.1 avec message personnalisé</td>
+                            <td class="estimation">5 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.40.3</td>
+                            <td>Message d'erreur personnalisé déjÃ  configuré: "La date de fin doit être après ou égale Ã  la date de début"</td>
+                            <td class="estimation">5 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.40.4</td>
+                            <td>Ajouter <code>Assert\GreaterThan("today")</code> pour dateDebut (déjÃ  fait dans US-5.1): <code>#[Assert\GreaterThan("today", message: "La date de début doit être dans le futur")]</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.40.5</td>
+                            <td>Tester validation avec date fin < date début: créer événement avec dateDebut=2026-03-01, dateFin=2026-02-28 â†’ vérifier erreur "date de fin doit être après date de début"</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.40.6</td>
+                            <td>Tester validation avec date début dans le passé: créer événement avec dateDebut=2025-01-01 â†’ vérifier erreur "date de début doit être dans le futur"</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.40.7</td>
+                            <td>Tester validation avec dates valides: dateDebut=2026-04-01, dateFin=2026-04-03 â†’ vérifier événement créé sans erreur</td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        
+        <div class="footer">
+            <p><strong>Date de Création:</strong> 23 Février 2026 | <strong>Version:</strong> 3.0 Professionnelle Complète | <strong>Statut:</strong> âœ… Basé sur Code Réel</p>
+            <p>Module Gestion des Événements - Plateforme AutoLearn - Symfony 6.4 / PHP 8.2</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Ce document contient les User Stories US-5.16 Ã  US-5.40 (25 User Stories complètes)</p>
+            <p style="font-size: 0.9em;">Voir SPRINT_BACKLOG_COMPLET_PARTIE1.html (US-5.1 Ã  US-5.5) et PARTIE2.html (US-5.6 Ã  US-5.15) pour les US précédentes</p>
+            <p style="margin-top: 10px; font-size: 0.85em; color: #666;">ðŸ“Š Estimation totale Partie 3: ~95 heures | ðŸŽ¯ Complexité: Élevée | âš¡ Technologies: SendGrid, Hugging Face AI, OpenWeatherMap, FullCalendar, dompdf, endroid/qr-code</p>
+        </div>
+    </div>
+</body>
+</html>

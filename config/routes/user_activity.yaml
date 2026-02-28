@@ -1,0 +1,3 @@
+user_activity_bundle:
+    resource: ../../src/Bundle/UserActivityBundle/Controller/
+    type: attribute

@@ -1,0 +1,600 @@
+{% extends 'backoffice/base.html.twig' %}
+
+{% block title %}Audit Trail - Student Management{% endblock %}
+{% block page_title %}📋 Audit Trail - Student Management{% endblock %}
+
+{% block body %}
+<div class="audit-container">
+    <!-- Header with Stats -->
+    <div class="audit-header">
+        <div class="header-content">
+            <h2>👨‍💼 Admin Actions Audit Trail</h2>
+            <p>Complete history of all admin actions: students, courses, chapters, challenges, events, communities, and more</p>
+            <p class="text-muted" style="font-size: 13px; margin-top: 8px;">
+                ℹ️ This shows ALL admin actions. For student activities (login, courses, quizzes), see 
+                <a href="{{ path('admin_user_activity_index') }}" style="color: #60a5fa;">User Activity Dashboard</a>
+            </p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ path('backoffice_audit_stats') }}" class="btn btn-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                View Statistics
+            </a>
+        </div>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="info-cards">
+        <div class="info-card">
+            <div class="info-icon" style="background: linear-gradient(135deg, #3b82f6, #60a5fa);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+            </div>
+            <div class="info-content">
+                <h3>{{ studentRevisions|length }}</h3>
+                <p>Student Actions</p>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-icon" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                </svg>
+            </div>
+            <div class="info-content">
+                <h3>{{ contentRevisions|length }}</h3>
+                <p>Content Actions</p>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-icon" style="background: linear-gradient(135deg, #0ea5e9, #38bdf8);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+            </div>
+            <div class="info-content">
+                <h3>Real-time</h3>
+                <p>Live Monitoring</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 1: Admin Actions on Students -->
+    <div class="glass-card">
+        <div class="card-header">
+            <h3>👨‍🎓 Admin Actions on Students</h3>
+            <span class="badge">{{ studentRevisions|length }} actions</span>
+        </div>
+
+        {% if studentRevisions is empty %}
+            <div class="empty-state">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                </svg>
+                <h3>No Student Actions Yet</h3>
+                <p>Create, update, or suspend a student to see audit data here.</p>
+                <a href="{{ path('backoffice_users') }}" class="btn btn-primary" style="margin-top: 20px;">
+                    Go to User Management
+                </a>
+            </div>
+        {% else %}
+            <!-- Search and Filter Bar for Students -->
+            <div style="padding: 20px; border-bottom: 1px solid var(--glass-border);">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <input type="text" id="searchStudentInput" placeholder="🔍 Search by student name..." 
+                           style="flex: 1; min-width: 200px; padding: 10px 15px; border: 2px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px;">
+                    <select id="studentActionFilter" style="padding: 10px 15px; border: 2px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px; min-width: 150px;">
+                        <option value="" style="background: #1f2937; color: white;">All Actions</option>
+                        <option value="CREATE" style="background: #1f2937; color: white;">➕ Created</option>
+                        <option value="UPDATE" style="background: #1f2937; color: white;">✏️ Updated</option>
+                        <option value="SUSPEND" style="background: #1f2937; color: white;">🚫 Suspended</option>
+                        <option value="REACTIVATE" style="background: #1f2937; color: white;">✅ Reactivated</option>
+                        <option value="DELETE" style="background: #1f2937; color: white;">🗑️ Deleted</option>
+                    </select>
+                    <button onclick="clearStudentFilters()" style="padding: 10px 20px; border: none; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px;">
+                        Clear Filters
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table class="data-table" id="studentAuditTable">
+                    <thead>
+                        <tr>
+                            <th>Revision ID</th>
+                            <th>Timestamp</th>
+                            <th>Student Affected</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for revision in studentRevisions %}
+                            {% set actionType = revision.action_type %}
+                            {% set actionLabel = '' %}
+                            {% set actionColor = '' %}
+                            {% set actionIcon = '' %}
+                            
+                            {% if actionType == 'CREATE' %}
+                                {% set actionLabel = 'Created' %}
+                                {% set actionColor = 'linear-gradient(135deg, #22c55e, #16a34a)' %}
+                                {% set actionIcon = '➕' %}
+                            {% elseif actionType == 'SUSPEND' %}
+                                {% set actionLabel = 'Suspended' %}
+                                {% set actionColor = 'linear-gradient(135deg, #ef4444, #dc2626)' %}
+                                {% set actionIcon = '🚫' %}
+                            {% elseif actionType == 'REACTIVATE' %}
+                                {% set actionLabel = 'Reactivated' %}
+                                {% set actionColor = 'linear-gradient(135deg, #10b981, #059669)' %}
+                                {% set actionIcon = '✅' %}
+                            {% elseif actionType == 'DELETE' %}
+                                {% set actionLabel = 'Deleted' %}
+                                {% set actionColor = 'linear-gradient(135deg, #ef4444, #dc2626)' %}
+                                {% set actionIcon = '🗑️' %}
+                            {% else %}
+                                {% set actionLabel = 'Updated' %}
+                                {% set actionColor = 'linear-gradient(135deg, #3b82f6, #2563eb)' %}
+                                {% set actionIcon = '✏️' %}
+                            {% endif %}
+                            
+                            <tr data-entity="{{ revision.nom|lower }}" 
+                                data-action="{{ actionType }}">
+                                <td>
+                                    <span class="badge badge-primary">#{{ revision.id }}</span>
+                                </td>
+                                <td>
+                                    <div class="timestamp">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <polyline points="12 6 12 12 16 14"/>
+                                        </svg>
+                                        {{ revision.timestamp|date('Y-m-d H:i:s') }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="user-badge" style="background: linear-gradient(135deg, #60a5fa, #3b82f6);">
+                                        👨‍🎓 {{ revision.prenom }} {{ revision.nom }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge" style="background: {{ actionColor }}; padding: 8px 16px; border-radius: 8px; color: white;">
+                                        {{ actionIcon }} {{ actionLabel }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ path('backoffice_audit_revision_details', {revisionId: revision.id}) }}" class="btn-icon" title="View Details">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                            <circle cx="12" cy="12" r="3"/>
+                                        </svg>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- SECTION 2: Admin Actions on Content -->
+    <div class="glass-card" style="margin-top: 30px;">
+        <div class="card-header">
+            <h3>📚 Admin Actions on Content</h3>
+            <span class="badge">{{ contentRevisions|length }} actions</span>
+        </div>
+
+        {% if contentRevisions is empty %}
+            <div class="empty-state">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                </svg>
+                <h3>No Content Actions Yet</h3>
+                <p>Create, update, or delete courses, challenges, events, or communities to see audit data here.</p>
+            </div>
+        {% else %}
+            <!-- Search and Filter Bar for Content -->
+            <div style="padding: 20px; border-bottom: 1px solid var(--glass-border);">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <input type="text" id="searchContentInput" placeholder="🔍 Search by content name..." 
+                           style="flex: 1; min-width: 200px; padding: 10px 15px; border: 2px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px;">
+                    <select id="contentEntityFilter" style="padding: 10px 15px; border: 2px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px; min-width: 180px;">
+                        <option value="" style="background: #1f2937; color: white;">All Types</option>
+                        <option value="cours" style="background: #1f2937; color: white;">📚 Courses</option>
+                        <option value="chapitre" style="background: #1f2937; color: white;">📖 Chapters</option>
+                        <option value="challenge" style="background: #1f2937; color: white;">💪 Challenges</option>
+                        <option value="evenement" style="background: #1f2937; color: white;">📅 Events</option>
+                        <option value="communaute" style="background: #1f2937; color: white;">👥 Communities</option>
+                    </select>
+                    <select id="contentActionFilter" style="padding: 10px 15px; border: 2px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px; min-width: 150px;">
+                        <option value="" style="background: #1f2937; color: white;">All Actions</option>
+                        <option value="INS" style="background: #1f2937; color: white;">➕ Created</option>
+                        <option value="UPD" style="background: #1f2937; color: white;">✏️ Updated</option>
+                        <option value="DEL" style="background: #1f2937; color: white;">🗑️ Deleted</option>
+                    </select>
+                    <button onclick="clearContentFilters()" style="padding: 10px 20px; border: none; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px;">
+                        Clear Filters
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table class="data-table" id="contentAuditTable">
+                    <thead>
+                        <tr>
+                            <th>Revision ID</th>
+                            <th>Timestamp</th>
+                            <th>Content Affected</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for revision in contentRevisions %}
+                            <tr data-entity="{{ revision.nom|lower }}" 
+                                data-action="{{ revision.revtype }}"
+                                data-type="{{ revision.entity_type }}">
+                                <td>
+                                    <span class="badge badge-primary">#{{ revision.id }}</span>
+                                </td>
+                                <td>
+                                    <div class="timestamp">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <polyline points="12 6 12 12 16 14"/>
+                                        </svg>
+                                        {{ revision.timestamp|date('Y-m-d H:i:s') }}
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if revision.entity_type == 'cours' %}
+                                        <span class="user-badge" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
+                                            📚 {{ revision.nom }}
+                                        </span>
+                                    {% elseif revision.entity_type == 'chapitre' %}
+                                        <span class="user-badge" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+                                            📖 {{ revision.nom }}
+                                        </span>
+                                    {% elseif revision.entity_type == 'challenge' %}
+                                        <span class="user-badge" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                                            💪 {{ revision.nom }}
+                                        </span>
+                                    {% elseif revision.entity_type == 'evenement' %}
+                                        <span class="user-badge" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                                            📅 {{ revision.nom }}
+                                        </span>
+                                    {% elseif revision.entity_type == 'communaute' %}
+                                        <span class="user-badge" style="background: linear-gradient(135deg, #ec4899, #db2777);">
+                                            👥 {{ revision.nom }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if revision.revtype == 'INS' %}
+                                        <span class="badge" style="background: linear-gradient(135deg, #22c55e, #16a34a); padding: 8px 16px; border-radius: 8px; color: white;">
+                                            ➕ Created
+                                        </span>
+                                    {% elseif revision.revtype == 'UPD' %}
+                                        <span class="badge" style="background: linear-gradient(135deg, #3b82f6, #2563eb); padding: 8px 16px; border-radius: 8px; color: white;">
+                                            ✏️ Updated
+                                        </span>
+                                    {% elseif revision.revtype == 'DEL' %}
+                                        <span class="badge" style="background: linear-gradient(135deg, #ef4444, #dc2626); padding: 8px 16px; border-radius: 8px; color: white;">
+                                            🗑️ Deleted
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ path('backoffice_audit_revision_details', {revisionId: revision.id}) }}" class="btn-icon" title="View Details">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                            <circle cx="12" cy="12" r="3"/>
+                                        </svg>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="glass-card" style="margin-top: 30px;">
+        <div class="card-header">
+            <h3>ℹ️ How the Audit Bundle Works</h3>
+        </div>
+        <div class="info-section">
+            <div class="info-item">
+                <div class="info-number">1</div>
+                <div>
+                    <h4>Automatic Tracking</h4>
+                    <p>The bundle automatically tracks INSERT, UPDATE, and DELETE operations on all major entities: students, courses, chapters, challenges, events, communities, and more.</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-number">2</div>
+                <div>
+                    <h4>Complete History</h4>
+                    <p>Every change is stored with the complete entity state, timestamp, and user who made the change.</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-number">3</div>
+                <div>
+                    <h4>Time Travel</h4>
+                    <p>You can view the exact state of any entity at any point in time by looking at revision history.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.audit-container {
+    padding: 20px;
+}
+
+.audit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 30px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--glass-border);
+}
+
+.header-content h2 {
+    font-size: 28px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--emerald-light), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header-content p {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.info-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.info-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--glass-border);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all var(--transition-normal);
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px var(--glass-shadow);
+}
+
+.info-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.info-content h3 {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+.info-content p {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state svg {
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: var(--text-secondary);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.timestamp {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+}
+
+.user-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.info-section {
+    padding: 20px;
+}
+
+.info-item {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+}
+
+.info-number {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--emerald), var(--gold));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.info-item h4 {
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.info-item p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--glass-bg);
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    transition: all var(--transition-fast);
+}
+
+.btn-icon:hover {
+    background: var(--emerald);
+    border-color: var(--emerald);
+    transform: scale(1.1);
+}
+</style>
+
+<script>
+// Filter functionality for STUDENT table
+const searchStudentInput = document.getElementById('searchStudentInput');
+const studentActionFilter = document.getElementById('studentActionFilter');
+const studentTable = document.getElementById('studentAuditTable');
+
+if (searchStudentInput && studentActionFilter && studentTable) {
+    const studentRows = studentTable.querySelectorAll('tbody tr');
+    
+    function filterStudentTable() {
+        const searchTerm = searchStudentInput.value.toLowerCase();
+        const actionValue = studentActionFilter.value;
+        
+        studentRows.forEach(row => {
+            const entity = row.dataset.entity || '';
+            const action = row.dataset.action || '';
+            
+            const matchesSearch = !searchTerm || entity.includes(searchTerm);
+            const matchesAction = !actionValue || action === actionValue;
+            
+            if (matchesSearch && matchesAction) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    function clearStudentFilters() {
+        searchStudentInput.value = '';
+        studentActionFilter.value = '';
+        filterStudentTable();
+    }
+    
+    searchStudentInput.addEventListener('input', filterStudentTable);
+    studentActionFilter.addEventListener('change', filterStudentTable);
+    
+    window.clearStudentFilters = clearStudentFilters;
+}
+
+// Filter functionality for CONTENT table
+const searchContentInput = document.getElementById('searchContentInput');
+const contentEntityFilter = document.getElementById('contentEntityFilter');
+const contentActionFilter = document.getElementById('contentActionFilter');
+const contentTable = document.getElementById('contentAuditTable');
+
+if (searchContentInput && contentEntityFilter && contentActionFilter && contentTable) {
+    const contentRows = contentTable.querySelectorAll('tbody tr');
+    
+    function filterContentTable() {
+        const searchTerm = searchContentInput.value.toLowerCase();
+        const entityValue = contentEntityFilter.value;
+        const actionValue = contentActionFilter.value;
+        
+        contentRows.forEach(row => {
+            const entity = row.dataset.entity || '';
+            const type = row.dataset.type || '';
+            const action = row.dataset.action || '';
+            
+            const matchesSearch = !searchTerm || entity.includes(searchTerm);
+            const matchesEntity = !entityValue || type === entityValue;
+            const matchesAction = !actionValue || action === actionValue;
+            
+            if (matchesSearch && matchesEntity && matchesAction) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    function clearContentFilters() {
+        searchContentInput.value = '';
+        contentEntityFilter.value = '';
+        contentActionFilter.value = '';
+        filterContentTable();
+    }
+    
+    searchContentInput.addEventListener('input', filterContentTable);
+    contentEntityFilter.addEventListener('change', filterContentTable);
+    contentActionFilter.addEventListener('change', filterContentTable);
+    
+    window.clearContentFilters = clearContentFilters;
+}
+</script>
+{% endblock %}

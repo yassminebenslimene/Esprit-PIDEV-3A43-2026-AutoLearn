@@ -20,6 +20,10 @@
     <div class="orb orb-3"></div>
 
     <div class="dashboard">
+<<<<<<< HEAD
+        {# Include Sidebar Component #}
+        {% include 'backoffice/_sidebar.html.twig' %}
+=======
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
@@ -128,31 +132,12 @@
                 </div>
             </div>
         </aside>
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Top Navbar -->
-            <nav class="navbar">
-                <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
-                <div class="navbar-right">
-                    <div class="search-box">
-                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"/>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                        </svg>
-                        <input type="text" class="search-input" placeholder="Rechercher...">
-                    </div>
-                    <button class="nav-btn" id="theme-toggle" title="Toggle Light/Dark Mode">
-                        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="4"/>
-                            <path d="M12 2v2"/><path d="M12 20v2"/>
-                            <path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/>
-                            <path d="M2 12h2"/><path d="M20 12h2"/>
-                            <path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/>
-                        </svg>
-                    </button>
-                </div>
-            </nav>
+            {# Include Navbar Component #}
+            {% include 'backoffice/_navbar.html.twig' %}
 
             <!-- Page Content -->
             <div class="page-content">
@@ -162,5 +147,8 @@
     </div>
 
     <script src="{{ asset('backoffice/js/templatemo-glass-admin-script.js') }}"></script>
+
+    {# AI Chat Widget - Assistant Intelligent #}
+    {% include 'ai_assistant/chat_widget.html.twig' %}
 </body>
 </html>

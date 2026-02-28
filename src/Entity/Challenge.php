@@ -35,15 +35,25 @@ class Challenge
     #[Assert\Choice(choices: ["Débutant", "Intermédiaire", "Avancé"], message: "Le niveau doit être l'un des suivants : Débutant, Intermédiaire, Avancé.")]
     private ?string $niveau = null;
     
+<<<<<<< HEAD
+    #[ORM\ManyToOne(inversedBy: 'challenges')]
+    #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: false, onDelete: "CASCADE")]
+    private ?User $created_by = null;
+=======
     #[ORM\ManyToOne(inversedBy: 'Challenges')]
     #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: false)]
     private ?User $createdby = null;
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 
     /**
      * @var Collection<int, Exercice>
      */
+<<<<<<< HEAD
+    #[ORM\OneToMany(targetEntity: Exercice::class, mappedBy: 'challenge', cascade: ['persist', 'remove'], orphanRemoval: true)]
+=======
     #[ORM\OneToMany(targetEntity: Exercice::class, mappedBy: 'challenge',    cascade: ['persist', 'remove'],
     orphanRemoval: true)]
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     private Collection $exercices;
 
     /**
@@ -51,6 +61,8 @@ class Challenge
      */
     #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'challenge')]
     private Collection $quizzes;
+<<<<<<< HEAD
+=======
 
     /**
      * @var Collection<int, UserChallenge>
@@ -63,13 +75,17 @@ class Challenge
      */
     #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'challenge', cascade: ["persist", "remove"])]
     private Collection $votes;
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 
     public function __construct()
     {
         $this->exercices = new ArrayCollection();
         $this->quizzes = new ArrayCollection();
+<<<<<<< HEAD
+=======
         $this->userChallenges = new ArrayCollection();
         $this->votes = new ArrayCollection();
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     }
     public function getId(): ?int
     {
@@ -135,6 +151,16 @@ class Challenge
 
         return $this;
     }
+<<<<<<< HEAD
+    public function getCreatedBy(): ?User
+    {
+        return $this->created_by;
+    }
+
+    public function setCreatedBy(?User $created_by): static
+    {
+        $this->created_by = $created_by;
+=======
     public function getCreatedby(): ?User
     {
         return $this->createdby;
@@ -143,6 +169,7 @@ class Challenge
     public function setCreatedby(?User $createdby): static
     {
         $this->createdby = $createdby;
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 
         return $this;
     }
@@ -191,6 +218,21 @@ class Challenge
             $this->quizzes->add($quiz);
             $quiz->setChallenge($this);
         }
+<<<<<<< HEAD
+
+        return $this;
+    }
+
+    public function removeQuiz(Quiz $quiz): static
+    {
+        if ($this->quizzes->removeElement($quiz)) {
+            // set the owning side to null (unless already changed)
+            if ($quiz->getChallenge() === $this) {
+                $quiz->setChallenge(null);
+            }
+        }
+=======
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 
         return $this;
     }

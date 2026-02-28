@@ -10,6 +10,11 @@
     {% block stylesheets %}
         <!-- Bootstrap -->
         <link rel="stylesheet" href="{{ asset('frontoffice/vendor/bootstrap/css/bootstrap.min.css') }}">
+<<<<<<< HEAD
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/templatemo-scholar.css') }}">
+        
+=======
         
         <!-- Font Awesome (obligatoire pour le bundle) -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -26,6 +31,7 @@
         <!-- Swiper -->
         <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
         
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
         <style>
             .completion-page {
                 margin-top: 120px;
@@ -160,6 +166,8 @@
                 color: #7fb77e;
             }
             
+<<<<<<< HEAD
+=======
             /* Styles pour la section rating */
             .rating-section {
                 margin-top: 30px;
@@ -266,6 +274,7 @@
                 border: 1px solid #f3b562;
             }
             
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
             .action-buttons {
                 display: flex;
                 gap: 20px;
@@ -307,6 +316,8 @@
                 transform: translateX(5px);
             }
             
+<<<<<<< HEAD
+=======
             /* Message si déjà noté */
             .already-rated {
                 background: #f9f9f9;
@@ -323,6 +334,7 @@
                 margin-right: 8px;
             }
             
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
             @media (max-width: 768px) {
                 .completion-card {
                     padding: 40px 20px;
@@ -336,10 +348,13 @@
                     padding: 12px 40px;
                     font-size: 16px;
                 }
+<<<<<<< HEAD
+=======
                 
                 .rating-stars .rating-star {
                     font-size: 30px;
                 }
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
             }
         </style>
     {% endblock %}
@@ -414,6 +429,8 @@
                 <div class="score-percentage">{{ percentage }}% de réussite</div>
                 <div class="score-message {{ colorClass }}">{{ message }}</div>
             </div>
+<<<<<<< HEAD
+=======
 
             <!-- Section Rating 5 étoiles avec le bundle -->
             <div class="rating-section">
@@ -475,6 +492,7 @@
                     <div id="ratingMessage" class="rating-message"></div>
                 {% endif %}
             </div>
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
             
             <div class="action-buttons">
                 <a href="{{ path('app_frontoffice') }}#challenge" class="btn-action btn-primary">
@@ -497,6 +515,8 @@
     <script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('frontoffice/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('frontoffice/js/custom.js') }}"></script>
+<<<<<<< HEAD
+=======
     
     <!-- JS du bundle StarRating -->
     <script src="{{ asset('bundles/starrating/js/rating.js') }}"></script>
@@ -642,6 +662,7 @@
             });
         }
     </script>
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 {% endblock %}
 
 </body>

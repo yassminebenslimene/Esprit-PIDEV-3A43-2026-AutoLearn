@@ -7,44 +7,281 @@
 
 
 <style>
+/* Container */
 .edit-container {
-    max-width: 700px;
-    margin: 80px auto;
+    max-width: 750px;
+    margin: 140px auto 80px;
+    padding: 0 20px;
 }
 
-.edit-card {
-    background: white;
-    border-radius: 16px;
-    padding: 30px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+/* Page heading avec gradient */
+.page-heading {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 30px 35px;
+    border-radius: 14px;
+    color: white;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.25);
 }
 
-.edit-card h4 {
-    margin-bottom: 20px;
-}
-
-/* boutons */
-.btn-primary {
-    background: linear-gradient(135deg, #7a6ad8, #6c63ff);
-    border: none;
-    border-radius: 999px;
-    padding: 8px 22px;
+.page-heading h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 6px;
     color: white;
 }
 
+.breadcrumb {
+    font-size: 0.85rem;
+    opacity: 0.95;
+}
+
+.breadcrumb a {
+    color: white;
+    text-decoration: none;
+    transition: opacity 0.3s;
+}
+
+.breadcrumb a:hover {
+    opacity: 0.8;
+}
+
+/* Carte principale */
+.edit-card {
+    background: white;
+    border-radius: 14px;
+    padding: 32px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.edit-card h4 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 25px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+/* Formulaire */
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label,
+.community-form label {
+    display: block;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    letter-spacing: 0.2px;
+}
+
+.form-control,
+.community-form input[type="text"],
+.community-form input[type="email"],
+.community-form textarea,
+input[type="text"],
+input[type="email"],
+textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    background: #f9fafb;
+    color: #1f2937;
+    box-sizing: border-box;
+}
+
+.form-control::placeholder,
+.community-form input::placeholder,
+.community-form textarea::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: #9ca3af;
+}
+
+.form-control:hover,
+.community-form input:hover,
+.community-form textarea:hover,
+input:hover,
+textarea:hover {
+    border-color: #cbd5e1;
+    background: #ffffff;
+}
+
+.form-control:focus,
+.community-form input:focus,
+.community-form textarea:focus,
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+    transform: translateY(-1px);
+}
+
+textarea.form-control,
+.community-form textarea,
+textarea {
+    resize: vertical;
+    min-height: 110px;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* Style spécifique pour le champ nom */
+input.form-control[type="text"],
+.community-form input[type="text"],
+input[type="text"] {
+    font-weight: 500;
+}
+
+/* Actions du formulaire */
+.form-actions {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 2px solid #f0f0f0;
+}
+
+/* Boutons */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 11px 28px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35);
+    letter-spacing: 0.3px;
+}
+
 .btn-primary:hover {
-    opacity: 0.9;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.45);
+}
+
+.btn-primary:active {
+    transform: translateY(-1px);
+}
+
+.btn-primary svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+}
+
+/* Zone dangereuse */
+.danger-zone {
+    margin-top: 40px;
+    padding: 25px;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+    border: 2px solid #fecaca;
+    border-radius: 12px;
+}
+
+.danger-zone-header {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.danger-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.danger-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #dc2626;
+    margin: 0 0 8px 0;
+}
+
+.danger-description {
+    font-size: 0.9rem;
+    color: #991b1b;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.danger-zone form {
+    margin: 0;
 }
 
 .btn-link {
     display: inline-block;
-    margin-top: 15px;
+    margin-top: 20px;
     text-decoration: none;
-    color: #6c63ff;
+    color: #667eea;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color 0.3s;
 }
 
+.btn-link:hover {
+    color: #764ba2;
+}
+
+/* Séparateur */
+.edit-card hr {
+    margin: 35px 0;
+    border: none;
+    border-top: 2px solid #f0f0f0;
+}
+
+/* Bouton supprimer */
 .btn-danger {
-    margin-top: 25px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #dc2626;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.25);
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.35);
+}
+
+.btn-danger svg {
+    flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .edit-card {
+        padding: 25px;
+    }
+    
+    .page-heading {
+        padding: 30px 25px;
+    }
+    
+    .page-heading h3 {
+        font-size: 1.5rem;
+    }
 }
 </style>
 
@@ -76,6 +313,13 @@
             'button_label': 'Enregistrer les modifications'
         }) }}
 
+<<<<<<< HEAD
+        <a href="{{ path('app_communaute_show', { id: communaute.id }) }}" class="btn-link">
+            ← Retour à la communauté
+        </a>
+
+        {{ include('frontoffice/communaute/_delete_form.html.twig') }}
+=======
         <a href="{{ path('app_communaute_show', { id: communaute.id }) }}"
            class="btn-link">
             ← Retour à la communauté
@@ -84,6 +328,7 @@
         <hr>
 
         {{ include('communaute/_delete_form.html.twig') }}
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 
     </div>
 

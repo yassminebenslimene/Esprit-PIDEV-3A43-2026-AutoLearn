@@ -14,8 +14,7 @@ class ResetPasswordRequestRepository extends ServiceEntityRepository implements 
 
     public function __construct(ManagerRegistry $registry)
     {
-        // Note: You'll need to create a ResetPasswordRequest entity
-        // For now, we'll use a dummy class to avoid errors
+       
         parent::__construct($registry, \stdClass::class);
     }
 
@@ -25,7 +24,6 @@ class ResetPasswordRequestRepository extends ServiceEntityRepository implements 
         string $selector,
         string $hashedToken
     ): ResetPasswordRequestInterface {
-        // Placeholder implementation
         return new class implements ResetPasswordRequestInterface {
             public function getRequestedAt(): \DateTimeInterface { return new \DateTime(); }
             public function isExpired(): bool { return false; }

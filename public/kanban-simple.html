@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau Kanban Simple - AutoLearn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #172b4d;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .header-info {
+            color: #5e6c84;
+            font-size: 14px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+
+        .legend-badge {
+            width: 40px;
+            height: 20px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .kanban-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .kanban-board {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .kanban-column {
+            background: #ebecf0;
+            border-radius: 8px;
+            padding: 10px;
+            min-height: 400px;
+        }
+
+        .column-header {
+            padding: 10px;
+            font-weight: 600;
+            color: #172b4d;
+            font-size: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .column-count {
+            background: #fff;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #5e6c84;
+        }
+
+        .card {
+            background: white;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #172b4d;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .card-description {
+            font-size: 13px;
+            color: #5e6c84;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .card-labels {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .label {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .label-bundle { background: #0079bf; }
+        .label-ia { background: #f2d600; color: #172b4d; }
+        .label-urgent { background: #ff9f1a; }
+        .label-done { background: #00875a; }
+
+        .stats {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stats h2 {
+            color: #172b4d;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f4f5f7;
+            border-radius: 6px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #172b4d;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #5e6c84;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📋 Tableau Kanban - AutoLearn Sprint 1</h1>
+        <div class="header-info">
+            <strong>Module:</strong> Gestion de Cours + Intelligence Artificielle | <strong>Sprint:</strong> 1
+        </div>
+        <div class="legend">
+            <div class="legend-item">
+                <span class="legend-badge label-bundle"></span>
+                <span>Bundle Gestion Cours</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-badge label-ia"></span>
+                <span>Intelligence Artificielle</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-badge label-urgent"></span>
+                <span>Priorité Haute</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="kanban-board">
+        <!-- TO DO Column -->
+        <div class="kanban-column">
+            <div class="column-header">
+                📌 À FAIRE
+                <span class="column-count">4</span>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🤖 Recommandation de Cours</div>
+                <div class="card-description">
+                    Suggérer des cours personnalisés selon le profil étudiant
+                </div>
+                <div class="card-labels">
+                    <span class="label label-ia">IA</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">� Chatbot Assistant</div>
+                <div class="card-description">
+                    Assistant virtuel pour répondre aux questions sur les cours
+                </div>
+                <div class="card-labels">
+                    <span class="label label-ia">IA</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">� Résumé Automatique</div>
+                <div class="card-description">
+                    Générer des résumés intelligents des chapitres
+                </div>
+                <div class="card-labels">
+                    <span class="label label-ia">IA</span>
+                    <span class="label label-urgent">Priorité</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">💡 Explication Simplifiée</div>
+                <div class="card-description">
+                    Reformuler le contenu complexe en langage simple avec exemples
+                </div>
+                <div class="card-labels">
+                    <span class="label label-ia">IA</span>
+                    <span class="label label-urgent">Priorité</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- IN PROGRESS Column -->
+        <div class="kanban-column">
+            <div class="column-header">
+                🔄 EN COURS
+                <span class="column-count">2</span>
+            </div>
+
+            <div class="card">
+                <div class="card-title">� Intégration Twilio SMS</div>
+                <div class="card-description">
+                    Configuration et tests des rappels SMS via Twilio
+                </div>
+                <div class="card-labels">
+                    <span class="label label-bundle">Bundle</span>
+                    <span class="label label-urgent">Priorité</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🌍 Traduction Multilingue</div>
+                <div class="card-description">
+                    Traduire les chapitres en plusieurs langues (FR, EN, ES, DE, AR)
+                </div>
+                <div class="card-labels">
+                    <span class="label label-ia">IA</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- TO VERIFY Column -->
+        <div class="kanban-column">
+            <div class="column-header">
+                ✅ À VÉRIFIER
+                <span class="column-count">2</span>
+            </div>
+
+            <div class="card">
+                <div class="card-title">� Design & Interface</div>
+                <div class="card-description">
+                    Valider le design et l'ergonomie de toutes les interfaces
+                </div>
+                <div class="card-labels">
+                    <span class="label label-bundle">Bundle</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">� Système de Notifications</div>
+                <div class="card-description">
+                    Tests complets du système de notifications avec badge
+                </div>
+                <div class="card-labels">
+                    <span class="label label-bundle">Bundle</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- DONE Column -->
+        <div class="kanban-column">
+            <div class="column-header">
+                ✅ TERMINÉ
+                <span class="column-count">10</span>
+            </div>
+
+            <div class="card">
+                <div class="card-title">✓ CRUD Cours Complet</div>
+                <div class="card-description">
+                    Créer, modifier, supprimer et consulter les cours
+                </div>
+                <div class="card-labels">
+                    <span class="label label-bundle">Bundle</span>
+                    <span class="label label-done">Terminé</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">✓ CRUD Chapitres</div>
+                <div class="card-description">
+                    Gestion complète des chapitres avec ordre et organisation
+                </div>
+                <div class="card-labels">
+                    <span class="label label-bundle">Bundle</span>
+                    <span class="label label-done">Terminé</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">✓ Génération PDF</div>
+                <div class="card-description">
+                    Export des chapitres en PDF avec design personnalisé
+                </div>
+                <div class="card-labels">
+                    <span class="label label-bundle">Bundle</span>
+                    <span class="label label-done">Terminé</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">✓ Système de Progression</div>
+                <div class="card-description">
+                    Suivi de l'avancement de l'étudiant dans chaque cours
+                </div>
+                <div class="card-labels">
+                    <span class="label label-bundle">Bundle</span>
+                    <span class="label label-done">Terminé</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">✓ Recherche Globale</div>
+                <div class="card-description">
+                    Recherche dans cours, chapitres et contenus
+                </div>
+                <div class="card-labels">
+                    <span class="label label-bundle">Bundle</span>
+                    <span class="label label-done">Terminé</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">✓ Rappel d'Inactivité</div>
+                <div class="card-description">
+                    Système automatique de rappel pour utilisateurs inactifs
+                </div>
+                <div class="card-labels">
+                    <span class="label label-bundle">Bundle</span>
+                    <span class="label label-done">Terminé</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">✓ Interface Backoffice</div>
+                <div class="card-description">
+                    Interface d'administration complète et fonctionnelle
+                </div>
+                <div class="card-labels">
+                    <span class="label label-bundle">Bundle</span>
+                    <span class="label label-done">Terminé</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">✓ Interface Frontoffice</div>
+                <div class="card-description">
+                    Interface utilisateur avec animations et interactions
+                </div>
+                <div class="card-labels">
+                    <span class="label label-bundle">Bundle</span>
+                    <span class="label label-done">Terminé</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">✓ API Traduction</div>
+                <div class="card-description">
+                    Connexion à l'API de traduction MyMemory établie
+                </div>
+                <div class="card-labels">
+                    <span class="label label-ia">IA</span>
+                    <span class="label label-done">Terminé</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">✓ Fixtures de Données</div>
+                <div class="card-description">
+                    Cours Java, Python et Web Development chargés
+                </div>
+                <div class="card-labels">
+                    <span class="label label-bundle">Bundle</span>
+                    <span class="label label-done">Terminé</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats">
+        <h2>📊 Vue d'ensemble du Sprint</h2>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value">4</div>
+                <div class="stat-label">À FAIRE<br>(IA)</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">2</div>
+                <div class="stat-label">EN COURS</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">2</div>
+                <div class="stat-label">À VÉRIFIER</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">10</div>
+                <div class="stat-label">TERMINÉ ✓</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats" style="margin-top: 20px;">
+        <h2>🎯 Répartition des Tâches</h2>
+        <div class="stats-grid">
+            <div class="stat-item" style="grid-column: span 2;">
+                <div class="stat-value" style="color: #0079bf;">13</div>
+                <div class="stat-label">Tâches Bundle<br>Gestion de Cours</div>
+            </div>
+            <div class="stat-item" style="grid-column: span 2;">
+                <div class="stat-value" style="color: #f2d600;">5</div>
+                <div class="stat-label">Tâches Intelligence<br>Artificielle</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .event-details {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #43e97b;
+        }
+        .alert-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 Event Started!</h1>
+    </div>
+    
+    <div class="content">
+        <p>Hello <strong>{{ studentName }}</strong>,</p>
+        
+        <p>Great news! The event you're registered for has officially <strong>started</strong>:</p>
+        
+        <div class="event-details">
+            <h2>📅 {{ eventName }}</h2>
+            <p><strong>Team:</strong> {{ teamName }}</p>
+            <p><strong>Started at:</strong> {{ eventDate|date('F d, Y \\a\\t H:i') }}</p>
+            <p><strong>Location:</strong> {{ eventLocation }}</p>
+        </div>
+        
+        <div class="alert-box">
+            <h3 style="margin: 0 0 10px 0; color: #856404;">⏰ Don't Miss It!</h3>
+            <p style="margin: 0; color: #856404; font-weight: bold;">
+                The event is happening NOW. Please head to the venue if you haven't already!
+            </p>
+        </div>
+        
+        <p><strong>What to bring:</strong></p>
+        <ul>
+            <li>✅ Your student ID</li>
+            <li>✅ Your event badge (attached in confirmation email)</li>
+            <li>✅ Your laptop (if required)</li>
+            <li>✅ Enthusiasm and team spirit! 🎉</li>
+        </ul>
+        
+        <p style="text-align: center; margin-top: 30px; font-size: 18px; color: #43e97b; font-weight: bold;">
+            🎯 Good luck and have fun!
+        </p>
+    </div>
+    
+    <div class="footer">
+        <p>Autolearn Platform - Your Learning Journey</p>
+        <p>This is an automated email, please do not reply.</p>
+    </div>
+</body>
+</html>

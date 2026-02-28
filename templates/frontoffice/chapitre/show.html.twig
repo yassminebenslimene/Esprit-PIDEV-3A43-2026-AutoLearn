@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ chapitre.titre }} – Détail du chapitre</title>
+
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('frontoffice/vendor/bootstrap/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/animate.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/flex-slider.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/owl.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/templatemo-scholar.css') }}">
+        <!-- Nouveau CSS moderne pour les chapitres -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/chapitres-style.css') }}">
+        <!-- Animations avancées -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/chapitres-animations.css') }}">
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+
+    <div class="container">
+        <div class="chapter-detail-container">
+            {# Barre de progression simple et compacte (si connecté) #}
+            {% if app.user and progress_stats %}
+                <div style="background: white; 
+                            padding: 12px 18px; 
+                            border-radius: 8px; 
+                            margin-bottom: 20px;
+                            border: 1px solid #e0e0e0;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-size: 13px; color: #666; font-weight: 500;">
+                            {{ progress_stats.completed_chapters }} of {{ progress_stats.total_chapters }} completed
+                        </span>
+                        <span style="font-size: 13px; color: #667eea; font-weight: 600;">
+                            {{ progress_stats.percentage }}%
+                        </span>
+                    </div>
+                    
+                    {# Barre de progression simple #}
+                    <div style="background: #e9ecef; 
+                                height: 6px; 
+                                border-radius: 10px; 
+                                overflow: hidden;">
+                        <div style="background: linear-gradient(90deg, #667eea, #764ba2); 
+                                    height: 100%; 
+                                    width: {{ progress_stats.percentage }}%; 
+                                    border-radius: 10px;
+                                    transition: width 0.6s ease;">
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="chapter-detail-header">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="chapter-detail-badge">{{ 'frontoffice.chapter.chapter'|trans }} {{ chapitre.ordre }}</span>
+                    </div>
+                    <div class="language-selector">
+                        <label for="langSelect" style="margin-right: 10px; font-weight: 500;">
+                            <i class="fa fa-language"></i> {{ 'language.select'|trans }}:
+                        </label>
+                        <select id="langSelect" class="form-select" style="width: auto; display: inline-block;">
+                            <option value="fr" {% if app.request.locale == 'fr' %}selected{% endif %}>{{ 'language.french'|trans }}</option>
+                            <option value="en" {% if app.request.locale == 'en' %}selected{% endif %}>{{ 'language.english'|trans }}</option>
+                            <option value="es" {% if app.request.locale == 'es' %}selected{% endif %}>{{ 'language.spanish'|trans }}</option>
+                            <option value="ar" {% if app.request.locale == 'ar' %}selected{% endif %}>{{ 'language.arabic'|trans }}</option>
+                        </select>
+                    </div>
+                </div>
+                <h1 class="chapter-detail-title" id="chapitreTitle">{{ chapitre.titre }}</h1>
+                
+                <div class="chapter-detail-meta">
+                    {% if chapitre.cours %}
+                        <span><i class="fa fa-book"></i> {{ chapitre.cours.titre }}</span>
+                    {% endif %}
+                    <span><i class="fa fa-clock"></i> {{ 'frontoffice.chapter.reading_time'|trans }} : 5 {{ 'frontoffice.chapter.minutes'|trans }}</span>
+                    <span><i class="fa fa-user"></i> {{ 'frontoffice.chapter.level_beginner'|trans }}</span>
+                </div>
+            </div>
+
+            <div class="chapter-detail-content" id="chapitreContent">
+                {{ chapitre.contenu|nl2br }}
+            </div>
+
+            {% if chapitre.ressources %}
+                <div class="resources-section">
+                    <h3 class="resources-title">
+                        <i class="fa fa-link"></i> 
+                        {{ 'frontoffice.chapter.additional_resources'|trans }}
+                    </h3>
+                    <ul class="resources-list">
+                        {% set ressources = chapitre.ressources|split(',') %}
+                        {% for ressource in ressources %}
+                            {% if ressource|trim %}
+                                <li>
+                                    <a href="{{ ressource|trim }}" target="_blank">
+                                        <i class="fa fa-external-link"></i> 
+                                        {{ ressource|trim }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li>
+                                <span style="color: var(--text-light);">
+                                    <i class="fa fa-info-circle"></i>
+                                    {{ 'frontoffice.chapter.no_resources'|trans }}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <!-- Actions PDF -->
+            <div class="pdf-actions" style="margin: 30px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; text-align: center;">
+                <h3 style="color: white; margin-bottom: 15px;">
+                    <i class="fa fa-file-pdf"></i> Télécharger ce chapitre
+                </h3>
+                <p style="color: rgba(255,255,255,0.9); margin-bottom: 20px;">
+                    Accédez au contenu hors ligne en format PDF avec le branding Autolearn
+                </p>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <a href="{{ path('app_chapitre_pdf_preview', {id: chapitre.id}) }}" 
+                       target="_blank"
+                       class="btn-modern" 
+                       style="background: white; color: #667eea; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                        <i class="fa fa-eye"></i> Prévisualiser PDF
+                    </a>
+                    <a href="{{ path('app_chapitre_pdf_download', {id: chapitre.id}) }}" 
+                       class="btn-modern" 
+                       style="background: rgba(255,255,255,0.2); color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; border: 2px solid white; transition: all 0.3s;">
+                        <i class="fa fa-download"></i> Télécharger PDF
+                    </a>
+                    <a href="{{ path('app_chapter_explainer', {id: chapitre.id}) }}" 
+                       class="btn-modern" 
+                       style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; border: 2px solid white; transition: all 0.3s; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+                        <i class="fa fa-robot"></i> 🤖 Assistant IA
+                    </a>
+                </div>
+            </div>
+
+            <div class="chapter-navigation">
+                <a href="{{ path('app_chapitre_index_front', {id: chapitre.cours.id}) }}" class="btn-modern btn-back">
+                    <i class="fa fa-arrow-left"></i> 
+                    {{ 'frontoffice.chapter.back_to_list'|trans }}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('frontoffice/vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+    <!-- Interactions dynamiques -->
+    <script src="{{ asset('frontoffice/js/chapitres-interactions.js') }}"></script>
+    
+    <!-- Script de traduction -->
+    <script>
+        const chapitreId = {{ chapitre.id }};
+        const originalTitre = {{ chapitre.titre|json_encode|raw }};
+        const originalContenu = {{ chapitre.contenu|json_encode|raw }};
+        
+        document.getElementById('langSelect').addEventListener('change', async function() {
+            const lang = this.value;
+            const titleEl = document.getElementById('chapitreTitle');
+            const contentEl = document.getElementById('chapitreContent');
+            
+            // Si français, restaurer contenu original
+            if (lang === 'fr') {
+                titleEl.textContent = originalTitre;
+                contentEl.innerHTML = originalContenu.replace(/\n/g, '<br>');
+                return;
+            }
+            
+            // Afficher indicateur de chargement
+            titleEl.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Traduction en cours...';
+            contentEl.innerHTML = '<div style="text-align: center; padding: 40px;"><i class="fa fa-spinner fa-spin fa-3x"></i><p style="margin-top: 20px;">Traduction en cours...</p></div>';
+            
+            try {
+                const response = await fetch(`/api/chapitres/${chapitreId}/translate?lang=${lang}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.status === 'error') {
+                    throw new Error(data.message);
+                }
+                
+                // Afficher contenu traduit
+                titleEl.textContent = data.titre;
+                contentEl.innerHTML = data.contenu.replace(/\n/g, '<br>');
+                
+                // Afficher badge si depuis cache
+                if (data.cached) {
+                    console.log('Traduction chargée depuis le cache');
+                }
+                
+            } catch (error) {
+                console.error('Erreur de traduction:', error);
+                titleEl.textContent = originalTitre;
+                contentEl.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fa fa-exclamation-triangle"></i>
+                        <strong>Erreur de traduction:</strong> ${error.message || 'Service temporairement indisponible'}
+                    </div>
+                    ${originalContenu.replace(/\n/g, '<br>')}
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

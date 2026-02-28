@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <title>{% block title %}Scholar - AutoLearn{% endblock %}</title>
+
+    {% block stylesheets %}
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/vendor/bootstrap/css/bootstrap.min.css') }}">
+
+        <!-- FrontOffice CSS -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/animate.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/flex-slider.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/owl.css') }}">
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/templatemo-scholar.css') }}">
+
+        <!-- Swiper -->
+        <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
+    {% endblock %}
+    
+    <style>
+        /* Fix navbar position */
+        .header-area {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 9999 !important;
+            background-color: rgba(122, 106, 216, 0.95) !important;
+            backdrop-filter: blur(10px) !important;
+            margin-bottom: 0 !important;
+        }
+        
+        /* Add padding to body to compensate for fixed header */
+        body {
+            padding-top: 80px !important;
+        }
+        
+        /* Remove any white space after header */
+        .header-area + * {
+            margin-top: 0 !important;
+        }
+        
+        /* Profile Dropdown Styles */
+        .main-nav {
+            display: flex !important;
+            align-items: center !important;
+            height: 80px !important;
+        }
+        
+        /* Notification Badge Styles */
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(255, 68, 68, 0.6);
+            animation: pulse 2s infinite;
+            z-index: 10;
+        }
+        
+        .badge-count {
+            color: white;
+            font-size: 10px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 6px rgba(255, 68, 68, 0.6);
+            }
+            50% {
+                transform: scale(1.2);
+                box-shadow: 0 4px 12px rgba(255, 68, 68, 0.8);
+            }
+        }
+        
+        .main-nav .nav {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .main-nav .nav li {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            margin: 0 !important;
+        }
+        
+        .main-nav .nav li a {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            line-height: 1 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        
+        .main-nav .nav li.profile-dropdown-container {
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-btn {
+            background: none !important;
+            border: none !important;
+            padding: 0 15px !important;
+            color: #1e1e1e !important;
+            font-weight: 500 !important;
+            text-decoration: none !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            line-height: 1 !important;
+            gap: 5px !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-btn i {
+            display: flex !important;
+            align-items: center !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu {
+            display: none;
+            position: absolute !important;
+            top: 100% !important;
+            right: 0 !important;
+            z-index: 999999 !important;
+            min-width: 220px !important;
+            background: white !important;
+            border-radius: 8px !important;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.15) !important;
+            padding: 10px 0 !important;
+            margin-top: 0 !important;
+            list-style: none !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu.show {
+            display: block !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu li {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            display: block !important;
+            height: auto !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu a {
+            display: block !important;
+            padding: 12px 20px !important;
+            color: #333 !important;
+            text-decoration: none !important;
+            font-size: 15px !important;
+            transition: all 0.2s !important;
+            line-height: normal !important;
+            height: auto !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu a:hover {
+            background: linear-gradient(105deg, #7a6ad8 0%, #4e3b9c 100%) !important;
+            color: white !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu i {
+            margin-right: 10px !important;
+            width: 18px !important;
+            text-align: center !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-divider {
+            height: 1px !important;
+            background: #eeeeee !important;
+            margin: 8px 0 !important;
+        }
+        
+        @media (max-width: 992px) {
+            .main-nav,
+            .main-nav .nav,
+            .main-nav .nav li,
+            .main-nav .nav li a,
+            .main-nav .nav li.profile-dropdown-container,
+            .main-nav .nav .profile-dropdown-btn {
+                height: auto !important;
+                min-height: 50px !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-menu {
+                position: static !important;
+                width: 100% !important;
+                box-shadow: none !important;
+                background: transparent !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-menu a {
+                color: white !important;
+                padding-left: 30px !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-divider {
+                background: rgba(255,255,255,0.2) !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ***** Preloader Start ***** -->
+<div id="js-preloader" class="js-preloader">
+    <div class="preloader-inner">
+        <span class="dot"></span>
+        <div class="dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</div>
+<!-- ***** Preloader End ***** -->
+
+<!-- ***** Header Area Start ***** -->
+<header class="header-area header-sticky">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                    <!-- ***** Logo Start ***** -->
+                    <a href="{{ path('app_frontoffice') }}" class="logo">
+                        <h1>AutoLearn</h1>
+                    </a>
+                    <!-- ***** Logo End ***** -->
+                    <!-- ***** Search Start ***** -->
+                    <div class="search-input">
+                        <form id="search" action="{{ path('app_search') }}" method="GET">
+                            <input type="text" placeholder="{{ 'search.placeholder'|trans }}" id='searchText' name="q" required minlength="2" />
+                            <button type="submit" style="background: none; border: none; cursor: pointer;">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <!-- ***** Search End ***** -->
+                    <!-- ***** Menu Start ***** -->
+                    <ul class="nav">
+                        <li><a href="{{ path('app_frontoffice') }}">{{ 'nav.home'|trans }}</a></li>
+                        <li><a href="{{ path('app_frontoffice') }}#cours">{{ 'nav.courses'|trans }}</a></li>
+                        {% if app.user %}
+                            <li style="position: relative; display: inline-block;">
+                                <a href="{{ path('app_notifications_index') }}" style="position: relative; display: inline-block; color: #FFD700; font-weight: bold; text-decoration: none;">
+                                    🔔 Notifications
+                                    <span id="notification-badge" style="display: none; position: absolute; top: -8px; right: -12px; background: #ff4444; color: white; border-radius: 50%; min-width: 20px; height: 20px; padding: 2px 4px; font-size: 11px; font-weight: bold; text-align: center; line-height: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid white;"></span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li><a href="{{ path('app_events') }}">{{ 'nav.events'|trans }}</a></li>
+                        <li><a href="{{ path('app_frontoffice') }}#challenge">{{ 'nav.challenges'|trans }}</a></li>
+                        <li><a href="{{ path('front_communaute') }}">{{ 'nav.community'|trans }}</a></li>
+                        {% if app.user %}
+                            <li><a href="{{ path('app_mes_participations') }}">{{ 'nav.my_participations'|trans }}</a></li>
+                            
+                            <li class="profile-dropdown-container">
+                                <a href="javascript:void(0);" onclick="toggleProfileDropdown(event)" class="profile-dropdown-btn">
+                                    <i class="fa fa-user-circle"></i>
+                                    {{ app.user.prenom }} {{ app.user.nom }}
+                                    <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                                </a>
+                                <ul class="profile-dropdown-menu" id="profileDropdown">
+                                    <li>
+                                        <a href="{{ path('app_profile') }}">
+                                            <i class="fa fa-id-card"></i> {{ 'nav.profile'|trans }}
+                                        </a>
+                                    </li>
+                                    <li class="profile-dropdown-divider"></li>
+                                    <li>
+                                        <a href="{{ path('backoffice_logout') }}">
+                                            <i class="fa fa-sign-out"></i> {{ 'nav.logout'|trans }}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li><a href="{{ path('backoffice_login') }}">{{ 'nav.login'|trans }}</a></li>
+                            <li><a href="{{ path('backoffice_register') }}">{{ 'nav.register'|trans }}</a></li>
+                        {% endif %}
+                        
+                        {# Sélecteur de langue #}
+                        <li class="profile-dropdown-container">
+                            <a href="javascript:void(0);" onclick="toggleLanguageDropdown(event)" class="profile-dropdown-btn">
+                                <i class="fa fa-globe"></i>
+                                {% if app.request.locale == 'fr' %}
+                                    {{ 'language.french'|trans }}
+                                {% elseif app.request.locale == 'en' %}
+                                    {{ 'language.english'|trans }}
+                                {% elseif app.request.locale == 'es' %}
+                                    {{ 'language.spanish'|trans }}
+                                {% elseif app.request.locale == 'ar' %}
+                                    {{ 'language.arabic'|trans }}
+                                {% endif %}
+                                <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                            </a>
+                            <ul class="profile-dropdown-menu" id="languageDropdown">
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'fr'}) }}">
+                                        <i class="fa fa-flag"></i> {{ 'language.french'|trans }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'en'}) }}">
+                                        <i class="fa fa-flag"></i> {{ 'language.english'|trans }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'es'}) }}">
+                                        <i class="fa fa-flag"></i> {{ 'language.spanish'|trans }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'ar'}) }}">
+                                        <i class="fa fa-flag"></i> {{ 'language.arabic'|trans }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <form id="logout-form-nav" action="{{ path('backoffice_logout') }}" method="POST" style="display: none;">
+                        <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
+                    </form>
+                    <a class='menu-trigger'>
+                        <span>Menu</span>
+                    </a>
+                    <!-- ***** Menu End ***** -->
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- ***** Header Area End ***** -->
+
+{% block body %}{% endblock %}
+
+<!-- Scripts -->
+{% block javascripts %}
+    <script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('frontoffice/vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('frontoffice/js/isotope.min.js') }}"></script>
+    <script src="{{ asset('frontoffice/js/owl-carousel.js') }}"></script>
+    <script src="{{ asset('frontoffice/js/counter.js') }}"></script>
+    <script src="{{ asset('frontoffice/js/custom.js') }}"></script>
+    
+    <!-- Profile Dropdown Toggle Script -->
+    <script>
+        function toggleProfileDropdown(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            var dropdown = document.getElementById('profileDropdown');
+            var languageDropdown = document.getElementById('languageDropdown');
+            
+            // Fermer le dropdown de langue
+            if (languageDropdown) {
+                languageDropdown.classList.remove('show');
+            }
+            
+            dropdown.classList.toggle('show');
+        }
+        
+        function toggleLanguageDropdown(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            var dropdown = document.getElementById('languageDropdown');
+            var profileDropdown = document.getElementById('profileDropdown');
+            
+            // Fermer le dropdown de profil
+            if (profileDropdown) {
+                profileDropdown.classList.remove('show');
+            }
+            
+            dropdown.classList.toggle('show');
+        }
+        
+        document.addEventListener('click', function(event) {
+            var dropdown = document.getElementById('profileDropdown');
+            var languageDropdown = document.getElementById('languageDropdown');
+            var isClickInside = event.target.closest('.profile-dropdown-container');
+            
+            if (!isClickInside) {
+                if (dropdown) {
+                    dropdown.classList.remove('show');
+                }
+                if (languageDropdown) {
+                    languageDropdown.classList.remove('show');
+                }
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Profile and language dropdowns initialized');
+            
+            // Force search form submission
+            var searchForm = document.getElementById('search');
+            if (searchForm) {
+                searchForm.addEventListener('submit', function(e) {
+                    // Ne pas empêcher la soumission du formulaire
+                    console.log('Search form submitted');
+                    return true;
+                });
+            }
+            
+            // Charger le nombre de notifications non lues
+            {% if app.user %}
+            updateNotificationBadge();
+            // Actualiser toutes les 30 secondes
+            setInterval(updateNotificationBadge, 30000);
+            {% endif %}
+        });
+        
+        {% if app.user %}
+        function updateNotificationBadge() {
+            fetch('{{ path('app_notifications_unread_count') }}')
+                .then(response => response.json())
+                .then(data => {
+                    var badge = document.getElementById('notification-badge');
+                    if (badge) {
+                        if (data.count > 0) {
+                            badge.textContent = data.count > 9 ? '9+' : data.count;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => console.error('Erreur lors du chargement des notifications:', error));
+        }
+        {% endif %}
+    </script>
+{% endblock %}
+
+{# Include AI Assistant Widget #}
+{% include 'ai_assistant/chat_widget.html.twig' %}
+
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tous les chapitres</title>
+
+    {% block stylesheets %}
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/vendor/bootstrap/css/bootstrap.min.css') }}">
+        <!-- FrontOffice CSS (Scholar) -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
+        <!-- Nouveau CSS moderne pour les chapitres -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/chapitres-style.css') }}">
+        <!-- Animations avancées -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/chapitres-animations.css') }}">
+        <!-- Progress Bar CSS -->
+        <link rel="stylesheet" href="{{ asset('frontoffice/css/progress-bar.css') }}">
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+
+    <div class="container">
+        {# Bouton de retour #}
+        <div class="back-navigation">
+            <a href="{{ path('app_frontoffice') }}#cours" class="btn-back-to-courses">
+                <i class="fa fa-arrow-left"></i>
+                {{ 'frontoffice.chapter.back_to_courses'|trans }}
+            </a>
+        </div>
+
+        <h1 class="page-title">📚 {{ 'frontoffice.chapter.discover_chapters'|trans }}</h1>
+
+        {# Carte de progression du cours (si connecté) #}
+        {% if app.user and progress_stats %}
+            <div class="course-progress-card">
+                <h3>
+                    <i class="fa fa-chart-line"></i>
+                    Votre progression dans ce cours
+                </h3>
+                
+                {% include 'components/progress_bar.html.twig' with {
+                    'percentage': progress_stats.percentage,
+                    'show_label': true,
+                    'completed': progress_stats.completed_chapters,
+                    'total': progress_stats.total_chapters
+                } %}
+                
+                <div class="progress-stats">
+                    <div class="progress-stat-item">
+                        <span class="progress-stat-value">{{ progress_stats.completed_chapters }}</span>
+                        <span class="progress-stat-label">Complétés</span>
+                    </div>
+                    <div class="progress-stat-item">
+                        <span class="progress-stat-value">{{ progress_stats.remaining_chapters }}</span>
+                        <span class="progress-stat-label">Restants</span>
+                    </div>
+                    <div class="progress-stat-item">
+                        <span class="progress-stat-value">{{ progress_stats.total_chapters }}</span>
+                        <span class="progress-stat-label">Total</span>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="row">
+            {% if chapitres is empty %}
+                <div class="col-12">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📖</div>
+                        <h3 class="empty-state-title">{{ 'frontoffice.chapter.no_chapters'|trans }}</h3>
+                        <p class="empty-state-text">{{ 'frontoffice.chapter.chapters_soon'|trans }}</p>
+                    </div>
+                </div>
+            {% else %}
+                {% for chapitre in chapitres %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="chapter-card">
+                            {# Badge de complétion (si connecté) #}
+                            {% if app.user and chapters_completion is defined %}
+                                <div style="position: absolute; top: 15px; right: 15px; z-index: 10;">
+                                    {% if chapters_completion[chapitre.id] %}
+                                        <span class="chapter-status-badge completed">
+                                            <i class="fa fa-check-circle"></i>
+                                            Complété
+                                        </span>
+                                    {% else %}
+                                        <span class="chapter-status-badge not-completed">
+                                            <i class="fa fa-circle"></i>
+                                            À faire
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            
+                            {# Icône du chapitre #}
+                            <div class="chapter-icon">
+                                📖
+                            </div>
+                            
+                            {# Titre du chapitre #}
+                            <h4 class="chapter-title">{{ chapitre.titre }}</h4>
+                            
+                            {# Description/Extrait du contenu #}
+                            <p class="chapter-excerpt">
+                                {{ chapitre.contenu|slice(0, 120) ~ (chapitre.contenu|length > 120 ? '...' : '') }}
+                            </p>
+                            
+                            {# Métadonnées #}
+                            <div class="chapter-meta">
+                                <span class="chapter-order">
+                                    <i class="fa fa-bookmark"></i> {{ 'frontoffice.chapter.chapter'|trans }} {{ chapitre.ordre }}
+                                </span>
+                                {% if chapitre.cours %}
+                                    <span class="chapter-course">
+                                        <i class="fa fa-graduation-cap"></i> {{ chapitre.cours.titre }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                            
+                            {# Boutons d'action #}
+                            <div class="chapter-actions">
+                                <a href="{{ path('app_chapitre_show_front', {'id': chapitre.id}) }}" class="btn-modern">
+                                    <i class="fa fa-book-open"></i>
+                                    {{ 'frontoffice.chapter.read_chapter'|trans }}
+                                </a>
+                                <a href="{{ path('app_chapitre_pdf_download', {'id': chapitre.id}) }}" class="btn-modern" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                    <i class="fa fa-file-pdf"></i>
+                                    PDF
+                                </a>
+                                <a href="{{ path('app_frontoffice_quiz_list', {'chapitreId': chapitre.id}) }}" class="btn-modern btn-quiz">
+                                    <i class="fa fa-question-circle"></i>
+                                    {{ 'frontoffice.chapter.take_quiz'|trans }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    {# Scripts minimaux #}
+    <script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('frontoffice/vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+    <!-- Interactions dynamiques -->
+    <script src="{{ asset('frontoffice/js/chapitres-interactions.js') }}"></script>
+    
+    <script>
+        // Système de sons
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        // Son de démarrage du quiz (montée joyeuse)
+        function playStartQuizSound() {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+            oscillator.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+            oscillator.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+            
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.4);
+        }
+
+        // Son de hover
+        function playHoverSound() {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+            
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.08);
+        }
+
+        // Ajouter son sur les boutons "Passer le quiz" (orange)
+        document.querySelectorAll('.btn-quiz').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                playStartQuizSound();
+            });
+            
+            btn.addEventListener('mouseenter', function() {
+                playHoverSound();
+            });
+        });
+
+        // Ajouter son sur les boutons "Lire le chapitre" (bleu)
+        document.querySelectorAll('.btn-modern:not(.btn-quiz)').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                playHoverSound();
+            });
+        });
+
+        // Ajouter son sur les cartes de chapitre
+        document.querySelectorAll('.chapter-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                playHoverSound();
+            });
+        });
+    </script>
+
+</body>
+</html>

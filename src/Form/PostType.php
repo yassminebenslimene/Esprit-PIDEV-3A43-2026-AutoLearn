@@ -5,11 +5,12 @@ namespace App\Form;
 use App\Entity\Post;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Vich\UploaderBundle\Form\Type\VichImageType;
+use Vich\UploaderBundle\Form\Type\VichFileType;
 use Symfony\Component\Validator\Constraints\File;
+
 class PostType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -19,15 +20,18 @@ class PostType extends AbstractType
                 'label' => 'Texte du post',
                 'required' => false,
                 'attr' => [
-                    'rows' => 4,
-                    'placeholder' => 'Écrivez votre message ici...'
+                    'rows' => 8,
+                    'placeholder' => 'Écrivez votre message ici...',
+                    'class' => 'rich-editor'
                 ],
             ])
-             // ✅ IMAGE UPLOAD
-            ->add('imageFile', FileType::class, [
+
+            // ✅ IMAGE UPLOAD via Vich
+            ->add('imageFileUpload', VichImageType::class, [
                 'label' => 'Uploader une image',
-                'mapped' => false,      // ⚠️ TRÈS IMPORTANT
                 'required' => false,
+                'allow_delete' => true,
+                'download_uri' => false,
                 'constraints' => [
                     new File([
                         'maxSize' => '5M',
@@ -41,17 +45,12 @@ class PostType extends AbstractType
                 ],
             ])
 
-            // ✅ IMAGE PAR LIEN
-            ->add('imageUrl', null, [
-                'required' => false,
-                'label' => 'Lien image',
-            ])
-
-            // VIDEO UPLOAD (PC)
-            ->add('videoFile', FileType::class, [
+            // ✅ VIDEO UPLOAD via Vich
+            ->add('videoFileUpload', VichFileType::class, [
                 'label' => 'Uploader une vidéo',
-                'mapped' => false,
                 'required' => false,
+                'allow_delete' => true,
+                'download_uri' => false,
                 'constraints' => [
                     new File([
                         'maxSize' => '50M',
@@ -63,14 +62,9 @@ class PostType extends AbstractType
                     ])
                 ],
             ])
-
-            // ✅ VIDEO PAR LIEN
-            ->add('videoUrl', null, [
-                'required' => false,
-                'label' => 'Lien vidéo (YouTube)',
-            ])
         ;
     }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

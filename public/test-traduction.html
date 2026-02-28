@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Traduction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .result {
+            background: white;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .error {
+            background: #fee;
+            border-color: #fcc;
+        }
+        .success {
+            background: #efe;
+            border-color: #cfc;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test API Traduction</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Liste des langues</h2>
+        <button onclick="testLanguages()">Tester /api/languages</button>
+        <div id="result1" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Traduction Chapitre 1</h2>
+        <button onclick="testTranslate(1, 'en')">Anglais</button>
+        <button onclick="testTranslate(1, 'es')">Espagnol</button>
+        <button onclick="testTranslate(1, 'ar')">Arabe</button>
+        <button onclick="testTranslate(1, 'de')">Allemand</button>
+        <div id="result2" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Erreurs</h2>
+        <button onclick="testTranslate(99999, 'en')">Chapitre inexistant</button>
+        <button onclick="testTranslate(1, 'xx')">Langue invalide</button>
+        <div id="result3" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        async function testLanguages() {
+            const resultDiv = document.getElementById('result1');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.innerHTML = '<p>⏳ Chargement...</p>';
+
+            try {
+                const response = await fetch('/api/languages');
+                const data = await response.json();
+                
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `
+                    <p><strong>✅ Succès!</strong></p>
+                    <p>Status: ${response.status}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <p><strong>❌ Erreur!</strong></p>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+
+        async function testTranslate(id, lang) {
+            const resultDiv = document.getElementById('result2');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.innerHTML = '<p>⏳ Traduction en cours...</p>';
+
+            try {
+                const url = `/api/chapitres/${id}/translate?lang=${lang}`;
+                console.log('Fetching:', url);
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.status === 'error') {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `
+                        <p><strong>⚠️ Erreur API</strong></p>
+                        <p>Status: ${response.status}</p>
+                        <p>Message: ${data.message}</p>
+                    `;
+                } else {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <p><strong>✅ Traduction réussie!</strong></p>
+                        <p>Status: ${response.status}</p>
+                        <p><strong>Titre:</strong> ${data.titre}</p>
+                        <p><strong>Contenu (100 premiers caractères):</strong></p>
+                        <p>${data.contenu.substring(0, 100)}...</p>
+                        <p><strong>Depuis cache:</strong> ${data.cached ? 'Oui' : 'Non'}</p>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <p><strong>❌ Erreur réseau!</strong></p>
+                    <p>${error.message}</p>
+                    <p><em>Le serveur est-il démarré sur http://localhost:8000 ?</em></p>
+                `;
+            }
+        }
+
+        // Test automatique au chargement
+        window.addEventListener('load', () => {
+            console.log('Page de test chargée');
+            console.log('URL de base:', window.location.origin);
+        });
+    </script>
+</body>
+</html>

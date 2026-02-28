@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .event-details {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+        .button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎉 Participation Confirmed!</h1>
+    </div>
+    
+    <div class="content">
+        <p>Hello <strong>{{ studentName }}</strong>,</p>
+        
+        <p>Great news! Your participation has been <strong>accepted</strong> for the following event:</p>
+        
+        <div class="event-details">
+            <h2>📅 {{ eventName }}</h2>
+            <p><strong>Date:</strong> {{ eventDate|date('F d, Y \\a\\t H:i') }}</p>
+            <p><strong>Location:</strong> {{ eventLocation }}</p>
+        </div>
+        
+        <p>We're excited to see you there! Please arrive 10 minutes early for check-in.</p>
+        
+        <p><strong>Important:</strong> Don't forget to bring your student ID.</p>
+        
+        {% if qrCodeData %}
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+            <h3>📱 Your Check-in QR Code</h3>
+            <p>Show this QR code at the event entrance for quick check-in:</p>
+            <img src="data:image/png;base64,{{ qrCodeData }}" alt="QR Code" style="max-width: 200px; margin: 10px auto;">
+            <p style="font-size: 12px; color: #666;">Save this email or take a screenshot</p>
+        </div>
+        {% endif %}
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+            <h3>🎫 Your Event Badge</h3>
+            <p>A PDF badge is attached to this email. Please <strong>print it and wear it</strong> during the event.</p>
+            <p style="font-size: 14px; color: #667eea; font-weight: bold;">📄 Attachment: event-badge.pdf</p>
+        </div>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+            <h3>📅 Add to Calendar</h3>
+            <p>An .ics file is attached to this email. Click on it to add this event to your calendar (Google Calendar, Outlook, Apple Calendar, etc.)</p>
+        </div>
+        
+        <p style="text-align: center; margin-top: 30px; font-size: 16px; color: #667eea; font-weight: bold;">
+            ⚠️ Important: Please wear your event badge on the day of the event!
+        </p>
+    </div>
+    
+    <div class="footer">
+        <p>Autolearn Platform - Your Learning Journey</p>
+        <p>This is an automated email, please do not reply.</p>
+    </div>
+</body>
+</html>

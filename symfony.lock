@@ -47,6 +47,10 @@
             "./migrations/.gitignore"
         ]
     },
+<<<<<<< HEAD
+    "knplabs/knp-paginator-bundle": {
+        "version": "v6.10.0"
+=======
     "openai-php/symfony": {
         "version": "0.10",
         "recipe": {
@@ -76,6 +80,7 @@
             "version": "1.0",
             "ref": "5e490cc197fb6bb1ae22e5abbc531ddc633b6767"
         }
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     },
     "phpunit/phpunit": {
         "version": "9.6",
@@ -91,6 +96,19 @@
             "./tests/bootstrap.php"
         ]
     },
+<<<<<<< HEAD
+    "sonata-project/entity-audit-bundle": {
+        "version": "1.22",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "1.1",
+            "ref": "15582fec4b2a012e8e9020916e567c641ea4a039"
+        },
+        "files": [
+            "./config/routes/sonata_entity_audit.yaml"
+        ]
+=======
     "sbyaute/star-rating-bundle": {
         "version": "v1.3"
     },
@@ -102,6 +120,7 @@
             "version": "1.2",
             "ref": "e805aba9eff5372e2d149a9ff56566769e22819d"
         }
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     },
     "symfony/asset-mapper": {
         "version": "6.4",
@@ -117,6 +136,15 @@
             "./config/packages/asset_mapper.yaml",
             "./importmap.php"
         ]
+    },
+    "symfony/brevo-mailer": {
+        "version": "6.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "6.4",
+            "ref": "7c1038ceb733175f610a913a885a7c8b552b703a"
+        }
     },
     "symfony/console": {
         "version": "6.4",
@@ -173,6 +201,15 @@
             "./src/Controller/.gitignore",
             "./src/Kernel.php"
         ]
+    },
+    "symfony/google-mailer": {
+        "version": "6.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "4.4",
+            "ref": "f8fd4ddb9b477510f8f4bce2b9c054ab428c0120"
+        }
     },
     "symfony/mailer": {
         "version": "6.4",
@@ -272,6 +309,15 @@
             "./config/routes/security.yaml"
         ]
     },
+    "symfony/sendgrid-mailer": {
+        "version": "6.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "4.4",
+            "ref": "224aedffb66812dc2b0965dabc14d5f800941da6"
+        }
+    },
     "symfony/stimulus-bundle": {
         "version": "2.32",
         "recipe": {
@@ -370,6 +416,18 @@
             "./config/packages/messenger.yaml"
         ]
     },
+    "symfony/workflow": {
+        "version": "6.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "3.3",
+            "ref": "3b2f8ca32a07fcb00f899649053943fa3d8bbfb6"
+        },
+        "files": [
+            "./config/packages/workflow.yaml"
+        ]
+    },
     "symfonycasts/reset-password-bundle": {
         "version": "1.24",
         "recipe": {
@@ -389,9 +447,28 @@
             "branch": "main",
             "version": "1.1",
             "ref": "0c643e17b5340747b35c2c75e11727fa31bfa9bb"
+<<<<<<< HEAD
+        },
+        "files": [
+            "./config/routes/calendar.yaml"
+        ]
+=======
         }
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     },
     "twig/extra-bundle": {
         "version": "v3.23.0"
+    },
+    "vich/uploader-bundle": {
+        "version": "2.9",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "1.13",
+            "ref": "1b3064c2f6b255c2bc2f56461aaeb76b11e07e36"
+        },
+        "files": [
+            "./config/packages/vich_uploader.yaml"
+        ]
     }
 }

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Backlog Détaillé - Partie 1 (US-5.1 à US-5.20)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px;
+        }
+        .us-section {
+            margin-bottom: 50px;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+        }
+        .us-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+        }
+        .us-header h2 {
+            font-size: 1.5em;
+            margin-bottom: 8px;
+        }
+        .us-header p {
+            font-size: 1.05em;
+            opacity: 0.95;
+            line-height: 1.5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background: #f8f9fa;
+        }
+        th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            font-size: 0.95em;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.92em;
+            vertical-align: top;
+        }
+        tbody tr:hover {
+            background-color: #f5f7fa;
+        }
+        .task-id {
+            font-weight: 600;
+            color: #667eea;
+            white-space: nowrap;
+        }
+        .estimation {
+            font-weight: 600;
+            color: #2ed573;
+            white-space: nowrap;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; }
+            .us-section { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 SPRINT BACKLOG DÉTAILLÉ</h1>
+            <div class="subtitle">Module Gestion des Événements - Partie 1 (US-5.1 à US-5.20)</div>
+            <div class="subtitle" style="margin-top: 10px; font-size: 1em;">Basé sur l'analyse complète du code source</div>
+        </div>
+        
+        <div class="content">
+            <!-- US-5.1 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.1 - Créer un événement</h2>
+                    <p>En tant qu'Admin, je souhaite créer un événement afin de permettre aux étudiants d'y participer</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.1.1</td>
+                            <td>Créer l'entité <code>src/Entity/Evenement.php</code> avec annotation <code>#[ORM\Entity(repositoryClass: EvenementRepository::class)]</code> et propriétés: <code>id</code> (int, auto-increment), <code>titre</code> (string 255), <code>lieu</code> (string 255), <code>description</code> (text), <code>type</code> (TypeEvenement enum), <code>dateDebut</code> (datetime), <code>dateFin</code> (datetime), <code>status</code> (StatutEvenement enum, default PLANIFIE), <code>isCanceled</code> (boolean, default false), <code>workflowStatus</code> (string 50, default 'planifie'), <code>nbMax</code> (integer)</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.1.2</td>
+                            <td>Créer l'enum <code>src/Enum/TypeEvenement.php</code> avec cases: <code>Conference</code>, <code>Hackathon</code>, <code>Workshop</code>, <code>Seminar</code>, <code>Meetup</code>, <code>Training</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.1.3</td>
+                            <td>Créer l'enum <code>src/Enum/StatutEvenement.php</code> avec cases: <code>PLANIFIE</code>, <code>EN_COURS</code>, <code>PASSE</code>, <code>ANNULE</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.1.4</td>
+                            <td>Ajouter validations Symfony sur Evenement: <code>Assert\NotBlank</code> sur titre/lieu/description/type/dates/nbMax avec messages personnalisés, <code>Assert\Length(min:3, max:255)</code> sur titre, <code>Assert\Length(min:2, max:255)</code> sur lieu, <code>Assert\Length(min:10, max:2000)</code> sur description, <code>Assert\GreaterThan("today")</code> sur dateDebut, <code>Assert\Expression("this.getDateFin() >= this.getDateDebut()")</code> pour cohérence dates, <code>Assert\Positive</code> et <code>Assert\Range(min:1, max:100)</code> sur nbMax</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.1.5</td>
+                            <td>Créer <code>src/Repository/EvenementRepository.php extends ServiceEntityRepository</code> avec méthodes de base (find, findAll, findBy, createQueryBuilder)</td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.1.6</td>
+                            <td>Ajouter relations dans Evenement: <code>#[ORM\OneToMany(mappedBy: "evenement", targetEntity: Equipe::class)]</code> pour equipes, <code>#[ORM\OneToMany(mappedBy: "evenement", targetEntity: Participation::class)]</code> pour participations, initialiser Collections dans __construct()</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.1.7</td>
+                            <td>Implémenter méthode <code>updateStatus(): void</code> dans Evenement qui compare dates avec <code>new \DateTime()</code> et met à jour status selon logique: si isCanceled → ANNULE, si now > dateFin → PASSE, si now entre dateDebut et dateFin → EN_COURS, si now < dateDebut → PLANIFIE</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.1.8</td>
+                            <td>Générer migration Doctrine: <code>php bin/console make:migration</code> puis <code>php bin/console doctrine:migrations:migrate</code> pour créer table evenement avec toutes colonnes</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.1.9</td>
+                            <td>Créer <code>src/Form/EvenementType.php extends AbstractType</code> avec buildForm: titre (TextType), lieu (TextType), description (TextareaType avec attr['rows' => 5]), type (EnumType avec class: TypeEvenement::class), dateDebut (DateTimeType avec widget: 'single_text'), dateFin (DateTimeType avec widget: 'single_text'), nbMax (IntegerType avec attr['min' => 1])</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.1.10</td>
+                            <td>Créer <code>src/Controller/EvenementController.php</code> avec annotation <code>#[Route('/backoffice/evenement')]</code>, injection <code>WorkflowInterface $evenementPublishingStateMachine</code> dans __construct()</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.1.11</td>
+                            <td>Implémenter méthode <code>new(Request $request, EntityManagerInterface $entityManager): Response</code> avec route <code>#[Route('/new', name: 'backoffice_evenement_new', methods: ['GET', 'POST'])]</code>, créer <code>$evenement = new Evenement()</code>, <code>$form = $this->createForm(EvenementType::class, $evenement)</code>, <code>$form->handleRequest($request)</code>, if isSubmitted && isValid: appeler <code>$evenement->updateStatus()</code>, <code>$entityManager->persist($evenement)</code>, <code>$entityManager->flush()</code>, <code>$this->addFlash('success', 'Événement créé avec succès')</code>, redirect vers 'backoffice_evenements'</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.1.12</td>
+                            <td>Créer template <code>templates/backoffice/evenement/new.html.twig</code> extends 'backoffice/base.html.twig' avec <code>{{ form_start(form) }}</code>, <code>{{ form_widget(form) }}</code>, <code>{{ form_end(form) }}</code>, bouton submit stylisé avec classes Bootstrap btn btn-primary</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.1.13</td>
+                            <td>Styliser formulaire avec design moderne: labels en gras, inputs avec border-radius 8px, focus effects (box-shadow bleu), sections pour chaque groupe de champs, responsive design avec grid CSS, messages d'erreur en rouge sous chaque champ</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.1.14</td>
+                            <td>Tester création avec données valides: titre "Hackathon 2026", lieu "Tunis", description longue (>10 caractères), type Hackathon, dateDebut future, dateFin > dateDebut, nbMax 10 → vérifier événement créé en BDD avec status PLANIFIE</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.1.15</td>
+                            <td>Tester validations: titre vide (erreur "Le titre est obligatoire"), date début passée (erreur "La date de début doit être dans le futur"), date fin < date début (erreur "La date de fin doit être après ou égale à la date de début"), nbMax négatif (erreur "Le nombre maximum d'équipes doit être positif"), description < 10 caractères (erreur "La description doit contenir au moins 10 caractères")</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.2 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.2 - Modifier un événement</h2>
+                    <p>En tant qu'Admin, je souhaite modifier un événement afin de mettre à jour ses informations</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.2.1</td>
+                            <td>Ajouter route <code>#[Route('/{id}/edit', name: 'backoffice_evenement_edit', methods: ['GET', 'POST'])]</code> dans EvenementController</td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.2.2</td>
+                            <td>Implémenter méthode <code>edit(Request $request, Evenement $evenement, EntityManagerInterface $entityManager): Response</code> avec ParamConverter automatique pour récupérer l'événement par ID</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.2.3</td>
+                            <td>Créer formulaire avec données existantes: <code>$form = $this->createForm(EvenementType::class, $evenement, ['is_edit' => false])</code>, <code>$form->handleRequest($request)</code>, if isSubmitted && isValid: appeler <code>$evenement->updateStatus()</code>, <code>$entityManager->flush()</code> (pas de persist car entité déjà managée), <code>$this->addFlash('success', 'Événement modifié avec succès')</code>, redirect</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.2.4</td>
+                            <td>Créer template <code>templates/backoffice/evenement/edit.html.twig</code> avec formulaire pré-rempli, afficher titre actuel de l'événement en haut, bouton "Enregistrer les modifications"</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.2.5</td>
+                            <td>Ajouter section séparée avec bouton "Annuler l'événement" (formulaire POST séparé) visible uniquement si <code>can_annuler</code> est true (passé depuis controller avec <code>$this->evenementPublishingStateMachine->can($evenement, 'annuler')</code>), styliser en rouge avec confirmation JavaScript</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.2.6</td>
+                            <td>Implémenter méthode <code>syncStatusFromWorkflow(): void</code> privée dans Evenement.php qui utilise <code>match($this->workflowStatus)</code> pour synchroniser status (enum) avec workflowStatus (string): 'planifie' → PLANIFIE, 'en_cours' → EN_COURS, 'termine' → PASSE, 'annule' → ANNULE</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.2.7</td>
+                            <td>Tester modification avec données valides: changer titre, lieu, dates, nbMax → vérifier modifications sauvegardées en BDD</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.2.8</td>
+                            <td>Tester validations après modification: dates incohérentes, nbMax invalide → vérifier messages d'erreur affichés</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.2.9</td>
+                            <td>Tester que le bouton "Annuler" n'apparaît pas si événement déjà annulé ou terminé (can_annuler = false)</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.3 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.3 - Supprimer un événement</h2>
+                    <p>En tant qu'Admin, je souhaite supprimer un événement afin de retirer un événement obsolète de la plateforme</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.3.1</td>
+                            <td>Ajouter route <code>#[Route('/{id}/delete', name: 'backoffice_evenement_delete', methods: ['GET'])]</code> dans EvenementController</td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.3.2</td>
+                            <td>Implémenter méthode <code>delete(Evenement $evenement, EntityManagerInterface $entityManager, ParticipationRepository $participationRepository): Response</code> avec gestion complète de la suppression en cascade</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.3.3</td>
+                            <td>Implémenter logique de suppression en cascade (IMPORTANT pour respecter contraintes FK): 1) <code>$equipes = $evenement->getEquipes()->toArray()</code>, 2) Pour chaque équipe: <code>$participations = $participationRepository->findBy(['equipe' => $equipe])</code> puis <code>$entityManager->remove($participation)</code>, 3) <code>$entityManager->flush()</code>, 4) Pour chaque équipe: <code>$entityManager->remove($equipe)</code>, 5) <code>$entityManager->flush()</code>, 6) <code>$entityManager->remove($evenement)</code>, 7) <code>$entityManager->flush()</code></td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.3.4</td>
+                            <td>Ajouter bouton "Supprimer" dans <code>templates/backoffice/evenement/index.html.twig</code> avec lien vers route delete, confirmation JavaScript: <code>onclick="return confirm('Attention ! Cette action supprimera également toutes les équipes et participations associées. Continuer ?')"</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.3.5</td>
+                            <td>Styliser bouton avec gradient rouge: <code>background: linear-gradient(135deg, #ff4757 0%, #ff6348 100%)</code>, icône poubelle (Font Awesome <code>fa-trash</code>), padding 8px 16px, border-radius 8px, hover effect avec transform scale(1.05)</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.3.6</td>
+                            <td>Ajouter flash message détaillé: <code>$this->addFlash('success', 'Événement, équipes et participations supprimés avec succès')</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.3.7</td>
+                            <td>Tester suppression événement sans participations: créer événement, supprimer → vérifier suppression en BDD</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.3.8</td>
+                            <td>Tester suppression en cascade complète: créer événement avec 2 équipes et 2 participations → supprimer événement → vérifier que toutes les participations, équipes et événement sont supprimés de la BDD (requêtes SQL pour vérifier)</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.4 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.4 - Gestion automatique des transitions d'états via Workflow</h2>
+                    <p>Le système gère automatiquement les transitions d'états via Workflow (planifié → en cours → terminé). L'Admin peut uniquement annuler manuellement un événement</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.4.1</td>
+                            <td>Installer symfony/workflow via <code>composer require symfony/workflow</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.2</td>
+                            <td>Créer fichier <code>config/packages/workflow.yaml</code> avec configuration complète du workflow</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.3</td>
+                            <td>Configurer workflow: <code>framework: workflows: evenement_publishing: type: 'state_machine'</code>, <code>supports: - App\Entity\Evenement</code>, <code>initial_marking: planifie</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.4</td>
+                            <td>Configurer marking_store: <code>marking_store: type: 'method', property: 'workflowStatus'</code> pour utiliser la propriété workflowStatus de l'entité Evenement</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.5</td>
+                            <td>Définir places (états): <code>places: - planifie, - en_cours, - termine, - annule</code></td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.6</td>
+                            <td>Définir transition demarrer: <code>demarrer: from: planifie, to: en_cours, metadata: {title: "Démarrer l'événement", description: "L'événement commence maintenant", color: 'success', icon: 'play'}</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.7</td>
+                            <td>Définir transition terminer: <code>terminer: from: en_cours, to: termine, metadata: {title: "Terminer l'événement", description: "L'événement est maintenant terminé", color: 'info', icon: 'check'}</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.8</td>
+                            <td>Définir transition annuler: <code>annuler: from: [planifie, en_cours], to: annule, metadata: {title: "Annuler l'événement", description: "L'événement est annulé", color: 'danger', icon: 'times'}</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.9</td>
+                            <td>Activer audit trail dans workflow.yaml: <code>audit_trail: enabled: true</code> pour logger toutes les transitions</td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.10</td>
+                            <td>Créer <code>src/Command/UpdateEvenementWorkflowCommand.php</code> avec <code>#[AsCommand(name: 'app:update-evenement-workflow', description: 'Met à jour automatiquement les statuts des événements via le Workflow Component')]</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.11</td>
+                            <td>Injecter dépendances dans __construct: <code>EvenementRepository $evenementRepository</code>, <code>WorkflowInterface $evenementPublishingStateMachine</code>, <code>EntityManagerInterface $entityManager</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.12</td>
+                            <td>Implémenter logique dans execute(): récupérer événements non annulés avec <code>createQueryBuilder('e')->where('e.isCanceled = :canceled')->setParameter('canceled', false)</code>, <code>$now = new \DateTime()</code>, pour chaque événement: vérifier conditions et appliquer transitions</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.13</td>
+                            <td>Implémenter transition demarrer: <code>if ($workflowStatus === 'planifie' && $evenement->getDateDebut() <= $now && $this->evenementPublishingStateMachine->can($evenement, 'demarrer')) { $this->evenementPublishingStateMachine->apply($evenement, 'demarrer'); }</code></td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.14</td>
+                            <td>Implémenter transition terminer: <code>if ($workflowStatus === 'en_cours' && $evenement->getDateFin() < $now && $this->evenementPublishingStateMachine->can($evenement, 'terminer')) { $this->evenementPublishingStateMachine->apply($evenement, 'terminer'); }</code></td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.15</td>
+                            <td>Ajouter route manuelle pour annulation: <code>#[Route('/{id}/annuler', name: 'backoffice_evenement_annuler', methods: ['POST'])]</code> dans EvenementController</td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.16</td>
+                            <td>Implémenter méthode annuler: vérifier <code>$this->evenementPublishingStateMachine->can($evenement, 'annuler')</code>, si true: <code>$this->evenementPublishingStateMachine->apply($evenement, 'annuler')</code>, <code>$evenement->setIsCanceled(true)</code>, <code>$entityManager->flush()</code>, flash success, sinon flash error</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.17</td>
+                            <td>Ajouter affichage résumé dans commande avec SymfonyStyle: <code>$io->table(['Action', 'Nombre'], [['Événements démarrés', $demarres], ['Événements terminés', $termines]])</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.18</td>
+                            <td>Tester commande: <code>php bin/console app:update-evenement-workflow</code> avec événements ayant dates passées/futures → vérifier transitions appliquées et logs affichés</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.4.19</td>
+                            <td>Tester annulation manuelle: cliquer bouton "Annuler" dans edit.html.twig → vérifier workflowStatus = 'annule', isCanceled = true, status = ANNULE</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- US-5.5 -->
+            <div class="us-section">
+                <div class="us-header">
+                    <h2>US-5.5 - Consulter la liste des événements</h2>
+                    <p>En tant qu'Admin, je souhaite consulter la liste des événements afin d'avoir une vue globale des événements créés</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">ID Tâche</th>
+                            <th style="width: 67%;">Tâche Technique Détaillée</th>
+                            <th style="width: 12%;">Estimation</th>
+                            <th style="width: 13%;">Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="task-id">T5.5.1</td>
+                            <td>Créer route <code>#[Route('/', name: 'backoffice_evenements', methods: ['GET'])]</code> dans EvenementController</td>
+                            <td class="estimation">10 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.5.2</td>
+                            <td>Implémenter méthode <code>index(EvenementRepository $evenementRepository, EntityManagerInterface $entityManager, FeedbackAnalyticsService $analyticsService): Response</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.5.3</td>
+                            <td>Récupérer tous événements: <code>$evenements = $evenementRepository->findAll()</code>, puis boucle foreach pour mettre à jour statuts: <code>foreach ($evenements as $evenement) { $evenement->updateStatus(); }</code>, <code>$entityManager->flush()</code></td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.5.4</td>
+                            <td>Récupérer statistiques feedbacks: <code>$statsByType = $analyticsService->analyzeByEventType()</code>, passer au template avec <code>['evenements' => $evenements, 'stats_by_type' => $statsByType]</code></td>
+                            <td class="estimation">15 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.5.5</td>
+                            <td>Créer template <code>templates/backoffice/evenement/index.html.twig</code> extends 'backoffice/base.html.twig' avec structure: titre page, section statistiques AI, tableau événements</td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.5.6</td>
+                            <td>Créer tableau HTML avec colonnes: Titre, Type, Date Début, Date Fin, Statut, Places (X/Y), Actions. Utiliser <code>&lt;table class="table table-hover"&gt;</code>, boucle <code>{% for evenement in evenements %}</code></td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.5.7</td>
+                            <td>Styliser badges de statut avec couleurs conditionnelles: <code>{% if evenement.status.value == 'PLANIFIE' %} &lt;span class="badge bg-primary"&gt;Planifié&lt;/span&gt; {% elseif evenement.status.value == 'EN_COURS' %} &lt;span class="badge bg-success"&gt;En cours&lt;/span&gt; {% elseif evenement.status.value == 'PASSE' %} &lt;span class="badge bg-secondary"&gt;Passé&lt;/span&gt; {% else %} &lt;span class="badge bg-danger"&gt;Annulé&lt;/span&gt; {% endif %}</code></td>
+                            <td class="estimation">30 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.5.8</td>
+                            <td>Ajouter boutons d'action dans colonne Actions: Voir (route show, gradient bleu), Modifier (route edit, gradient violet), Annuler (route annuler, gradient orange, visible si can_annuler), Supprimer (route delete, gradient rouge). Chaque bouton avec icône Font Awesome, padding 8px 16px, border-radius 8px</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.5.9</td>
+                            <td>Créer section "Statistiques & Rapports AI" en haut du tableau avec <code>&lt;div class="card mb-4"&gt;</code>, afficher statistiques par type d'événement si disponibles: nombre feedbacks, rating moyen, sentiment distribution</td>
+                            <td class="estimation">40 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.5.10</td>
+                            <td>Ajouter 3 boutons de génération de rapports AI: "Générer Analyse AI" (route backoffice_evenement_ai_analysis), "Recommandations AI" (route backoffice_evenement_ai_recommendations), "Suggestions d'Amélioration AI" (route backoffice_evenement_ai_improvements). Chaque bouton avec onclick JavaScript pour appel AJAX</td>
+                            <td class="estimation">45 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.5.11</td>
+                            <td>Implémenter JavaScript pour appels AJAX: <code>fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}})</code>, afficher loading spinner pendant requête avec <code>&lt;div class="spinner-border"&gt;</code>, afficher résultat dans modal Bootstrap avec <code>&lt;div class="modal"&gt;</code></td>
+                            <td class="estimation">50 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.5.12</td>
+                            <td>Styliser modal de résultats AI: titre avec gradient, contenu avec formatage markdown (gras, listes), bouton fermer, responsive design, animation fade-in</td>
+                            <td class="estimation">35 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.5.13</td>
+                            <td>Tester affichage de la liste avec plusieurs événements (différents types, statuts) → vérifier tableau affiché correctement, badges colorés, boutons visibles</td>
+                            <td class="estimation">20 min</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td class="task-id">T5.5.14</td>
+                            <td>Tester affichage responsive: mobile (tableau scroll horizontal), tablette, desktop → vérifier lisibilité sur tous écrans</td>
+                            <td class="estimation">25 min</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        
+        <div class="footer">
+            <p><strong>Date de Création:</strong> 23 Février 2026 | <strong>Version:</strong> 3.0 Professionnelle | <strong>Statut:</strong> ✅ Basé sur Code Réel</p>
+            <p>Module Gestion des Événements - Plateforme AutoLearn - Symfony 6.4 / PHP 8.2</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Ce document contient les tâches détaillées pour les User Stories US-5.1 à US-5.5</p>
+            <p style="font-size: 0.9em;">Voir SPRINT_BACKLOG_COMPLET_PARTIE2.html pour les US-5.6 à US-5.40</p>
+        </div>
+    </div>
+</body>
+</html>

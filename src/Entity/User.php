@@ -10,6 +10,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use App\Bundle\UserActivityBundle\Entity\UserActivity;
+
+
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\InheritanceType('SINGLE_TABLE')]
@@ -19,6 +22,16 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé!')]
 abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+<<<<<<< HEAD
+
+#[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Challenge::class)]
+private Collection $challenges;
+
+#[ORM\OneToMany(mappedBy: 'user', targetEntity: UserActivity::class, cascade: ['persist', 'remove'])]
+private Collection $activities;
+
+=======
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'userId', type: "integer")]
@@ -66,7 +79,7 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank(message: 'L\'email est obligatoire')]
     #[Assert\Email(message: 'L\'email "{{ value }}" n\'est pas valide')]
     #[Assert\Length(max: 255)]
-     #[Assert\Regex(
+    #[Assert\Regex(
         pattern: "/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/",
         message: 'Format d\'email invalide. Exemple : nom.prenom@domaine.com'
     )]
@@ -97,6 +110,35 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: 'createdAt', type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
 
+<<<<<<< HEAD
+    #[ORM\Column(name: 'isSuspended', type: 'boolean', options: ['default' => false])]
+    private bool $isSuspended = false;
+
+    #[ORM\Column(name: 'suspendedAt', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $suspendedAt = null;
+
+    #[ORM\Column(name: 'suspensionReason', type: 'string', length: 500, nullable: true)]
+    private ?string $suspensionReason = null;
+
+    #[ORM\Column(name: 'suspendedBy', type: 'integer', nullable: true)]
+    private ?int $suspendedBy = null;
+
+    #[ORM\Column(name: 'lastLoginAt', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $lastLoginAt = null;
+
+    #[ORM\Column(name: 'lastActivityAt', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $lastActivityAt = null;
+
+   
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+        $this->challenges = new ArrayCollection();
+        $this->isSuspended = false;
+        $this->lastLoginAt = new \DateTime(); // Initialize with current time
+        $this->lastActivityAt = new \DateTime(); // Initialize with current time
+        $this->activities = new ArrayCollection();
+=======
     /**
      * @var Collection<int, Challenge>
      */
@@ -120,6 +162,7 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->Challenges = new ArrayCollection();
         $this->userChallenges = new ArrayCollection();
         $this->votes = new ArrayCollection();
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     }
 
     public function getRoles(): array
@@ -232,9 +275,14 @@ public function isEtudiant(): bool {
     return $this instanceof Etudiant;
 }
 
+<<<<<<< HEAD
+
+
+=======
 /**
  * @return Collection<int, Challenge>
  */
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 public function getChallenges(): Collection
 {
     return $this->Challenges;
@@ -252,10 +300,16 @@ public function addChallenge(Challenge $challenge): static
 
 public function removeChallenge(Challenge $challenge): static
 {
+<<<<<<< HEAD
+    if ($this->challenges->removeElement($challenge)) {
+        if ($challenge->getCreatedBy() === $this) {
+            $challenge->setCreatedBy(null);
+=======
     if ($this->Challenges->removeElement($challenge)) {
         // set the owning side to null (unless already changed)
         if ($challenge->getCreatedby() === $this) {
             $challenge->setCreatedby(null);
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
         }
     }
 
@@ -321,5 +375,104 @@ public function removeVote(Vote $vote): static
 
     return $this;
 }
+
+public function getIsSuspended(): bool
+{
+    return $this->isSuspended;
+}
+
+public function setIsSuspended(bool $isSuspended): static
+{
+    $this->isSuspended = $isSuspended;
+    return $this;
+}
+
+public function getSuspendedAt(): ?\DateTimeInterface
+{
+    return $this->suspendedAt;
+}
+
+public function setSuspendedAt(?\DateTimeInterface $suspendedAt): static
+{
+    $this->suspendedAt = $suspendedAt;
+    return $this;
+}
+
+public function getSuspensionReason(): ?string
+{
+    return $this->suspensionReason;
+}
+
+public function setSuspensionReason(?string $suspensionReason): static
+{
+    $this->suspensionReason = $suspensionReason;
+    return $this;
+}
+
+public function getSuspendedBy(): ?int
+{
+    return $this->suspendedBy;
+}
+
+public function setSuspendedBy(?int $suspendedBy): static
+{
+    $this->suspendedBy = $suspendedBy;
+    return $this;
+}
+
+public function getLastLoginAt(): ?\DateTimeInterface
+{
+    return $this->lastLoginAt;
+}
+
+public function setLastLoginAt(?\DateTimeInterface $lastLoginAt): static
+{
+    $this->lastLoginAt = $lastLoginAt;
+    return $this;
+}
+
+public function getLastActivityAt(): ?\DateTimeInterface
+{
+    return $this->lastActivityAt;
+}
+
+public function setLastActivityAt(?\DateTimeInterface $lastActivityAt): static
+{
+    $this->lastActivityAt = $lastActivityAt;
+    return $this;
+}
+
+/**
+ * @return Collection<int, UserActivity>
+ */
+public function getActivities(): Collection
+{
+    return $this->activities;
+}
+
+public function addActivity(UserActivity $activity): static
+{
+    if (!$this->activities->contains($activity)) {
+        $this->activities->add($activity);
+        $activity->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removeActivity(UserActivity $activity): static
+{
+    if ($this->activities->removeElement($activity)) {
+        // set the owning side to null (unless already changed)
+        if ($activity->getUser() === $this) {
+            $activity->setUser(null);
+        }
+    }
+
+    return $this;
+}
+
+
+
 
 }

@@ -1,0 +1,107 @@
+{{ form_start(form, {'attr': {'style': 'display: grid; gap: 1.5rem;'}}) }}
+    <div style="display: grid; gap: 1rem;">
+        <div>
+            {{ form_label(form.titre) }}
+            {{ form_widget(form.titre, {'attr': {'style': 'width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; color: var(--text-primary);'}}) }}
+            {{ form_help(form.titre) }}
+            {{ form_errors(form.titre) }}
+        </div>
+        
+        <div>
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description, {'attr': {'style': 'width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; color: var(--text-primary); min-height: 100px;'}}) }}
+            {{ form_help(form.description) }}
+            {{ form_errors(form.description) }}
+        </div>
+        
+        <div>
+            {{ form_label(form.etat) }}
+            {{ form_widget(form.etat, {'attr': {'style': 'width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; color: var(--text-primary);'}}) }}
+            {{ form_help(form.etat) }}
+            {{ form_errors(form.etat) }}
+        </div>
+        
+        <div>
+            {{ form_label(form.chapitre) }}
+            {{ form_widget(form.chapitre, {'attr': {'style': 'width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; color: var(--text-primary);', 'required': 'required'}}) }}
+            {{ form_help(form.chapitre) }}
+            {{ form_errors(form.chapitre) }}
+        </div>
+        
+        <div>
+            {{ form_label(form.dureeMaxMinutes) }}
+            {{ form_widget(form.dureeMaxMinutes, {'attr': {'style': 'width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; color: var(--text-primary);'}}) }}
+            {{ form_help(form.dureeMaxMinutes) }}
+            {{ form_errors(form.dureeMaxMinutes) }}
+        </div>
+        
+        <div>
+            {{ form_label(form.seuilReussite) }}
+            {{ form_widget(form.seuilReussite, {'attr': {'style': 'width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; color: var(--text-primary);'}}) }}
+            {{ form_help(form.seuilReussite) }}
+            {{ form_errors(form.seuilReussite) }}
+        </div>
+        
+        <div>
+            {{ form_label(form.maxTentatives) }}
+            {{ form_widget(form.maxTentatives, {'attr': {'style': 'width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; color: var(--text-primary);'}}) }}
+            {{ form_help(form.maxTentatives) }}
+            {{ form_errors(form.maxTentatives) }}
+        </div>
+        
+        {# Image désactivée - propriété imageFile n'existe pas dans l'entité Quiz
+        <div>
+            {{ form_label(form.imageFile) }}
+            {{ form_widget(form.imageFile) }}
+            {{ form_help(form.imageFile) }}
+            {{ form_errors(form.imageFile) }}
+            <small style="color: rgba(255, 255, 255, 0.6); display: block; margin-top: 0.5rem;">
+                Formats acceptés: JPG, PNG, GIF (max 2MB)
+            </small>
+        </div>
+        #}
+        </div>
+    </div>
+    
+    <!-- Boutons d'action -->
+    <div style="display: flex; gap: 1rem; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <div style="display: flex; gap: 0.75rem;">
+            <button type="button" onclick="window.history.back()" class="card-btn" style="background: rgba(255, 255, 255, 0.1); color: white; padding: 0.75rem 1.25rem; border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer;">
+                <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"/>
+                    <polyline points="12 19 5 12 12 5"/>
+                </svg>
+                Retour
+            </button>
+            <a href="{{ path('backoffice_quiz_management') }}" class="card-btn" style="background: rgba(255, 255, 255, 0.1); color: white; padding: 0.75rem 1.25rem; border: 1px solid rgba(255, 255, 255, 0.2); text-decoration: none; display: inline-flex; align-items: center;">
+                <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                Gestion Quiz
+            </a>
+        </div>
+        <button type="submit" class="card-btn" style="background: linear-gradient(135deg, var(--emerald-light), var(--emerald)); color: white; padding: 0.75rem 1.5rem; border: none; cursor: pointer;">
+            <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            {{ button_label|default('Enregistrer') }}
+        </button>
+    </div>
+{{ form_end(form) }}
+
+<!-- Bouton Supprimer (formulaire séparé) -->
+{% if show_delete|default(false) and quiz is defined %}
+<form method="post" action="{{ path('app_quiz_delete', {'id': quiz.id}) }}" 
+      onsubmit="return confirm('⚠️ Êtes-vous sûr de vouloir supprimer ce quiz ? Cette action est irréversible.');"
+      style="margin-top: 1rem;">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quiz.id) }}">
+    <button type="submit" class="card-btn" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 0.75rem 1.5rem; border: none; cursor: pointer;">
+        <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+        Supprimer
+    </button>
+</form>
+{% endif %}

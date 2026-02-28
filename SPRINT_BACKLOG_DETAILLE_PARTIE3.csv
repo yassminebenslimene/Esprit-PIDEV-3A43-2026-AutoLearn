@@ -1,0 +1,95 @@
+ID US,User Story,ID Tâche,Tâche Technique Détaillée,Estimation (min),Responsable
+US-5.31,"En tant qu'Admin, je souhaite générer recommandations d'événements via AI",T5.31.1,"Créer méthode buildRecommendationPrompt() dans AIReportService",40,Admin
+US-5.31,"En tant qu'Admin, je souhaite générer recommandations d'événements via AI",T5.31.2,"Structurer prompt pour recommander 3 événements",35,Admin
+US-5.31,"En tant qu'Admin, je souhaite générer recommandations d'événements via AI",T5.31.3,"Inclure justifications basées sur données",30,Admin
+US-5.31,"En tant qu'Admin, je souhaite générer recommandations d'événements via AI",T5.31.4,"Implémenter méthode generateEventRecommendations()",25,Admin
+US-5.31,"En tant qu'Admin, je souhaite générer recommandations d'événements via AI",T5.31.5,"Ajouter route POST /backoffice/evenement/ai/generate-recommendations",15,Admin
+US-5.31,"En tant qu'Admin, je souhaite générer recommandations d'événements via AI",T5.31.6,"Ajouter bouton ""Recommandations AI"" dans index.html.twig",25,Admin
+US-5.31,"En tant qu'Admin, je souhaite générer recommandations d'événements via AI",T5.31.7,"Implémenter appel AJAX et affichage dans modal",35,Admin
+US-5.31,"En tant qu'Admin, je souhaite générer recommandations d'événements via AI",T5.31.8,"Styliser avec cartes pour chaque recommandation",40,Admin
+US-5.31,"En tant qu'Admin, je souhaite générer recommandations d'événements via AI",T5.31.9,"Tester génération recommandations",25,Admin
+US-5.32,"En tant qu'Admin, je souhaite générer suggestions d'amélioration via AI",T5.32.1,"Créer méthode buildImprovementPrompt() dans AIReportService",40,Admin
+US-5.32,"En tant qu'Admin, je souhaite générer suggestions d'amélioration via AI",T5.32.2,"Structurer prompt pour plan d'amélioration",35,Admin
+US-5.32,"En tant qu'Admin, je souhaite générer suggestions d'amélioration via AI",T5.32.3,"Inclure priorités (HAUTE, MOYENNE, BASSE)",30,Admin
+US-5.32,"En tant qu'Admin, je souhaite générer suggestions d'amélioration via AI",T5.32.4,"Implémenter méthode generateImprovementSuggestions()",25,Admin
+US-5.32,"En tant qu'Admin, je souhaite générer suggestions d'amélioration via AI",T5.32.5,"Ajouter route POST /backoffice/evenement/ai/generate-improvements",15,Admin
+US-5.32,"En tant qu'Admin, je souhaite générer suggestions d'amélioration via AI",T5.32.6,"Ajouter bouton ""Suggestions d'Amélioration AI"" dans index.html.twig",25,Admin
+US-5.32,"En tant qu'Admin, je souhaite générer suggestions d'amélioration via AI",T5.32.7,"Implémenter appel AJAX et affichage dans modal",35,Admin
+US-5.32,"En tant qu'Admin, je souhaite générer suggestions d'amélioration via AI",T5.32.8,"Styliser avec badges de priorité colorés",40,Admin
+US-5.32,"En tant qu'Admin, je souhaite générer suggestions d'amélioration via AI",T5.32.9,"Tester génération suggestions",25,Admin
+US-5.33,"Le système empêche participations aux événements en cours ou terminés",T5.33.1,"Implémenter méthode areParticipationsOpen() dans Evenement.php",25,Admin
+US-5.33,"Le système empêche participations aux événements en cours ou terminés",T5.33.2,"Vérifier workflowStatus === 'planifie'",15,Admin
+US-5.33,"Le système empêche participations aux événements en cours ou terminés",T5.33.3,"Vérifier !isCanceled",10,Admin
+US-5.33,"Le système empêche participations aux événements en cours ou terminés",T5.33.4,"Créer méthode canAcceptParticipations() (alias)",10,Admin
+US-5.33,"Le système empêche participations aux événements en cours ou terminés",T5.33.5,"Modifier FrontofficeEvenementController->participate()",30,Admin
+US-5.33,"Le système empêche participations aux événements en cours ou terminés",T5.33.6,"Vérifier canAcceptParticipations() avant affichage",20,Admin
+US-5.33,"Le système empêche participations aux événements en cours ou terminés",T5.33.7,"Rediriger avec message d'erreur si bloqué",20,Admin
+US-5.33,"Le système empêche participations aux événements en cours ou terminés",T5.33.8,"Modifier index.html.twig pour cacher bouton ""Participer""",30,Admin
+US-5.33,"Le système empêche participations aux événements en cours ou terminés",T5.33.9,"Afficher messages conditionnels (En cours, Terminé, Annulé)",35,Admin
+US-5.33,"Le système empêche participations aux événements en cours ou terminés",T5.33.10,"Styliser messages avec couleurs appropriées",25,Admin
+US-5.33,"Le système empêche participations aux événements en cours ou terminés",T5.33.11,"Tester blocage participations (en_cours)",20,Admin
+US-5.33,"Le système empêche participations aux événements en cours ou terminés",T5.33.12,"Tester blocage participations (termine)",20,Admin
+US-5.33,"Le système empêche participations aux événements en cours ou terminés",T5.33.13,"Tester blocage participations (annule)",20,Admin
+US-5.34,"Le système log toutes les transitions d'états avec traçabilité",T5.34.1,"Créer src/EventSubscriber/EvenementWorkflowSubscriber.php (déjà fait)",30,Admin
+US-5.34,"Le système log toutes les transitions d'états avec traçabilité",T5.34.2,"Implémenter getSubscribedEvents()",20,Admin
+US-5.34,"Le système log toutes les transitions d'états avec traçabilité",T5.34.3,"Écouter workflow.transition (toutes transitions)",15,Admin
+US-5.34,"Le système log toutes les transitions d'états avec traçabilité",T5.34.4,"Implémenter méthode onTransition() pour logger",35,Admin
+US-5.34,"Le système log toutes les transitions d'états avec traçabilité",T5.34.5,"Logger: événement ID, titre, transition, from, to",30,Admin
+US-5.34,"Le système log toutes les transitions d'états avec traçabilité",T5.34.6,"Logger: timestamp, user (si disponible)",25,Admin
+US-5.34,"Le système log toutes les transitions d'états avec traçabilité",T5.34.7,"Écouter workflow.entered (états spécifiques)",20,Admin
+US-5.34,"Le système log toutes les transitions d'états avec traçabilité",T5.34.8,"Implémenter méthodes onEnCours(), onTermine(), onAnnule()",40,Admin
+US-5.34,"Le système log toutes les transitions d'états avec traçabilité",T5.34.9,"Logger dans var/log/dev.log avec contexte",25,Admin
+US-5.34,"Le système log toutes les transitions d'états avec traçabilité",T5.34.10,"Tester vérification logs après transitions",30,Admin
+US-5.35,"En tant qu'Étudiant, je souhaite rejoindre une équipe existante",T5.35.1,"Créer route /events/{equipeId}/join/{eventId} (POST)",15,Admin
+US-5.35,"En tant qu'Étudiant, je souhaite rejoindre une équipe existante",T5.35.2,"Implémenter méthode joinEquipe() dans FrontofficeEvenementController",30,Admin
+US-5.35,"En tant qu'Étudiant, je souhaite rejoindre une équipe existante",T5.35.3,"Vérifier que équipe existe et appartient à l'événement",20,Admin
+US-5.35,"En tant qu'Étudiant, je souhaite rejoindre une équipe existante",T5.35.4,"Vérifier que équipe a moins de 6 membres",20,Admin
+US-5.35,"En tant qu'Étudiant, je souhaite rejoindre une équipe existante",T5.35.5,"Vérifier que étudiant n'est pas déjà dans l'équipe",25,Admin
+US-5.35,"En tant qu'Étudiant, je souhaite rejoindre une équipe existante",T5.35.6,"Ajouter étudiant à l'équipe (addEtudiant)",15,Admin
+US-5.35,"En tant qu'Étudiant, je souhaite rejoindre une équipe existante",T5.35.7,"Afficher liste des équipes disponibles dans participate.html.twig",40,Admin
+US-5.35,"En tant qu'Étudiant, je souhaite rejoindre une équipe existante",T5.35.8,"Afficher nombre de membres actuels (X/6)",25,Admin
+US-5.35,"En tant qu'Étudiant, je souhaite rejoindre une équipe existante",T5.35.9,"Ajouter bouton ""Rejoindre"" pour chaque équipe",20,Admin
+US-5.35,"En tant qu'Étudiant, je souhaite rejoindre une équipe existante",T5.35.10,"Styliser cartes d'équipes avec design moderne",35,Admin
+US-5.35,"En tant qu'Étudiant, je souhaite rejoindre une équipe existante",T5.35.11,"Tester rejoindre équipe avec places disponibles",20,Admin
+US-5.35,"En tant qu'Étudiant, je souhaite rejoindre une équipe existante",T5.35.12,"Tester refus si équipe complète (6 membres)",20,Admin
+US-5.36,"En tant qu'Étudiant, je souhaite voir les équipes participantes",T5.36.1,"Récupérer participations acceptées dans index()",20,Admin
+US-5.36,"En tant qu'Étudiant, je souhaite voir les équipes participantes",T5.36.2,"Pour chaque participation, récupérer l'équipe",15,Admin
+US-5.36,"En tant qu'Étudiant, je souhaite voir les équipes participantes",T5.36.3,"Passer les équipes au template",10,Admin
+US-5.36,"En tant qu'Étudiant, je souhaite voir les équipes participantes",T5.36.4,"Créer section ""Équipes Participantes"" dans index.html.twig",35,Admin
+US-5.36,"En tant qu'Étudiant, je souhaite voir les équipes participantes",T5.36.5,"Afficher mini-cartes pour chaque équipe",40,Admin
+US-5.36,"En tant qu'Étudiant, je souhaite voir les équipes participantes",T5.36.6,"Afficher nom équipe + nombre de membres",20,Admin
+US-5.36,"En tant qu'Étudiant, je souhaite voir les équipes participantes",T5.36.7,"Styliser avec gradients et icônes",30,Admin
+US-5.36,"En tant qu'Étudiant, je souhaite voir les équipes participantes",T5.36.8,"Afficher dans accordéon expand/collapse",25,Admin
+US-5.36,"En tant qu'Étudiant, je souhaite voir les équipes participantes",T5.36.9,"Tester affichage équipes",15,Admin
+US-5.37,"En tant qu'Admin, je souhaite voir détails d'un événement",T5.37.1,"Créer route /backoffice/evenement/{id} (GET)",10,Admin
+US-5.37,"En tant qu'Admin, je souhaite voir détails d'un événement",T5.37.2,"Implémenter méthode show() dans EvenementController",25,Admin
+US-5.37,"En tant qu'Admin, je souhaite voir détails d'un événement",T5.37.3,"Récupérer toutes participations de l'événement",20,Admin
+US-5.37,"En tant qu'Admin, je souhaite voir détails d'un événement",T5.37.4,"Calculer statistiques (acceptées, refusées, en attente)",30,Admin
+US-5.37,"En tant qu'Admin, je souhaite voir détails d'un événement",T5.37.5,"Récupérer feedbacks si disponibles",20,Admin
+US-5.37,"En tant qu'Admin, je souhaite voir détails d'un événement",T5.37.6,"Créer template templates/backoffice/evenement/show.html.twig",50,Admin
+US-5.37,"En tant qu'Admin, je souhaite voir détails d'un événement",T5.37.7,"Section informations générales (titre, type, dates, lieu)",30,Admin
+US-5.37,"En tant qu'Admin, je souhaite voir détails d'un événement",T5.37.8,"Section participations avec tableau",40,Admin
+US-5.37,"En tant qu'Admin, je souhaite voir détails d'un événement",T5.37.9,"Section équipes avec détails membres",40,Admin
+US-5.37,"En tant qu'Admin, je souhaite voir détails d'un événement",T5.37.10,"Section statistiques avec graphiques",45,Admin
+US-5.37,"En tant qu'Admin, je souhaite voir détails d'un événement",T5.37.11,"Boutons d'action (Modifier, Annuler, Supprimer)",25,Admin
+US-5.37,"En tant qu'Admin, je souhaite voir détails d'un événement",T5.37.12,"Tester affichage détails",25,Admin
+US-5.38,"Le système supprime automatiquement participations refusées",T5.38.1,"Créer src/Command/CleanupRefusedParticipationsCommand.php",30,Admin
+US-5.38,"Le système supprime automatiquement participations refusées",T5.38.2,"Récupérer toutes participations avec statut REFUSE",20,Admin
+US-5.38,"Le système supprime automatiquement participations refusées",T5.38.3,"Supprimer chaque participation refusée",20,Admin
+US-5.38,"Le système supprime automatiquement participations refusées",T5.38.4,"Logger les suppressions (nombre, IDs)",20,Admin
+US-5.38,"Le système supprime automatiquement participations refusées",T5.38.5,"Configurer cron job pour exécution quotidienne",15,Admin
+US-5.38,"Le système supprime automatiquement participations refusées",T5.38.6,"Tester suppression automatique",20,Admin
+US-5.39,"Le système génère fichier .ics calendrier",T5.39.1,"Implémenter méthode generateIcsFile() dans EmailService",40,Admin
+US-5.39,"Le système génère fichier .ics calendrier",T5.39.2,"Format iCalendar (BEGIN:VCALENDAR, VERSION:2.0)",30,Admin
+US-5.39,"Le système génère fichier .ics calendrier",T5.39.3,"Ajouter VEVENT avec DTSTART, DTEND, SUMMARY, LOCATION",35,Admin
+US-5.39,"Le système génère fichier .ics calendrier",T5.39.4,"Ajouter DESCRIPTION avec détails événement",20,Admin
+US-5.39,"Le système génère fichier .ics calendrier",T5.39.5,"Ajouter UID unique pour chaque événement",15,Admin
+US-5.39,"Le système génère fichier .ics calendrier",T5.39.6,"Attacher fichier .ics à l'email de confirmation",25,Admin
+US-5.39,"Le système génère fichier .ics calendrier",T5.39.7,"Tester génération fichier .ics",20,Admin
+US-5.39,"Le système génère fichier .ics calendrier",T5.39.8,"Tester import dans Google Calendar / Outlook",25,Admin
+US-5.40,"Le système valide contraintes de dates",T5.40.1,"Ajouter Assert\Expression dans Evenement.php",20,Admin
+US-5.40,"Le système valide contraintes de dates",T5.40.2,"Expression: ""this.getDateFin() >= this.getDateDebut()""",15,Admin
+US-5.40,"Le système valide contraintes de dates",T5.40.3,"Message d'erreur personnalisé",10,Admin
+US-5.40,"Le système valide contraintes de dates",T5.40.4,"Ajouter Assert\GreaterThan(""today"") pour dateDebut",15,Admin
+US-5.40,"Le système valide contraintes de dates",T5.40.5,"Tester validation avec date fin < date début",15,Admin
+US-5.40,"Le système valide contraintes de dates",T5.40.6,"Tester validation avec date début dans le passé",15,Admin

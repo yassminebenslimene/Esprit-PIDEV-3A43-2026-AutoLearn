@@ -1,0 +1,267 @@
+{% extends 'frontoffice/base.html.twig' %}
+
+{% block title %}My Participations{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .participations-section {
+            padding: 120px 0 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+        }
+        
+        .section-header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .section-header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .participation-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .participation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .participation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .status-accepted {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .status-pending {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+        
+        .status-refused {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .event-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            color: #4a5568;
+        }
+        
+        .info-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            color: #667eea;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-success {
+            background: #e9d8fd;
+            color: #44337a;
+            border-left: 4px solid #667eea;
+        }
+        
+        .alert-warning {
+            background: #feebc8;
+            color: #7c2d12;
+            border-left: 4px solid #dd6b20;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="participations-section">
+    <div class="container">
+        <div class="section-header">
+            <h1>My Participations</h1>
+            <p>Track your event participations</p>
+        </div>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                ✓ {{ message }}
+            </div>
+        {% endfor %}
+
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-warning" style="background: #fed7d7; color: #742a2a; border-left: 4px solid #fc8181;">
+                ✗ {{ message }}
+            </div>
+        {% endfor %}
+
+        {% for message in app.flashes('warning') %}
+            <div class="alert alert-warning">
+                ⚠️ {{ message }}
+            </div>
+        {% endfor %}
+
+        {% if participations is empty %}
+            <div class="empty-state">
+                <div class="empty-state-icon">🎯</div>
+                <h3>No participations yet</h3>
+                <p>Register your team for an event!</p>
+                <a href="{{ path('app_events') }}" class="btn btn-primary">
+                    View Events
+                </a>
+            </div>
+        {% else %}
+            <div class="row">
+                {% for participation in participations %}
+                    <div class="col-lg-6">
+                        <div class="participation-card">
+                            {% if participation.statut.value == 'Accepté' %}
+                                <span class="status-badge status-accepted">✓ Accepted</span>
+                            {% elseif participation.statut.value == 'En attente' %}
+                                <span class="status-badge status-pending">⏳ Pending</span>
+                            {% else %}
+                                <span class="status-badge status-refused">✗ Refused</span>
+                            {% endif %}
+                            
+                            <h3 class="event-title">{{ participation.evenement.titre }}</h3>
+                            
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                    </svg>
+                                    <strong>Team:</strong>&nbsp;{{ participation.equipe.nom }}
+                                </div>
+                                <div class="info-item">
+                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    <strong>Location:</strong>&nbsp;{{ participation.evenement.lieu }}
+                                </div>
+                                <div class="info-item">
+                                    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <strong>Date:</strong>&nbsp;{{ participation.evenement.dateDebut|date('d/m/Y H:i') }}
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 20px;">
+                                <a href="{{ path('app_participation_show', {'id': participation.id}) }}" class="btn btn-primary">
+                                    👁️ View Details
+                                </a>
+                                
+                                {# Bouton Feedback - visible UNIQUEMENT si: événement terminé + participation acceptée + événement NON annulé #}
+                                {% set now = date() %}
+                                {% if participation.evenement.dateFin < now 
+                                   and participation.statut.value == 'Accepté' 
+                                   and participation.evenement.isCanceled == false %}
+                                    {% set hasFeedback = participation.hasFeedbackFromEtudiant(app.user.id) %}
+                                    <a href="{{ path('app_feedback_form', {'id': participation.id}) }}" 
+                                       class="btn" 
+                                       style="background: {% if hasFeedback %}#48bb78{% else %}#f6ad55{% endif %}; color: white; margin-left: 10px; padding: 12px 25px; border-radius: 10px; text-decoration: none; font-weight: 600;">
+                                        {% if hasFeedback %}
+                                            ✅ Modifier mon feedback
+                                        {% else %}
+                                            📝 Donner mon feedback
+                                        {% endif %}
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

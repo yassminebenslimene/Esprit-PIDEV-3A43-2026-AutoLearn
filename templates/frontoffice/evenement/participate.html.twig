@@ -1,0 +1,371 @@
+{% extends 'frontoffice/base.html.twig' %}
+
+{% block title %}Participate in {{ evenement.titre }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .participate-section {
+            padding: 120px 0 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .participate-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        
+        .page-header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .page-header .event-name {
+            font-size: 24px;
+            opacity: 0.95;
+        }
+        
+        .intro-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        
+        .intro-card h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .intro-card p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+        
+        .benefits-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+        
+        .benefit-item {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .benefit-item strong {
+            display: block;
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .benefit-item p {
+            margin: 0;
+            font-size: 14px;
+            color: #718096;
+        }
+        
+        .options-section {
+            margin-top: 40px;
+        }
+        
+        .options-section h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+        
+        .option-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        }
+        
+        .option-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+        
+        .option-card h4 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        .option-card p {
+            font-size: 15px;
+            color: #718096;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .option-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 35px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .teams-available {
+            margin-top: 40px;
+        }
+        
+        .teams-available h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .teams-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .team-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .team-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        
+        .team-card h5 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        .team-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: #718096;
+            font-size: 14px;
+        }
+        
+        .team-info svg {
+            width: 18px;
+            height: 18px;
+            color: #667eea;
+        }
+        
+        .join-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .join-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.3);
+            color: white;
+        }
+        
+        .no-teams {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            color: #718096;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="participate-section">
+    <div class="container">
+        <div class="participate-container">
+            <a href="{{ path('app_events') }}" class="back-btn">← Back to Events</a>
+            
+            <div class="page-header">
+                <h1>🎯 Join the Event</h1>
+                <p class="event-name">{{ evenement.titre }}</p>
+            </div>
+
+            <div class="intro-card">
+                <h2>
+                    <span>🚀</span>
+                    Why Participate in Our Events?
+                </h2>
+                <p>
+                    Our events are carefully designed to provide you with practical, hands-on experience that goes beyond 
+                    traditional classroom learning. By participating, you'll have the opportunity to apply your technical 
+                    knowledge in real-world scenarios while developing crucial professional skills.
+                </p>
+                
+                <div class="benefits-list">
+                    <div class="benefit-item">
+                        <strong>🤝 Networking</strong>
+                        <p>Connect with peers, mentors, and industry professionals to expand your professional network.</p>
+                    </div>
+                    <div class="benefit-item">
+                        <strong>💬 Communication</strong>
+                        <p>Enhance your ability to articulate ideas, collaborate effectively, and present solutions.</p>
+                    </div>
+                    <div class="benefit-item">
+                        <strong>👥 Teamwork</strong>
+                        <p>Learn to work efficiently in teams, manage conflicts, and leverage diverse perspectives.</p>
+                    </div>
+                    <div class="benefit-item">
+                        <strong>🛠️ Technical Skills</strong>
+                        <p>Apply what you've learned through practical projects, hackathons, and workshops.</p>
+                    </div>
+                </div>
+
+                <div class="options-section">
+                    <h3>Choose Your Path</h3>
+                    
+                    <div class="options-grid">
+                        <div class="option-card">
+                            <div class="option-icon">👥</div>
+                            <h4>Join an Existing Team</h4>
+                            <p>
+                                Connect with students who are already registered for this event. 
+                                Teams can have up to 6 members, so you can join any team with available spots.
+                            </p>
+                            {% if equipesDisponibles is not empty %}
+                                <a href="#teams-list" class="option-btn">View Available Teams</a>
+                            {% else %}
+                                <p style="color: #e53e3e; font-weight: 600;">No teams available with open spots</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="option-card">
+                            <div class="option-icon">✨</div>
+                            <h4>Create a New Team</h4>
+                            <p>
+                                Start your own team with your classmates! Select 4 to 6 students 
+                                and give your team a unique name. You'll automatically be registered for this event.
+                            </p>
+                            <a href="{{ path('app_equipe_new_for_event', {'eventId': evenement.id}) }}" class="option-btn">Create New Team</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if equipesDisponibles is not empty %}
+                <div class="teams-available" id="teams-list">
+                    <h3>Available Teams ({{ equipesDisponibles|length }})</h3>
+                    
+                    <div class="teams-list">
+                        {% for equipe in equipesDisponibles %}
+                            <div class="team-card">
+                                <h5>{{ equipe.nom }}</h5>
+                                
+                                <div class="team-info">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                    </svg>
+                                    <span>{{ equipe.etudiants|length }} / 6 members</span>
+                                </div>
+                                
+                                <div class="team-info">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span>{{ 6 - equipe.etudiants|length }} spots available</span>
+                                </div>
+                                
+                                <form method="post" action="{{ path('app_equipe_join', {'equipeId': equipe.id, 'eventId': evenement.id}) }}" style="margin-top: 15px;">
+                                    <button type="submit" class="join-btn">Join This Team</button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

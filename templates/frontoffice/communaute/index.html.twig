@@ -5,6 +5,428 @@
 {% block body %}
     <h1>Communaute index</h1>
 
+<<<<<<< HEAD
+<div class="page-heading header-text">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h3>Communautés</h3>
+                <span class="breadcrumb">
+                    <a href="{{ path('app_frontoffice') }}">Home</a>
+                    > Communautés
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Container principal */
+.community-container {
+    max-width: 1100px;
+    margin: 40px auto 80px;
+    padding: 0 20px;
+}
+
+/* Section header avec bouton */
+.communities-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.communities-header-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.communities-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 10px 0;
+}
+
+.communities-stats {
+    color: #999;
+    font-size: 0.95rem;
+    margin-bottom: 25px;
+}
+
+/* Bouton nouvelle communauté */
+.btn-main {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+}
+
+.btn-main:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    color: white;
+    text-decoration: none;
+}
+
+/* Grille de communautés */
+.communities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+/* Carte de communauté */
+.community-card {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.community-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.community-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+}
+
+.community-card:hover::before {
+    transform: scaleX(1);
+}
+
+/* Icône de la communauté */
+.community-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Titre de la communauté */
+.community-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 12px;
+    line-height: 1.3;
+}
+
+/* Description */
+.community-desc {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Métadonnées */
+.community-meta {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #999;
+    font-size: 0.85rem;
+}
+
+.meta-item i {
+    color: #667eea;
+}
+
+/* Actions */
+.community-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f8f9ff;
+    color: #667eea;
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.btn-outline:hover {
+    background: #667eea;
+    color: white;
+    text-decoration: none;
+    border-color: #667eea;
+}
+
+.btn-edit {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.btn-edit:hover {
+    background: #ffc107;
+    color: white;
+    border-color: #ffc107;
+}
+
+.btn-delete {
+    background: #f8d7da;
+    color: #721c24;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+/* Message vide */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: #999;
+    font-size: 1rem;
+    margin-bottom: 30px;
+}
+
+/* Badge propriétaire */
+.owner-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .communities-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .communities-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .community-card {
+        padding: 20px;
+    }
+}
+</style>
+
+<div class="community-container">
+
+    <div class="communities-header-center">
+        <h2>Mes Communautés</h2>
+        <p class="communities-stats">{{ communautes|length }} communauté(s) disponible(s)</p>
+        
+        {# Barre de recherche #}
+        <form method="get" action="{{ path('app_communaute_index') }}" style="width: 100%; max-width: 600px; margin: 20px 0;">
+            <div style="position: relative;">
+                <input 
+                    type="text" 
+                    name="search" 
+                    value="{{ search }}" 
+                    placeholder="🔍 Rechercher une communauté par nom ou description..."
+                    style="width: 100%; padding: 14px 50px 14px 20px; border: 2px solid #e0e0e0; border-radius: 50px; font-size: 1rem; transition: all 0.3s;"
+                    onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'"
+                    onblur="this.style.borderColor='#e0e0e0'; this.style.boxShadow='none'"
+                >
+                <button 
+                    type="submit" 
+                    style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; font-weight: 600;"
+                >
+                    Rechercher
+                </button>
+            </div>
+        </form>
+        
+        {% if search %}
+            <p style="color: #667eea; font-size: 0.9rem; margin-top: 10px;">
+                Résultats pour "{{ search }}" 
+                <a href="{{ path('app_communaute_index') }}" style="color: #999; text-decoration: underline; margin-left: 10px;">Effacer</a>
+            </p>
+        {% endif %}
+        
+        <a href="/communaute/new" class="btn-main" style="margin-top: 20px;">
+            ➕ Nouvelle communauté
+        </a>
+    </div>
+
+    {% if communautes|length > 0 %}
+        <div class="communities-grid">
+            {% for communaute in communautes %}
+                <div class="community-card">
+                    
+                    {% if app.user and communaute.owner and communaute.owner.id == app.user.id %}
+                        <div class="owner-badge">
+                            👑 Propriétaire
+                        </div>
+                    {% endif %}
+
+                    <div class="community-icon">
+                        {{ communaute.nom|first|upper }}
+                    </div>
+
+                    <div class="community-title">
+                        {{ communaute.nom }}
+                    </div>
+
+                    <div class="community-desc">
+                        {{ communaute.description }}
+                    </div>
+
+                    <div class="community-meta">
+                        <div class="meta-item">
+                            <i>👥</i>
+                            <span>{{ communaute.members|length }} membres</span>
+                        </div>
+                        <div class="meta-item">
+                            <i>💬</i>
+                            <span>{{ communaute.posts|length }} posts</span>
+                        </div>
+                    </div>
+
+                    <div class="community-actions">
+                        {% set isMember = app.user and (communaute.members.contains(app.user) or (communaute.owner and communaute.owner.id == app.user.id)) %}
+                        {% set hasPendingRequest = app.user and communaute.hasPendingRequest(app.user) %}
+                        
+                        {% if isMember %}
+                            <a href="/communaute/{{ communaute.id }}" class="btn-outline">
+                                👁️ Voir
+                            </a>
+                        {% elseif hasPendingRequest %}
+                            <button class="btn-outline" disabled style="opacity: 0.6; cursor: not-allowed;">
+                                ⏳ Demande en attente
+                            </button>
+                        {% elseif app.user %}
+                            <form method="post" action="{{ path('app_communaute_request_join', {id: communaute.id}) }}" style="display: inline-block;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('join_' ~ communaute.id) }}">
+                                <button type="submit" class="btn-outline">
+                                    ➕ Rejoindre
+                                </button>
+                            </form>
+                        {% else %}
+                            <a href="{{ path('app_login') }}" class="btn-outline">
+                                🔒 Connexion requise
+                            </a>
+                        {% endif %}
+
+                        {% if app.user and communaute.owner and communaute.owner.id == app.user.id %}
+                            <a href="/communaute/{{ communaute.id }}/edit" class="btn-outline btn-edit">
+                                ✏️ Modifier
+                            </a>
+                            
+                            <form method="post" action="/communaute/{{ communaute.id }}" style="display: inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette communauté ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ communaute.id) }}">
+                                <button type="submit" class="btn-outline btn-delete">
+                                    🗑️ Supprimer
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            {% if search %}
+                <h3>Aucun résultat trouvé</h3>
+                <p>Aucune communauté ne correspond à votre recherche "{{ search }}"</p>
+                <a href="{{ path('app_communaute_index') }}" class="btn-main">
+                    ← Voir toutes les communautés
+                </a>
+            {% else %}
+                <h3>Aucune communauté pour le moment</h3>
+                <p>Créez votre première communauté pour commencer à échanger avec d'autres membres</p>
+                <a href="/communaute/new" class="btn-main">
+                    ➕ Créer ma première communauté
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+</div>
+
+=======
     <table class="table">
         <thead>
             <tr>
@@ -34,4 +456,5 @@
     </table>
 
     <a href="{{ path('app_communaute_new') }}">Create new</a>
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 {% endblock %}

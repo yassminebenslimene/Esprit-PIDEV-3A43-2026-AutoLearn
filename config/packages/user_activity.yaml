@@ -1,0 +1,11 @@
+user_activity:
+    max_failed_attempts: 5
+    lock_duration: 10
+    cleanup_after_days: 90
+    tracked_actions:
+        - LOGIN_SUCCESS
+        - LOGIN_FAILED
+        - LOGOUT
+        - PASSWORD_CHANGE
+        - PROFILE_UPDATE
+        - ACCOUNT_SUSPEND

@@ -1,0 +1,13 @@
+# src/Bundle/UserActivityBundle/Resources/config/services.yaml
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\Bundle\UserActivityBundle\:
+        resource: '../../'
+        exclude:
+            - '../../DependencyInjection/'
+            - '../../Entity/'
+            - '../../Resources/'
+            - '../../Tests/'

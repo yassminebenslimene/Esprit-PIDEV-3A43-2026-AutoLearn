@@ -3,11 +3,14 @@
 namespace App\Entity;
 
 use App\Repository\PostRepository;
+use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
+#[Vich\Uploadable]
 class Post
 {
     #[ORM\Id]
@@ -18,20 +21,29 @@ class Post
     #[ORM\Column(type: 'text')]
     private ?string $contenu = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $imageUrl = null;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $titre = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $videoUrl = null;
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    private ?string $aiReaction = null;
 
-    // src/Entity/Post.php
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $aiReactionData = null;
 
-   #[ORM\Column(nullable: true)]
-   private ?string $imageFile = null;
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $summary = null;
 
-   #[ORM\Column(nullable: true)]
-   private ?string $videoFile = null;
+    #[ORM\Column(nullable: true)]
+    private ?string $imageFile = null;
 
+    #[Vich\UploadableField(mapping: 'post_images', fileNameProperty: 'imageFile')]
+    private ?File $imageFileUpload = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $videoFile = null;
+
+    #[Vich\UploadableField(mapping: 'post_videos', fileNameProperty: 'videoFile')]
+    private ?File $videoFileUpload = null;
 
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
@@ -39,6 +51,10 @@ class Post
     #[ORM\ManyToOne(inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Communaute $communaute = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(referencedColumnName: 'userId', nullable: true)]
+    private ?User $user = null;
 
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: Commentaire::class, orphanRemoval: true)]
     private Collection $commentaires;
@@ -49,109 +65,67 @@ class Post
         $this->commentaires = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    public function getId(): ?int { return $this->id; }
 
-    public function getContenu(): ?string
-    {
-        return $this->contenu;
-    }
+    public function getContenu(): ?string { return $this->contenu; }
+    public function setContenu(?string $contenu): self { $this->contenu = $contenu ?? ''; return $this; }
 
-    public function setContenu(string $contenu): self
-    {
-        $this->contenu = $contenu;
-        return $this;
-    }
+    public function getTitre(): ?string { return $this->titre; }
+    public function setTitre(?string $titre): self { $this->titre = $titre; return $this; }
 
-    public function getCreatedAt(): \DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
+    public function getSummary(): ?string { return $this->summary; }
+    public function setSummary(?string $summary): self { $this->summary = $summary; return $this; }
 
-    public function getCommunaute(): ?Communaute
-    {
-        return $this->communaute;
-    }
+    public function getAiReaction(): ?string { return $this->aiReaction; }
+    public function setAiReaction(?string $aiReaction): self { $this->aiReaction = $aiReaction; return $this; }
 
-    public function setCommunaute(?Communaute $communaute): self
-    {
-        $this->communaute = $communaute;
-        return $this;
-    }
+    public function getAiReactionData(): ?array { return $this->aiReactionData; }
+    public function setAiReactionData(?array $aiReactionData): self { $this->aiReactionData = $aiReactionData; return $this; }
 
-    /**
-     * @return Collection<int, Commentaire>
-     */
-    public function getCommentaires(): Collection
-    {
-        return $this->commentaires;
-    }
+    public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
 
-    public function addCommentaire(Commentaire $commentaire): self
+    public function getImageFile(): ?string { return $this->imageFile; }
+    public function setImageFile(?string $imageFile): void { $this->imageFile = $imageFile; }
+
+    public function setImageFileUpload(?File $file = null): void
     {
-        if (!$this->commentaires->contains($commentaire)) {
-            $this->commentaires->add($commentaire);
-            $commentaire->setPost($this);
+        $this->imageFileUpload = $file;
+        if ($file) {
+            $this->createdAt = new \DateTimeImmutable();
         }
-
-        return $this;
     }
 
-    public function removeCommentaire(Commentaire $commentaire): self
+    public function getImageFileUpload(): ?File
     {
-        if ($this->commentaires->removeElement($commentaire)) {
-            if ($commentaire->getPost() === $this) {
-                $commentaire->setPost(null);
-            }
-        }
-
-        return $this;
+        return $this->imageFileUpload;
     }
 
-    public function getImageUrl(): ?string
-{
-    return $this->imageUrl;
-}
+    public function getVideoFile(): ?string { return $this->videoFile; }
+    public function setVideoFile(?string $videoFile): void { $this->videoFile = $videoFile; }
 
-public function setImageUrl(?string $imageUrl): self
-{
-    $this->imageUrl = $imageUrl;
-    return $this;
-}
+    public function setVideoFileUpload(?File $file = null): void
+    {
+        $this->videoFileUpload = $file;
+        if ($file) {
+            $this->createdAt = new \DateTimeImmutable();
+        }
+    }
 
-public function getVideoUrl(): ?string
-{
-    return $this->videoUrl;
-}
+    public function getVideoFileUpload(): ?File
+    {
+        return $this->videoFileUpload;
+    }
 
-public function setVideoUrl(?string $videoUrl): self
-{
-    $this->videoUrl = $videoUrl;
-    return $this;
-}
+    public function getCommunaute(): ?Communaute { return $this->communaute; }
+    public function setCommunaute(?Communaute $communaute): self { $this->communaute = $communaute; return $this; }
 
-public function getImageFile(): ?string
-{
-    return $this->imageFile;
-}
+    public function getUser(): ?User { return $this->user; }
+    public function setUser(?User $user): self { $this->user = $user; return $this; }
 
-public function setImageFile(?string $imageFile): self
-{
-    $this->imageFile = $imageFile;
-    return $this;
-}
+    public function getCommentaires(): Collection { return $this->commentaires; }
 
-public function getVideoFile(): ?string
-{
-    return $this->videoFile;
-}
-
-public function setVideoFile(?string $videoFile): self
-{
-    $this->videoFile = $videoFile;
-    return $this;
-}
-
+    public function __toString(): string
+    {
+        return (string) ($this->contenu ?? '');
+    }
 }

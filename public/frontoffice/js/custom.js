@@ -148,13 +148,22 @@
 	    var scrollPos = $(document).scrollTop();
 	    $('.nav a').each(function () {
 	        var currLink = $(this);
-	        var refElement = $(currLink.attr("href"));
-	        if (refElement.position().top <= scrollPos && refElement.position().top + refElement.height() > scrollPos) {
-	            $('.nav ul li a').removeClass("active");
-	            currLink.addClass("active");
+	        var href = currLink.attr("href");
+	        
+	        // Skip external links (those without # or with full URLs)
+	        if (!href || href.indexOf('#') !== 0) {
+	            return;
 	        }
-	        else{
-	            currLink.removeClass("active");
+	        
+	        var refElement = $(href);
+	        if (refElement.length && refElement.position()) {
+	            if (refElement.position().top <= scrollPos && refElement.position().top + refElement.height() > scrollPos) {
+	                $('.nav a').removeClass("active");
+	                currLink.addClass("active");
+	            }
+	            else{
+	                currLink.removeClass("active");
+	            }
 	        }
 	    });
 	}

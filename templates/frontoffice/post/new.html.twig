@@ -2,9 +2,72 @@
 
 {% block title %}Nouveau post | Scholar{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.querySelector('.rich-editor');
+            if (!textarea) return;
+
+            // Créer un div pour CKEditor
+            const editorDiv = document.createElement('div');
+            editorDiv.id = 'editor';
+            textarea.style.display = 'none';
+            textarea.parentNode.insertBefore(editorDiv, textarea);
+
+            // Initialiser CKEditor 5
+            ClassicEditor
+                .create(editorDiv, {
+                    language: 'fr',
+                    toolbar: {
+                        items: [
+                            'heading',
+                            '|',
+                            'bold',
+                            'italic',
+                            '|',
+                            'link',
+                            'bulletedList',
+                            'numberedList',
+                            '|',
+                            'blockQuote',
+                            'insertTable',
+                            '|',
+                            'undo',
+                            'redo'
+                        ]
+                    }
+                })
+                .then(editor => {
+                    // Synchroniser avec le textarea
+                    editor.model.document.on('change:data', () => {
+                        textarea.value = editor.getData();
+                    });
+                    
+                    // Charger le contenu initial
+                    if (textarea.value) {
+                        editor.setData(textarea.value);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur CKEditor:', error);
+                });
+        });
+    </script>
+    <style>
+        .ck-editor__editable {
+            min-height: 300px;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
 
-<!-- ===== PAGE HEADING ===== -->
 <div class="page-heading header-text">
     <div class="container">
         <div class="row">
@@ -32,11 +95,6 @@
     box-shadow: 0 12px 32px rgba(0,0,0,0.08);
 }
 
-.post-form-card h4 {
-    margin-bottom: 22px;
-}
-
-/* textarea */
 .post-form-card textarea {
     width: 100%;
     min-height: 140px;
@@ -47,29 +105,10 @@
     font-size: 15px;
 }
 
-/* media fields */
 .media-field {
     margin-top: 20px;
 }
 
-.media-field label {
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 8px;
-    display: block;
-}
-
-/* text inputs */
-.media-field input[type="text"],
-.media-field input[type="url"] {
-    width: 100%;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    padding: 10px 14px;
-    font-size: 14px;
-}
-
-/* file upload */
 .media-field input[type="file"] {
     width: 100%;
     padding: 10px;
@@ -79,15 +118,6 @@
     cursor: pointer;
 }
 
-/* separator */
-.media-separator {
-    text-align: center;
-    font-size: 13px;
-    color: #999;
-    margin: 14px 0;
-}
-
-/* actions */
 .post-actions {
     display: flex;
     gap: 12px;
@@ -110,6 +140,7 @@
     padding: 10px 26px;
     border-radius: 999px;
     text-decoration: none;
+    display: inline-block;
 }
 </style>
 
@@ -119,47 +150,28 @@
 
         <h4>Créer un post</h4>
 
-        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+        {{ form_start(form) }}
 
         {# ===== TEXTE ===== #}
-        {{ form_widget(form.contenu, {
-            attr: { placeholder: 'Écris ton post ici...' }
-        }) }}
-
-        {# ================= IMAGE ================= #}
-
-        <div class="media-field">
-            {{ form_label(form.imageUrl, 'Image (lien)') }}
-            {{ form_widget(form.imageUrl, {
-                attr: { placeholder: 'https://exemple.com/image.jpg' }
-            }) }}
+        <div class="form-group">
+            {{ form_label(form.contenu, 'Texte du post') }}
+            {{ form_widget(form.contenu) }}
+            {{ form_errors(form.contenu) }}
         </div>
 
-        <div class="media-separator">ou</div>
-
+        {# ================= IMAGE ================= #}
         <div class="media-field">
-            {{ form_label(form.imageFile, 'Uploader une image') }}
-            {{ form_widget(form.imageFile) }}
+            {{ form_label(form.imageFileUpload, 'Uploader une image') }}
+            {{ form_widget(form.imageFileUpload) }}
         </div>
 
         {# ================= VIDEO ================= #}
-
         <div class="media-field">
-            {{ form_label(form.videoUrl, 'Vidéo YouTube (lien)') }}
-            {{ form_widget(form.videoUrl, {
-                attr: { placeholder: 'https://www.youtube.com/watch?v=XXXX' }
-            }) }}
-        </div>
-
-        <div class="media-separator">ou</div>
-
-        <div class="media-field">
-            {{ form_label(form.videoFile, 'Uploader une vidéo') }}
-            {{ form_widget(form.videoFile) }}
+            {{ form_label(form.videoFileUpload, 'Uploader une vidéo') }}
+            {{ form_widget(form.videoFileUpload) }}
         </div>
 
         {# ================= ACTIONS ================= #}
-
         <div class="post-actions">
             <button type="submit" class="btn-publish">
                 Publier
@@ -177,4 +189,8 @@
 
 </div>
 
+<<<<<<< HEAD
 {% endblock %}
+=======
+{% endblock %}
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f

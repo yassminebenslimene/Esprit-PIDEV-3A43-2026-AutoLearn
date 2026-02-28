@@ -27,7 +27,38 @@
            {% block importmap %}{{ importmap('app') }}{% endblock %} #}
         {% endblock %}
     </head>
+<<<<<<< HEAD
+    <
+        <!-- Swiper -->
+        <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
+    {% endblock %}
+</head>
+<body>
+    {% block body %}{% endblock %}
+
+    {% block javascripts %}
+        <!-- jQuery -->
+        <script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
+        
+        <!-- Bootstrap -->
+        <script src="{{ asset('frontoffice/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+        
+        <!-- Plugin JS -->
+        <script src="{{ asset('frontoffice/js/isotope.min.js') }}"></script>
+        <script src="{{ asset('frontoffice/js/owl-carousel.js') }}"></script>
+        <script src="{{ asset('frontoffice/js/counter.js') }}"></script>
+        
+        <!-- Custom JS -->
+        <script src="{{ asset('frontoffice/js/custom.js') }}"></script>
+        
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% endblock %}
+    {% include 'ai_assistant/chat_widget.html.twig' %}
+</body>
+</html>
+=======
     <body>
         {% block body %}{% endblock %}
     </body>
 </html>
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
