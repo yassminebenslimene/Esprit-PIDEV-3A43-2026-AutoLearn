@@ -26,11 +26,69 @@
     {% endblock %}
     
     <style>
+        /* Fix navbar position */
+        .header-area {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 9999 !important;
+            background-color: rgba(122, 106, 216, 0.95) !important;
+            backdrop-filter: blur(10px) !important;
+            margin-bottom: 0 !important;
+        }
+        
+        /* Add padding to body to compensate for fixed header */
+        body {
+            padding-top: 80px !important;
+        }
+        
+        /* Remove any white space after header */
+        .header-area + * {
+            margin-top: 0 !important;
+        }
+        
+        /* Notification Badge Styles */
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(255, 68, 68, 0.6);
+            animation: pulse 2s infinite;
+            z-index: 10;
+        }
+        
+        .badge-count {
+            color: white;
+            font-size: 10px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 6px rgba(255, 68, 68, 0.6);
+            }
+            50% {
+                transform: scale(1.2);
+                box-shadow: 0 4px 12px rgba(255, 68, 68, 0.8);
+            }
+        }
+        
         /* Reset any conflicting styles - AVEC CENTRAGE VERTICAL */
         .main-nav {
             display: flex !important;
             align-items: center !important;
-            height: 80px !important;  /* Ajuste si nécessaire */
+            height: 80px !important;
         }
         
         .main-nav .nav {
@@ -153,6 +211,22 @@
             line-height: 1 !important;
         }
         
+        /* Force navbar items to stay on one line */
+        .main-nav .nav {
+            flex-wrap: nowrap !important;
+            white-space: nowrap !important;
+        }
+        
+        /* Reduce padding for compact layout */
+        .main-nav .nav li a {
+            padding: 0 10px !important;
+            font-size: 14px !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-btn {
+            padding: 0 10px !important;
+        }
+        
         @media (max-width: 992px) {
             .main-nav,
             .main-nav .nav,
@@ -222,67 +296,37 @@
                     
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
-
                         <li class="scroll-to-section"><a href="#top" class="active">{{ 'nav.home'|trans }}</a></li>
                         <li class="scroll-to-section"><a href="#cours">{{ 'nav.courses'|trans }}</a></li>
                         <li class="scroll-to-section"><a href="#events">{{ 'nav.events'|trans }}</a></li>
                         <li class="scroll-to-section"><a href="#challenge">{{ 'nav.challenges'|trans }}</a></li>
-                        <li class="scroll-to-section"><a href="#contact">{{ 'nav.contact'|trans }}</a></li>
                         <li><a href="{{ path('front_communaute') }}">{{ 'nav.community'|trans }}</a></li>
-                        
-                        {# Sélecteur de langue - VISIBLE POUR TOUS #}
-                        <li class="profile-dropdown-container">
-                            <a href="javascript:void(0);" onclick="toggleLanguageDropdown(event)" class="profile-dropdown-btn" style="padding: 0 15px;">
-                                <i class="fa fa-globe"></i>
-                                {% if app.request.locale == 'fr' %}
-                                    FR
-                                {% elseif app.request.locale == 'en' %}
-                                    EN
-                                {% elseif app.request.locale == 'es' %}
-                                    ES
-                                {% elseif app.request.locale == 'ar' %}
-                                    AR
-                                {% endif %}
-                                <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
-                            </a>
-                            <ul class="profile-dropdown-menu" id="languageDropdown">
-                                <li>
-                                    <a href="{{ path('app_change_language', {'locale': 'fr'}) }}">
-                                        🇫🇷 {{ 'language.french'|trans }}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ path('app_change_language', {'locale': 'en'}) }}">
-                                        🇬🇧 {{ 'language.english'|trans }}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ path('app_change_language', {'locale': 'es'}) }}">
-                                        🇪🇸 {{ 'language.spanish'|trans }}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ path('app_change_language', {'locale': 'ar'}) }}">
-                                        🇸🇦 {{ 'language.arabic'|trans }}
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                        <li><a href="{{ path('app_about') }}">{{ 'nav.about'|trans }}</a></li>
                         
                         {% if app.user %}
-                            <!-- User Logged In - Profile Dropdown -->
-                            <li><a href="{{ path('app_mes_participations') }}">{{ 'nav.my_participations'|trans }}</a></li>
-
+                            {# Notifications avec badge #}
+                            <li style="position: relative;">
+                                <a href="{{ path('app_notifications_index') }}" style="position: relative; display: inline-flex; align-items: center; gap: 5px;">
+                                    <i class="fa fa-bell"></i>
+                                    <span id="notification-badge" class="notification-badge" style="display: none;"></span>
+                                </a>
+                            </li>
+                            
+                            {# Dropdown Profil #}
                             <li class="profile-dropdown-container">
                                 <a href="javascript:void(0);" onclick="toggleProfileDropdown(event)" class="profile-dropdown-btn">
                                     <i class="fa fa-user-circle"></i>
-                                    {{ app.user.prenom }} {{ app.user.nom }}
-                                    <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                                    <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
                                 </a>
                                 <ul class="profile-dropdown-menu" id="profileDropdown">
                                     <li>
                                         <a href="{{ path('app_profile') }}">
                                             <i class="fa fa-id-card"></i> {{ 'nav.profile'|trans }}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ path('app_mes_participations') }}">
+                                            <i class="fa fa-trophy"></i> {{ 'nav.my_participations'|trans }}
                                         </a>
                                     </li>
                                     <li class="profile-dropdown-divider"></li>
@@ -294,10 +338,39 @@
                                 </ul>
                             </li>
                         {% else %}
-                            <!-- User Not Logged In -->
                             <li><a href="{{ path('backoffice_login') }}">{{ 'nav.login'|trans }}</a></li>
-                            <li><a href="{{ path('backoffice_register') }}">{{ 'nav.register'|trans }}</a></li>
                         {% endif %}
+                        
+                        {# Sélecteur de langue compact #}
+                        <li class="profile-dropdown-container">
+                            <a href="javascript:void(0);" onclick="toggleLanguageDropdown(event)" class="profile-dropdown-btn">
+                                <i class="fa fa-globe"></i>
+                                <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
+                            </a>
+                            <ul class="profile-dropdown-menu" id="languageDropdown">
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'fr'}) }}">
+                                        <i class="fa fa-flag"></i> Français
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'en'}) }}">
+                                        <i class="fa fa-flag"></i> English
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'es'}) }}">
+                                        <i class="fa fa-flag"></i> Español
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'ar'}) }}">
+                                        <i class="fa fa-flag"></i> العربية
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                     </ul> 
                     <!-- ***** Menu End ***** -->
                     
@@ -389,331 +462,371 @@
 </div>
 <!-- ***** Main Banner End ***** -->
 
-<!-- ***** Cours Section Start ***** -->
-<div class="services section" id="cours">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <div class="section-heading">
-                    <h6>Nos Cours</h6>
-                    <h2>Découvrez Nos Cours de Programmation</h2>
+{% if app.user %}
+    {# LOGGED IN USER: Show Cours → Challenge → Events → Contact #}
+    
+    <!-- ***** Cours Section Start ***** -->
+    <div class="services section" id="cours">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="section-heading">
+                        <h6>Nos Cours</h6>
+                        <h2>Découvrez Nos Cours de Programmation</h2>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row">
-            {% if cours is empty %}
-                <div class="col-12 text-center">
-                    <p>{{ 'courses.no_courses'|trans }}</p>
-                </div>
-            {% else %}
-                {% for cour in cours %}
-                    <div class="col-lg-4 col-md-6">
-                        <div class="service-item">
-                            <div class="icon">
-                                <img src="{{ asset('frontoffice/images/service-01.png') }}" alt="icône cours">
-                            </div>
-                            <div class="main-content">
-                                <h4>{{ cour.titre }}</h4>
-                                <p>{{ cour.description|length > 100 ? cour.description|slice(0, 100) ~ '...' : cour.description }}</p>
+            <div class="row">
+                {% if cours is empty %}
+                    <div class="col-12 text-center">
+                        <p>{{ 'courses.no_courses'|trans }}</p>
+                    </div>
+                {% else %}
+                    {% for cour in cours %}
+                        <div class="col-lg-4 col-md-6">
+                            <div class="service-item">
+                                <div class="icon">
+                                    <img src="{{ asset('frontoffice/images/service-01.png') }}" alt="icône cours">
+                                </div>
+                                <div class="main-content">
+                                    <h4>{{ cour.titre }}</h4>
+                                    <p>{{ cour.description|length > 100 ? cour.description|slice(0, 100) ~ '...' : cour.description }}</p>
 
-                                {# Afficher la progression si l'utilisateur est connecté #}
-                                {% if app.user and coursProgress[cour.id] is defined %}
-                                    {% set progress = coursProgress[cour.id] %}
-                                    <div style="margin: 15px 0;">
-                                        {% include 'components/progress_bar.html.twig' with {
-                                            'percentage': progress.percentage,
-                                            'show_label': true,
-                                            'completed': progress.completed_chapters,
-                                            'total': progress.total_chapters
-                                        } %}
+                                    {# Afficher la progression si l'utilisateur est connecté #}
+                                    {% if app.user and coursProgress[cour.id] is defined %}
+                                        {% set progress = coursProgress[cour.id] %}
+                                        <div style="margin: 15px 0;">
+                                            {% include 'components/progress_bar.html.twig' with {
+                                                'percentage': progress.percentage,
+                                                'show_label': true,
+                                                'completed': progress.completed_chapters,
+                                                'total': progress.total_chapters
+                                            } %}
+                                        </div>
+                                    {% endif %}
+
+                                    <div class="main-button">
+                                        <a href="{{ path('app_frontoffice_chapitre_by_cours', {'coursId': cour.id}) }}" class="btn">
+                                            {{ 'courses.view'|trans }}
+                                        </a>
+                                        <a href="{{ path('front_communaute_cours', {'coursId': cour.id}) }}" class="btn" style="background: linear-gradient(135deg, #6c5ce7, #4a69bd);">
+                                            <i class="fa fa-users me-1"></i> {{ 'nav.community'|trans }}
+                                        </a>
                                     </div>
-                                {% endif %}
-
-                                <div class="main-button">
-
-                                    <a href="{{ path('app_frontoffice_chapitre_by_cours', {'coursId': cour.id}) }}" class="btn">
-                                        {{ 'courses.view'|trans }}
-                                    </a>
-                                    <a href="{{ path('front_communaute_cours', {'coursId': cour.id}) }}" class="btn" style="background: linear-gradient(135deg, #6c5ce7, #4a69bd);">
-                                        <i class="fa fa-users me-1"></i> {{ 'nav.community'|trans }}
-                                    </a>
-
                                 </div>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
         </div>
     </div>
-</div>
-<!-- ***** Cours Section End ***** -->
+    <!-- ***** Cours Section End ***** -->
 
 <!-- ***** About Us Section Start ***** -->
-<div class="section about-us">
+<section class="about-us" style="padding: 80px 0;">
     <div class="container">
-        <div class="row">
-            <div class="col-lg-6 offset-lg-1">
-                <div class="accordion" id="accordionExample">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingOne">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                Where shall we begin?
-                            </button>
-                        </h2>
-                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                Dolor <strong>almesit amet</strong>, consectetur adipiscing elit, sed doesn't eiusmod tempor incididunt ut labore consectetur <code>adipiscing</code> elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingTwo">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                How do we work together?
-                            </button>
-                        </h2>
-                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                Dolor <strong>almesit amet</strong>, consectetur adipiscing elit, sed doesn't eiusmod tempor incididunt ut labore consectetur <code>adipiscing</code> elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingThree">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                Why SCHOLAR is the best?
-                            </button>
-                        </h2>
-                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                There are more than one hundred responsive HTML templates to choose from <strong>Template</strong>Mo website. You can browse by different tags or categories.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingFour">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                                Do we get the best support?
-                            </button>
-                        </h2>
-                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                You can also search on Google with specific keywords such as <code>templatemo business templates, templatemo gallery templates, admin dashboard templatemo, 3-column templatemo, etc.</code>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-5 align-self-center">
+        <!-- Mission -->
+        <div class="row" style="margin-bottom: 60px;">
+            <div class="col-lg-6">
                 <div class="section-heading">
-                    <h6>About Us</h6>
-                    <h2>What make us the best academy online?</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravid risus commodo.</p>
-                    <div class="main-button">
-                        <a href="#">Discover More</a>
-                    </div>
+                    <h6>Notre Mission</h6>
+                    <h2>Révolutionner l'apprentissage en ligne</h2>
+                    <div class="div-dec"></div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-<!-- ***** About Us Section End ***** -->
-
-<!-- ***** Fun Facts Section Start ***** -->
-<div class="section fun-facts">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="wrapper">
-                    <div class="row">
-                        <div class="col-lg-3 col-md-6">
-                            <div class="counter">
-                                <h2 class="timer count-title count-number" data-to="150" data-speed="1000"></h2>
-                                <p class="count-text">Happy Students</p>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <div class="counter">
-                                <h2 class="timer count-title count-number" data-to="804" data-speed="1000"></h2>
-                                <p class="count-text">Course Hours</p>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <div class="counter">
-                                <h2 class="timer count-title count-number" data-to="50" data-speed="1000"></h2>
-                                <p class="count-text">Employed Students</p>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <div class="counter end">
-                                <h2 class="timer count-title count-number" data-to="15" data-speed="1000"></h2>
-                                <p class="count-text">Years Experience</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- ***** Fun Facts Section End ***** -->
-
-<!-- ***** Testimonials Section Start ***** -->
-
-<div class="section testimonials">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-7">
-                <div class="owl-carousel owl-testimonials">
-                    <div class="item">
-                        <p>"Please tell your friends or collegues about TemplateMo website. Anyone can access the website to download free templates. Thank you for visiting."</p>
-                        <div class="author">
-                            <img src="{{ asset('frontoffice/images/testimonial-author.jpg') }}" alt="">
-                            <span class="category">Full Stack Master</span>
-                            <h4>Claude David</h4>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravid."</p>
-                        <div class="author">
-                            <img src="{{ asset('frontoffice/images/testimonial-author.jpg') }}" alt="">
-                            <span class="category">UI Expert</span>
-                            <h4>Thomas Jefferson</h4>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <p>"Scholar is free website template provided by TemplateMo for educational related websites. This CSS layout is based on Bootstrap v5.3.0 framework."</p>
-                        <div class="author">
-                            <img src="{{ asset('frontoffice/images/testimonial-author.jpg') }}" alt="">
-                            <span class="category">Digital Animator</span>
-                            <h4>Stella Blair</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-5 align-self-center">
-                <div class="section-heading">
-                    <h6>TESTIMONIALS</h6>
-                    <h2>What they say about us?</h2>
-                    <p>You can search free CSS templates on Google using different keywords such as templatemo portfolio, templatemo gallery, templatemo blue color, etc.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- ***** Testimonials Section End ***** -->
-
-<!-- ***** Events Section Start ***** -->
-<div class="section events" id="events">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <div class="section-heading">
-                    <h6>Événements</h6>
-                    <h2>Nos Événements</h2>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row">
-            <div class="col-lg-12">
-                <p style="text-align: center; margin-bottom: 40px;">
-                    <a href="{{ path('app_events') }}" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; border-radius: 10px; text-decoration: none; font-weight: 600; display: inline-block;">
-                        🎯 View All Events
-                    </a>
+            <div class="col-lg-6">
+                <p style="font-size: 16px; line-height: 1.8; color: #666;">
+                    AutoLearn est une plateforme d'apprentissage en ligne innovante qui combine l'intelligence artificielle 
+                    et la pédagogie moderne pour offrir une expérience d'apprentissage personnalisée et efficace. 
+                    Notre mission est de rendre l'éducation accessible à tous, partout et à tout moment.
                 </p>
             </div>
         </div>
-    </div>
-</div>
-<!-- ***** Events Section End ***** -->
 
-<!-- ***** Challenges Section Start ***** -->
-<section id="challenge" class="section events">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <div class="section-heading">
-                    <h6>Défis</h6>
-                    <h2>Challenges à Relever</h2>
+        <!-- Fonctionnalités Principales -->
+        <div class="row" style="margin-bottom: 60px;">
+            <div class="col-lg-12">
+                <div class="section-heading text-center" style="margin-bottom: 50px;">
+                    <h6>Nos Fonctionnalités</h6>
+                    <h2>Ce qui nous rend uniques</h2>
+                    <div class="div-dec" style="margin: 20px auto;"></div>
                 </div>
             </div>
         </div>
 
-        {% if challenges is empty %}
+        <div class="row">
+            <!-- Feature 1 -->
+            <div class="col-lg-4 col-md-6" style="margin-bottom: 30px;">
+                <div class="service-item" style="background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); height: 100%; transition: transform 0.3s;">
+                    <div class="icon" style="font-size: 48px; color: #7a6ad8; margin-bottom: 20px;">
+                        <i class="fa fa-robot"></i>
+                    </div>
+                    <h4 style="margin-bottom: 15px; color: #1e1e1e;">Intelligence Artificielle</h4>
+                    <p style="color: #666; line-height: 1.6;">
+                        Correction automatique et analyse sémantique des réponses grâce à l'IA Groq. 
+                        Génération intelligente d'exercices adaptés à votre niveau.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="col-lg-4 col-md-6" style="margin-bottom: 30px;">
+                <div class="service-item" style="background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); height: 100%; transition: transform 0.3s;">
+                    <div class="icon" style="font-size: 48px; color: #7a6ad8; margin-bottom: 20px;">
+                        <i class="fa fa-trophy"></i>
+                    </div>
+                    <h4 style="margin-bottom: 15px; color: #1e1e1e;">Challenges Interactifs</h4>
+                    <p style="color: #666; line-height: 1.6;">
+                        Participez à des challenges stimulants avec feedback détaillé et explications personnalisées. 
+                        Suivez votre progression en temps réel.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="col-lg-4 col-md-6" style="margin-bottom: 30px;">
+                <div class="service-item" style="background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); height: 100%; transition: transform 0.3s;">
+                    <div class="icon" style="font-size: 48px; color: #7a6ad8; margin-bottom: 20px;">
+                        <i class="fa fa-users"></i>
+                    </div>
+                    <h4 style="margin-bottom: 15px; color: #1e1e1e;">Communauté Active</h4>
+                    <p style="color: #666; line-height: 1.6;">
+                        Rejoignez une communauté d'apprenants passionnés. Partagez vos connaissances, 
+                        posez des questions et collaborez avec d'autres étudiants.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="col-lg-4 col-md-6" style="margin-bottom: 30px;">
+                <div class="service-item" style="background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); height: 100%; transition: transform 0.3s;">
+                    <div class="icon" style="font-size: 48px; color: #7a6ad8; margin-bottom: 20px;">
+                        <i class="fa fa-book"></i>
+                    </div>
+                    <h4 style="margin-bottom: 15px; color: #1e1e1e;">Cours Structurés</h4>
+                    <p style="color: #666; line-height: 1.6;">
+                        Accédez à des cours complets organisés par chapitres et niveaux de difficulté. 
+                        Apprenez à votre rythme avec du contenu de qualité.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 5 -->
+            <div class="col-lg-4 col-md-6" style="margin-bottom: 30px;">
+                <div class="service-item" style="background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); height: 100%; transition: transform 0.3s;">
+                    <div class="icon" style="font-size: 48px; color: #7a6ad8; margin-bottom: 20px;">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <h4 style="margin-bottom: 15px; color: #1e1e1e;">Événements en Direct</h4>
+                    <p style="color: #666; line-height: 1.6;">
+                        Participez à des événements en ligne, webinaires et sessions de formation en direct. 
+                        Interagissez avec des experts et des formateurs qualifiés.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 6 -->
+            <div class="col-lg-4 col-md-6" style="margin-bottom: 30px;">
+                <div class="service-item" style="background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); height: 100%; transition: transform 0.3s;">
+                    <div class="icon" style="font-size: 48px; color: #7a6ad8; margin-bottom: 20px;">
+                        <i class="fa fa-chart-line"></i>
+                    </div>
+                    <h4 style="margin-bottom: 15px; color: #1e1e1e;">Suivi de Progression</h4>
+                    <p style="color: #666; line-height: 1.6;">
+                        Visualisez votre progression avec des statistiques détaillées et des rapports personnalisés. 
+                        Identifiez vos points forts et axes d'amélioration.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+       
+
+        
+
+        <!-- Statistiques -->
+        <div class="row" style="margin-top: 80px; background: linear-gradient(105deg, #7a6ad8 0%, #4e3b9c 100%); padding: 60px 40px; border-radius: 20px;">
+            <div class="col-lg-3 col-md-6 text-center" style="margin-bottom: 30px;">
+                <h2 style="color: white; font-size: 48px; font-weight: 700; margin-bottom: 10px;">1000+</h2>
+                <p style="color: rgba(255,255,255,0.9); font-size: 16px;">Étudiants actifs</p>
+            </div>
+            <div class="col-lg-3 col-md-6 text-center" style="margin-bottom: 30px;">
+                <h2 style="color: white; font-size: 48px; font-weight: 700; margin-bottom: 10px;">50+</h2>
+                <p style="color: rgba(255,255,255,0.9); font-size: 16px;">Cours disponibles</p>
+            </div>
+            <div class="col-lg-3 col-md-6 text-center" style="margin-bottom: 30px;">
+                <h2 style="color: white; font-size: 48px; font-weight: 700; margin-bottom: 10px;">500+</h2>
+                <p style="color: rgba(255,255,255,0.9); font-size: 16px;">Exercices IA</p>
+            </div>
+            <div class="col-lg-3 col-md-6 text-center" style="margin-bottom: 30px;">
+                <h2 style="color: white; font-size: 48px; font-weight: 700; margin-bottom: 10px;">24/7</h2>
+                <p style="color: rgba(255,255,255,0.9); font-size: 16px;">Support disponible</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .service-item:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(122, 106, 216, 0.2) !important;
+    }
+</style>
+<!-- ***** About Us Section End ***** -->
+
+    <!-- ***** Challenges Section Start ***** -->
+    <section id="challenge" class="section events">
+        <div class="container">
             <div class="row">
-                <div class="col-lg-12">
-                    <div class="item" style="text-align: center; padding: 40px;">
-                        <p style="color: #7a7a7a; font-size: 16px;">Aucun challenge pour le moment</p>
+                <div class="col-lg-12 text-center">
+                    <div class="section-heading">
+                        <h6>Défis</h6>
+                        <h2>Challenges à Relever</h2>
                     </div>
                 </div>
             </div>
-        {% else %}
-            <div class="row">
-                {% for challenge in challenges %}
-                    <div class="col-lg-12 col-md-6">
-                        <div class="item">
-                            <div class="row">
-                                <div class="col-lg-3">
-                                    <div class="image">
-                                        {% if loop.index0 % 3 == 0 %}
-                                            <img src="{{ asset('frontoffice/images/event-01.jpg') }}" alt="{{ challenge.titre }}">
-                                        {% elseif loop.index0 % 3 == 1 %}
-                                            <img src="{{ asset('frontoffice/images/event-02.jpg') }}" alt="{{ challenge.titre }}">
-                                        {% else %}
-                                            <img src="{{ asset('frontoffice/images/event-03.jpg') }}" alt="{{ challenge.titre }}">
-                                        {% endif %}
+
+            {% if challenges is empty %}
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="item" style="text-align: center; padding: 40px;">
+                            <p style="color: #7a7a7a; font-size: 16px;">Aucun challenge pour le moment</p>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="row">
+                    {% for challenge in challenges %}
+                        <div class="col-lg-12 col-md-6">
+                            <div class="item">
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <div class="image">
+                                            {% if loop.index0 % 3 == 0 %}
+                                                <img src="{{ asset('frontoffice/images/event-01.jpg') }}" alt="{{ challenge.titre }}">
+                                            {% elseif loop.index0 % 3 == 1 %}
+                                                <img src="{{ asset('frontoffice/images/event-02.jpg') }}" alt="{{ challenge.titre }}">
+                                            {% else %}
+                                                <img src="{{ asset('frontoffice/images/event-03.jpg') }}" alt="{{ challenge.titre }}">
+                                            {% endif %}
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-9">
-                                    <ul>
-                                        <li>
-                                            <span class="category" style="background: 
-                                                {% if challenge.niveau == 'Facile' %}#7fb77e;
-                                                {% elseif challenge.niveau == 'Intermédiaire' %}#f3b562;
-                                                {% else %}#f17b7b;
-                                                {% endif %}">
-                                                {{ challenge.niveau }}
-                                            </span>
-                                            <h4>{{ challenge.titre }}</h4>
-                                            <p style="margin-top: 8px; color: #7a7a7a;">
-                                                {{ challenge.description|length > 100 ? challenge.description|slice(0, 100) ~ '...' : challenge.description }}
-                                            </p>
-                                        </li>
-                                        <li>
-                                            <span>Début:</span>
-                                            <h6>{{ challenge.dateDebut|date('d M Y') }}</h6>
-                                        </li>
-                                        <li>
-                                            <span>Fin:</span>
-                                            <h6>{{ challenge.dateFin|date('d M Y') }}</h6>
-                                        </li>
-                                        <li>
-                                            <span>Niveau:</span>
-                                            <h6 style="color: 
-                                                {% if challenge.niveau == 'Facile' %}#7fb77e;
-                                                {% elseif challenge.niveau == 'Intermédiaire' %}#f3b562;
-                                                {% else %}#f17b7b;
-                                                {% endif %}; font-weight: 700;">
-                                                {{ challenge.niveau }}
-                                            </h6>
-                                        </li>
-                                    </ul>
-<a href="{{ path('frontchallenge', {'id': challenge.id}) }}">
-                                        <i class="fa fa-angle-right"></i>
-                                    </a>
+                                    <div class="col-lg-9">
+                                        <ul>
+                                            <li>
+                                                <span class="category" style="background: 
+                                                    {% if challenge.niveau == 'Facile' %}#7fb77e;
+                                                    {% elseif challenge.niveau == 'Intermédiaire' %}#f3b562;
+                                                    {% else %}#f17b7b;
+                                                    {% endif %}">
+                                                    {{ challenge.niveau }}
+                                                </span>
+                                                <h4>{{ challenge.titre }}</h4>
+                                                <p style="margin-top: 8px; color: #7a7a7a;">
+                                                    {{ challenge.description|length > 100 ? challenge.description|slice(0, 100) ~ '...' : challenge.description }}
+                                                </p>
+                                            </li>
+                                            <li>
+                                                <span>Durée:</span>
+                                                <h6>{{ challenge.duree }} min</h6>
+                                            </li>
+                                            <li>
+                                                <span>Niveau:</span>
+                                                <h6 style="color: 
+                                                    {% if challenge.niveau == 'Débutant' %}#7fb77e;
+                                                    {% elseif challenge.niveau == 'Intermédiaire' %}#f3b562;
+                                                    {% else %}#f17b7b;
+                                                    {% endif %}; font-weight: 700;">
+                                                    {{ challenge.niveau }}
+                                                </h6>
+                                            </li>
+                                        </ul>
+                                        <a href="{{ path('frontchallenge', {'id': challenge.id}) }}">
+                                            <i class="fa fa-angle-right"></i>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
+    <!-- ***** Challenges Section End ***** -->
+
+    <!-- ***** Events Section Start ***** -->
+    <div class="section events" id="events">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="section-heading">
+                        <h6>Événements</h6>
+                        <h2>Nos Événements</h2>
                     </div>
-                {% endfor %}
+                </div>
             </div>
-        {% endif %}
+            
+            <div class="row">
+                <div class="col-lg-12">
+                    <p style="text-align: center; margin-bottom: 40px;">
+                        <a href="{{ path('app_events') }}" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; border-radius: 10px; text-decoration: none; font-weight: 600; display: inline-block;">
+                            🎯 View All Events
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
-</section>
-<!-- ***** Challenges Section End ***** -->
+    <!-- ***** Events Section End ***** -->
+
+{% else %}
+    {# NOT LOGGED IN: Show About Us only #}
+    
+    <!-- ***** About Us Section Start ***** -->
+    <section class="about-us" style="padding: 80px 0;">
+        <div class="container">
+            <!-- Mission -->
+            <div class="row" style="margin-bottom: 60px;">
+                <div class="col-lg-6">
+                    <div class="section-heading">
+                        <h6>Notre Mission</h6>
+                        <h2>Révolutionner l'apprentissage en ligne</h2>
+                        <div class="div-dec"></div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <p style="font-size: 16px; line-height: 1.8; color: #666;">
+                        AutoLearn est une plateforme d'apprentissage en ligne innovante qui combine l'intelligence artificielle 
+                        et la pédagogie moderne pour offrir une expérience d'apprentissage personnalisée et efficace. 
+                        Notre mission est de rendre l'éducation accessible à tous, partout et à tout moment.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Call to Action for Non-Logged Users -->
+            <div class="row" style="margin-top: 60px; margin-bottom: 60px; background: linear-gradient(105deg, #7a6ad8 0%, #4e3b9c 100%); padding: 60px 40px; border-radius: 20px;">
+                <div class="col-lg-12 text-center">
+                    <h2 style="color: white; margin-bottom: 20px;">Prêt à commencer votre parcours d'apprentissage ?</h2>
+                    <p style="font-size: 18px; color: rgba(255,255,255,0.9); margin-bottom: 30px;">
+                        Inscrivez-vous pour accéder à nos cours, challenges et événements
+                    </p>
+                    <a href="{{ path('backoffice_register') }}" class="main-button" style="display: inline-block; padding: 15px 40px; background: white; color: #7a6ad8; text-decoration: none; border-radius: 25px; font-weight: 600; font-size: 16px; transition: transform 0.3s; margin-right: 15px;">
+                        Inscrivez-vous gratuitement
+                    </a>
+                    <a href="{{ path('backoffice_login') }}" class="main-button" style="display: inline-block; padding: 15px 40px; background: transparent; border: 2px solid white; color: white; text-decoration: none; border-radius: 25px; font-weight: 600; font-size: 16px; transition: transform 0.3s;">
+                        Se connecter
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ***** About Us Section End ***** -->
+    
+{% endif %}
+
 
 <!-- ***** Contact Us Section Start ***** -->
 <div class="contact-us section" id="contact">
@@ -993,6 +1106,13 @@
                 });
             }
             
+            // Charger le nombre de notifications non lues
+            {% if app.user %}
+            updateNotificationBadge();
+            // Actualiser toutes les 30 secondes
+            setInterval(updateNotificationBadge, 30000);
+            {% endif %}
+            
             // Auto-dismiss flash messages after 5 seconds
             setTimeout(function() {
                 var alerts = document.querySelectorAll('.alert');
@@ -1009,6 +1129,25 @@
                 }, 100);
             }
         });
+        
+        {% if app.user %}
+        function updateNotificationBadge() {
+            fetch('{{ path('app_notifications_unread_count') }}')
+                .then(response => response.json())
+                .then(data => {
+                    var badge = document.getElementById('notification-badge');
+                    if (badge) {
+                        if (data.count > 0) {
+                            badge.textContent = data.count > 9 ? '9+' : data.count;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => console.error('Erreur lors du chargement des notifications:', error));
+        }
+        {% endif %}
     </script>
 {% endblock %}
 

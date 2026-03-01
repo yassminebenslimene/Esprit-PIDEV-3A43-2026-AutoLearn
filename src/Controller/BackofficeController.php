@@ -9,6 +9,7 @@ use App\Repository\ExerciceRepository;
 use App\Entity\Challenge;
 use App\Form\ChallengeType;
 use App\Repository\ChallengeRepository;
+use App\Repository\QuizRepository;
 use App\Entity\User;
 use App\Entity\Etudiant;
 use App\Entity\Admin;
@@ -656,6 +657,68 @@ class BackofficeController extends AbstractController
 
         return $this->redirectToRoute('backoffice_exercices');
     }
+    
+    #[Route('/backoffice/exercice/generate-ai', name: 'backoffice_exercice_generate_ai', methods: ['POST'])]
+    public function generateExercicesAI(
+        Request $request,
+        \App\Service\ExerciceGeneratorAIService $generatorService,
+        EntityManagerInterface $em
+    ): Response {
+        try {
+            $data = json_decode($request->getContent(), true);
+            
+            $sujet = $data['sujet'] ?? '';
+            $niveau = $data['niveau'] ?? '';
+            $nombre = $data['nombre'] ?? 5;
+            
+            if (empty($sujet) || empty($niveau)) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Le sujet et le niveau sont requis'
+                ], 400);
+            }
+            
+            // Générer les exercices avec l'IA
+            $exercicesData = $generatorService->generateExercices($sujet, $niveau, $nombre);
+            
+            if (empty($exercicesData)) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'L\'IA n\'a pas pu générer d\'exercices valides. Cela peut être dû à: 1) Une réponse mal formatée de l\'IA, 2) Des réponses trop courtes, 3) Un problème de connexion. Veuillez réessayer avec un sujet plus précis.'
+                ], 500);
+            }
+            
+            // Créer et persister les exercices
+            $count = 0;
+            foreach ($exercicesData as $exerciceData) {
+                $exercice = new Exercice();
+                $exercice->setQuestion($exerciceData['question']);
+                $exercice->setReponse($exerciceData['reponse']);
+                $exercice->setPoints($exerciceData['points']);
+                
+                $em->persist($exercice);
+                $count++;
+            }
+            
+            $em->flush();
+            
+            return $this->json([
+                'success' => true,
+                'count' => $count,
+                'message' => "$count exercice(s) généré(s) avec succès"
+            ]);
+            
+        } catch (\Exception $e) {
+            // Log l'erreur complète
+            error_log('Erreur génération exercices IA: ' . $e->getMessage());
+            error_log('Stack trace: ' . $e->getTraceAsString());
+            
+            return $this->json([
+                'success' => false,
+                'error' => 'Erreur lors de la génération: ' . $e->getMessage() . '. Vérifiez que votre clé API Groq est valide et que vous avez une connexion internet.'
+            ], 500);
+        }
+    }
     #[Route('/backoffice/challenges', name: 'backoffice_challenges')]
     public function showchallenge(ChallengeRepository $repository): Response
     {
@@ -666,33 +729,70 @@ class BackofficeController extends AbstractController
         ]);
     }
     #[Route('/backoffice/challenge/add', name: 'backoffice_challenge_add')]
-    public function addchall(Request $request, EntityManagerInterface $em, Security $security): Response
-{
-    $challenge = new Challenge();
-    $form = $this->createForm(ChallengeType::class, $challenge);
-    $form->handleRequest($request);
+    public function addchall(
+        Request $request, 
+        EntityManagerInterface $em, 
+        Security $security,
+        ExerciceRepository $exerciceRepository,
+        QuizRepository $quizRepository
+    ): Response {
+        $challenge = new Challenge();
+        $form = $this->createForm(ChallengeType::class, $challenge);
+        $form->handleRequest($request);
 
-    if ($form->isSubmitted() && $form->isValid()) {
+        // Récupérer tous les exercices et quiz disponibles
+        $allExercices = $exerciceRepository->findAll();
+        $allQuizs = $quizRepository->findAll();
 
-        // 🔥 Ici on affecte automatiquement l'utilisateur connecté
-        $challenge->setCreatedBy($security->getUser());
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Récupérer les exercices sélectionnés depuis la requête
+            $selectedExerciceIds = $request->request->all('exercices') ?? [];
+            
+            // Ajouter les exercices sélectionnés
+            foreach ($selectedExerciceIds as $exerciceId) {
+                $exercice = $exerciceRepository->find($exerciceId);
+                if ($exercice) {
+                    $challenge->addExercice($exercice);
+                }
+            }
+            
+            // Récupérer les quiz sélectionnés depuis la requête
+            $selectedQuizIds = $request->request->all('quizs') ?? [];
+            
+            // Ajouter les quiz sélectionnés
+            foreach ($selectedQuizIds as $quizId) {
+                $quiz = $quizRepository->find($quizId);
+                if ($quiz) {
+                    $challenge->addQuiz($quiz);
+                }
+            }
 
-        $em->persist($challenge);
-        $em->flush();
+            // 🔥 Ici on affecte automatiquement l'utilisateur connecté
+            $challenge->setCreatedBy($security->getUser());
 
-        return $this->redirectToRoute('backoffice_challenges');
+            $em->persist($challenge);
+            $em->flush();
+
+            return $this->redirectToRoute('backoffice_challenges');
+        }
+
+        return $this->render('backoffice/challenge_form.html.twig', [
+            'form' => $form->createView(),
+            'exercices' => $allExercices,
+            'quizs' => $allQuizs,
+            'exerciceIds' => [],
+            'quizIds' => [],
+            'title' => 'Ajouter un Challenge'
+        ]);
     }
-
-    return $this->render('backoffice/challenge_form.html.twig', [
-        'form' => $form->createView(),
-    ]);
-}
     #[Route('/backoffice/challenge/edit/{id}', name: 'backoffice_challenge_edit')]
     public function editchal(
         $id,
         ChallengeRepository $repository,
         Request $request,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ExerciceRepository $exerciceRepository,
+        QuizRepository $quizRepository
     ): Response {
 
         $challenge = $repository->find($id);
@@ -704,7 +804,58 @@ class BackofficeController extends AbstractController
         $form = $this->createForm(ChallengeType::class, $challenge);
         $form->handleRequest($request);
 
+        // Récupérer tous les exercices et quiz disponibles
+        $allExercices = $exerciceRepository->findAll();
+        $allQuizs = $quizRepository->findAll();
+        
+        // Récupérer les IDs des exercices déjà associés
+        $exerciceIds = [];
+        foreach ($challenge->getExercices() as $exercice) {
+            $exerciceIds[] = $exercice->getId();
+        }
+        
+        // Récupérer les IDs des quiz déjà associés
+        $quizIds = [];
+        foreach ($challenge->getQuizzes() as $quiz) {
+            $quizIds[] = $quiz->getId();
+        }
+
         if ($form->isSubmitted() && $form->isValid()) {
+            // Récupérer les exercices sélectionnés depuis la requête
+            $selectedExerciceIds = $request->request->all('exercices') ?? [];
+            
+            // Supprimer les exercices qui ne sont plus sélectionnés
+            foreach ($challenge->getExercices() as $exercice) {
+                if (!in_array($exercice->getId(), $selectedExerciceIds)) {
+                    $challenge->removeExercice($exercice);
+                }
+            }
+            
+            // Ajouter les nouveaux exercices sélectionnés
+            foreach ($selectedExerciceIds as $exerciceId) {
+                $exercice = $exerciceRepository->find($exerciceId);
+                if ($exercice && !$challenge->getExercices()->contains($exercice)) {
+                    $challenge->addExercice($exercice);
+                }
+            }
+            
+            // Récupérer les quiz sélectionnés depuis la requête
+            $selectedQuizIds = $request->request->all('quizs') ?? [];
+            
+            // Supprimer les quiz qui ne sont plus sélectionnés
+            foreach ($challenge->getQuizzes() as $quiz) {
+                if (!in_array($quiz->getId(), $selectedQuizIds)) {
+                    $challenge->removeQuiz($quiz);
+                }
+            }
+            
+            // Ajouter les nouveaux quiz sélectionnés
+            foreach ($selectedQuizIds as $quizId) {
+                $quiz = $quizRepository->find($quizId);
+                if ($quiz && !$challenge->getQuizzes()->contains($quiz)) {
+                    $challenge->addQuiz($quiz);
+                }
+            }
 
             $em->flush();
 
@@ -713,6 +864,10 @@ class BackofficeController extends AbstractController
 
         return $this->render('backoffice/challenge_form.html.twig', [
             'form' => $form->createView(),
+            'exercices' => $allExercices,
+            'quizs' => $allQuizs,
+            'exerciceIds' => $exerciceIds,
+            'quizIds' => $quizIds,
             'title' => 'Modifier le Challenge'
         ]);
     }

@@ -170,4 +170,33 @@ class EmailService
 
         $this->mailer->send($email);
     }
+
+    /**
+     * Envoie un email de confirmation de complétion de challenge
+     */
+    public function sendChallengeReceipt(
+        string $toEmail,
+        string $challengeName,
+        int $earnedPoints,
+        int $totalPoints,
+        \DateTimeInterface $completedAt
+    ): void {
+        $percentage = $totalPoints > 0 ? round(($earnedPoints / $totalPoints) * 100, 2) : 0;
+        
+        $html = $this->twig->render('emails/challenge_receipt.html.twig', [
+            'challengeName' => $challengeName,
+            'earnedPoints' => $earnedPoints,
+            'totalPoints' => $totalPoints,
+            'percentage' => $percentage,
+            'completedAt' => $completedAt,
+        ]);
+
+        $email = (new Email())
+            ->from(new Address($this->fromEmail, $this->fromName))
+            ->to($toEmail)
+            ->subject('🎉 Challenge Completed - ' . $challengeName)
+            ->html($html);
+
+        $this->mailer->send($email);
+    }
 }

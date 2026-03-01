@@ -285,7 +285,7 @@ https://templatemo.com/tm-607-glass-admin
                                 Utilisateurs
                             </a>
                         </li>
-                                                <li class="nav-item">
+                        <li class="nav-item">
                             <a href="{{ path('backoffice_audit_index') }}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -409,28 +409,36 @@ https://templatemo.com/tm-607-glass-admin
                         {% endif %}
                     </h2>
                 </div>
-
-                {{ form_start(form, {'attr': {'style': 'display: flex; flex-direction: column; gap: 20px;'}}) }}
-
+                    {{ form_start(form,{'attr': {'novalidate': 'novalidate'}} ) }}
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div>
-                        {{ form_row(form.titre, {'attr': {'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;'}}) }}
+                        {{ form_row(form.titre, {'attr': {
+                            'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;'
+                        }}) }}
+                        {{form_errors(form.titre)}}
                     </div>
                     <div>
-                        {{ form_row(form.niveau, {'attr': {'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;'}}) }}
+                        {{ form_row(form.niveau, {'attr': {
+                            'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;'
+                        }}) }}
+                        {{form_errors(form.niveau) }}
                     </div>
                 </div>
 
                 <div>
-                    {{ form_row(form.description, {'attr': {'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit; min-height: 100px;'}}) }}
+                    {{ form_row(form.description, {'attr': {
+                        'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit; min-height: 100px;'
+                    }}) }}
+                    {{form_errors(form.description) }}
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div>
-                        {{ form_row(form.dateDebut, {'attr': {'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;'}}) }}
-                    </div>
-                    <div>
-                        {{ form_row(form.dateFin, {'attr': {'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;'}}) }}
+                        {{ form_row(form.duree, {'attr': {
+                            'style': 'width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;',
+                            'placeholder': 'Ex: 30 minutes'
+                        }}) }}
+                        {{form_errors(form.duree) }}
                     </div>
                 </div>
 
@@ -582,8 +590,5 @@ https://templatemo.com/tm-607-glass-admin
         });
     </script>
     <!-- TemplateMo 607 Glass Admin -->
-    
-    {# AI Chat Widget - Assistant Intelligent #}
-    {% include 'ai_assistant/chat_widget.html.twig' %}
 </body>
 </html>

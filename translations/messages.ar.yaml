@@ -1,10 +1,11 @@
-# Arabic translations - الترجمات العربية
+# Arabic translations
 nav:
   home: الرئيسية
-  events: الفعاليات
+  events: الأحداث
   challenges: التحديات
   community: المجتمع
   courses: الدورات
+  about: حول
   my_participations: مشاركاتي
   login: تسجيل الدخول
   register: التسجيل
@@ -18,129 +19,3 @@ language:
   arabic: العربية
   spanish: الإسبانية
   select: اختر اللغة
-
-frontoffice:
-  banner:
-    our_courses: دوراتنا
-    learn_programming: تعلم البرمجة مع الخبراء
-    discover_courses: اكتشف دورات البرمجة المصممة من قبل المحترفين. أتقن اللغات الحديثة مثل Python و JavaScript و Java والمزيد مع مشاريع عملية وتحديات محفزة.
-    view_courses: عرض الدورات
-    start_now: ابدأ الآن
-    best_results: أفضل النتائج
-    develop_skills: طور مهاراتك في البرمجة
-    progress_fast: تقدم بسرعة بفضل أساليب التعلم التفاعلية. تمارين عملية واختبارات ومشاريع حقيقية لتحويل جهودك إلى مهارات ملموسة ومطلوبة في السوق.
-    take_challenge: قبول التحدي
-    explore_courses: استكشف الدورات
-    online_learning: التعلم عبر الإنترنت
-    learn_at_pace: تعلم البرمجة بالسرعة التي تناسبك
-    access_247: الوصول إلى دورات البرمجة على مدار الساعة طوال أيام الأسبوع من أي مكان. تعلم تقنيات الويب وتطوير الهاتف المحمول والذكاء الاصطناعي والمزيد، مع متابعة مخصصة لتقدمك.
-    register_free: التسجيل مجانا
-    discover_autolearn: اكتشف AutoLearn
-  
-  chapter:
-    chapter: الفصل
-    reading_time: وقت القراءة المقدر
-    minutes: دقيقة
-    level_beginner: مستوى مبتدئ
-    level_intermediate: مستوى متوسط
-    level_advanced: مستوى متقدم
-    additional_resources: موارد إضافية
-    no_resources: لا توجد موارد إضافية لهذا الفصل
-    back_to_list: العودة إلى قائمة الفصول
-    discover_chapters: اكتشف فصولنا
-    no_chapters: لا توجد فصول متاحة
-    chapters_soon: ستكون الفصول متاحة قريبا. عد لاحقا!
-    read_chapter: قراءة الفصل
-    take_quiz: خذ الاختبار
-    back_to_courses: العودة إلى الدورات
-
-dashboard:
-  title: لوحة التحكم
-  analytics: التحليلات
-  management: الإدارة
-  community: المجتمع
-  system: النظام
-  account: الحساب
-
-courses:
-  title: الدورات
-  list: قائمة الدورات
-  new: دورة جديدة
-  edit: تعديل الدورة
-  delete: حذف الدورة
-  view: عرض الدورة
-  no_courses: لا توجد دورات متاحة في الوقت الحالي
-  chapters: الفصول
-  quizzes: الاختبارات
-  resources: الموارد
-
-chapters:
-  title: الفصول
-  new: فصل جديد
-  edit: تعديل الفصل
-  delete: حذف الفصل
-  view: عرض الفصل
-  order: الترتيب
-  content: المحتوى
-  no_chapters: لا توجد فصول متاحة
-
-quiz:
-  title: اختبار
-  new: اختبار جديد
-  edit: تعديل الاختبار
-  delete: حذف الاختبار
-  view: عرض الاختبار
-  management: إدارة الاختبارات
-  no_quizzes: لا توجد اختبارات متاحة
-
-events:
-  title: الفعاليات
-  list: قائمة الفعاليات
-  upcoming: الفعاليات القادمة
-  past: الفعاليات السابقة
-
-users:
-  title: المستخدمون
-  list: قائمة المستخدمين
-  profile: الملف الشخصي
-
-settings:
-  title: الإعدادات
-  general: عام
-  preferences: التفضيلات
-
-actions:
-  create: إنشاء
-  edit: تعديل
-  delete: حذف
-  save: حفظ
-  cancel: إلغاء
-  back: رجوع
-  search: بحث
-  view: عرض
-  actions: الإجراءات
-
-messages:
-  success:
-    created: تم الإنشاء بنجاح
-    updated: تم التحديث بنجاح
-    deleted: تم الحذف بنجاح
-  error:
-    general: حدث خطأ
-    not_found: العنصر غير موجود
-
-search:
-  placeholder: البحث عن دورات، فصول، اختبارات...
-  results: نتائج البحث
-  results_for: نتائج البحث عن
-  results_found: نتائج تم العثور عليها
-  result_found: نتيجة تم العثور عليها
-  no_results: لم يتم العثور على نتائج
-  try_different: جرب كلمات مفتاحية مختلفة
-  view_details: عرض التفاصيل
-  type:
-    cours: دورة
-    chapitre: فصل
-    quiz: اختبار
-    event: حدث
-    challenge: تحدي

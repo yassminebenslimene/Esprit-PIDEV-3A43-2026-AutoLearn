@@ -123,41 +123,6 @@ class Quiz
         return $this;
     }
 
-    public function getQuestions(): Collection
-    {
-        return $this->questions;
-    }
-
-    public function addQuestion(Question $question): static
-    {
-        if (!$this->questions->contains($question)) {
-            $this->questions->add($question);
-            $question->setQuiz($this);
-        }
-        return $this;
-    }
-
-    public function removeQuestion(Question $question): static
-    {
-        if ($this->questions->removeElement($question)) {
-            if ($question->getQuiz() === $this) {
-                $question->setQuiz(null);
-            }
-        }
-        return $this;
-    }
-
-    public function getChapitre(): ?Chapitre
-    {
-        return $this->chapitre;
-    }
-
-    public function setChapitre(?Chapitre $chapitre): static
-    {
-        $this->chapitre = $chapitre;
-        return $this;
-    }
-
     public function getDureeMaxMinutes(): ?int
     {
         return $this->dureeMaxMinutes;
@@ -191,6 +156,17 @@ class Quiz
         return $this;
     }
 
+    public function getChapitre(): ?Chapitre
+    {
+        return $this->chapitre;
+    }
+
+    public function setChapitre(?Chapitre $chapitre): static
+    {
+        $this->chapitre = $chapitre;
+        return $this;
+    }
+
     public function getChallenge(): ?Challenge
     {
         return $this->challenge;
@@ -199,6 +175,33 @@ class Quiz
     public function setChallenge(?Challenge $challenge): static
     {
         $this->challenge = $challenge;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Question>
+     */
+    public function getQuestions(): Collection
+    {
+        return $this->questions;
+    }
+
+    public function addQuestion(Question $question): static
+    {
+        if (!$this->questions->contains($question)) {
+            $this->questions->add($question);
+            $question->setQuiz($this);
+        }
+        return $this;
+    }
+
+    public function removeQuestion(Question $question): static
+    {
+        if ($this->questions->removeElement($question)) {
+            if ($question->getQuiz() === $this) {
+                $question->setQuiz(null);
+            }
+        }
         return $this;
     }
 }
