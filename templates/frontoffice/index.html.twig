@@ -26,11 +26,69 @@
     {% endblock %}
     
     <style>
+        /* Fix navbar position */
+        .header-area {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 9999 !important;
+            background-color: rgba(122, 106, 216, 0.95) !important;
+            backdrop-filter: blur(10px) !important;
+            margin-bottom: 0 !important;
+        }
+        
+        /* Add padding to body to compensate for fixed header */
+        body {
+            padding-top: 80px !important;
+        }
+        
+        /* Remove any white space after header */
+        .header-area + * {
+            margin-top: 0 !important;
+        }
+        
+        /* Notification Badge Styles */
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(255, 68, 68, 0.6);
+            animation: pulse 2s infinite;
+            z-index: 10;
+        }
+        
+        .badge-count {
+            color: white;
+            font-size: 10px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 6px rgba(255, 68, 68, 0.6);
+            }
+            50% {
+                transform: scale(1.2);
+                box-shadow: 0 4px 12px rgba(255, 68, 68, 0.8);
+            }
+        }
+        
         /* Reset any conflicting styles - AVEC CENTRAGE VERTICAL */
         .main-nav {
             display: flex !important;
             align-items: center !important;
-            height: 80px !important;  /* Ajuste si nécessaire */
+            height: 80px !important;
         }
         
         .main-nav .nav {
@@ -222,67 +280,37 @@
                     
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
-
                         <li class="scroll-to-section"><a href="#top" class="active">{{ 'nav.home'|trans }}</a></li>
                         <li class="scroll-to-section"><a href="#cours">{{ 'nav.courses'|trans }}</a></li>
                         <li class="scroll-to-section"><a href="#events">{{ 'nav.events'|trans }}</a></li>
                         <li class="scroll-to-section"><a href="#challenge">{{ 'nav.challenges'|trans }}</a></li>
-                        <li class="scroll-to-section"><a href="#contact">{{ 'nav.contact'|trans }}</a></li>
                         <li><a href="{{ path('front_communaute') }}">{{ 'nav.community'|trans }}</a></li>
-                        
-                        {# Sélecteur de langue - VISIBLE POUR TOUS #}
-                        <li class="profile-dropdown-container">
-                            <a href="javascript:void(0);" onclick="toggleLanguageDropdown(event)" class="profile-dropdown-btn" style="padding: 0 15px;">
-                                <i class="fa fa-globe"></i>
-                                {% if app.request.locale == 'fr' %}
-                                    FR
-                                {% elseif app.request.locale == 'en' %}
-                                    EN
-                                {% elseif app.request.locale == 'es' %}
-                                    ES
-                                {% elseif app.request.locale == 'ar' %}
-                                    AR
-                                {% endif %}
-                                <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
-                            </a>
-                            <ul class="profile-dropdown-menu" id="languageDropdown">
-                                <li>
-                                    <a href="{{ path('app_change_language', {'locale': 'fr'}) }}">
-                                        🇫🇷 {{ 'language.french'|trans }}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ path('app_change_language', {'locale': 'en'}) }}">
-                                        🇬🇧 {{ 'language.english'|trans }}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ path('app_change_language', {'locale': 'es'}) }}">
-                                        🇪🇸 {{ 'language.spanish'|trans }}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ path('app_change_language', {'locale': 'ar'}) }}">
-                                        🇸🇦 {{ 'language.arabic'|trans }}
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                        <li><a href="{{ path('app_about') }}">{{ 'nav.about'|trans }}</a></li>
                         
                         {% if app.user %}
-                            <!-- User Logged In - Profile Dropdown -->
-                            <li><a href="{{ path('app_mes_participations') }}">{{ 'nav.my_participations'|trans }}</a></li>
-
+                            {# Notifications avec badge #}
+                            <li style="position: relative;">
+                                <a href="{{ path('app_notifications_index') }}" style="position: relative; display: inline-flex; align-items: center; gap: 5px;">
+                                    <i class="fa fa-bell"></i>
+                                    <span id="notification-badge" class="notification-badge" style="display: none;"></span>
+                                </a>
+                            </li>
+                            
+                            {# Dropdown Profil #}
                             <li class="profile-dropdown-container">
                                 <a href="javascript:void(0);" onclick="toggleProfileDropdown(event)" class="profile-dropdown-btn">
                                     <i class="fa fa-user-circle"></i>
-                                    {{ app.user.prenom }} {{ app.user.nom }}
-                                    <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                                    <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
                                 </a>
                                 <ul class="profile-dropdown-menu" id="profileDropdown">
                                     <li>
                                         <a href="{{ path('app_profile') }}">
                                             <i class="fa fa-id-card"></i> {{ 'nav.profile'|trans }}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ path('app_mes_participations') }}">
+                                            <i class="fa fa-trophy"></i> {{ 'nav.my_participations'|trans }}
                                         </a>
                                     </li>
                                     <li class="profile-dropdown-divider"></li>
@@ -294,10 +322,39 @@
                                 </ul>
                             </li>
                         {% else %}
-                            <!-- User Not Logged In -->
                             <li><a href="{{ path('backoffice_login') }}">{{ 'nav.login'|trans }}</a></li>
-                            <li><a href="{{ path('backoffice_register') }}">{{ 'nav.register'|trans }}</a></li>
                         {% endif %}
+                        
+                        {# Sélecteur de langue compact #}
+                        <li class="profile-dropdown-container">
+                            <a href="javascript:void(0);" onclick="toggleLanguageDropdown(event)" class="profile-dropdown-btn">
+                                <i class="fa fa-globe"></i>
+                                <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
+                            </a>
+                            <ul class="profile-dropdown-menu" id="languageDropdown">
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'fr'}) }}">
+                                        <i class="fa fa-flag"></i> Français
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'en'}) }}">
+                                        <i class="fa fa-flag"></i> English
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'es'}) }}">
+                                        <i class="fa fa-flag"></i> Español
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'ar'}) }}">
+                                        <i class="fa fa-flag"></i> العربية
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                     </ul> 
                     <!-- ***** Menu End ***** -->
                     
@@ -712,81 +769,47 @@
 <!-- ***** Challenges Section End ***** -->
 
 <!-- ***** Testimonials Section Start ***** -->
-<section class="testimonials section" style="padding: 100px 0; background: #f8f9fa;">
+<div class="section testimonials">
     <div class="container">
         <div class="row">
-            <div class="col-lg-12">
-                <div class="section-heading text-center" style="margin-bottom: 60px;">
-                    <h6 style="color: #7a6ad8; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">TÉMOIGNAGES</h6>
-                    <h2 style="font-size: 42px; font-weight: 800; color: #1e1e1e; margin-top: 15px;">Ce qu'ils disent de nous</h2>
-                    <div class="div-dec" style="width: 60px; height: 3px; background: linear-gradient(105deg, #7a6ad8 0%, #4e3b9c 100%); margin: 20px auto;"></div>
-                    <p style="color: #666; font-size: 16px; max-width: 600px; margin: 20px auto 0;">
-                        Découvrez les témoignages de nos étudiants qui ont transformé leur carrière grâce à AutoLearn
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- Testimonial 1 -->
-            <div class="col-lg-4 col-md-6" style="margin-bottom: 30px;">
-                <div class="testimonial-card" style="background: linear-gradient(135deg, #7a6ad8 0%, #6a5ac8 100%); padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(122, 106, 216, 0.3); height: 100%; position: relative; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
-                    <div style="color: rgba(255,255,255,0.3); font-size: 60px; line-height: 1; margin-bottom: 20px; font-family: Georgia, serif;">"</div>
-                    <p style="color: white; font-size: 16px; line-height: 1.8; margin-bottom: 30px; font-style: italic;">
-                        AutoLearn a transformé ma façon d'apprendre. Les exercices générés par l'IA sont incroyablement pertinents et m'aident à progresser rapidement. La correction intelligente me donne des feedbacks précis qui m'aident vraiment à comprendre mes erreurs.
-                    </p>
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <div style="width: 60px; height: 60px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; color: #7a6ad8; flex-shrink: 0;">
-                            SM
+            <div class="col-lg-7">
+                <div class="owl-carousel owl-testimonials">
+                    <div class="item">
+                        <p>"Please tell your friends or collegues about TemplateMo website. Anyone can access the website to download free templates. Thank you for visiting."</p>
+                        <div class="author">
+                            <img src="{{ asset('frontoffice/images/testimonial-author.jpg') }}" alt="">
+                            <span class="category">Full Stack Master</span>
+                            <h4>Claude David</h4>
                         </div>
-                        <div>
-                            <h5 style="color: white; margin: 0; font-size: 18px; font-weight: 700;">Sarah Martin</h5>
-                            <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 14px;">Développeuse Full Stack</p>
+                    </div>
+                    <div class="item">
+                        <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravid."</p>
+                        <div class="author">
+                            <img src="{{ asset('frontoffice/images/testimonial-author.jpg') }}" alt="">
+                            <span class="category">UI Expert</span>
+                            <h4>Thomas Jefferson</h4>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <p>"Scholar is free website template provided by TemplateMo for educational related websites. This CSS layout is based on Bootstrap v5.3.0 framework."</p>
+                        <div class="author">
+                            <img src="{{ asset('frontoffice/images/testimonial-author.jpg') }}" alt="">
+                            <span class="category">Digital Animator</span>
+                            <h4>Stella Blair</h4>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Testimonial 2 -->
-            <div class="col-lg-4 col-md-6" style="margin-bottom: 30px;">
-                <div class="testimonial-card" style="background: linear-gradient(135deg, #6a5ac8 0%, #5a4ab8 100%); padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(122, 106, 216, 0.3); height: 100%; position: relative; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
-                    <div style="color: rgba(255,255,255,0.3); font-size: 60px; line-height: 1; margin-bottom: 20px; font-family: Georgia, serif;">"</div>
-                    <p style="color: white; font-size: 16px; line-height: 1.8; margin-bottom: 30px; font-style: italic;">
-                        La plateforme est intuitive et les cours sont très bien structurés. J'apprécie particulièrement les challenges qui me permettent de mettre en pratique ce que j'apprends. Le système de progression me motive à continuer chaque jour.
-                    </p>
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <div style="width: 60px; height: 60px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; color: #7a6ad8; flex-shrink: 0;">
-                            AB
-                        </div>
-                        <div>
-                            <h5 style="color: white; margin: 0; font-size: 18px; font-weight: 700;">Ahmed Benali</h5>
-                            <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 14px;">Étudiant en Informatique</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Testimonial 3 -->
-            <div class="col-lg-4 col-md-6" style="margin-bottom: 30px;">
-                <div class="testimonial-card" style="background: linear-gradient(135deg, #5a4ab8 0%, #4e3b9c 100%); padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(122, 106, 216, 0.3); height: 100%; position: relative; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
-                    <div style="color: rgba(255,255,255,0.3); font-size: 60px; line-height: 1; margin-bottom: 20px; font-family: Georgia, serif;">"</div>
-                    <p style="color: white; font-size: 16px; line-height: 1.8; margin-bottom: 30px; font-style: italic;">
-                        Excellente plateforme pour apprendre à son rythme. Les explications sont claires, les exercices variés et la communauté est très active. Le support est réactif et toujours prêt à aider. Je recommande vivement AutoLearn!
-                    </p>
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <div style="width: 60px; height: 60px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; color: #7a6ad8; flex-shrink: 0;">
-                            ML
-                        </div>
-                        <div>
-                            <h5 style="color: white; margin: 0; font-size: 18px; font-weight: 700;">Marie Lefebvre</h5>
-                            <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 14px;">Data Scientist</p>
-                        </div>
-                    </div>
+            <div class="col-lg-5 align-self-center">
+                <div class="section-heading">
+                    <h6>TESTIMONIALS</h6>
+                    <h2>What they say about us?</h2>
+                    <p>You can search free CSS templates on Google using different keywords such as templatemo portfolio, templatemo gallery, templatemo blue color, etc.</p>
                 </div>
             </div>
         </div>
     </div>
-</section>
+</div>
 <!-- ***** Testimonials Section End ***** -->
 
 <!-- ***** Contact Us Section Start ***** -->
@@ -1067,6 +1090,13 @@
                 });
             }
             
+            // Charger le nombre de notifications non lues
+            {% if app.user %}
+            updateNotificationBadge();
+            // Actualiser toutes les 30 secondes
+            setInterval(updateNotificationBadge, 30000);
+            {% endif %}
+            
             // Auto-dismiss flash messages after 5 seconds
             setTimeout(function() {
                 var alerts = document.querySelectorAll('.alert');
@@ -1083,6 +1113,25 @@
                 }, 100);
             }
         });
+        
+        {% if app.user %}
+        function updateNotificationBadge() {
+            fetch('{{ path('app_notifications_unread_count') }}')
+                .then(response => response.json())
+                .then(data => {
+                    var badge = document.getElementById('notification-badge');
+                    if (badge) {
+                        if (data.count > 0) {
+                            badge.textContent = data.count > 9 ? '9+' : data.count;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => console.error('Erreur lors du chargement des notifications:', error));
+        }
+        {% endif %}
     </script>
 {% endblock %}
 
