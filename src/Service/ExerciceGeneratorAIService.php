@@ -43,7 +43,7 @@ class ExerciceGeneratorAIService
                 $messages = [
                     [
                         'role' => 'system',
-                        'content' => 'Tu es un expert pédagogique qui crée des exercices éducatifs de haute qualité. Tu génères des questions claires et des réponses COMPLÈTES et DÉTAILLÉES (minimum 2-3 phrases). Tes réponses expliquent toujours les concepts en profondeur. Tu réponds UNIQUEMENT en JSON valide, SANS AUCUN TEXTE AVANT OU APRÈS le JSON.'
+                        'content' => 'Tu es un expert pédagogique qui crée des exercices éducatifs de TRÈS HAUTE QUALITÉ. RÈGLE ABSOLUE: Chaque réponse doit faire MINIMUM 3-5 phrases complètes (150-300 caractères). JAMAIS de réponses courtes! Tes réponses doivent être aussi détaillées que des explications de manuel scolaire. Tu réponds UNIQUEMENT en JSON valide, SANS AUCUN TEXTE AVANT OU APRÈS le JSON. Commence directement par { et termine par }.'
                     ],
                     [
                         'role' => 'user',
@@ -52,8 +52,8 @@ class ExerciceGeneratorAIService
                 ];
 
                 $response = $this->groqService->chat($messages, [
-                    'temperature' => 0.8,
-                    'max_tokens' => 3000
+                    'temperature' => 0.9,  // Plus créatif et verbeux
+                    'max_tokens' => 4000   // Plus d'espace pour réponses longues
                 ]);
 
                 if (!$response) {
@@ -122,34 +122,57 @@ class ExerciceGeneratorAIService
         };
 
         return <<<PROMPT
-Génère exactement {$nombre} exercices pédagogiques de qualité sur le sujet: "{$sujet}"
+Tu dois générer {$nombre} exercices pédagogiques COMPLETS sur: "{$sujet}"
 
-**Niveau de difficulté:** {$niveauDescription}
-**Points par exercice:** {$pointsRange}
+**Niveau:** {$niveauDescription}
+**Points:** {$pointsRange}
 
-**RÈGLES IMPORTANTES POUR LES QUESTIONS:**
-1. Questions claires, précises et sans ambiguïté
-2. Questions variées couvrant différents aspects du sujet
-3. Complexité adaptée au niveau demandé
-4. Formulation professionnelle et pédagogique
+🚨 RÈGLE ABSOLUE POUR LES RÉPONSES 🚨
 
-**RÈGLES CRITIQUES POUR LES RÉPONSES:**
-1. ✅ Réponses COMPLÈTES et DÉTAILLÉES (minimum 2-3 phrases)
-2. ✅ Réponses PRÉCISES avec tous les éléments clés
-3. ✅ Réponses COMPRÉHENSIBLES qui expliquent le concept
-4. ❌ PAS de réponses courtes type "oui/non" ou un seul mot
-5. ❌ PAS de réponses vagues ou incomplètes
+CHAQUE RÉPONSE DOIT CONTENIR AU MINIMUM:
+✅ 3-5 PHRASES COMPLÈTES (pas 1 ou 2!)
+✅ 150-300 CARACTÈRES MINIMUM
+✅ Explication détaillée du concept
+✅ Exemples concrets si possible
+✅ Contexte et utilité
 
-**EXEMPLES DE BONNES RÉPONSES:**
+❌ INTERDIT:
+❌ Réponses d'un seul mot: "Une variable"
+❌ Réponses d'une seule phrase courte
+❌ Réponses vagues ou incomplètes
+❌ Réponses sans explication
 
-❌ MAUVAIS: "Télécharger Python"
-✅ BON: "Pour installer Python, il faut d'abord télécharger l'installateur officiel depuis le site python.org, puis l'exécuter en cochant l'option 'Add Python to PATH' pour pouvoir l'utiliser depuis n'importe quel terminal."
+📚 EXEMPLES OBLIGATOIRES À SUIVRE:
 
-❌ MAUVAIS: "Une boucle for"
-✅ BON: "Une boucle for en Python permet de parcourir une séquence (liste, tuple, chaîne) élément par élément. Elle s'écrit 'for element in sequence:' et exécute le bloc de code indenté pour chaque élément de la séquence."
+EXEMPLE 1 - Sujet: Python
+Question: "Qu'est-ce qu'une variable en Python?"
 
-❌ MAUVAIS: "C'est une fonction"
-✅ BON: "Une fonction en programmation est un bloc de code réutilisable qui effectue une tâche spécifique. Elle peut accepter des paramètres en entrée et retourner un résultat. On la définit avec le mot-clé 'def' suivi du nom et des paramètres entre parenthèses."
+❌ MAUVAISE RÉPONSE (TROP COURTE):
+"Une variable est un conteneur pour stocker des données."
+
+✅ BONNE RÉPONSE (À SUIVRE):
+"Une variable en Python est un conteneur qui permet de stocker une valeur en mémoire sous un nom symbolique. Elle est créée automatiquement lors de la première affectation avec l'opérateur égal (=). Python utilise un typage dynamique, ce qui signifie que le type de la variable est déterminé automatiquement selon la valeur assignée, sans besoin de déclaration explicite. Par exemple, 'x = 5' crée une variable entière, tandis que 'nom = \"Alice\"' crée une variable de type chaîne de caractères."
+
+EXEMPLE 2 - Sujet: Java
+Question: "Comment fonctionne une boucle for en Java?"
+
+❌ MAUVAISE RÉPONSE (TROP COURTE):
+"Une boucle for permet de répéter du code."
+
+✅ BONNE RÉPONSE (À SUIVRE):
+"Une boucle for en Java est une structure de contrôle qui permet d'exécuter un bloc de code un nombre déterminé de fois. Elle se compose de trois parties: l'initialisation d'un compteur, la condition de continuation, et l'incrémentation du compteur. La syntaxe est: for(int i=0; i<10; i++) { ... }. Cette boucle est particulièrement utile lorsqu'on connaît à l'avance le nombre d'itérations nécessaires, comme pour parcourir un tableau ou répéter une action un nombre fixe de fois. Elle est plus concise que la boucle while pour ce type d'usage."
+
+EXEMPLE 3 - Sujet: Bases de données
+Question: "Qu'est-ce qu'une clé primaire?"
+
+❌ MAUVAISE RÉPONSE (TROP COURTE):
+"Une clé primaire identifie une ligne."
+
+✅ BONNE RÉPONSE (À SUIVRE):
+"Une clé primaire (Primary Key) est un champ ou une combinaison de champs dans une table de base de données qui identifie de manière unique chaque enregistrement. Elle ne peut pas contenir de valeurs NULL et doit être unique pour chaque ligne de la table. La clé primaire est essentielle pour maintenir l'intégrité des données et établir des relations entre les tables via les clés étrangères. Par exemple, dans une table 'Utilisateurs', le champ 'id_utilisateur' sert souvent de clé primaire car chaque utilisateur a un identifiant unique. Elle permet également d'optimiser les performances des requêtes de recherche."
+
+🎯 TON OBJECTIF:
+Génère {$nombre} exercices où CHAQUE réponse est aussi LONGUE et DÉTAILLÉE que les exemples ci-dessus!
 
 **FORMAT DE RÉPONSE OBLIGATOIRE (JSON uniquement):**
 
@@ -159,8 +182,8 @@ Génère exactement {$nombre} exercices pédagogiques de qualité sur le sujet: 
 {
     "exercices": [
         {
-            "question": "Question claire et précise ici (une phrase interrogative complète)",
-            "reponse": "Réponse COMPLÈTE et DÉTAILLÉE ici (minimum 2-3 phrases explicatives avec tous les détails importants)",
+            "question": "Question claire et précise ici",
+            "reponse": "Réponse LONGUE et DÉTAILLÉE de 3-5 phrases minimum (150-300 caractères) avec explication complète, exemples et contexte comme dans les exemples ci-dessus",
             "points": 10
         }
     ]
@@ -169,16 +192,15 @@ Génère exactement {$nombre} exercices pédagogiques de qualité sur le sujet: 
 ⚠️ RAPPEL: Commence ta réponse directement par { et termine par }
 
 **VALIDATION AVANT D'ENVOYER:**
-- ✅ Chaque réponse fait au moins 2-3 phrases complètes?
-- ✅ Chaque réponse explique clairement le concept?
-- ✅ Chaque réponse contient tous les éléments clés?
-- ✅ Les réponses sont compréhensibles et pédagogiques?
+- ✅ Chaque réponse fait au moins 3-5 phrases?
+- ✅ Chaque réponse fait au moins 150 caractères?
+- ✅ Chaque réponse explique le concept en détail?
+- ✅ Chaque réponse ressemble aux exemples donnés?
 
 **IMPORTANT:**
 - Génère EXACTEMENT {$nombre} exercices
-- Réponds UNIQUEMENT en JSON valide, sans texte avant ou après
-- Les réponses doivent être COMPLÈTES et DÉTAILLÉES
 - Points dans la fourchette {$pointsRange}
+- Réponds UNIQUEMENT en JSON valide
 PROMPT;
     }
 
@@ -226,10 +248,13 @@ PROMPT;
             
             // Vérifier que la réponse n'est pas trop courte
             $reponse = trim($exercice['reponse']);
-            if (strlen($reponse) < 20) {
+            $reponseLength = strlen($reponse);
+            
+            if ($reponseLength < 100) {
                 $this->logger->warning('Skipping exercise with too short answer', [
                     'question' => $exercice['question'],
-                    'reponse' => $reponse
+                    'reponse' => $reponse,
+                    'length' => $reponseLength
                 ]);
                 continue;
             }
