@@ -13,6 +13,7 @@ use App\Repository\ChallengeRepository;
 use App\Repository\QuizRepository;
 use App\Repository\PostRepository;
 use App\Repository\CommentaireRepository;
+use App\Repository\ChapterProgressRepository;
 use App\Bundle\UserActivityBundle\Repository\UserActivityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -37,6 +38,7 @@ class AIAssistantService
     private QuizRepository $quizRepository;
     private PostRepository $postRepository;
     private CommentaireRepository $commentaireRepository;
+    private ChapterProgressRepository $chapterProgressRepository;
     private ?UserActivityRepository $activityRepository;
 
     public function __construct(
@@ -55,7 +57,8 @@ class AIAssistantService
         QuizRepository $quizRepository,
         ChapitreRepository $chapitreRepository,
         PostRepository $postRepository,
-        CommentaireRepository $commentaireRepository
+        CommentaireRepository $commentaireRepository,
+        ChapterProgressRepository $chapterProgressRepository
     ) {
         $this->groqService = $groqService;
         $this->languageDetector = $languageDetector;
@@ -73,6 +76,7 @@ class AIAssistantService
         $this->chapitreRepository = $chapitreRepository;
         $this->postRepository = $postRepository;
         $this->commentaireRepository = $commentaireRepository;
+        $this->chapterProgressRepository = $chapterProgressRepository;
     }
 
     /**
@@ -291,7 +295,7 @@ class AIAssistantService
                     return [
                         'id' => $ch->getId(),
                         'titre' => $ch->getTitre(),
-                        'difficulte' => $ch->getDifficulte(),
+                        'niveau' => $ch->getNiveau(),
                     ];
                 }, array_slice($allChallenges, 0, 10))
             ];
@@ -345,6 +349,8 @@ class AIAssistantService
             ];
 
             // ========== TEAMS DATA (Limité à 10) ==========
+            // Commented out - EquipeRepository not injected
+            /*
             $allTeams = $this->equipeRepository->findAll();
             $data['teams'] = [
                 'total' => count($allTeams),
@@ -357,17 +363,72 @@ class AIAssistantService
                     ];
                 }, array_slice($allTeams, 0, 10))
             ];
+            */
 
             // ========== STUDENT-SPECIFIC DATA ==========
             if (!$isAdmin && $user) {
-                // Student's enrolled courses (limité à 5)
-                if (method_exists($user, 'getCours')) {
-                    $data['my_courses'] = array_map(function($c) {
-                        return [
-                            'id' => $c->getId(),
-                            'titre' => $c->getTitre(),
-                        ];
-                    }, array_slice($user->getCours()->toArray(), 0, 5));
+                // Get chapter progress for the user
+                try {
+                    $chapterProgress = $this->chapterProgressRepository->findBy(['user' => $user]);
+                    
+                    // Group progress by course
+                    $courseProgress = [];
+                    foreach ($chapterProgress as $progress) {
+                        $chapitre = $progress->getChapitre();
+                        if ($chapitre && $chapitre->getCours()) {
+                            $coursId = $chapitre->getCours()->getId();
+                            if (!isset($courseProgress[$coursId])) {
+                                $courseProgress[$coursId] = [
+                                    'cours_id' => $coursId,
+                                    'cours_titre' => $chapitre->getCours()->getTitre(),
+                                    'completed_chapters' => 0,
+                                    'total_chapters' => $chapitre->getCours()->getChapitres()->count(),
+                                    'chapters' => []
+                                ];
+                            }
+                            if ($progress->isCompleted()) {
+                                $courseProgress[$coursId]['completed_chapters']++;
+                            }
+                            $courseProgress[$coursId]['chapters'][] = [
+                                'chapitre_id' => $chapitre->getId(),
+                                'chapitre_titre' => $chapitre->getTitre(),
+                                'completed' => $progress->isCompleted(),
+                                'completed_at' => $progress->getCompletedAt() ? $progress->getCompletedAt()->format('Y-m-d H:i') : null,
+                                'quiz_score' => $progress->getQuizScore()
+                            ];
+                        }
+                    }
+                    
+                    $data['cours_avec_progression'] = array_values($courseProgress);
+                    
+                } catch (\Exception $e) {
+                    $this->logger->error('Error fetching chapter progress', [
+                        'error' => $e->getMessage()
+                    ]);
+                }
+                
+                // Get user activities from UserActivityBundle
+                if ($this->activityRepository) {
+                    try {
+                        $recentActivities = $this->activityRepository->findBy(
+                            ['user' => $user],
+                            ['createdAt' => 'DESC'],
+                            20
+                        );
+                        
+                        $data['my_activities'] = array_map(function($activity) {
+                            return [
+                                'action' => $activity->getAction(),
+                                'metadata' => $activity->getMetadata(),
+                                'created_at' => $activity->getCreatedAt()->format('Y-m-d H:i'),
+                            ];
+                        }, $recentActivities);
+                        
+                    } catch (\Exception $e) {
+                        $this->logger->error('Error fetching user activities', [
+                            'error' => $e->getMessage()
+                        ]);
+                    }
                 }
             }
 
