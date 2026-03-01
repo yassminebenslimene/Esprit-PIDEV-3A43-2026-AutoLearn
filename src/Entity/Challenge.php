@@ -24,12 +24,10 @@ class Challenge
     #[Assert\NotBlank(message: "La description ne peut pas être vide.")]
     private ?string $description = null;
 
-    #[ORM\Column]
-    private ?\DateTime $date_debut = null;
-
-    #[ORM\Column]
-    #[Assert\GreaterThan(propertyPath: "date_debut", message: "La date de fin doit être supérieure à la date de début.")]
-    private ?\DateTime $date_fin = null;
+    #[ORM\Column(type: 'integer')]
+    #[Assert\NotBlank(message: "La durée ne peut pas être vide.")]
+    #[Assert\Positive(message: "La durée doit être un nombre positif.")]
+    private ?int $duree = null; // Durée en minutes
 
     #[ORM\Column(length: 15)]
     #[Assert\NotBlank(message: "Le niveau ne peut pas être vide.")]
@@ -99,25 +97,14 @@ class Challenge
         return $this;
     }
 
-    public function getDateDebut(): ?\DateTime
+    public function getDuree(): ?int
     {
-        return $this->date_debut;
+        return $this->duree;
     }
 
-    public function setDateDebut(\DateTime $date_debut): static
+    public function setDuree(int $duree): static
     {
-        $this->date_debut = $date_debut;
-        return $this;
-    }
-
-    public function getDateFin(): ?\DateTime
-    {
-        return $this->date_fin;
-    }
-
-    public function setDateFin(\DateTime $date_fin): static
-    {
-        $this->date_fin = $date_fin;
+        $this->duree = $duree;
         return $this;
     }
 

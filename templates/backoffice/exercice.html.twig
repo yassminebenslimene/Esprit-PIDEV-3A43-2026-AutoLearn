@@ -61,7 +61,17 @@ https://templatemo.com/tm-607-glass-admin
             </nav>
 
             <!-- Content -->
-            <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <button onclick="openAIGeneratorModal()" 
+                   class="btn btn-secondary" 
+                   style="background: linear-gradient(135deg, #f3b562, #f0a53b); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    🤖 Générer avec IA
+                </button>
                 <a href="{{ path('backoffice_exercice_add') }}" 
                    class="btn btn-primary" 
                    style="background: linear-gradient(135deg, var(--emerald-light), var(--emerald)); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
@@ -172,6 +182,134 @@ https://templatemo.com/tm-607-glass-admin
 
     <script src="{{ asset('backoffice/js/templatemo-glass-admin-script.js') }}"></script>
     <!-- TemplateMo 607 Glass Admin -->
+    
+    <!-- Modal de génération IA -->
+    <div id="aiGeneratorModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);">
+            <h2 style="margin-bottom: 20px; color: var(--text); font-size: 24px;">🤖 Générer des exercices avec IA</h2>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: var(--text); font-weight: 500;">Sujet</label>
+                <input type="text" id="aiSujet" placeholder="Ex: Les boucles en PHP" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;">
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: var(--text); font-weight: 500;">Niveau</label>
+                <select id="aiNiveau" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;">
+                    <option value="">Sélectionnez un niveau</option>
+                    <option value="Débutant">Débutant</option>
+                    <option value="Intermédiaire">Intermédiaire</option>
+                    <option value="Avancé">Avancé</option>
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: var(--text); font-weight: 500;">Nombre d'exercices</label>
+                <input type="number" id="aiNombre" value="5" min="1" max="10" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); font-family: inherit;">
+            </div>
+            
+            <div id="aiGeneratorStatus" style="margin-bottom: 20px; padding: 12px; border-radius: 8px; display: none;"></div>
+            
+            <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                <button onclick="closeAIGeneratorModal()" style="padding: 12px 24px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text); cursor: pointer; font-weight: 500;">
+                    Annuler
+                </button>
+                <button onclick="generateExercices()" id="generateBtn" style="padding: 12px 24px; background: linear-gradient(135deg, #f3b562, #f0a53b); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">
+                    🚀 Générer
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function openAIGeneratorModal() {
+            document.getElementById('aiGeneratorModal').style.display = 'flex';
+        }
+        
+        function closeAIGeneratorModal() {
+            document.getElementById('aiGeneratorModal').style.display = 'none';
+            document.getElementById('aiGeneratorStatus').style.display = 'none';
+            document.getElementById('aiSujet').value = '';
+            document.getElementById('aiNiveau').value = '';
+            document.getElementById('aiNombre').value = '5';
+        }
+        
+        async function generateExercices() {
+            const sujet = document.getElementById('aiSujet').value.trim();
+            const niveau = document.getElementById('aiNiveau').value;
+            const nombre = parseInt(document.getElementById('aiNombre').value);
+            const statusDiv = document.getElementById('aiGeneratorStatus');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            // Validation
+            if (!sujet) {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = 'rgba(241, 123, 123, 0.2)';
+                statusDiv.style.color = '#f17b7b';
+                statusDiv.innerHTML = '⚠️ Veuillez saisir un sujet';
+                return;
+            }
+            
+            if (!niveau) {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = 'rgba(241, 123, 123, 0.2)';
+                statusDiv.style.color = '#f17b7b';
+                statusDiv.innerHTML = '⚠️ Veuillez sélectionner un niveau';
+                return;
+            }
+            
+            // Afficher le statut de chargement
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = 'rgba(127, 183, 126, 0.2)';
+            statusDiv.style.color = '#7fb77e';
+            statusDiv.innerHTML = '⏳ Génération en cours... Cela peut prendre quelques secondes.';
+            generateBtn.disabled = true;
+            generateBtn.style.opacity = '0.5';
+            
+            try {
+                const response = await fetch('{{ path('backoffice_exercice_generate_ai') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        sujet: sujet,
+                        niveau: niveau,
+                        nombre: nombre
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusDiv.style.background = 'rgba(127, 183, 126, 0.2)';
+                    statusDiv.style.color = '#7fb77e';
+                    statusDiv.innerHTML = `✅ ${data.count} exercice(s) généré(s) avec succès! Rechargement...`;
+                    
+                    // Recharger la page après 2 secondes
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    throw new Error(data.error || 'Erreur inconnue');
+                }
+            } catch (error) {
+                statusDiv.style.background = 'rgba(241, 123, 123, 0.2)';
+                statusDiv.style.color = '#f17b7b';
+                statusDiv.innerHTML = `❌ Erreur: ${error.message}`;
+                generateBtn.disabled = false;
+                generateBtn.style.opacity = '1';
+            }
+        }
+        
+        // Fermer la modal en cliquant en dehors
+        document.getElementById('aiGeneratorModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAIGeneratorModal();
+            }
+        });
+    </script>
     
     {# AI Chat Widget - Assistant Intelligent #}
     {% include 'ai_assistant/chat_widget.html.twig' %}

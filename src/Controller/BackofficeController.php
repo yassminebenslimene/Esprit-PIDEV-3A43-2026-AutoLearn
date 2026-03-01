@@ -657,6 +657,64 @@ class BackofficeController extends AbstractController
 
         return $this->redirectToRoute('backoffice_exercices');
     }
+    
+    #[Route('/backoffice/exercice/generate-ai', name: 'backoffice_exercice_generate_ai', methods: ['POST'])]
+    public function generateExercicesAI(
+        Request $request,
+        \App\Service\ExerciceGeneratorAIService $generatorService,
+        EntityManagerInterface $em
+    ): Response {
+        try {
+            $data = json_decode($request->getContent(), true);
+            
+            $sujet = $data['sujet'] ?? '';
+            $niveau = $data['niveau'] ?? '';
+            $nombre = $data['nombre'] ?? 5;
+            
+            if (empty($sujet) || empty($niveau)) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Le sujet et le niveau sont requis'
+                ], 400);
+            }
+            
+            // Générer les exercices avec l'IA
+            $exercicesData = $generatorService->generateExercices($sujet, $niveau, $nombre);
+            
+            if (empty($exercicesData)) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Aucun exercice n\'a pu être généré'
+                ], 500);
+            }
+            
+            // Créer et persister les exercices
+            $count = 0;
+            foreach ($exercicesData as $exerciceData) {
+                $exercice = new Exercice();
+                $exercice->setQuestion($exerciceData['question']);
+                $exercice->setReponse($exerciceData['reponse']);
+                $exercice->setPoints($exerciceData['points']);
+                
+                $em->persist($exercice);
+                $count++;
+            }
+            
+            $em->flush();
+            
+            return $this->json([
+                'success' => true,
+                'count' => $count,
+                'message' => "$count exercice(s) généré(s) avec succès"
+            ]);
+            
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
     #[Route('/backoffice/challenges', name: 'backoffice_challenges')]
     public function showchallenge(ChallengeRepository $repository): Response
     {
