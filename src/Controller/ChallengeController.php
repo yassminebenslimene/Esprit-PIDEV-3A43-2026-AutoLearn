@@ -427,7 +427,7 @@ class ChallengeController extends AbstractController
         $data = json_decode($request->getContent(), true);
         
         $qb = $challengeRepository->createQueryBuilder('c')
-            ->leftJoin('c.createdby', 'u')
+            ->leftJoin('c.createdBy', 'u')
             ->addSelect('u');
         
         if (!empty($data['titre'])) {
