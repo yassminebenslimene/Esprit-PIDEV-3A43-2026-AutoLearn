@@ -37,7 +37,7 @@ class ExerciceGeneratorAIService
             $messages = [
                 [
                     'role' => 'system',
-                    'content' => 'Tu es un expert pédagogique qui crée des exercices éducatifs de qualité. Tu génères des exercices adaptés au niveau demandé avec des questions claires et des réponses précises. Tu réponds UNIQUEMENT en JSON valide.'
+                    'content' => 'Tu es un expert pédagogique qui crée des exercices éducatifs de haute qualité. Tu génères des questions claires et des réponses COMPLÈTES et DÉTAILLÉES (minimum 2-3 phrases). Tes réponses expliquent toujours les concepts en profondeur. Tu réponds UNIQUEMENT en JSON valide.'
                 ],
                 [
                     'role' => 'user',
@@ -46,8 +46,8 @@ class ExerciceGeneratorAIService
             ];
 
             $response = $this->groqService->chat($messages, [
-                'temperature' => 0.7,
-                'max_tokens' => 2000
+                'temperature' => 0.8,
+                'max_tokens' => 3000
             ]);
 
             if (!$response) {
@@ -80,9 +80,9 @@ class ExerciceGeneratorAIService
     private function buildGenerationPrompt(string $sujet, string $niveau, int $nombre): string
     {
         $niveauDescription = match($niveau) {
-            'Débutant' => 'niveau débutant (questions simples, concepts de base)',
-            'Intermédiaire' => 'niveau intermédiaire (questions moyennement complexes, concepts avancés)',
-            'Avancé' => 'niveau avancé (questions complexes, concepts experts)',
+            'Débutant' => 'niveau débutant (questions simples et claires, concepts de base, réponses courtes et précises)',
+            'Intermédiaire' => 'niveau intermédiaire (questions moyennement complexes, concepts avancés, réponses détaillées)',
+            'Avancé' => 'niveau avancé (questions complexes et approfondies, concepts experts, réponses complètes et techniques)',
             default => 'niveau intermédiaire'
         };
 
@@ -94,34 +94,57 @@ class ExerciceGeneratorAIService
         };
 
         return <<<PROMPT
-Génère exactement {$nombre} exercices sur le sujet suivant: "{$sujet}"
+Génère exactement {$nombre} exercices pédagogiques de qualité sur le sujet: "{$sujet}"
 
 **Niveau de difficulté:** {$niveauDescription}
 **Points par exercice:** {$pointsRange}
 
-**Consignes importantes:**
-1. Chaque exercice doit avoir une question claire et précise
-2. Chaque réponse doit être complète et correcte
-3. Les questions doivent être variées et couvrir différents aspects du sujet
-4. Adapte la complexité au niveau demandé
-5. Les réponses doivent être concises mais complètes (2-4 phrases maximum)
+**RÈGLES IMPORTANTES POUR LES QUESTIONS:**
+1. Questions claires, précises et sans ambiguïté
+2. Questions variées couvrant différents aspects du sujet
+3. Complexité adaptée au niveau demandé
+4. Formulation professionnelle et pédagogique
 
-**Format de réponse OBLIGATOIRE (JSON uniquement):**
+**RÈGLES CRITIQUES POUR LES RÉPONSES:**
+1. ✅ Réponses COMPLÈTES et DÉTAILLÉES (minimum 2-3 phrases)
+2. ✅ Réponses PRÉCISES avec tous les éléments clés
+3. ✅ Réponses COMPRÉHENSIBLES qui expliquent le concept
+4. ❌ PAS de réponses courtes type "oui/non" ou un seul mot
+5. ❌ PAS de réponses vagues ou incomplètes
+
+**EXEMPLES DE BONNES RÉPONSES:**
+
+❌ MAUVAIS: "Télécharger Python"
+✅ BON: "Pour installer Python, il faut d'abord télécharger l'installateur officiel depuis le site python.org, puis l'exécuter en cochant l'option 'Add Python to PATH' pour pouvoir l'utiliser depuis n'importe quel terminal."
+
+❌ MAUVAIS: "Une boucle for"
+✅ BON: "Une boucle for en Python permet de parcourir une séquence (liste, tuple, chaîne) élément par élément. Elle s'écrit 'for element in sequence:' et exécute le bloc de code indenté pour chaque élément de la séquence."
+
+❌ MAUVAIS: "C'est une fonction"
+✅ BON: "Une fonction en programmation est un bloc de code réutilisable qui effectue une tâche spécifique. Elle peut accepter des paramètres en entrée et retourner un résultat. On la définit avec le mot-clé 'def' suivi du nom et des paramètres entre parenthèses."
+
+**FORMAT DE RÉPONSE OBLIGATOIRE (JSON uniquement):**
 {
     "exercices": [
         {
-            "question": "Question claire et précise ici",
-            "reponse": "Réponse complète et correcte ici",
+            "question": "Question claire et précise ici (une phrase interrogative complète)",
+            "reponse": "Réponse COMPLÈTE et DÉTAILLÉE ici (minimum 2-3 phrases explicatives avec tous les détails importants)",
             "points": 10
         }
     ]
 }
 
-**Important:**
+**VALIDATION AVANT D'ENVOYER:**
+- ✅ Chaque réponse fait au moins 2-3 phrases complètes?
+- ✅ Chaque réponse explique clairement le concept?
+- ✅ Chaque réponse contient tous les éléments clés?
+- ✅ Les réponses sont compréhensibles et pédagogiques?
+
+**IMPORTANT:**
 - Génère EXACTEMENT {$nombre} exercices
 - Réponds UNIQUEMENT en JSON valide, sans texte avant ou après
-- Assure-toi que les questions sont pertinentes et éducatives
-- Les points doivent être dans la fourchette {$pointsRange}
+- Les réponses doivent être COMPLÈTES et DÉTAILLÉES
+- Points dans la fourchette {$pointsRange}
 PROMPT;
     }
 

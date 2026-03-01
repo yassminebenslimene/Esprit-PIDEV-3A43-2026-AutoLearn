@@ -81,45 +81,59 @@ class ChallengeCorrectorAIService
     private function buildCorrectionPrompt(string $question, string $userAnswer, string $correctAnswer): string
     {
         return <<<PROMPT
-Tu dois évaluer la réponse d'un étudiant de manière intelligente et pédagogique.
+Tu es un correcteur expert qui évalue les réponses en analysant le SENS et la COMPRÉHENSION, pas la formulation exacte.
 
 **Question posée:** 
 $question
 
-**Réponse correcte attendue:** 
+**Réponse attendue (référence):** 
 $correctAnswer
 
 **Réponse de l'étudiant:** 
 $userAnswer
 
-**Ta mission:**
-1. Analyse si la réponse de l'étudiant démontre une compréhension du concept, même si la formulation est différente
-2. Identifie les points corrects et les erreurs spécifiques
-3. Explique POURQUOI la réponse est correcte ou incorrecte
-4. Si incorrecte, explique clairement l'erreur commise et le concept mal compris
-5. Donne des conseils concrets et actionnables pour s'améliorer
+**RÈGLES D'ÉVALUATION CRITIQUES:**
 
-**Critères d'évaluation:**
-- Compréhension conceptuelle (plus important que la formulation exacte)
-- Présence des éléments clés de la réponse
-- Exactitude factuelle
-- Cohérence logique
+1. **ANALYSE SÉMANTIQUE PRIORITAIRE:**
+   - Compare le SENS et les CONCEPTS, pas les mots exacts
+   - "bla" et "Pour installer Python, il suffit de..." peuvent avoir le même sens
+   - Une réponse courte mais correcte = 100%
+   - Une réponse longue mais correcte = 100%
+   - Seul le sens compte!
 
-**Format de réponse OBLIGATOIRE (JSON uniquement):**
+2. **EXEMPLES D'ÉVALUATION:**
+   - Question: "Comment installer Python?"
+   - Réponse attendue: "Pour installer Python, il suffit de télécharger l'installateur depuis python.org"
+   - Réponse étudiant: "bla" → Si "bla" signifie la même chose = CORRECT
+   - Réponse étudiant: "Télécharger depuis python.org" → CORRECT (même sens, formulation différente)
+   - Réponse étudiant: "Installer Java" → INCORRECT (sens différent)
+
+3. **CRITÈRES DE CORRECTION:**
+   ✅ La réponse contient les concepts clés?
+   ✅ La réponse démontre la compréhension?
+   ✅ Les informations sont factuellement correctes?
+   ❌ PAS IMPORTANT: Longueur, style, grammaire, formulation exacte
+
+4. **SCORING:**
+   - 100% = Sens correct, même si formulation différente
+   - 70-90% = Partiellement correct, quelques éléments manquants
+   - 40-60% = Compréhension partielle, erreurs mineures
+   - 0-30% = Sens incorrect ou incompréhension majeure
+
+**FORMAT DE RÉPONSE (JSON UNIQUEMENT):**
 {
-    "isCorrect": true ou false,
-    "score": 0-100 (pourcentage de justesse),
-    "feedback": "Message court et encourageant (1-2 phrases)",
-    "explanation": "Explication détaillée: Qu'est-ce qui est correct/incorrect? Pourquoi? Quelle est l'erreur de compréhension? (3-5 phrases)",
-    "advice": "Conseil concret et actionnable pour s'améliorer ou approfondir (2-3 phrases)"
+    "isCorrect": true/false,
+    "score": 0-100,
+    "feedback": "Message encourageant (1-2 phrases)",
+    "explanation": "Pourquoi correct/incorrect? Analyse du sens, pas de la forme (3-5 phrases)",
+    "advice": "Conseil concret pour s'améliorer (2-3 phrases)"
 }
 
-**Important:**
-- Sois bienveillant mais honnête
-- Si la réponse est partiellement correcte, donne un score proportionnel (ex: 50-70)
-- Explique toujours le "pourquoi" de l'erreur, pas seulement le "quoi"
-- Fournis des conseils spécifiques, pas génériques
-- Réponds UNIQUEMENT en JSON valide, sans texte avant ou après
+**IMPORTANT:**
+- Analyse le SENS, pas la FORME
+- Sois généreux si le sens est correct
+- Explique clairement pourquoi c'est correct ou incorrect
+- Réponds UNIQUEMENT en JSON valide
 PROMPT;
     }
 
