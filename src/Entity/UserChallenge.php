@@ -13,11 +13,11 @@ class UserChallenge
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'targetEntity: User::class')]
+    #[ORM\ManyToOne(inversedBy: 'userChallenges')]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'userId', nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(targetEntity: Challenge::class)]
+    #[ORM\ManyToOne(inversedBy: 'userChallenges')]
     #[ORM\JoinColumn(name: 'challenge_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Challenge $challenge = null;
 
@@ -49,7 +49,6 @@ class UserChallenge
     public function setUser(?User $user): static
     {
         $this->user = $user;
-
         return $this;
     }
 
@@ -61,7 +60,6 @@ class UserChallenge
     public function setChallenge(?Challenge $challenge): static
     {
         $this->challenge = $challenge;
-
         return $this;
     }
 
@@ -73,7 +71,6 @@ class UserChallenge
     public function setCurrentIndex(?int $currentIndex): static
     {
         $this->currentIndex = $currentIndex;
-
         return $this;
     }
 
@@ -85,7 +82,6 @@ class UserChallenge
     public function setAnswers(?array $answers): static
     {
         $this->answers = $answers;
-
         return $this;
     }
 
@@ -97,7 +93,6 @@ class UserChallenge
     public function setCompletedAt(?\DateTimeImmutable $completedAt): static
     {
         $this->completedAt = $completedAt;
-
         return $this;
     }
 
@@ -109,7 +104,6 @@ class UserChallenge
     public function setScore(?int $score): static
     {
         $this->score = $score;
-
         return $this;
     }
 
@@ -121,9 +115,9 @@ class UserChallenge
     public function setTotalPoints(?int $totalPoints): static
     {
         $this->totalPoints = $totalPoints;
-
         return $this;
     }
+
     public function isCompleted(): bool
     {
         return $this->completedAt !== null;

@@ -8,11 +8,19 @@ class AiSummaryService
 {
     private HttpClientInterface $httpClient;
     private string $apiKey;
+    private string $apiUrl;
+    private string $model;
 
-    public function __construct(HttpClientInterface $httpClient, string $groqApiKey)
-    {
-    $this->httpClient = $httpClient;
+    public function __construct(
+        HttpClientInterface $httpClient, 
+        string $groqApiKey, 
+        string $groqApiUrl,
+        string $groqModel
+    ) {
+        $this->httpClient = $httpClient;
         $this->apiKey = $groqApiKey;
+        $this->apiUrl = $groqApiUrl;
+        $this->model = $groqModel;
     }
 
     public function generateSummary(string $content): ?string
@@ -21,13 +29,13 @@ class AiSummaryService
             // Limiter le contenu à 2000 caractères pour éviter les coûts élevés
             $truncatedContent = mb_substr(strip_tags($content), 0, 2000);
 
-            $response = $this->httpClient->request('POST', 'https://api.groq.com/openai/v1/chat/completions', [
+            $response = $this->httpClient->request('POST', $this->apiUrl . '/openai/v1/chat/completions', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->apiKey,
                     'Content-Type' => 'application/json',
                 ],
                 'json' => [
-                    'model' => 'llama-3.3-70b-versatile',
+                    'model' => $this->model,  // Utiliser le modèle configuré
                     'messages' => [
                         [
                             'role' => 'system',

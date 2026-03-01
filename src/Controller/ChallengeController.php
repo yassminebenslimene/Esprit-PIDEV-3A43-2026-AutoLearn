@@ -1,15 +1,14 @@
 <?php
 
 namespace App\Controller;
+
 use App\Entity\UserChallenge;
 use App\Repository\ChallengeRepository;
-<<<<<<< HEAD
 use App\Repository\ExerciceRepository;
 use App\Repository\QuizRepository;
-=======
 use App\Repository\UserChallengeRepository;
 use App\Service\EmailService;
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
+use App\Entity\Vote;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,84 +16,72 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-<<<<<<< HEAD
 
 class ChallengeController extends AbstractController
 {
     // ⚠️ IMPORTANT: La route spécifique DOIT être avant la route générique
     #[Route('/challenge/save-answer', name: 'frontchallenge_save_answer', methods: ['POST'])]
-    public function saveAnswer(Request $request, SessionInterface $session): JsonResponse
-    {
+    public function saveAnswer(
+        Request $request, 
+        SessionInterface $session,
+        UserChallengeRepository $userChallengeRepository,
+        ChallengeRepository $challengeRepository,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
         try {
-            // Récupérer les données JSON de la requête
             $data = json_decode($request->getContent(), true);
             
-            // Vérifier si le JSON est valide
             if (!$data) {
-                return $this->json([
-                    'success' => false, 
-                    'error' => 'JSON invalide'
-                ], 400);
+                return $this->json(['success' => false, 'error' => 'JSON invalide'], 400);
             }
             
-            // Récupérer les paramètres
             $itemId = $data['itemId'] ?? null;
             $answer = $data['answer'] ?? null;
             $challengeId = $data['challengeId'] ?? null;
+            $currentIndex = $data['currentIndex'] ?? 0;
             
-            // Vérifier que tous les paramètres sont présents
-            if (!$itemId) {
-                return $this->json([
-                    'success' => false, 
-                    'error' => 'ID de l\'élément manquant'
-                ], 400);
+            if (!$itemId || !$challengeId) {
+                return $this->json(['success' => false, 'error' => 'Paramètres manquants'], 400);
             }
             
-            if (!$challengeId) {
-                return $this->json([
-                    'success' => false, 
-                    'error' => 'ID du challenge manquant'
-                ], 400);
+            $user = $this->getUser();
+            if ($user) {
+                // Récupérer le challenge
+                $challenge = $challengeRepository->find($challengeId);
+                
+                if ($challenge) {
+                    // Sauvegarder dans la base de données
+                    $userChallenge = $userChallengeRepository->findOneBy([
+                        'user' => $user,
+                        'challenge' => $challenge
+                    ]);
+                    
+                    if ($userChallenge && !$userChallenge->isCompleted()) {
+                        $answers = $userChallenge->getAnswers() ?? [];
+                        $answers[$itemId] = $answer;
+                        $userChallenge->setAnswers($answers);
+                        $userChallenge->setCurrentIndex($currentIndex);
+                        $entityManager->flush();
+                    }
+                }
             }
             
-            // Utiliser l'ID du challenge pour la clé de session
+            // Sauvegarder aussi dans la session
             $sessionKey = 'challenge_answers_' . $challengeId;
             $sessionAnswers = $session->get($sessionKey, []);
-            
-            // Sauvegarder la réponse
-            $sessionAnswers[$itemId] = [
-                'answer' => $answer,
-                'timestamp' => time()
-            ];
-            
-            // Mettre à jour la session
+            $sessionAnswers[$itemId] = $answer;
             $session->set($sessionKey, $sessionAnswers);
             
-            return $this->json([
-                'success' => true, 
-                'message' => 'Réponse sauvegardée avec succès'
-            ]);
+            return $this->json(['success' => true, 'message' => 'Réponse sauvegardée avec succès']);
             
         } catch (\Exception $e) {
-            // En cas d'erreur, retourner les détails pour le débogage
             return $this->json([
                 'success' => false,
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'error' => $e->getMessage()
             ], 500);
         }
     }
 
-    // Route pour afficher les détails d'un challenge
-    #[Route('/challenge/{id}', name: 'frontchallenge')]
-    public function showChallenge(int $id, ChallengeRepository $challengeRepository): Response
-    {
-=======
-use App\Entity\Vote;
-
-class ChallengeController extends AbstractController
-{
     #[Route('/challenge/vote', name: 'frontchallenge_vote', methods: ['POST'])]
     public function voteChallenge(Request $request, EntityManagerInterface $entityManager, ChallengeRepository $challengeRepository): JsonResponse
     {
@@ -169,68 +156,7 @@ class ChallengeController extends AbstractController
             ], 500);
         }
     }
-    // ⚠️ IMPORTANT: La route spécifique DOIT être avant la route générique
-    #[Route('/challenge/save-answer', name: 'frontchallenge_save_answer', methods: ['POST'])]
-    public function saveAnswer(
-        Request $request, 
-        SessionInterface $session,
-        UserChallengeRepository $userChallengeRepository,
-        ChallengeRepository $challengeRepository,
-        EntityManagerInterface $entityManager
-    ): JsonResponse {
-        try {
-            $data = json_decode($request->getContent(), true);
-            
-            if (!$data) {
-                return $this->json(['success' => false, 'error' => 'JSON invalide'], 400);
-            }
-            
-            $itemId = $data['itemId'] ?? null;
-            $answer = $data['answer'] ?? null;
-            $challengeId = $data['challengeId'] ?? null;
-            $currentIndex = $data['currentIndex'] ?? 0;
-            
-            if (!$itemId || !$challengeId) {
-                return $this->json(['success' => false, 'error' => 'Paramètres manquants'], 400);
-            }
-            
-            $user = $this->getUser();
-            if ($user) {
-                // Récupérer le challenge
-                $challenge = $challengeRepository->find($challengeId);
-                
-                if ($challenge) {
-                    // Sauvegarder dans la base de données
-                    $userChallenge = $userChallengeRepository->findOneBy([
-                        'user' => $user,
-                        'challenge' => $challenge
-                    ]);
-                    
-                    if ($userChallenge && !$userChallenge->isCompleted()) {
-                        $answers = $userChallenge->getAnswers() ?? [];
-                        $answers[$itemId] = $answer;
-                        $userChallenge->setAnswers($answers);
-                        $userChallenge->setCurrentIndex($currentIndex);
-                        $entityManager->flush();
-                    }
-                }
-            }
-            
-            // Sauvegarder aussi dans la session
-            $sessionKey = 'challenge_answers_' . $challengeId;
-            $sessionAnswers = $session->get($sessionKey, []);
-            $sessionAnswers[$itemId] = $answer;
-            $session->set($sessionKey, $sessionAnswers);
-            
-            return $this->json(['success' => true, 'message' => 'Réponse sauvegardée avec succès']);
-            
-        } catch (\Exception $e) {
-            return $this->json([
-                'success' => false,
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+
     #[Route('/challenge/save-index', name: 'frontchallenge_save_index', methods: ['POST'])]
     public function saveIndex(
         Request $request,
@@ -279,6 +205,7 @@ class ChallengeController extends AbstractController
             ], 500);
         }
     }
+
     #[Route('/challenge/{id}/play/{index}', name: 'frontchallenge_play', defaults: ['index' => 0])]
     public function playChallenge(
         int $id, 
@@ -288,81 +215,12 @@ class ChallengeController extends AbstractController
         UserChallengeRepository $userChallengeRepository,
         EntityManagerInterface $entityManager
     ): Response {
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
         $challenge = $challengeRepository->find($id);
         
         if (!$challenge) {
             throw $this->createNotFoundException('Challenge non trouvé');
         }
         
-<<<<<<< HEAD
-        return $this->render('frontoffice/challenge_show.html.twig', [
-            'challenge' => $challenge
-        ]);
-    }
-
-    // Route pour jouer à un challenge (avec progression)
-    #[Route('/challenge/{id}/play/{index}', name: 'frontchallenge_play', defaults: ['index' => 0])]
-    public function playChallenge(
-        int $id, 
-        int $index, 
-        ChallengeRepository $challengeRepository,
-        SessionInterface $session
-    ): Response {
-        $challenge = $challengeRepository->find($id);
-        
-        if (!$challenge) {
-            throw $this->createNotFoundException('Challenge non trouvé');
-        }
-        
-        // Récupérer ou initialiser la session pour ce challenge
-        $sessionKey = 'challenge_answers_' . $id;
-        $sessionAnswers = $session->get($sessionKey, []);
-        
-        // Fusionner tous les éléments (exercices + quiz)
-        $allItems = [];
-        
-        // Ajouter les exercices
-        foreach ($challenge->getExercices() as $exercice) {
-            $allItems[] = [
-                'type' => 'exercice', 
-                'item' => $exercice
-            ];
-        }
-        
-        // Ajouter les quiz
-        foreach ($challenge->getQuizzes() as $quiz) {
-            $allItems[] = [
-                'type' => 'quiz', 
-                'item' => $quiz
-            ];
-        }
-        
-        // Vérifier s'il y a du contenu
-        if (empty($allItems)) {
-            throw $this->createNotFoundException('Ce challenge ne contient aucun contenu');
-        }
-        
-        // Valider l'index
-        if ($index < 0 || $index >= count($allItems)) {
-            $index = 0;
-        }
-        
-        // Récupérer l'élément courant
-        $currentItem = $allItems[$index];
-        
-        return $this->render('frontoffice/challenge_play.html.twig', [
-            'challenge' => $challenge,
-            'currentItem' => $currentItem['item'],
-            'currentType' => $currentItem['type'],
-            'currentIndex' => $index,
-            'totalItems' => count($allItems),
-            'sessionAnswers' => $sessionAnswers
-        ]);
-    }
-
-    // Route pour terminer un challenge et voir le score
-=======
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('backoffice_login');
@@ -447,19 +305,15 @@ class ChallengeController extends AbstractController
             'sessionAnswers' => $sessionAnswers
         ]);
     }
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
+
     #[Route('/challenge/{id}/complete', name: 'frontchallenge_complete')]
     public function completeChallenge(
         int $id, 
         ChallengeRepository $challengeRepository,
-<<<<<<< HEAD
-        SessionInterface $session
-=======
         SessionInterface $session,
         UserChallengeRepository $userChallengeRepository,
         EntityManagerInterface $entityManager,
         EmailService $emailService
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     ): Response {
         $challenge = $challengeRepository->find($id);
         
@@ -467,25 +321,15 @@ class ChallengeController extends AbstractController
             throw $this->createNotFoundException('Challenge non trouvé');
         }
         
-<<<<<<< HEAD
-=======
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('backoffice_login');
         }
         
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
         // Récupérer les réponses de la session
         $sessionKey = 'challenge_answers_' . $id;
         $sessionAnswers = $session->get($sessionKey, []);
         
-<<<<<<< HEAD
-        // Calculer le score total et le score obtenu
-        $totalPoints = 0;
-        $earnedPoints = 0;
-        
-        // Vérifier les exercices
-=======
         // Récupérer l'enregistrement UserChallenge
         $userChallenge = $userChallengeRepository->findOneBy([
             'user' => $user,
@@ -508,28 +352,21 @@ class ChallengeController extends AbstractController
         $totalPoints = 0;
         $earnedPoints = 0;
         
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
+        // Vérifier les exercices
         foreach ($challenge->getExercices() as $exercice) {
             $totalPoints += $exercice->getPoints();
             
             if (isset($sessionAnswers[$exercice->getId()])) {
-<<<<<<< HEAD
-                $userAnswer = $sessionAnswers[$exercice->getId()]['answer'] ?? '';
-                // Comparaison insensible à la casse et sans espaces superflus
-=======
                 $userAnswer = $sessionAnswers[$exercice->getId()];
                 if (is_array($userAnswer)) {
                     $userAnswer = $userAnswer['answer'] ?? '';
                 }
-                
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
                 if (strtolower(trim($userAnswer)) === strtolower(trim($exercice->getReponse()))) {
                     $earnedPoints += $exercice->getPoints();
                 }
             }
         }
         
-<<<<<<< HEAD
         // Vérifier les quiz
         foreach ($challenge->getQuizzes() as $quiz) {
             foreach ($quiz->getQuestions() as $question) {
@@ -549,8 +386,6 @@ class ChallengeController extends AbstractController
             }
         }
         
-        // Nettoyer la session après completion
-=======
         // Marquer comme complété
         $userChallenge->setCompletedAt(new \DateTimeImmutable());
         $userChallenge->setScore($earnedPoints);
@@ -560,12 +395,8 @@ class ChallengeController extends AbstractController
         $entityManager->persist($userChallenge);
         $entityManager->flush();
         
-        // 🔥 ENVOYER L'EMAIL AVANT DE NETTOYER LA SESSION
+        // ENVOYER L'EMAIL
         try {
-            error_log("=== ENVOI EMAIL CHALLENGE ===");
-            error_log("Destinataire: " . $user->getEmail());
-            error_log("Challenge: " . $challenge->getTitre());
-            
             $emailService->sendChallengeReceipt(
                 $user->getEmail(),
                 $challenge->getTitre(),
@@ -574,16 +405,13 @@ class ChallengeController extends AbstractController
                 new \DateTimeImmutable()
             );
             
-            error_log("Email envoyé avec succès !");
             $this->addFlash('success', 'Un récapitulatif vous a été envoyé par email.');
             
         } catch (\Exception $e) {
-            error_log("ERREUR ENVOI EMAIL: " . $e->getMessage());
             $this->addFlash('warning', 'Le challenge est terminé mais l\'email n\'a pas pu être envoyé.');
         }
         
-        // Nettoyer la session APRÈS l'envoi de l'email
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
+        // Nettoyer la session
         $session->remove($sessionKey);
         
         return $this->render('frontoffice/challenge_complete.html.twig', [
@@ -592,15 +420,11 @@ class ChallengeController extends AbstractController
             'totalPoints' => $totalPoints
         ]);
     }
-<<<<<<< HEAD
-=======
-    
+
     #[Route('/backoffice/challenges/filter', name: 'backoffice_challenges_filter', methods: ['POST'])]
     public function filterChallenges(Request $request, ChallengeRepository $challengeRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        
-        error_log('Filtres reçus: ' . print_r($data, true));
         
         $qb = $challengeRepository->createQueryBuilder('c')
             ->leftJoin('c.createdby', 'u')
@@ -622,8 +446,6 @@ class ChallengeController extends AbstractController
         }
         
         $challenges = $qb->getQuery()->getResult();
-        
-        error_log('Nombre de résultats: ' . count($challenges));
         
         $formattedChallenges = [];
         foreach ($challenges as $challenge) {
@@ -648,6 +470,7 @@ class ChallengeController extends AbstractController
             'count' => count($formattedChallenges)
         ]);
     }
+
     // Route pour afficher les détails d'un challenge
     #[Route('/challenge/{id}', name: 'frontchallenge')]
     public function showChallenge(
@@ -676,5 +499,4 @@ class ChallengeController extends AbstractController
             'userChallenge' => $userChallenge
         ]);
     }
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 }

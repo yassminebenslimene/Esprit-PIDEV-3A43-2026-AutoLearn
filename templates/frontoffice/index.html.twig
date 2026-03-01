@@ -27,14 +27,6 @@
 </head>
 <body>
 
-<!--
-
-TemplateMo 586 Scholar
-
-https://templatemo.com/tm-586-scholar
-
--->
-
 <!-- ***** Preloader Start ***** -->
 <div id="js-preloader" class="js-preloader">
     <div class="preloader-inner">
@@ -59,6 +51,7 @@ https://templatemo.com/tm-586-scholar
                         <h1>Scholar</h1>
                     </a>
                     <!-- ***** Logo End ***** -->
+                    
                     <!-- ***** Search Start ***** -->
                     <div class="search-input">
                         <form id="search" action="{{ path('app_search') }}" method="GET">
@@ -69,10 +62,9 @@ https://templatemo.com/tm-586-scholar
                         </form>
                     </div>
                     <!-- ***** Search End ***** -->
+                    
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
-<<<<<<< HEAD
-
                         <li class="scroll-to-section"><a href="#top" class="active">{{ 'nav.home'|trans }}</a></li>
                         <li class="scroll-to-section"><a href="#cours">{{ 'nav.courses'|trans }}</a></li>
                         <li class="scroll-to-section"><a href="#events">{{ 'nav.events'|trans }}</a></li>
@@ -149,33 +141,11 @@ https://templatemo.com/tm-586-scholar
                             <li><a href="{{ path('backoffice_register') }}">{{ 'nav.register'|trans }}</a></li>
                         {% endif %}
                     </ul> 
-                    <!-- ***** Menu End ***** -->
                     
                     <form id="logout-form-nav" action="{{ path('backoffice_logout') }}" method="POST" style="display: none;">
                         <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
                     </form>
-=======
-                        <li class="scroll-to-section"><a href="#top" class="active">Home</a></li>
-                        <li class="scroll-to-section"><a href="#services">Services</a></li>
-                        <li class="scroll-to-section"><a href="#courses">Courses</a></li>
-                        <li class="scroll-to-section"><a href="#team">Team</a></li>
-                        <li class="scroll-to-section"><a href="#events">Events</a></li>
-<<<<<<< HEAD
-                        <li class="scroll-to-section"><a href="#challenge">Challenge</a></li>
-                        <li class="scroll-to-section"><a href="#contact">Register Now!</a></li>
-                    </ul>   
-=======
-{% if app.user %}
-    <li class="scroll-to-section">
-     <li><a href="{{ path('app_profile') }}">My Profil</a></li>
-        <a href="{{ path('backoffice_logout') }}">Logout ({{ app.user.prenom }})</a>
-    </li>
-{% else %}
-    <li class="scroll-to-section"><a href="{{ path('backoffice_login') }}">Login</a></li>
-    <li class="scroll-to-section"><a href="{{ path('backoffice_register') }}">Register</a></li>
-{% endif %}                    </ul>   
->>>>>>> cbd2e773930cb70cefbc6082f3b24c49fb76374d
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
+                    
                     <a class='menu-trigger'>
                         <span>Menu</span>
                     </a>
@@ -187,7 +157,6 @@ https://templatemo.com/tm-586-scholar
 </header>
 <!-- ***** Header Area End ***** -->
 
-<<<<<<< HEAD
 <!-- Flash Messages -->
 {% for label, messages in app.flashes %}
     {% for message in messages %}
@@ -206,8 +175,6 @@ https://templatemo.com/tm-586-scholar
 {% endfor %}
 
 <!-- ***** Main Banner Start ***** -->
-=======
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 <div class="main-banner" id="top">
     <div class="container">
         <div class="row">
@@ -263,8 +230,8 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </div>
+<!-- ***** Main Banner End ***** -->
 
-<<<<<<< HEAD
 <!-- ***** Cours Section Start ***** -->
 <div class="services section" id="cours">
     <div class="container">
@@ -307,73 +274,22 @@ https://templatemo.com/tm-586-scholar
                                 {% endif %}
 
                                 <div class="main-button">
-
                                     <a href="{{ path('app_frontoffice_chapitre_by_cours', {'coursId': cour.id}) }}" class="btn">
                                         {{ 'courses.view'|trans }}
                                     </a>
                                     <a href="{{ path('front_communaute_cours', {'coursId': cour.id}) }}" class="btn" style="background: linear-gradient(135deg, #6c5ce7, #4a69bd);">
                                         <i class="fa fa-users me-1"></i> {{ 'nav.community'|trans }}
                                     </a>
-
                                 </div>
                             </div>
-=======
-<div class="services section" id="services">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-4 col-md-6">
-                <div class="service-item">
-                    <div class="icon">
-                        <!-- CORRECTION : Utiliser asset() -->
-                        <img src="{{ asset('frontoffice/images/service-01.png') }}" alt="online degrees">
-                    </div>
-                    <div class="main-content">
-                        <h4>Online Degrees</h4>
-                        <p>Whenever you need free templates in HTML CSS, you just remember TemplateMo website.</p>
-                        <div class="main-button">
-                            <a href="#">Read More</a>
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="service-item">
-                    <div class="icon">
-                        <!-- CORRECTION -->
-                        <img src="{{ asset('frontoffice/images/service-02.png') }}" alt="short courses">
-                    </div>
-                    <div class="main-content">
-                        <h4>Short Courses</h4>
-                        <p>You can browse free templates based on different tags such as digital marketing, etc.</p>
-                        <div class="main-button">
-                            <a href="#">Read More</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="service-item">
-                    <div class="icon">
-                        <!-- CORRECTION -->
-                        <img src="{{ asset('frontoffice/images/service-03.png') }}" alt="web experts">
-                    </div>
-                    <div class="main-content">
-                        <h4>Web Experts</h4>
-                        <p>You can start learning HTML CSS by modifying free templates from our website too.</p>
-                        <div class="main-button">
-                            <a href="#">Read More</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </div>
-<<<<<<< HEAD
 <!-- ***** Cours Section End ***** -->
-=======
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 
 <div class="section about-us">
     <div class="container">
@@ -444,123 +360,7 @@ https://templatemo.com/tm-586-scholar
     </div>
 </div>
 
-<<<<<<< HEAD
 <!-- ***** Fun Facts Section Start ***** -->
-=======
-<section class="section courses" id="courses">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <div class="section-heading">
-                    <h6>Latest Courses</h6>
-                    <h2>Latest Courses</h2>
-                </div>
-            </div>
-        </div>
-        <ul class="event_filter">
-            <li>
-                <a class="is_active" href="#!" data-filter="*">Show All</a>
-            </li>
-            <li>
-                <a href="#!" data-filter=".design">Webdesign</a>
-            </li>
-            <li>
-                <a href="#!" data-filter=".development">Development</a>
-            </li>
-            <li>
-                <a href="#!" data-filter=".wordpress">Wordpress</a>
-            </li>
-        </ul>
-        <div class="row event_box">
-            <!-- COURSE 1 -->
-            <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 design">
-                <div class="events_item">
-                    <div class="thumb">
-                        <a href="#"><img src="{{ asset('frontoffice/images/course-01.jpg') }}" alt=""></a>
-                        <span class="category">Webdesign</span>
-                        <span class="price"><h6><em>$</em>160</h6></span>
-                    </div>
-                    <div class="down-content">
-                        <span class="author">Stella Blair</span>
-                        <h4>Learn Web Design</h4>
-                    </div>
-                </div>
-            </div>
-            <!-- COURSE 2 -->
-            <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 development">
-                <div class="events_item">
-                    <div class="thumb">
-                        <a href="#"><img src="{{ asset('frontoffice/images/course-02.jpg') }}" alt=""></a>
-                        <span class="category">Development</span>
-                        <span class="price"><h6><em>$</em>340</h6></span>
-                    </div>
-                    <div class="down-content">
-                        <span class="author">Cindy Walker</span>
-                        <h4>Web Development Tips</h4>
-                    </div>
-                </div>
-            </div>
-            <!-- COURSE 3 -->
-            <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 design wordpress">
-                <div class="events_item">
-                    <div class="thumb">
-                        <a href="#"><img src="{{ asset('frontoffice/images/course-03.jpg') }}" alt=""></a>
-                        <span class="category">Wordpress</span>
-                        <span class="price"><h6><em>$</em>640</h6></span>
-                    </div>
-                    <div class="down-content">
-                        <span class="author">David Hutson</span>
-                        <h4>Latest Web Trends</h4>
-                    </div>
-                </div>
-            </div>
-            <!-- COURSE 4 -->
-            <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 development">
-                <div class="events_item">
-                    <div class="thumb">
-                        <a href="#"><img src="{{ asset('frontoffice/images/course-04.jpg') }}" alt=""></a>
-                        <span class="category">Development</span>
-                        <span class="price"><h6><em>$</em>450</h6></span>
-                    </div>
-                    <div class="down-content">
-                        <span class="author">Stella Blair</span>
-                        <h4>Online Learning Steps</h4>
-                    </div>
-                </div>
-            </div>
-            <!-- COURSE 5 -->
-            <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 wordpress development">
-                <div class="events_item">
-                    <div class="thumb">
-                        <a href="#"><img src="{{ asset('frontoffice/images/course-05.jpg') }}" alt=""></a>
-                        <span class="category">Wordpress</span>
-                        <span class="price"><h6><em>$</em>320</h6></span>
-                    </div>
-                    <div class="down-content">
-                        <span class="author">Sophia Rose</span>
-                        <h4>Be a WordPress Master</h4>
-                    </div>
-                </div>
-            </div>
-            <!-- COURSE 6 -->
-            <div class="col-lg-4 col-md-6 align-self-center mb-30 event_outer col-md-6 wordpress design">
-                <div class="events_item">
-                    <div class="thumb">
-                        <a href="#"><img src="{{ asset('frontoffice/images/course-06.jpg') }}" alt=""></a>
-                        <span class="category">Webdesign</span>
-                        <span class="price"><h6><em>$</em>240</h6></span>
-                    </div>
-                    <div class="down-content">
-                        <span class="author">David Hutson</span>
-                        <h4>Full Stack Developer</h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 <div class="section fun-facts">
     <div class="container">
         <div class="row">
@@ -598,77 +398,7 @@ https://templatemo.com/tm-586-scholar
     </div>
 </div>
 
-<<<<<<< HEAD
 <!-- ***** Testimonials Section Start ***** -->
-=======
-<div class="team section" id="team">
-    <div class="container">
-        <div class="row">
-            <!-- TEAM MEMBER 1 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="team-member">
-                    <div class="main-content">
-                        <img src="{{ asset('frontoffice/images/member-01.jpg') }}" alt="">
-                        <span class="category">UX Teacher</span>
-                        <h4>Sophia Rose</h4>
-                        <ul class="social-icons">
-                            <li><a href="#"><i class="fab fa-facebook"></i></a></li>
-                            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <!-- TEAM MEMBER 2 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="team-member">
-                    <div class="main-content">
-                        <img src="{{ asset('frontoffice/images/member-02.jpg') }}" alt="">
-                        <span class="category">Graphic Teacher</span>
-                        <h4>Cindy Walker</h4>
-                        <ul class="social-icons">
-                            <li><a href="#"><i class="fab fa-facebook"></i></a></li>
-                            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <!-- TEAM MEMBER 3 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="team-member">
-                    <div class="main-content">
-                        <img src="{{ asset('frontoffice/images/member-03.jpg') }}" alt="">
-                        <span class="category">Full Stack Master</span>
-                        <h4>David Hutson</h4>
-                        <ul class="social-icons">
-                            <li><a href="#"><i class="fab fa-facebook"></i></a></li>
-                            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <!-- TEAM MEMBER 4 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="team-member">
-                    <div class="main-content">
-                        <img src="{{ asset('frontoffice/images/member-04.jpg') }}" alt="">
-                        <span class="category">Digital Animator</span>
-                        <h4>Stella Blair</h4>
-                        <ul class="social-icons">
-                            <li><a href="#"><i class="fab fa-facebook"></i></a></li>
-                            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> 
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
-
 <div class="section testimonials">
     <div class="container">
         <div class="row">
@@ -733,6 +463,7 @@ https://templatemo.com/tm-586-scholar
         </div>
     </div>
 </div>
+
 <section id="challenge" class="section events">
     <div class="container">
         <div class="row">
@@ -858,11 +589,7 @@ https://templatemo.com/tm-586-scholar
                                             </div>
                                         </li>
                                     </ul>
-<<<<<<< HEAD
-<a href="{{ path('frontchallenge', {'id': challenge.id}) }}">
-=======
                                     <a href="{{ path('frontchallenge', {'id': challenge.id}) }}">
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
                                         <i class="fa fa-angle-right"></i>
                                     </a>
                                 </div>
@@ -874,6 +601,7 @@ https://templatemo.com/tm-586-scholar
         {% endif %}
     </div>
 </section>
+
 <div class="contact-us section" id="contact">
     <div class="container">
         <div class="row">
@@ -956,12 +684,8 @@ https://templatemo.com/tm-586-scholar
     </div>
 </div>
 
-<<<<<<< HEAD
 <!-- ***** Footer Start ***** -->
 <footer style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 60px 0 20px; margin-top: 80px;">
-=======
-<footer>
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     <div class="container">
         <div class="row">
             <div class="col-lg-4 col-md-6 mb-4">
@@ -1093,7 +817,6 @@ https://templatemo.com/tm-586-scholar
     
     <!-- Script d'initialisation -->
     <script>
-<<<<<<< HEAD
         function toggleProfileDropdown(event) {
             event.preventDefault();
             event.stopPropagation();
@@ -1101,7 +824,6 @@ https://templatemo.com/tm-586-scholar
             var dropdown = document.getElementById('profileDropdown');
             var languageDropdown = document.getElementById('languageDropdown');
             
-            // Fermer le dropdown de langue
             if (languageDropdown) {
                 languageDropdown.classList.remove('show');
             }
@@ -1118,104 +840,26 @@ https://templatemo.com/tm-586-scholar
             var dropdown = document.getElementById('languageDropdown');
             var profileDropdown = document.getElementById('profileDropdown');
             
-            // Fermer le dropdown de profil
             if (profileDropdown) {
                 profileDropdown.classList.remove('show');
             }
             
-            dropdown.classList.toggle('show');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
         }
         
-        document.addEventListener('click', function(event) {
-            var dropdown = document.getElementById('profileDropdown');
-            var languageDropdown = document.getElementById('languageDropdown');
-            var isClickInside = event.target.closest('.profile-dropdown-container');
-            
-            if (!isClickInside) {
-                if (dropdown) {
-                    dropdown.classList.remove('show');
-                }
-                if (languageDropdown) {
-                    languageDropdown.classList.remove('show');
-=======
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('FrontOffice Scholar Template chargé');
-        
-        // Script de test pour vérifier que tout est chargé
-        var images = document.querySelectorAll('img');
-        images.forEach(function(img) {
-            img.onerror = function() {
-                console.error('Image non chargée:', this.src);
-            };
-        });
-    });
-    function loadFullCalendar() {
-        return new Promise((resolve, reject) => {
-            // Charger le CSS
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css';
-            document.head.appendChild(link);
-            
-            // Charger le JS
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js';
-            script.onload = resolve;
-            script.onerror = reject;
-            document.body.appendChild(script);
-            
-            // Charger la locale française
-            const localeScript = document.createElement('script');
-            localeScript.src = 'https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales/fr.global.min.js';
-            document.body.appendChild(localeScript);
-        });
-    }
-
-    // Fonction pour initialiser le calendrier
-    function initCalendar() {
-        const calendarEl = document.getElementById('calendar-holder');
-        if (!calendarEl) return;
-        
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            headerToolbar: {
-                start: 'prev,next today',
-                center: 'title',
-                end: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
-            locale: 'fr',
-            height: 'auto',
-            events: {
-                url: '{{ path('fc_load_events') }}',
-                method: 'POST',
-                failure: function(error) {
-                    console.error('Erreur chargement événements:', error);
-                }
-            },
-            eventClick: function(info) {
-                if (info.event.url) {
-                    window.location.href = info.event.url;
-                    return false;
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
-                }
-            }
-        });
-        
-<<<<<<< HEAD
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Profile and language dropdowns initialized');
+            console.log('FrontOffice Scholar Template chargé');
             
-            // Force search form submission
             var searchForm = document.getElementById('search');
             if (searchForm) {
                 searchForm.addEventListener('submit', function(e) {
-                    // Ne pas empêcher la soumission du formulaire
                     console.log('Search form submitted');
                     return true;
                 });
             }
             
-            // Auto-dismiss flash messages after 5 seconds
             setTimeout(function() {
                 var alerts = document.querySelectorAll('.alert');
                 alerts.forEach(function(alert) {
@@ -1224,50 +868,90 @@ https://templatemo.com/tm-586-scholar
                 });
             }, 5000);
             
-            // Scroll to contact section if there's a hash
             if (window.location.hash === '#contact') {
                 setTimeout(function() {
                     document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
                 }, 100);
             }
         });
-=======
-        calendar.render();
-    }
-
-    // Gestion du bouton
-    document.addEventListener('DOMContentLoaded', function() {
-        const btn = document.getElementById('calendarToggleBtn');
-        const container = document.getElementById('calendar-container');
         
-        if (btn && container) {
-            btn.addEventListener('click', async function() {
-                if (container.style.display === 'none') {
-                    // Changer le texte du bouton
-                    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Chargement...';
-                    
-                    // Charger FullCalendar si nécessaire
-                    if (!window.fullCalendarLoaded) {
-                        await loadFullCalendar();
-                        window.fullCalendarLoaded = true;
-                    }
-                    
-                    // Afficher le conteneur
-                    container.style.display = 'block';
-                    btn.innerHTML = '<i class="fa fa-calendar"></i> Masquer le calendrier';
-                    
-                    // Initialiser le calendrier
-                    setTimeout(() => {
-                        initCalendar();
-                    }, 100);
-                } else {
-                    container.style.display = 'none';
-                    btn.innerHTML = '<i class="fa fa-calendar"></i> Voir le calendrier des challenges';
-                }
+        function loadFullCalendar() {
+            return new Promise((resolve, reject) => {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css';
+                document.head.appendChild(link);
+                
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.body.appendChild(script);
+                
+                const localeScript = document.createElement('script');
+                localeScript.src = 'https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales/fr.global.min.js';
+                document.body.appendChild(localeScript);
             });
         }
-    });
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
+
+        function initCalendar() {
+            const calendarEl = document.getElementById('calendar-holder');
+            if (!calendarEl) return;
+            
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    start: 'prev,next today',
+                    center: 'title',
+                    end: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                locale: 'fr',
+                height: 'auto',
+                events: {
+                    url: '{{ path('fc_load_events') }}',
+                    method: 'POST',
+                    failure: function(error) {
+                        console.error('Erreur chargement événements:', error);
+                    }
+                },
+                eventClick: function(info) {
+                    if (info.event.url) {
+                        window.location.href = info.event.url;
+                        return false;
+                    }
+                }
+            });
+            
+            calendar.render();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('calendarToggleBtn');
+            const container = document.getElementById('calendar-container');
+            
+            if (btn && container) {
+                btn.addEventListener('click', async function() {
+                    if (container.style.display === 'none' || container.style.display === '') {
+                        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Chargement...';
+                        
+                        if (!window.fullCalendarLoaded) {
+                            await loadFullCalendar();
+                            window.fullCalendarLoaded = true;
+                        }
+                        
+                        container.style.display = 'block';
+                        btn.innerHTML = '<i class="fa fa-calendar"></i> Masquer le calendrier';
+                        
+                        setTimeout(() => {
+                            initCalendar();
+                        }, 100);
+                    } else {
+                        container.style.display = 'none';
+                        btn.innerHTML = '<i class="fa fa-calendar"></i> Voir le calendrier des challenges';
+                    }
+                });
+            }
+        });
     </script>
 {% endblock %}
 

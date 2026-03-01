@@ -12,8 +12,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Bundle\UserActivityBundle\Entity\UserActivity;
 
-
-
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\InheritanceType('SINGLE_TABLE')]
 #[ORM\DiscriminatorColumn(name: 'discr', type: 'string')]
@@ -22,16 +20,6 @@ use App\Bundle\UserActivityBundle\Entity\UserActivity;
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé!')]
 abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-<<<<<<< HEAD
-
-#[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Challenge::class)]
-private Collection $challenges;
-
-#[ORM\OneToMany(mappedBy: 'user', targetEntity: UserActivity::class, cascade: ['persist', 'remove'])]
-private Collection $activities;
-
-=======
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'userId', type: "integer")]
@@ -110,7 +98,6 @@ private Collection $activities;
     #[ORM\Column(name: 'createdAt', type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
 
-<<<<<<< HEAD
     #[ORM\Column(name: 'isSuspended', type: 'boolean', options: ['default' => false])]
     private bool $isSuspended = false;
 
@@ -129,40 +116,28 @@ private Collection $activities;
     #[ORM\Column(name: 'lastActivityAt', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $lastActivityAt = null;
 
-   
+    #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Challenge::class)]
+    private Collection $challenges;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserActivity::class, cascade: ['persist', 'remove'])]
+    private Collection $activities;
+
+    #[ORM\OneToMany(targetEntity: UserChallenge::class, mappedBy: 'user')]
+    private Collection $userChallenges;
+
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'user')]
+    private Collection $votes;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
         $this->challenges = new ArrayCollection();
-        $this->isSuspended = false;
-        $this->lastLoginAt = new \DateTime(); // Initialize with current time
-        $this->lastActivityAt = new \DateTime(); // Initialize with current time
         $this->activities = new ArrayCollection();
-=======
-    /**
-     * @var Collection<int, Challenge>
-     */
-    #[ORM\OneToMany(targetEntity: Challenge::class, mappedBy: 'createdby', orphanRemoval: true)]
-    private Collection $Challenges;
-
-    /**
-     * @var Collection<int, UserChallenge>
-     */
-    #[ORM\OneToMany(targetEntity: UserChallenge::class, mappedBy: 'user')]
-    private Collection $userChallenges;
-
-    /**
-     * @var Collection<int, Vote>
-     */
-    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'user')]
-    private Collection $votes;
-    public function __construct()
-    {
-        $this->createdAt = new \DateTime();
-        $this->Challenges = new ArrayCollection();
         $this->userChallenges = new ArrayCollection();
         $this->votes = new ArrayCollection();
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
+        $this->isSuspended = false;
+        $this->lastLoginAt = new \DateTime();
+        $this->lastActivityAt = new \DateTime();
     }
 
     public function getRoles(): array
@@ -271,208 +246,183 @@ private Collection $activities;
     {
         return static::class;
     }
-public function isEtudiant(): bool {
-    return $this instanceof Etudiant;
-}
 
-<<<<<<< HEAD
-
-
-=======
-/**
- * @return Collection<int, Challenge>
- */
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
-public function getChallenges(): Collection
-{
-    return $this->Challenges;
-}
-
-public function addChallenge(Challenge $challenge): static
-{
-    if (!$this->Challenges->contains($challenge)) {
-        $this->Challenges->add($challenge);
-        $challenge->setCreatedby($this);
+    public function isEtudiant(): bool 
+    {
+        return $this instanceof Etudiant;
     }
 
-    return $this;
-}
+    /**
+     * @return Collection<int, Challenge>
+     */
+    public function getChallenges(): Collection
+    {
+        return $this->challenges;
+    }
 
-public function removeChallenge(Challenge $challenge): static
-{
-<<<<<<< HEAD
-    if ($this->challenges->removeElement($challenge)) {
-        if ($challenge->getCreatedBy() === $this) {
-            $challenge->setCreatedBy(null);
-=======
-    if ($this->Challenges->removeElement($challenge)) {
-        // set the owning side to null (unless already changed)
-        if ($challenge->getCreatedby() === $this) {
-            $challenge->setCreatedby(null);
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
+    public function addChallenge(Challenge $challenge): static
+    {
+        if (!$this->challenges->contains($challenge)) {
+            $this->challenges->add($challenge);
+            $challenge->setCreatedBy($this);
         }
+        return $this;
     }
 
-    return $this;
-}
-
-/**
- * @return Collection<int, UserChallenge>
- */
-public function getUserChallenges(): Collection
-{
-    return $this->userChallenges;
-}
-
-public function addUserChallenge(UserChallenge $userChallenge): static
-{
-    if (!$this->userChallenges->contains($userChallenge)) {
-        $this->userChallenges->add($userChallenge);
-        $userChallenge->setUser($this);
-    }
-
-    return $this;
-}
-
-public function removeUserChallenge(UserChallenge $userChallenge): static
-{
-    if ($this->userChallenges->removeElement($userChallenge)) {
-        // set the owning side to null (unless already changed)
-        if ($userChallenge->getUser() === $this) {
-            $userChallenge->setUser(null);
+    public function removeChallenge(Challenge $challenge): static
+    {
+        if ($this->challenges->removeElement($challenge)) {
+            if ($challenge->getCreatedBy() === $this) {
+                $challenge->setCreatedBy(null);
+            }
         }
+        return $this;
     }
 
-    return $this;
-}
-
-/**
- * @return Collection<int, Vote>
- */
-public function getVotes(): Collection
-{
-    return $this->votes;
-}
-
-public function addVote(Vote $vote): static
-{
-    if (!$this->votes->contains($vote)) {
-        $this->votes->add($vote);
-        $vote->setUser($this);
+    /**
+     * @return Collection<int, UserChallenge>
+     */
+    public function getUserChallenges(): Collection
+    {
+        return $this->userChallenges;
     }
 
-    return $this;
-}
-
-public function removeVote(Vote $vote): static
-{
-    if ($this->votes->removeElement($vote)) {
-        // set the owning side to null (unless already changed)
-        if ($vote->getUser() === $this) {
-            $vote->setUser(null);
+    public function addUserChallenge(UserChallenge $userChallenge): static
+    {
+        if (!$this->userChallenges->contains($userChallenge)) {
+            $this->userChallenges->add($userChallenge);
+            $userChallenge->setUser($this);
         }
+        return $this;
     }
 
-    return $this;
-}
-
-public function getIsSuspended(): bool
-{
-    return $this->isSuspended;
-}
-
-public function setIsSuspended(bool $isSuspended): static
-{
-    $this->isSuspended = $isSuspended;
-    return $this;
-}
-
-public function getSuspendedAt(): ?\DateTimeInterface
-{
-    return $this->suspendedAt;
-}
-
-public function setSuspendedAt(?\DateTimeInterface $suspendedAt): static
-{
-    $this->suspendedAt = $suspendedAt;
-    return $this;
-}
-
-public function getSuspensionReason(): ?string
-{
-    return $this->suspensionReason;
-}
-
-public function setSuspensionReason(?string $suspensionReason): static
-{
-    $this->suspensionReason = $suspensionReason;
-    return $this;
-}
-
-public function getSuspendedBy(): ?int
-{
-    return $this->suspendedBy;
-}
-
-public function setSuspendedBy(?int $suspendedBy): static
-{
-    $this->suspendedBy = $suspendedBy;
-    return $this;
-}
-
-public function getLastLoginAt(): ?\DateTimeInterface
-{
-    return $this->lastLoginAt;
-}
-
-public function setLastLoginAt(?\DateTimeInterface $lastLoginAt): static
-{
-    $this->lastLoginAt = $lastLoginAt;
-    return $this;
-}
-
-public function getLastActivityAt(): ?\DateTimeInterface
-{
-    return $this->lastActivityAt;
-}
-
-public function setLastActivityAt(?\DateTimeInterface $lastActivityAt): static
-{
-    $this->lastActivityAt = $lastActivityAt;
-    return $this;
-}
-
-/**
- * @return Collection<int, UserActivity>
- */
-public function getActivities(): Collection
-{
-    return $this->activities;
-}
-
-public function addActivity(UserActivity $activity): static
-{
-    if (!$this->activities->contains($activity)) {
-        $this->activities->add($activity);
-        $activity->setUser($this);
-    }
-
-    return $this;
-}
-
-public function removeActivity(UserActivity $activity): static
-{
-    if ($this->activities->removeElement($activity)) {
-        // set the owning side to null (unless already changed)
-        if ($activity->getUser() === $this) {
-            $activity->setUser(null);
+    public function removeUserChallenge(UserChallenge $userChallenge): static
+    {
+        if ($this->userChallenges->removeElement($userChallenge)) {
+            if ($userChallenge->getUser() === $this) {
+                $userChallenge->setUser(null);
+            }
         }
+        return $this;
     }
 
-    return $this;
-}
+    /**
+     * @return Collection<int, Vote>
+     */
+    public function getVotes(): Collection
+    {
+        return $this->votes;
+    }
 
+    public function addVote(Vote $vote): static
+    {
+        if (!$this->votes->contains($vote)) {
+            $this->votes->add($vote);
+            $vote->setUser($this);
+        }
+        return $this;
+    }
 
+    public function removeVote(Vote $vote): static
+    {
+        if ($this->votes->removeElement($vote)) {
+            if ($vote->getUser() === $this) {
+                $vote->setUser(null);
+            }
+        }
+        return $this;
+    }
 
+    public function getIsSuspended(): bool
+    {
+        return $this->isSuspended;
+    }
 
+    public function setIsSuspended(bool $isSuspended): static
+    {
+        $this->isSuspended = $isSuspended;
+        return $this;
+    }
+
+    public function getSuspendedAt(): ?\DateTimeInterface
+    {
+        return $this->suspendedAt;
+    }
+
+    public function setSuspendedAt(?\DateTimeInterface $suspendedAt): static
+    {
+        $this->suspendedAt = $suspendedAt;
+        return $this;
+    }
+
+    public function getSuspensionReason(): ?string
+    {
+        return $this->suspensionReason;
+    }
+
+    public function setSuspensionReason(?string $suspensionReason): static
+    {
+        $this->suspensionReason = $suspensionReason;
+        return $this;
+    }
+
+    public function getSuspendedBy(): ?int
+    {
+        return $this->suspendedBy;
+    }
+
+    public function setSuspendedBy(?int $suspendedBy): static
+    {
+        $this->suspendedBy = $suspendedBy;
+        return $this;
+    }
+
+    public function getLastLoginAt(): ?\DateTimeInterface
+    {
+        return $this->lastLoginAt;
+    }
+
+    public function setLastLoginAt(?\DateTimeInterface $lastLoginAt): static
+    {
+        $this->lastLoginAt = $lastLoginAt;
+        return $this;
+    }
+
+    public function getLastActivityAt(): ?\DateTimeInterface
+    {
+        return $this->lastActivityAt;
+    }
+
+    public function setLastActivityAt(?\DateTimeInterface $lastActivityAt): static
+    {
+        $this->lastActivityAt = $lastActivityAt;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserActivity>
+     */
+    public function getActivities(): Collection
+    {
+        return $this->activities;
+    }
+
+    public function addActivity(UserActivity $activity): static
+    {
+        if (!$this->activities->contains($activity)) {
+            $this->activities->add($activity);
+            $activity->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeActivity(UserActivity $activity): static
+    {
+        if ($this->activities->removeElement($activity)) {
+            if ($activity->getUser() === $this) {
+                $activity->setUser(null);
+            }
+        }
+        return $this;
+    }
 }

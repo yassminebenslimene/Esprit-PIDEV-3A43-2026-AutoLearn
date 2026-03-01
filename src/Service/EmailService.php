@@ -1,29 +1,34 @@
 <?php
-<<<<<<< HEAD
-=======
 // src/Service/EmailService.php
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 
 namespace App\Service;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
-<<<<<<< HEAD
 use Twig\Environment;
 
 class EmailService
 {
     private MailerInterface $mailer;
     private Environment $twig;
+    private LoggerInterface $logger;
     private string $fromEmail;
     private string $fromName;
+    private string $adminEmail;
 
-    public function __construct(MailerInterface $mailer, Environment $twig)
-    {
+    public function __construct(
+        MailerInterface $mailer, 
+        Environment $twig,
+        LoggerInterface $logger,
+        string $adminEmail
+    ) {
         $this->mailer = $mailer;
         $this->twig = $twig;
-        // L'email de ton sender identity SendGrid
+        $this->logger = $logger;
+        $this->adminEmail = $adminEmail;
+        // L'email de ton sender identity
         $this->fromEmail = 'autolearnplateforme@gmail.com';
         $this->fromName = 'Autolearn Platform';
     }
@@ -175,23 +180,10 @@ class EmailService
 
         $this->mailer->send($email);
     }
-}
-=======
-use Psr\Log\LoggerInterface;
 
-class EmailService
-{
-    private $mailer;
-    private $logger;
-    private $adminEmail;
-
-    public function __construct(MailerInterface $mailer, LoggerInterface $logger, string $adminEmail)
-    {
-        $this->mailer = $mailer;
-        $this->logger = $logger;
-        $this->adminEmail = $adminEmail;
-    }
-
+    /**
+     * Envoie un récapitulatif de challenge
+     */
     public function sendChallengeReceipt(
         string $to, 
         string $challengeTitle, 
@@ -594,4 +586,3 @@ class EmailService
         }
     }
 }
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f

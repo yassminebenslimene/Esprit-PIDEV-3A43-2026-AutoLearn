@@ -8,7 +8,7 @@ use App\Entity\Etudiant;
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
 use App\Repository\UserRepository;
-use App\Service\BrevoMailService; // 👈 USE BrevoMailService (WORKING)
+use App\Service\BrevoMailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,36 +29,28 @@ class UserController extends AbstractController
     }
 
     #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
-<<<<<<< HEAD
     public function new(
         Request $request,
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher,
-        BrevoMailService $mailService // 👈 USE BrevoMailService (WORKING)
+        BrevoMailService $mailService
     ): Response {
         $dto = new UserCreateDTO();
-=======
-public function new(
-    Request $request,
-    EntityManagerInterface $entityManager,
-    UserPasswordHasherInterface $passwordHasher
-): Response {
-    $dto = new UserCreateDTO();
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 
-    $form = $this->createForm(UserType::class, $dto, [
-        'is_edit' => false,
-    ]);
-    $form->handleRequest($request);
+        $form = $this->createForm(UserType::class, $dto, [
+            'is_edit' => false,
+        ]);
+        $form->handleRequest($request);
 
-<<<<<<< HEAD
         if ($form->isSubmitted() && $form->isValid()) {
+            // Générer un mot de passe si non fourni
             $plainPassword = $dto->password;
             if (empty($plainPassword)) {
                 $plainPassword = bin2hex(random_bytes(4));
                 $dto->password = $plainPassword;
             }
             
+            // Créer l'utilisateur selon le rôle
             if ($dto->role === 'ADMIN') {
                 $user = new Admin();
             } else {
@@ -75,6 +67,7 @@ public function new(
             $entityManager->persist($user);
             $entityManager->flush();
 
+            // Envoyer email seulement pour les étudiants
             if ($user instanceof Etudiant) {
                 try {
                     $loginUrl = $this->generateUrl('backoffice_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
@@ -99,38 +92,8 @@ public function new(
             'form' => $form->createView(),
             'hide_role' => false,
         ]);
-=======
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Vérifier si l'email existe déjà (la contrainte UniqueEntity s'en charge)
-        // Créer l'utilisateur
-        if ($dto->role === 'ADMIN') {
-            $user = new Admin();
-        } else {
-            $user = new Etudiant();
-            $user->setNiveau($dto->niveau);
-        }
-
-        $user->setNom($dto->nom);
-        $user->setPrenom($dto->prenom);
-        $user->setEmail($dto->email);
-        $user->setRole($dto->role);
-
-        $user->setPassword(
-            $passwordHasher->hashPassword($user, $dto->password)
-        );
-
-        $entityManager->persist($user);
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Utilisateur créé avec succès');
-        return $this->redirectToRoute('app_user_index');
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     }
 
-    return $this->render('backoffice/user/new.html.twig', [
-        'form' => $form->createView(),
-    ]);
-}
     #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
     public function show(?User $user): Response
     {
@@ -170,6 +133,7 @@ public function new(
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Vérifier si l'email existe déjà
             if ($dto->email !== $user->getEmail()) {
                 $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $dto->email]);
                 if ($existingUser && $existingUser->getId() !== $user->getId()) {
@@ -177,26 +141,22 @@ public function new(
                     return $this->render('backoffice/user/edit.html.twig', [
                         'user' => $user,
                         'form' => $form->createView(),
-<<<<<<< HEAD
                         'hide_role' => false,
-=======
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
                     ]);
                 }
             }
 
+            // Vérifier le niveau pour les étudiants
             if ($dto->role === 'ETUDIANT' && empty($dto->niveau)) {
                 $this->addFlash('error', 'Le niveau est requis pour un étudiant!');
                 return $this->render('backoffice/user/edit.html.twig', [
                     'user' => $user,
                     'form' => $form->createView(),
-<<<<<<< HEAD
                     'hide_role' => false,
-=======
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
                 ]);
             }
 
+            // Gérer le changement de rôle
             if (($user instanceof Admin && $dto->role === 'ETUDIANT') ||
                 ($user instanceof Etudiant && $dto->role === 'ADMIN')) {
                 
@@ -228,6 +188,7 @@ public function new(
                 }
             }
 
+            // Mettre à jour le mot de passe si fourni
             if (!empty($dto->password)) {
                 $user->setPassword(
                     $passwordHasher->hashPassword($user, $dto->password)
@@ -248,10 +209,7 @@ public function new(
         return $this->render('backoffice/user/edit.html.twig', [
             'user' => $user,
             'form' => $form->createView(),
-<<<<<<< HEAD
             'hide_role' => false,
-=======
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
         ]);
     }
 

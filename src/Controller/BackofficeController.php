@@ -121,84 +121,62 @@ class BackofficeController extends AbstractController
     }
 
     #[Route('/backoffice/users', name: 'backoffice_users')]
-<<<<<<< HEAD
-        #[IsGranted('ROLE_ADMIN')]
-        public function users(UserRepository $userRepository, Request $request): Response
-        {
-            // Get all users for statistics (always show total stats)
-            $allUsers = $userRepository->findAll();
-
-            // Calculate statistics from ALL users
-            $totalUsers = count($allUsers);
-            $students = array_filter($allUsers, fn($user) => $user->getRole() === 'ETUDIANT');
-            $admins = array_filter($allUsers, fn($user) => $user->getRole() === 'ADMIN');
-
-            // Users created today
-            $today = new \DateTime();
-            $today->setTime(0, 0, 0);
-            $newToday = array_filter($allUsers, fn($user) => $user->getCreatedAt() >= $today);
-
-            // Handle search and filter
-            $search = $request->query->get('search');
-            $roleFilter = $request->query->get('role'); // New: role filter
-
-            $users = $allUsers; // Start with all users
-
-            // Apply search filter
-            if ($search) {
-                try {
-                    $users = $userRepository->createQueryBuilder('u')
-                        ->where('u.nom LIKE :search')
-                        ->orWhere('u.prenom LIKE :search')
-                        ->orWhere('u.email LIKE :search')
-                        ->setParameter('search', '%' . $search . '%');
-
-                    // Apply role filter to search query if present
-                    if ($roleFilter && in_array($roleFilter, ['ADMIN', 'ETUDIANT'])) {
-                        $users->andWhere('u.role = :role')
-                              ->setParameter('role', $roleFilter);
-                    }
-
-                    $users = $users->getQuery()->getResult();
-                } catch (\Exception $e) {
-                    $users = $allUsers;
-                }
-            } elseif ($roleFilter && in_array($roleFilter, ['ADMIN', 'ETUDIANT'])) {
-                // Apply only role filter if no search
-                $users = array_filter($allUsers, fn($user) => $user->getRole() === $roleFilter);
-=======
     #[IsGranted('ROLE_ADMIN')]
     public function users(UserRepository $userRepository, Request $request): Response
     {
-        // Gérer la recherche
+        // Get all users for statistics (always show total stats)
+        $allUsers = $userRepository->findAll();
+
+        // Calculate statistics from ALL users
+        $totalUsers = count($allUsers);
+        $students = array_filter($allUsers, fn($user) => $user->getRole() === 'ETUDIANT');
+        $admins = array_filter($allUsers, fn($user) => $user->getRole() === 'ADMIN');
+
+        // Users created today
+        $today = new \DateTime();
+        $today->setTime(0, 0, 0);
+        $newToday = array_filter($allUsers, fn($user) => $user->getCreatedAt() >= $today);
+
+        // Handle search and filter
         $search = $request->query->get('search');
-        
+        $roleFilter = $request->query->get('role'); // New: role filter
+
+        $users = $allUsers; // Start with all users
+
+        // Apply search filter
         if ($search) {
-            // Méthode de recherche - créer si elle n'existe pas encore
             try {
                 $users = $userRepository->createQueryBuilder('u')
                     ->where('u.nom LIKE :search')
                     ->orWhere('u.prenom LIKE :search')
                     ->orWhere('u.email LIKE :search')
-                    ->setParameter('search', '%' . $search . '%')
-                    ->getQuery()
-                    ->getResult();
-            } catch (\Exception $e) {
-                // Fallback si erreur
-                $users = $userRepository->findAll();
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
-            }
+                    ->setParameter('search', '%' . $search . '%');
 
-            return $this->render('backoffice/users/users.html.twig', [
-                'users' => $users,
-                'search' => $search,
-                'roleFilter' => $roleFilter,
-                'totalUsers' => $totalUsers,
-                'totalStudents' => count($students),
-                'totalAdmins' => count($admins),
-                'newTodayCount' => count($newToday),
-            ]);
+                // Apply role filter to search query if present
+                if ($roleFilter && in_array($roleFilter, ['ADMIN', 'ETUDIANT'])) {
+                    $users->andWhere('u.role = :role')
+                          ->setParameter('role', $roleFilter);
+                }
+
+                $users = $users->getQuery()->getResult();
+            } catch (\Exception $e) {
+                $users = $allUsers;
+            }
+        } elseif ($roleFilter && in_array($roleFilter, ['ADMIN', 'ETUDIANT'])) {
+            // Apply only role filter if no search
+            $users = array_filter($allUsers, fn($user) => $user->getRole() === $roleFilter);
         }
+
+        return $this->render('backoffice/users/users.html.twig', [
+            'users' => $users,
+            'search' => $search,
+            'roleFilter' => $roleFilter,
+            'totalUsers' => $totalUsers,
+            'totalStudents' => count($students),
+            'totalAdmins' => count($admins),
+            'newTodayCount' => count($newToday),
+        ]);
+    }
 
 
     #[Route('/backoffice/users/new', name: 'backoffice_user_new')]
@@ -216,13 +194,13 @@ class BackofficeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-<<<<<<< HEAD
+
             // Store plain password before hashing
             $plainPassword = $userDto->password;
             
             // Always create Etudiant
             $user = new Etudiant();
-=======
+
             // Créer l'utilisateur selon le rôle
             if ($userDto->role === 'ADMIN') {
                 $user = new Admin();
@@ -231,7 +209,6 @@ class BackofficeController extends AbstractController
                 $user->setNiveau($userDto->niveau);
             }
 
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
             $user->setNom($userDto->nom);
             $user->setPrenom($userDto->prenom);
             $user->setEmail($userDto->email);
@@ -241,7 +218,6 @@ class BackofficeController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-<<<<<<< HEAD
             // Log the user creation activity
             $activityLogger->logCreate($user);
 
@@ -258,10 +234,7 @@ class BackofficeController extends AbstractController
             } catch (\Exception $e) {
                 $this->addFlash('warning', 'Étudiant créé mais l\'email n\'a pas pu être envoyé: ' . $e->getMessage());
             }
-            
-=======
             $this->addFlash('success', 'Utilisateur créé avec succès!');
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
             return $this->redirectToRoute('backoffice_users');
         }
 
@@ -272,7 +245,6 @@ class BackofficeController extends AbstractController
     }
 
     #[Route('/backoffice/users/{id}/edit', name: 'backoffice_user_edit')]
-<<<<<<< HEAD
     #[IsGranted('ROLE_ADMIN')]
     public function editUser(
         ?User $user, 
@@ -353,54 +325,7 @@ class BackofficeController extends AbstractController
             'is_edit' => true,
             'hide_role' => true, 
         ]);
-=======
-#[IsGranted('ROLE_ADMIN')]
-public function editUser(User $user, Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
-{
-    // Créer le DTO manuellement (sans fromEntity)
-    $userDto = new UserCreateDTO();
-    $userDto->nom = $user->getNom();
-    $userDto->prenom = $user->getPrenom();
-    $userDto->email = $user->getEmail();
-    $userDto->role = $user->getRole();
-    
-    if ($user instanceof Etudiant) {
-        $userDto->niveau = $user->getNiveau();
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     }
-    
-    $form = $this->createForm(UserType::class, $userDto, ['is_edit' => true]);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Mettre à jour l'utilisateur
-        $user->setNom($userDto->nom);
-        $user->setPrenom($userDto->prenom);
-        $user->setEmail($userDto->email);
-        $user->setRole($userDto->role);
-        
-        // Gérer le mot de passe (seulement si fourni)
-        if ($userDto->password) {
-            $user->setPassword($passwordHasher->hashPassword($user, $userDto->password));
-        }
-        
-        // Pour les étudiants, mettre à jour le niveau
-        if ($user instanceof Etudiant) {
-            $user->setNiveau($userDto->niveau);
-        }
-
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Utilisateur mis à jour avec succès!');
-        return $this->redirectToRoute('backoffice_users');
-    }
-
-    return $this->render('backoffice/user_form.html.twig', [
-        'form' => $form->createView(),
-        'title' => 'Modifier ' . $user->getPrenom() . ' ' . $user->getNom(),
-        'user' => $user,
-    ]);
-}
     #[Route('/backoffice/users/export', name: 'backoffice_users_export')]
     #[IsGranted('ROLE_ADMIN')]
     public function exportUsers(UserRepository $userRepository): Response
@@ -437,7 +362,6 @@ public function editUser(User $user, Request $request, UserPasswordHasherInterfa
         \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
     ): Response
     {
-<<<<<<< HEAD
         if (!$user) {
             throw $this->createNotFoundException('Utilisateur non trouvé');
         }
@@ -446,9 +370,6 @@ public function editUser(User $user, Request $request, UserPasswordHasherInterfa
         $activityLogger->logView($user);
         
         return $this->render('backoffice/users/user_show.html.twig', [
-=======
-        return $this->render('backoffice/user_show.html.twig', [
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
             'user' => $user,
         ]);
     }
@@ -463,7 +384,6 @@ public function editUser(User $user, Request $request, UserPasswordHasherInterfa
         \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
     ): Response
     {
-<<<<<<< HEAD
         if (!$user) {
             $this->addFlash('error', 'Utilisateur non trouvé');
             return $this->redirectToRoute('backoffice_users');
@@ -572,24 +492,21 @@ public function editUser(User $user, Request $request, UserPasswordHasherInterfa
             }
         } else {
             $this->addFlash('error', 'Token CSRF invalide.');
-=======
         if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
             $entityManager->remove($user);
             $entityManager->flush();
             
             $this->addFlash('success', 'Utilisateur supprimé avec succès!');
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
         }
 
         return $this->redirectToRoute('backoffice_users');
     }
-
+    }
     #[Route('/backoffice/settings', name: 'backoffice_settings', methods: ['GET', 'POST'])]
     public function settings(
         Request $request,
         EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher
-    ): Response {
+        UserPasswordHasherInterface $passwordHasher): Response {
         // Get the currently logged-in user
         $user = $this->getUser();
         
@@ -665,14 +582,12 @@ public function editUser(User $user, Request $request, UserPasswordHasherInterfa
     {
         return $this->render('backoffice/about-templatemo.html.twig');
     }
-<<<<<<< HEAD
-=======
+
     #[Route('/backoffice/login', name: 'backoffice_login')]
     public function login(): Response
     {
         return $this->render('backoffice/login.html.twig');
     }
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
 
     #[Route('/backoffice/register', name: 'backoffice_register')]
     public function register(): Response
@@ -811,7 +726,6 @@ public function addchall(
         'title' => 'Ajouter un Challenge'
     ]);
 }
-
 #[Route('/backoffice/challenge/edit/{id}', name: 'backoffice_challenge_edit')]
 public function editchal(
     $id,
@@ -889,28 +803,6 @@ public function editchal(
         return $this->redirectToRoute('backoffice_challenges');
     }
 
-<<<<<<< HEAD
-    /**
-     * API pour récupérer les chapitres d'un cours
-     */
-    #[Route('/backoffice/api/cours/{id}/chapitres', name: 'backoffice_api_cours_chapitres', methods: ['GET'])]
-    public function getCoursChapitres(\App\Entity\GestionDeCours\Cours $cours): Response
-    {
-        $chapitres = $cours->getChapitres();
-        $data = [];
-        
-        foreach ($chapitres as $chapitre) {
-            $data[] = [
-                'id' => $chapitre->getId(),
-                'titre' => $chapitre->getTitre(),
-                'ordre' => $chapitre->getOrdre(),
-            ];
-        }
-        
-        return $this->json($data);
-    }
-}
-=======
     return $this->render('backoffice/challenge_form.html.twig', [
         'form' => $form->createView(),
         'title' => 'Modifier le Challenge',
@@ -940,6 +832,24 @@ public function deletechal(
 
     return $this->redirectToRoute('backoffice_challenges');
 }
+
+#[Route('/backoffice/api/cours/{id}/chapitres', name: 'backoffice_api_cours_chapitres', methods: ['GET'])]
+public function getCoursChapitres(\App\Entity\GestionDeCours\Cours $cours): Response
+{
+    $chapitres = $cours->getChapitres();
+    $data = [];
+    
+    foreach ($chapitres as $chapitre) {
+        $data[] = [
+            'id' => $chapitre->getId(),
+            'titre' => $chapitre->getTitre(),
+            'ordre' => $chapitre->getOrdre(),
+        ];
+    }
+    
+    return $this->json($data);
+}
+
 #[Route('/backoffice/exercice/ai-generate', name: 'backoffice_exercice_ai_generate', methods: ['POST'])]
 public function aiGenerate(Request $request, AIExerciseGenerator $aiGenerator): JsonResponse
 {
@@ -1133,4 +1043,3 @@ public function aiGenerateMultiple(Request $request, AIExerciseGenerator $aiGene
     }
 }
 }
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f

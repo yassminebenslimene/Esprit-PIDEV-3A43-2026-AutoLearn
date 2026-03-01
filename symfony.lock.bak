@@ -47,9 +47,10 @@
             "./migrations/.gitignore"
         ]
     },
+<<<<<<< HEAD
     "knplabs/knp-paginator-bundle": {
         "version": "v6.10.0"
-    },
+=======
     "openai-php/symfony": {
         "version": "0.10",
         "recipe": {
@@ -78,10 +79,8 @@
             "branch": "main",
             "version": "1.0",
             "ref": "5e490cc197fb6bb1ae22e5abbc531ddc633b6767"
-        },
-        "files": [
-            "./phpstan.dist.neon"
-        ]
+        }
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     },
     "phpunit/phpunit": {
         "version": "9.6",
@@ -97,9 +96,7 @@
             "./tests/bootstrap.php"
         ]
     },
-    "sbyaute/star-rating-bundle": {
-        "version": "v1.3"
-    },
+<<<<<<< HEAD
     "sonata-project/entity-audit-bundle": {
         "version": "1.22",
         "recipe": {
@@ -111,6 +108,9 @@
         "files": [
             "./config/routes/sonata_entity_audit.yaml"
         ]
+=======
+    "sbyaute/star-rating-bundle": {
+        "version": "v1.3"
     },
     "stof/doctrine-extensions-bundle": {
         "version": "1.15",
@@ -119,10 +119,8 @@
             "branch": "main",
             "version": "1.2",
             "ref": "e805aba9eff5372e2d149a9ff56566769e22819d"
-        },
-        "files": [
-            "./config/packages/stof_doctrine_extensions.yaml"
-        ]
+        }
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     },
     "symfony/asset-mapper": {
         "version": "6.4",
@@ -226,7 +224,7 @@
         ]
     },
     "symfony/maker-bundle": {
-        "version": "1.66",
+        "version": "1.65",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -406,6 +404,18 @@
             "./config/routes/web_profiler.yaml"
         ]
     },
+    "symfony/webapp-pack": {
+        "version": "1.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "b9e6cc8e7b6069d0e8a816665809a423864eb4dd"
+        },
+        "files": [
+            "./config/packages/messenger.yaml"
+        ]
+    },
     "symfony/workflow": {
         "version": "6.4",
         "recipe": {
@@ -437,10 +447,14 @@
             "branch": "main",
             "version": "1.1",
             "ref": "0c643e17b5340747b35c2c75e11727fa31bfa9bb"
+<<<<<<< HEAD
         },
         "files": [
             "./config/routes/calendar.yaml"
         ]
+=======
+        }
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     },
     "twig/extra-bundle": {
         "version": "v3.23.0"

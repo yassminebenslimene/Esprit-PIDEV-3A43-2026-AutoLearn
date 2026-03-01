@@ -50,7 +50,6 @@ class Quiz
     )]
     private ?string $etat = null;
 
-<<<<<<< HEAD
     #[ORM\Column(nullable: true)]
     #[Assert\Positive(message: "La durée doit être un nombre positif.")]
     private ?int $dureeMaxMinutes = null;
@@ -75,16 +74,11 @@ class Quiz
     #[ORM\JoinColumn(name: 'challenge_id', referencedColumnName: 'id', nullable: true)]
     private ?Challenge $challenge = null;
 
-=======
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     /**
      * @var Collection<int, Question>
      */
     #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz', orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $questions;
-
-    #[ORM\ManyToOne(inversedBy: 'quizzes')]
-    private ?Challenge $challenge = null;
 
     public function __construct()
     {
@@ -129,42 +123,6 @@ class Quiz
         return $this;
     }
 
-    public function getQuestions(): Collection
-    {
-        return $this->questions;
-    }
-
-    public function addQuestion(Question $question): static
-    {
-        if (!$this->questions->contains($question)) {
-            $this->questions->add($question);
-            $question->setQuiz($this);
-        }
-        return $this;
-    }
-
-    public function removeQuestion(Question $question): static
-    {
-        if ($this->questions->removeElement($question)) {
-            if ($question->getQuiz() === $this) {
-                $question->setQuiz(null);
-            }
-        }
-        return $this;
-    }
-
-    public function getChallenge(): ?Challenge
-    {
-        return $this->challenge;
-    }
-
-    public function setChallenge(?Challenge $challenge): static
-    {
-        $this->challenge = $challenge;
-
-        return $this;
-    }
-
     public function getDureeMaxMinutes(): ?int
     {
         return $this->dureeMaxMinutes;
@@ -198,6 +156,17 @@ class Quiz
         return $this;
     }
 
+    public function getChapitre(): ?Chapitre
+    {
+        return $this->chapitre;
+    }
+
+    public function setChapitre(?Chapitre $chapitre): static
+    {
+        $this->chapitre = $chapitre;
+        return $this;
+    }
+
     public function getChallenge(): ?Challenge
     {
         return $this->challenge;
@@ -206,6 +175,33 @@ class Quiz
     public function setChallenge(?Challenge $challenge): static
     {
         $this->challenge = $challenge;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Question>
+     */
+    public function getQuestions(): Collection
+    {
+        return $this->questions;
+    }
+
+    public function addQuestion(Question $question): static
+    {
+        if (!$this->questions->contains($question)) {
+            $this->questions->add($question);
+            $question->setQuiz($this);
+        }
+        return $this;
+    }
+
+    public function removeQuestion(Question $question): static
+    {
+        if ($this->questions->removeElement($question)) {
+            if ($question->getQuiz() === $this) {
+                $question->setQuiz(null);
+            }
+        }
         return $this;
     }
 }
