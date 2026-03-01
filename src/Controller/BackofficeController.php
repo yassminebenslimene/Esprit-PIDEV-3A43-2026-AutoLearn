@@ -65,7 +65,7 @@ class BackofficeController extends AbstractController
             $request->query->getInt('page', 1),
             // Nombre d'éléments par page (5 quiz par page)
             // Modifié de 10 à 5 pour un affichage plus compact
-            5
+            3
         );
 
         // Passer l'objet pagination au template Twig
