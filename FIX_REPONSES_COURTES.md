@@ -9,12 +9,41 @@ L'IA générait des réponses trop courtes et incomplètes:
 
 ## Causes
 
-1. **Prompt pas assez strict** - Instructions trop vagues
-2. **Pas d'exemples concrets** - L'IA ne savait pas ce qu'on attendait
-3. **Validation trop permissive** - Acceptait des réponses de 20 caractères
-4. **Temperature trop basse** - Réponses trop concises
+1. **🔴 CAUSE PRINCIPALE: Limitation base de données** - Les colonnes `question` et `reponse` étaient limitées à VARCHAR(30) = 30 caractères maximum!
+2. **Prompt pas assez strict** - Instructions trop vagues
+3. **Pas d'exemples concrets** - L'IA ne savait pas ce qu'on attendait
+4. **Validation trop permissive** - Acceptait des réponses de 20 caractères
+5. **Temperature trop basse** - Réponses trop concises
 
 ## Solutions implémentées
+
+### 0. ✅ FIX CRITIQUE: Augmenter la taille des colonnes en base de données
+
+**Avant:**
+```php
+#[ORM\Column(length: 30)]  // ❌ Seulement 30 caractères!
+private ?string $question = null;
+
+#[ORM\Column(length: 30)]  // ❌ Seulement 30 caractères!
+private ?string $reponse = null;
+```
+
+**Après:**
+```php
+#[ORM\Column(type: 'text')]  // ✅ Jusqu'à 65,535 caractères!
+private ?string $question = null;
+
+#[ORM\Column(type: 'text')]  // ✅ Jusqu'à 65,535 caractères!
+private ?string $reponse = null;
+```
+
+**SQL exécuté:**
+```sql
+ALTER TABLE exercice MODIFY COLUMN question TEXT NOT NULL;
+ALTER TABLE exercice MODIFY COLUMN reponse TEXT NOT NULL;
+```
+
+**Impact:** Les réponses peuvent maintenant faire jusqu'à 65,535 caractères au lieu de 30!
 
 ### 1. ✅ Prompt ultra-détaillé avec exemples concrets
 
