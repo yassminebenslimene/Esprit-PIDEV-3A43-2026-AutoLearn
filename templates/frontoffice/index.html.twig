@@ -683,17 +683,13 @@
                                             </p>
                                         </li>
                                         <li>
-                                            <span>Début:</span>
-                                            <h6>{{ challenge.dateDebut|date('d M Y') }}</h6>
-                                        </li>
-                                        <li>
-                                            <span>Fin:</span>
-                                            <h6>{{ challenge.dateFin|date('d M Y') }}</h6>
+                                            <span>Durée:</span>
+                                            <h6>{{ challenge.duree }} min</h6>
                                         </li>
                                         <li>
                                             <span>Niveau:</span>
                                             <h6 style="color: 
-                                                {% if challenge.niveau == 'Facile' %}#7fb77e;
+                                                {% if challenge.niveau == 'Débutant' %}#7fb77e;
                                                 {% elseif challenge.niveau == 'Intermédiaire' %}#f3b562;
                                                 {% else %}#f17b7b;
                                                 {% endif %}; font-weight: 700;">

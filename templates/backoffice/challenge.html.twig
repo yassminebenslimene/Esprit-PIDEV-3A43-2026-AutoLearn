@@ -278,8 +278,7 @@ https://templatemo.com/tm-607-glass-admin
                             <tr>
                                 <th>Titre</th>
                                 <th>Description</th>
-                                <th>Date début</th>
-                                <th>Date fin</th>
+                                <th>Durée</th>
                                 <th>Niveau</th>
                                 <th>Créé par</th>
                                 <th>Actions</th>
@@ -290,8 +289,7 @@ https://templatemo.com/tm-607-glass-admin
                             <tr>
                                 <td>{{ challenge.titre }}</td>
                                 <td>{{ challenge.description }}</td>
-                                <td>{{ challenge.dateDebut|date('Y-m-d') }}</td>
-                                <td>{{ challenge.dateFin|date('Y-m-d') }}</td>
+                                <td>{{ challenge.duree }} min</td>
                                 <td>
                                     <span class="status-badge {% if challenge.niveau == 'Débutant' %}completed{% elseif challenge.niveau == 'Intermédiaire' %}processing{% else %}pending{% endif %}">
                                         {{ challenge.niveau }}
@@ -421,8 +419,7 @@ https://templatemo.com/tm-607-glass-admin
                     <tr>
                         <td>${escapeHtml(challenge.titre)}</td>
                         <td>${escapeHtml(challenge.description)}</td>
-                        <td>${challenge.dateDebut}</td>
-                        <td>${challenge.dateFin}</td>
+                        <td>${challenge.duree} min</td>
                         <td>
                             <span class="status-badge ${niveauClass}">
                                 ${escapeHtml(challenge.niveau)}
