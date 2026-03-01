@@ -262,30 +262,35 @@
                     <ul class="nav">
                         <li><a href="{{ path('app_frontoffice') }}">{{ 'nav.home'|trans }}</a></li>
                         <li><a href="{{ path('app_frontoffice') }}#cours">{{ 'nav.courses'|trans }}</a></li>
-                        {% if app.user %}
-                            <li style="position: relative; display: inline-block;">
-                                <a href="{{ path('app_notifications_index') }}" style="position: relative; display: inline-block; color: #FFD700; font-weight: bold; text-decoration: none;">
-                                    🔔 Notifications
-                                    <span id="notification-badge" style="display: none; position: absolute; top: -8px; right: -12px; background: #ff4444; color: white; border-radius: 50%; min-width: 20px; height: 20px; padding: 2px 4px; font-size: 11px; font-weight: bold; text-align: center; line-height: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid white;"></span>
-                                </a>
-                            </li>
-                        {% endif %}
                         <li><a href="{{ path('app_events') }}">{{ 'nav.events'|trans }}</a></li>
                         <li><a href="{{ path('app_frontoffice') }}#challenge">{{ 'nav.challenges'|trans }}</a></li>
                         <li><a href="{{ path('front_communaute') }}">{{ 'nav.community'|trans }}</a></li>
+                        <li><a href="{{ path('app_about') }}">{{ 'nav.about'|trans }}</a></li>
+                        
                         {% if app.user %}
-                            <li><a href="{{ path('app_mes_participations') }}">{{ 'nav.my_participations'|trans }}</a></li>
+                            {# Notifications avec badge #}
+                            <li style="position: relative;">
+                                <a href="{{ path('app_notifications_index') }}" style="position: relative; display: inline-flex; align-items: center; gap: 5px;">
+                                    <i class="fa fa-bell"></i>
+                                    <span id="notification-badge" class="notification-badge" style="display: none;"></span>
+                                </a>
+                            </li>
                             
+                            {# Dropdown Profil #}
                             <li class="profile-dropdown-container">
                                 <a href="javascript:void(0);" onclick="toggleProfileDropdown(event)" class="profile-dropdown-btn">
                                     <i class="fa fa-user-circle"></i>
-                                    {{ app.user.prenom }} {{ app.user.nom }}
-                                    <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                                    <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
                                 </a>
                                 <ul class="profile-dropdown-menu" id="profileDropdown">
                                     <li>
                                         <a href="{{ path('app_profile') }}">
                                             <i class="fa fa-id-card"></i> {{ 'nav.profile'|trans }}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ path('app_mes_participations') }}">
+                                            <i class="fa fa-trophy"></i> {{ 'nav.my_participations'|trans }}
                                         </a>
                                     </li>
                                     <li class="profile-dropdown-divider"></li>
@@ -298,43 +303,33 @@
                             </li>
                         {% else %}
                             <li><a href="{{ path('backoffice_login') }}">{{ 'nav.login'|trans }}</a></li>
-                            <li><a href="{{ path('backoffice_register') }}">{{ 'nav.register'|trans }}</a></li>
                         {% endif %}
                         
-                        {# Sélecteur de langue #}
+                        {# Sélecteur de langue compact #}
                         <li class="profile-dropdown-container">
                             <a href="javascript:void(0);" onclick="toggleLanguageDropdown(event)" class="profile-dropdown-btn">
                                 <i class="fa fa-globe"></i>
-                                {% if app.request.locale == 'fr' %}
-                                    {{ 'language.french'|trans }}
-                                {% elseif app.request.locale == 'en' %}
-                                    {{ 'language.english'|trans }}
-                                {% elseif app.request.locale == 'es' %}
-                                    {{ 'language.spanish'|trans }}
-                                {% elseif app.request.locale == 'ar' %}
-                                    {{ 'language.arabic'|trans }}
-                                {% endif %}
-                                <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                                <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
                             </a>
                             <ul class="profile-dropdown-menu" id="languageDropdown">
                                 <li>
                                     <a href="{{ path('app_change_language', {'locale': 'fr'}) }}">
-                                        <i class="fa fa-flag"></i> {{ 'language.french'|trans }}
+                                        <i class="fa fa-flag"></i> Français
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ path('app_change_language', {'locale': 'en'}) }}">
-                                        <i class="fa fa-flag"></i> {{ 'language.english'|trans }}
+                                        <i class="fa fa-flag"></i> English
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ path('app_change_language', {'locale': 'es'}) }}">
-                                        <i class="fa fa-flag"></i> {{ 'language.spanish'|trans }}
+                                        <i class="fa fa-flag"></i> Español
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ path('app_change_language', {'locale': 'ar'}) }}">
-                                        <i class="fa fa-flag"></i> {{ 'language.arabic'|trans }}
+                                        <i class="fa fa-flag"></i> العربية
                                     </a>
                                 </li>
                             </ul>

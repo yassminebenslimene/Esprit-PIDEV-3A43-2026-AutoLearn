@@ -191,4 +191,10 @@ class FrontofficeController extends AbstractController
         return $this->redirectToRoute('app_frontoffice', [], Response::HTTP_SEE_OTHER);
     }
 
+    #[Route('/about', name: 'app_about')]
+    public function about(): Response
+    {
+        return $this->render('frontoffice/about.html.twig');
+    }
+
 }
