@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Entity;
+
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\ChallengeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -34,16 +35,15 @@ class Challenge
     #[Assert\NotBlank(message: "Le niveau ne peut pas être vide.")]
     #[Assert\Choice(choices: ["Débutant", "Intermédiaire", "Avancé"], message: "Le niveau doit être l'un des suivants : Débutant, Intermédiaire, Avancé.")]
     private ?string $niveau = null;
-    
-    #[ORM\ManyToOne(inversedBy: 'Challenges')]
-    #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: false)]
-    private ?User $createdby = null;
+
+    #[ORM\ManyToOne(inversedBy: 'challenges')]
+    #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: false, onDelete: "CASCADE")]
+    private ?User $createdBy = null;
 
     /**
      * @var Collection<int, Exercice>
      */
-    #[ORM\OneToMany(targetEntity: Exercice::class, mappedBy: 'challenge',    cascade: ['persist', 'remove'],
-    orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Exercice::class, mappedBy: 'challenge', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $exercices;
 
     /**
@@ -71,6 +71,7 @@ class Challenge
         $this->userChallenges = new ArrayCollection();
         $this->votes = new ArrayCollection();
     }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -84,7 +85,6 @@ class Challenge
     public function setTitre(string $titre): static
     {
         $this->titre = $titre;
-
         return $this;
     }
 
@@ -96,7 +96,6 @@ class Challenge
     public function setDescription(string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -108,7 +107,6 @@ class Challenge
     public function setDateDebut(\DateTime $date_debut): static
     {
         $this->date_debut = $date_debut;
-
         return $this;
     }
 
@@ -120,7 +118,6 @@ class Challenge
     public function setDateFin(\DateTime $date_fin): static
     {
         $this->date_fin = $date_fin;
-
         return $this;
     }
 
@@ -132,18 +129,17 @@ class Challenge
     public function setNiveau(string $niveau): static
     {
         $this->niveau = $niveau;
-
         return $this;
     }
-    public function getCreatedby(): ?User
+
+    public function getCreatedBy(): ?User
     {
-        return $this->createdby;
+        return $this->createdBy;
     }
 
-    public function setCreatedby(?User $createdby): static
+    public function setCreatedBy(?User $createdBy): static
     {
-        $this->createdby = $createdby;
-
+        $this->createdBy = $createdBy;
         return $this;
     }
 
@@ -158,22 +154,19 @@ class Challenge
     public function addExercice(Exercice $exercice): static
     {
         if (!$this->exercices->contains($exercice)) {
-            $this->exercices[]= $exercice;
+            $this->exercices[] = $exercice;
             $exercice->setChallenge($this);
         }
-
         return $this;
     }
 
     public function removeExercice(Exercice $exercice): static
     {
         if ($this->exercices->removeElement($exercice)) {
-            // set the owning side to null (unless already changed)
             if ($exercice->getChallenge() === $this) {
                 $exercice->setChallenge(null);
             }
         }
-
         return $this;
     }
 
@@ -191,19 +184,16 @@ class Challenge
             $this->quizzes->add($quiz);
             $quiz->setChallenge($this);
         }
-
         return $this;
     }
 
     public function removeQuiz(Quiz $quiz): static
     {
         if ($this->quizzes->removeElement($quiz)) {
-            // set the owning side to null (unless already changed)
             if ($quiz->getChallenge() === $this) {
                 $quiz->setChallenge(null);
             }
         }
-
         return $this;
     }
 
@@ -221,70 +211,63 @@ class Challenge
             $this->userChallenges->add($userChallenge);
             $userChallenge->setChallenge($this);
         }
-
         return $this;
     }
 
     public function removeUserChallenge(UserChallenge $userChallenge): static
     {
         if ($this->userChallenges->removeElement($userChallenge)) {
-            // set the owning side to null (unless already changed)
             if ($userChallenge->getChallenge() === $this) {
                 $userChallenge->setChallenge(null);
             }
         }
-
         return $this;
     }
+
+    /**
+     * @return Collection<int, Vote>
+     */
+    public function getVotes(): Collection
+    {
+        return $this->votes;
+    }
+
     public function getNoteMoyenne(): float
-{
-    // Calcule la moyenne des votes
-    $votes = $this->getVotes();
-    if ($votes->count() === 0) {
-        return 0;
-    }
-    
-    $total = 0;
-    foreach ($votes as $vote) {
-        $total += $vote->getValeur();
-    }
-    
-    return round($total / $votes->count(), 1);
-}
-
-public function getNombreVotes(): int
-{
-    return $this->votes->count();
-}
-
-/**
- * @return Collection<int, Vote>
- */
-public function getVotes(): Collection
-{
-    return $this->votes;
-}
-
-public function addVote(Vote $vote): static
-{
-    if (!$this->votes->contains($vote)) {
-        $this->votes->add($vote);
-        $vote->setChallenge($this);
-    }
-
-    return $this;
-}
-
-public function removeVote(Vote $vote): static
-{
-    if ($this->votes->removeElement($vote)) {
-        // set the owning side to null (unless already changed)
-        if ($vote->getChallenge() === $this) {
-            $vote->setChallenge(null);
+    {
+        $votes = $this->getVotes();
+        if ($votes->count() === 0) {
+            return 0;
         }
+        
+        $total = 0;
+        foreach ($votes as $vote) {
+            $total += $vote->getValeur();
+        }
+        
+        return round($total / $votes->count(), 1);
     }
 
-    return $this;
-}
+    public function getNombreVotes(): int
+    {
+        return $this->votes->count();
+    }
 
+    public function addVote(Vote $vote): static
+    {
+        if (!$this->votes->contains($vote)) {
+            $this->votes->add($vote);
+            $vote->setChallenge($this);
+        }
+        return $this;
+    }
+
+    public function removeVote(Vote $vote): static
+    {
+        if ($this->votes->removeElement($vote)) {
+            if ($vote->getChallenge() === $this) {
+                $vote->setChallenge(null);
+            }
+        }
+        return $this;
+    }
 }

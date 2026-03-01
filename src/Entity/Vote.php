@@ -16,7 +16,7 @@ class Vote
     #[ORM\Column(type: "integer")]
     private ?int $valeur = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'votes')]  // AJOUTÉ inversedBy
     #[ORM\JoinColumn(name: "user_id", referencedColumnName: "userId", nullable: false)]
     private ?User $user = null;
 
@@ -26,10 +26,12 @@ class Vote
 
     #[ORM\Column(type: "datetime_immutable")]
     private ?\DateTimeImmutable $createdvoteAt = null;
+
     public function __construct()
     {
         $this->createdvoteAt = new \DateTimeImmutable();
     }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -43,7 +45,6 @@ class Vote
     public function setValeur(?int $valeur): static
     {
         $this->valeur = $valeur;
-
         return $this;
     }
 
@@ -55,7 +56,6 @@ class Vote
     public function setUser(?User $user): static
     {
         $this->user = $user;
-
         return $this;
     }
 
@@ -67,7 +67,6 @@ class Vote
     public function setChallenge(?Challenge $challenge): static
     {
         $this->challenge = $challenge;
-
         return $this;
     }
 
@@ -79,7 +78,6 @@ class Vote
     public function setCreatedvoteAt(?\DateTimeImmutable $createdvoteAt): static
     {
         $this->createdvoteAt = $createdvoteAt;
-
         return $this;
     }
 }

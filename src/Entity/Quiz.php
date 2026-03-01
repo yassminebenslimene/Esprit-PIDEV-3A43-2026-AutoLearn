@@ -50,11 +50,21 @@ class Quiz
     )]
     private ?string $etat = null;
 
-    /**
-     * @var Collection<int, Question>
-     */
-    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz', orphanRemoval: true)]
-    private Collection $questions;
+    #[ORM\Column(nullable: true)]
+    #[Assert\Positive(message: "La durée doit être un nombre positif.")]
+    private ?int $dureeMaxMinutes = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Assert\Range(
+        min: 0,
+        max: 100,
+        notInRangeMessage: "Le seuil de réussite doit être entre {{ min }}% et {{ max }}%."
+    )]
+    private ?int $seuilReussite = 50;
+
+    #[ORM\Column(nullable: true)]
+    #[Assert\Positive(message: "Le nombre de tentatives doit être positif.")]
+    private ?int $maxTentatives = null;
 
     #[ORM\ManyToOne(inversedBy: 'quizzes')]
     #[ORM\JoinColumn(nullable: true)]
@@ -63,6 +73,12 @@ class Quiz
     #[ORM\ManyToOne(inversedBy: 'quizzes')]
     #[ORM\JoinColumn(name: 'challenge_id', referencedColumnName: 'id', nullable: true)]
     private ?Challenge $challenge = null;
+
+    /**
+     * @var Collection<int, Question>
+     */
+    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz', orphanRemoval: true, cascade: ['persist', 'remove'])]
+    private Collection $questions;
 
     public function __construct()
     {
@@ -107,6 +123,64 @@ class Quiz
         return $this;
     }
 
+    public function getDureeMaxMinutes(): ?int
+    {
+        return $this->dureeMaxMinutes;
+    }
+
+    public function setDureeMaxMinutes(?int $dureeMaxMinutes): static
+    {
+        $this->dureeMaxMinutes = $dureeMaxMinutes;
+        return $this;
+    }
+
+    public function getSeuilReussite(): ?int
+    {
+        return $this->seuilReussite;
+    }
+
+    public function setSeuilReussite(?int $seuilReussite): static
+    {
+        $this->seuilReussite = $seuilReussite;
+        return $this;
+    }
+
+    public function getMaxTentatives(): ?int
+    {
+        return $this->maxTentatives;
+    }
+
+    public function setMaxTentatives(?int $maxTentatives): static
+    {
+        $this->maxTentatives = $maxTentatives;
+        return $this;
+    }
+
+    public function getChapitre(): ?Chapitre
+    {
+        return $this->chapitre;
+    }
+
+    public function setChapitre(?Chapitre $chapitre): static
+    {
+        $this->chapitre = $chapitre;
+        return $this;
+    }
+
+    public function getChallenge(): ?Challenge
+    {
+        return $this->challenge;
+    }
+
+    public function setChallenge(?Challenge $challenge): static
+    {
+        $this->challenge = $challenge;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Question>
+     */
     public function getQuestions(): Collection
     {
         return $this->questions;
@@ -128,30 +202,6 @@ class Quiz
                 $question->setQuiz(null);
             }
         }
-        return $this;
-    }
-
-    public function getChallenge(): ?Challenge
-    {
-        return $this->challenge;
-    }
-
-    public function setChallenge(?Challenge $challenge): static
-    {
-        $this->challenge = $challenge;
-
-        return $this;
-    }
-
-    public function getChapitre(): ?Chapitre
-    {
-        return $this->chapitre;
-    }
-
-    public function setChapitre(?Chapitre $chapitre): static
-    {
-        $this->chapitre = $chapitre;
-
         return $this;
     }
 }

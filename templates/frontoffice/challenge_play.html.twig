@@ -184,6 +184,8 @@
                 color: white;
             }
             
+<<<<<<< HEAD
+=======
             .nav-btn.quit {
                 background: #f17b7b;
                 color: white;
@@ -194,6 +196,7 @@
                 transform: translateY(-2px);
             }
             
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
             .nav-btn:disabled {
                 opacity: 0.5;
                 cursor: not-allowed;
@@ -235,6 +238,27 @@
                 margin-top: 10px;
             }
             
+<<<<<<< HEAD
+            .question-block {
+                margin-bottom: 30px;
+                padding: 20px;
+                background: #f9f9f9;
+                border-radius: 10px;
+            }
+            
+            .question-text {
+                font-size: 18px;
+                font-weight: 600;
+                color: #2a2a2a;
+                margin-bottom: 15px;
+            }
+            
+            .quiz-questions {
+                margin-top: 20px;
+            }
+            
+=======
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
             .save-indicator {
                 font-size: 12px;
                 color: #7a7a7a;
@@ -242,6 +266,8 @@
                 text-align: right;
                 font-style: italic;
             }
+<<<<<<< HEAD
+=======
             
             .header-buttons {
                 display: flex;
@@ -268,6 +294,7 @@
                 transform: translateY(-2px);
                 color: white;
             }
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
         </style>
     {% endblock %}
 </head>
@@ -302,6 +329,8 @@
 
 <div class="play-challenge">
     <div class="container">
+<<<<<<< HEAD
+=======
         <div class="header-buttons">
             <a href="{{ path('app_frontoffice') }}" class="quit-btn">
                 <i class="fa fa-sign-out"></i> Quitter
@@ -309,6 +338,7 @@
             <div class="challenge-title">{{ challenge.titre }}</div>
         </div>
         
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
         {% if currentItem %}
             <!-- Barre de progression -->
             <div class="progress-container">
@@ -334,12 +364,35 @@
                         <div class="answer-area">
                             <input type="text" class="form-control" placeholder="Votre réponse..." id="answer_{{ currentItem.id }}" 
                                    value="{{ sessionAnswers[currentItem.id]['answer'] is defined ? sessionAnswers[currentItem.id]['answer'] : '' }}"
+<<<<<<< HEAD
+                                   onchange="saveAnswer('{{ currentItem.id }}', this.value, 'exercice')">
+=======
                                    onchange="saveAnswer('{{ currentItem.id }}', this.value, 'exercice', {{ currentIndex }})">
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
                         </div>
                         <div class="question-points">Points: {{ currentItem.points }}</div>
                     {% else %}
                         <h2 class="content-title">{{ currentItem.titre }}</h2>
                         <p class="content-text">{{ currentItem.description }}</p>
+<<<<<<< HEAD
+                        <div class="quiz-questions">
+                            {% if currentItem.questions is defined and currentItem.questions|length > 0 %}
+                                {% for question in currentItem.questions %}
+                                    <div class="question-block">
+                                        <h3 class="question-text">{{ question.texteQuestion }}</h3>
+                                        <div class="quiz-options" id="quizOptions_{{ question.id }}">
+                                            {% for option in question.options %}
+                                                <div class="quiz-option {% if sessionAnswers[question.id] is defined and sessionAnswers[question.id]['answer'] == option.id %}selected{% endif %}" 
+                                                     onclick="selectOption(this, 'opt{{ option.id }}', '{{ question.id }}', '{{ option.id }}')">
+                                                    <input type="radio" name="question_{{ question.id }}" id="opt{{ option.id }}" 
+                                                           value="{{ option.id }}" 
+                                                           {% if sessionAnswers[question.id] is defined and sessionAnswers[question.id]['answer'] == option.id %}checked{% endif %}>
+                                                    <label for="opt{{ option.id }}">{{ option.texteOption }}</label>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="question-points">Points: {{ question.point }}</div>
+=======
                         <div class="quiz-options" id="quizOptions">
                             {% if currentItem.questions is defined and currentItem.questions|length > 0 %}
                                 {% for question in currentItem.questions %}
@@ -349,6 +402,7 @@
                                                value="{{ question.reponse }}" 
                                                {% if sessionAnswers[question.id] is defined %}checked{% endif %}>
                                         <label for="q{{ question.id }}">{{ question.question }}</label>
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
                                     </div>
                                 {% endfor %}
                             {% else %}
@@ -366,9 +420,13 @@
                 <!-- Boutons de navigation -->
                 <div class="navigation-buttons">
                     {% if currentIndex > 0 %}
+<<<<<<< HEAD
+                        <a href="{{ path('frontchallenge_play', {'id': challenge.id, 'index': currentIndex - 1}) }}" class="nav-btn prev">
+=======
                         <a href="javascript:void(0);" 
                            class="nav-btn prev" 
                            onclick="saveAndNavigate({{ currentIndex - 1 }}, '{{ path('frontchallenge_play', {'id': challenge.id, 'index': currentIndex - 1}) }}')">
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
                             <i class="fa fa-arrow-left"></i> Précédent
                         </a>
                     {% else %}
@@ -378,6 +436,13 @@
                     {% endif %}
                     
                     {% if currentIndex < totalItems - 1 %}
+<<<<<<< HEAD
+                        <a href="{{ path('frontchallenge_play', {'id': challenge.id, 'index': currentIndex + 1}) }}" class="nav-btn next">
+                            Suivant <i class="fa fa-arrow-right"></i>
+                        </a>
+                    {% else %}
+                        <a href="{{ path('frontchallenge_complete', {'id': challenge.id}) }}" class="nav-btn next">
+=======
                         <a href="javascript:void(0);" 
                            class="nav-btn next" 
                            onclick="saveAndNavigate({{ currentIndex + 1 }}, '{{ path('frontchallenge_play', {'id': challenge.id, 'index': currentIndex + 1}) }}')">
@@ -387,6 +452,7 @@
                         <a href="javascript:void(0);" 
                            class="nav-btn next" 
                            onclick="saveAndNavigate({{ totalItems }}, '{{ path('frontchallenge_complete', {'id': challenge.id}) }}')">
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
                             Terminer <i class="fa fa-check"></i>
                         </a>
                     {% endif %}
@@ -418,9 +484,14 @@
         let answers = {{ sessionAnswers|json_encode|raw }};
         let saveTimeout;
         let currentChallengeId = {{ challenge.id }};
+<<<<<<< HEAD
+        
+        function selectOption(element, inputId, questionId, answer) {
+=======
         let currentIndex = {{ currentIndex }};
         
         function selectOption(element, inputId, questionId, answer, index) {
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
             // Désélectionner toutes les options
             document.querySelectorAll('.quiz-option').forEach(opt => {
                 opt.classList.remove('selected');
@@ -433,6 +504,68 @@
             document.getElementById(inputId).checked = true;
             
             // Sauvegarder la réponse
+<<<<<<< HEAD
+            saveAnswer(questionId, answer, 'quiz');
+        }
+        function saveAnswer(itemId, answer, type) {
+    // Afficher l'indicateur de sauvegarde
+    const indicator = document.getElementById('saveIndicator');
+    indicator.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Sauvegarde en cours...';
+    indicator.style.color = '#7a7a7a';
+    
+    // Annuler le timeout précédent
+    if (saveTimeout) {
+        clearTimeout(saveTimeout);
+    }
+    
+    // Envoyer la réponse au serveur via AJAX
+    fetch('{{ path('frontchallenge_save_answer') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            itemId: itemId,
+            answer: answer,
+            type: type,
+            challengeId: currentChallengeId
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erreur HTTP: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Mettre à jour l'indicateur
+            indicator.innerHTML = '<i class="fa fa-check-circle" style="color: #7fb77e;"></i> Réponse sauvegardée';
+            indicator.style.color = '#7fb77e';
+        } else {
+            throw new Error(data.error || 'Erreur inconnue');
+        }
+        
+        // Cache l'indicateur après 3 secondes
+        saveTimeout = setTimeout(() => {
+            indicator.innerHTML = '<i class="fa fa-info-circle"></i> Les réponses sont automatiquement sauvegardées';
+            indicator.style.color = '#7a7a7a';
+        }, 3000);
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        indicator.innerHTML = '<i class="fa fa-exclamation-circle" style="color: #f17b7b;"></i> Erreur: ' + error.message;
+        indicator.style.color = '#f17b7b';
+        
+        // Cache l'erreur après 5 secondes
+        saveTimeout = setTimeout(() => {
+            indicator.innerHTML = '<i class="fa fa-info-circle"></i> Les réponses sont automatiquement sauvegardées';
+            indicator.style.color = '#7a7a7a';
+        }, 5000);
+    });
+}
+=======
             saveAnswer(questionId, answer, 'quiz', index);
         }
         
@@ -529,6 +662,7 @@
                 window.location.href = url;
             });
         }
+>>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
     </script>
 {% endblock %}
 
