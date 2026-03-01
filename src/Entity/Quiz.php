@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\GestionDeCours\Chapitre;
 use App\Repository\QuizRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -56,6 +57,11 @@ class Quiz
     private Collection $questions;
 
     #[ORM\ManyToOne(inversedBy: 'quizzes')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Chapitre $chapitre = null;
+
+    #[ORM\ManyToOne(inversedBy: 'quizzes')]
+    #[ORM\JoinColumn(name: 'challenge_id', referencedColumnName: 'id', nullable: true)]
     private ?Challenge $challenge = null;
 
     public function __construct()
@@ -133,6 +139,18 @@ class Quiz
     public function setChallenge(?Challenge $challenge): static
     {
         $this->challenge = $challenge;
+
+        return $this;
+    }
+
+    public function getChapitre(): ?Chapitre
+    {
+        return $this->chapitre;
+    }
+
+    public function setChapitre(?Chapitre $chapitre): static
+    {
+        $this->chapitre = $chapitre;
 
         return $this;
     }
