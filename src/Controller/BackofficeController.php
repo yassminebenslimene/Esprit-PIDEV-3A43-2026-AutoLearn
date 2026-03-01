@@ -9,6 +9,7 @@ use App\Repository\ExerciceRepository;
 use App\Entity\Challenge;
 use App\Form\ChallengeType;
 use App\Repository\ChallengeRepository;
+use App\Repository\QuizRepository;
 use App\Entity\User;
 use App\Entity\Etudiant;
 use App\Entity\Admin;

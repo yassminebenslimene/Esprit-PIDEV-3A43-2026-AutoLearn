@@ -8,6 +8,7 @@ use App\Repository\ExerciceRepository;
 use App\Repository\QuizRepository;
 use App\Repository\UserChallengeRepository;
 use App\Service\EmailService;
+use App\Service\ChallengeCorrectorAIService;
 use App\Entity\Vote;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +20,57 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ChallengeController extends AbstractController
 {
+    // AI Correction endpoint
+    #[Route('/challenge/correct-answer', name: 'frontchallenge_correct_answer', methods: ['POST'])]
+    public function correctAnswer(
+        Request $request,
+        ChallengeCorrectorAIService $correctorService,
+        ExerciceRepository $exerciceRepository
+    ): JsonResponse {
+        try {
+            $data = json_decode($request->getContent(), true);
+            
+            $itemId = $data['itemId'] ?? null;
+            $itemType = $data['itemType'] ?? null;
+            $userAnswer = $data['userAnswer'] ?? '';
+            
+            if (!$itemId || !$itemType) {
+                return $this->json(['success' => false, 'error' => 'Paramètres manquants'], 400);
+            }
+            
+            // For now, only handle exercices (open questions)
+            if ($itemType !== 'exercice') {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Type non supporté pour la correction AI'
+                ], 400);
+            }
+            
+            $exercice = $exerciceRepository->find($itemId);
+            if (!$exercice) {
+                return $this->json(['success' => false, 'error' => 'Exercice non trouvé'], 404);
+            }
+            
+            // Use AI to correct the answer
+            $correction = $correctorService->correctAnswer(
+                $exercice->getQuestion(),
+                $exercice->getReponse(),
+                $userAnswer
+            );
+            
+            return $this->json([
+                'success' => true,
+                'correction' => $correction
+            ]);
+            
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     // ⚠️ IMPORTANT: La route spécifique DOIT être avant la route générique
     #[Route('/challenge/save-answer', name: 'frontchallenge_save_answer', methods: ['POST'])]
     public function saveAnswer(
@@ -286,7 +338,8 @@ class ChallengeController extends AbstractController
         
         // Vérifier s'il y a du contenu
         if (empty($allItems)) {
-            throw $this->createNotFoundException('Ce challenge ne contient aucun contenu');
+            $this->addFlash('error', 'Ce challenge ne contient pas encore de contenu. Veuillez réessayer plus tard.');
+            return $this->redirectToRoute('frontchallenge', ['id' => $id]);
         }
         
         // Valider l'index
@@ -305,7 +358,6 @@ class ChallengeController extends AbstractController
             'sessionAnswers' => $sessionAnswers
         ]);
     }
-
     #[Route('/challenge/{id}/complete', name: 'frontchallenge_complete')]
     public function completeChallenge(
         int $id, 
@@ -313,7 +365,8 @@ class ChallengeController extends AbstractController
         SessionInterface $session,
         UserChallengeRepository $userChallengeRepository,
         EntityManagerInterface $entityManager,
-        EmailService $emailService
+        EmailService $emailService,
+        ChallengeCorrectorAIService $aiCorrector
     ): Response {
         $challenge = $challengeRepository->find($id);
         
@@ -348,41 +401,97 @@ class ChallengeController extends AbstractController
             return $this->redirectToRoute('frontchallenge', ['id' => $id]);
         }
         
-        // Calculer le score
+        // Calculer le score et obtenir les corrections IA
         $totalPoints = 0;
         $earnedPoints = 0;
+        $results = [];
         
-        // Vérifier les exercices
+        // Vérifier les exercices avec IA
         foreach ($challenge->getExercices() as $exercice) {
             $totalPoints += $exercice->getPoints();
             
+            $userAnswer = '';
             if (isset($sessionAnswers[$exercice->getId()])) {
-                $userAnswer = $sessionAnswers[$exercice->getId()];
-                if (is_array($userAnswer)) {
-                    $userAnswer = $userAnswer['answer'] ?? '';
-                }
-                if (strtolower(trim($userAnswer)) === strtolower(trim($exercice->getReponse()))) {
-                    $earnedPoints += $exercice->getPoints();
-                }
+                $userAnswerData = $sessionAnswers[$exercice->getId()];
+                $userAnswer = is_array($userAnswerData) ? ($userAnswerData['answer'] ?? '') : $userAnswerData;
             }
+            
+            // Utiliser l'IA pour corriger
+            $correction = $aiCorrector->correctAnswer(
+                $exercice->getQuestion(),
+                $userAnswer,
+                $exercice->getReponse(),
+                $exercice->getPoints()
+            );
+            
+            $earnedPoints += $correction['score'];
+            
+            $results[] = [
+                'type' => 'exercice',
+                'question' => $exercice->getQuestion(),
+                'userAnswer' => $userAnswer,
+                'correctAnswer' => $exercice->getReponse(),
+                'points' => $exercice->getPoints(),
+                'earnedPoints' => $correction['score'],
+                'isCorrect' => $correction['isCorrect'],
+                'feedback' => $correction['feedback'],
+                'explanation' => $correction['explanation'],
+                'advice' => $correction['advice']
+            ];
         }
         
-        // Vérifier les quiz
+        // Vérifier les quiz (utiliser l'IA pour les explications)
         foreach ($challenge->getQuizzes() as $quiz) {
             foreach ($quiz->getQuestions() as $question) {
                 $totalPoints += $question->getPoint();
                 
+                $userAnswerOptionId = null;
                 if (isset($sessionAnswers[$question->getId()])) {
-                    $userAnswerOptionId = $sessionAnswers[$question->getId()]['answer'] ?? null;
-                    
-                    // Trouver l'option sélectionnée et vérifier si elle est correcte
-                    foreach ($question->getOptions() as $option) {
-                        if ($option->getId() == $userAnswerOptionId && $option->isEstCorrecte()) {
+                    $answerData = $sessionAnswers[$question->getId()];
+                    $userAnswerOptionId = is_array($answerData) ? ($answerData['answer'] ?? null) : $answerData;
+                }
+                
+                $isCorrect = false;
+                $correctOption = null;
+                $userOption = null;
+                
+                // Trouver l'option correcte et l'option sélectionnée
+                foreach ($question->getOptions() as $option) {
+                    if ($option->isEstCorrecte()) {
+                        $correctOption = $option;
+                    }
+                    if ($option->getId() == $userAnswerOptionId) {
+                        $userOption = $option;
+                        if ($option->isEstCorrecte()) {
+                            $isCorrect = true;
                             $earnedPoints += $question->getPoint();
-                            break;
                         }
                     }
                 }
+                
+                // Utiliser l'IA pour générer une explication détaillée
+                $userAnswerText = $userOption ? $userOption->getTexteOption() : 'Aucune réponse';
+                $correctAnswerText = $correctOption ? $correctOption->getTexteOption() : '';
+                
+                $aiExplanation = $aiCorrector->correctAnswer(
+                    $question->getTexteQuestion(),
+                    $userAnswerText,
+                    $correctAnswerText,
+                    $question->getPoint()
+                );
+                
+                $results[] = [
+                    'type' => 'quiz',
+                    'question' => $question->getTexteQuestion(),
+                    'userAnswer' => $userAnswerText,
+                    'correctAnswer' => $correctAnswerText,
+                    'points' => $question->getPoint(),
+                    'earnedPoints' => $isCorrect ? $question->getPoint() : 0,
+                    'isCorrect' => $isCorrect,
+                    'feedback' => $aiExplanation['feedback'],
+                    'explanation' => $aiExplanation['explanation'],
+                    'advice' => $aiExplanation['advice']
+                ];
             }
         }
         
@@ -417,7 +526,8 @@ class ChallengeController extends AbstractController
         return $this->render('frontoffice/challenge_complete.html.twig', [
             'challenge' => $challenge,
             'score' => $earnedPoints,
-            'totalPoints' => $totalPoints
+            'totalPoints' => $totalPoints,
+            'results' => $results
         ]);
     }
 
@@ -498,5 +608,163 @@ class ChallengeController extends AbstractController
             'challenge' => $challenge,
             'userChallenge' => $userChallenge
         ]);
+    }
+
+    #[Route('/challenge/{id}/results', name: 'frontchallenge_results')]
+    public function showResults(
+        int $id, 
+        ChallengeRepository $challengeRepository,
+        UserChallengeRepository $userChallengeRepository,
+        ChallengeCorrectorAIService $aiCorrector
+    ): Response {
+        $challenge = $challengeRepository->find($id);
+        
+        if (!$challenge) {
+            throw $this->createNotFoundException('Challenge non trouvé');
+        }
+        
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('backoffice_login');
+        }
+        
+        $userChallenge = $userChallengeRepository->findOneBy([
+            'user' => $user,
+            'challenge' => $challenge
+        ]);
+        
+        if (!$userChallenge || !$userChallenge->isCompleted()) {
+            $this->addFlash('error', 'Vous devez d\'abord compléter ce challenge');
+            return $this->redirectToRoute('frontchallenge', ['id' => $id]);
+        }
+        
+        // Recalculer les résultats avec les explications IA
+        $sessionAnswers = $userChallenge->getAnswers() ?? [];
+        $results = [];
+        
+        // Exercices
+        foreach ($challenge->getExercices() as $exercice) {
+            $userAnswer = '';
+            if (isset($sessionAnswers[$exercice->getId()])) {
+                $userAnswerData = $sessionAnswers[$exercice->getId()];
+                $userAnswer = is_array($userAnswerData) ? ($userAnswerData['answer'] ?? '') : $userAnswerData;
+            }
+            
+            $correction = $aiCorrector->correctAnswer(
+                $exercice->getQuestion(),
+                $userAnswer,
+                $exercice->getReponse(),
+                $exercice->getPoints()
+            );
+            
+            $results[] = [
+                'type' => 'exercice',
+                'question' => $exercice->getQuestion(),
+                'userAnswer' => $userAnswer,
+                'correctAnswer' => $exercice->getReponse(),
+                'points' => $exercice->getPoints(),
+                'earnedPoints' => $correction['score'],
+                'isCorrect' => $correction['isCorrect'],
+                'feedback' => $correction['feedback'],
+                'explanation' => $correction['explanation'],
+                'advice' => $correction['advice']
+            ];
+        }
+        
+        // Quiz
+        foreach ($challenge->getQuizzes() as $quiz) {
+            foreach ($quiz->getQuestions() as $question) {
+                $userAnswerOptionId = null;
+                if (isset($sessionAnswers[$question->getId()])) {
+                    $answerData = $sessionAnswers[$question->getId()];
+                    $userAnswerOptionId = is_array($answerData) ? ($answerData['answer'] ?? null) : $answerData;
+                }
+                
+                $isCorrect = false;
+                $correctOption = null;
+                $userOption = null;
+                
+                foreach ($question->getOptions() as $option) {
+                    if ($option->isEstCorrecte()) {
+                        $correctOption = $option;
+                    }
+                    if ($option->getId() == $userAnswerOptionId) {
+                        $userOption = $option;
+                        if ($option->isEstCorrecte()) {
+                            $isCorrect = true;
+                        }
+                    }
+                }
+                
+                $userAnswerText = $userOption ? $userOption->getTexteOption() : 'Aucune réponse';
+                $correctAnswerText = $correctOption ? $correctOption->getTexteOption() : '';
+                
+                $aiExplanation = $aiCorrector->correctAnswer(
+                    $question->getTexteQuestion(),
+                    $userAnswerText,
+                    $correctAnswerText,
+                    $question->getPoint()
+                );
+                
+                $results[] = [
+                    'type' => 'quiz',
+                    'question' => $question->getTexteQuestion(),
+                    'userAnswer' => $userAnswerText,
+                    'correctAnswer' => $correctAnswerText,
+                    'points' => $question->getPoint(),
+                    'earnedPoints' => $isCorrect ? $question->getPoint() : 0,
+                    'isCorrect' => $isCorrect,
+                    'feedback' => $aiExplanation['feedback'],
+                    'explanation' => $aiExplanation['explanation'],
+                    'advice' => $aiExplanation['advice']
+                ];
+            }
+        }
+        
+        return $this->render('frontoffice/challenge_complete.html.twig', [
+            'challenge' => $challenge,
+            'score' => $userChallenge->getScore(),
+            'totalPoints' => $userChallenge->getTotalPoints(),
+            'results' => $results
+        ]);
+    }
+
+    #[Route('/challenge/{id}/retry', name: 'frontchallenge_retry')]
+    public function retryChallenge(
+        int $id, 
+        ChallengeRepository $challengeRepository,
+        UserChallengeRepository $userChallengeRepository,
+        EntityManagerInterface $entityManager,
+        SessionInterface $session
+    ): Response {
+        $challenge = $challengeRepository->find($id);
+        
+        if (!$challenge) {
+            throw $this->createNotFoundException('Challenge non trouvé');
+        }
+        
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('backoffice_login');
+        }
+        
+        // Supprimer l'ancien enregistrement
+        $userChallenge = $userChallengeRepository->findOneBy([
+            'user' => $user,
+            'challenge' => $challenge
+        ]);
+        
+        if ($userChallenge) {
+            $entityManager->remove($userChallenge);
+            $entityManager->flush();
+        }
+        
+        // Nettoyer la session
+        $sessionKey = 'challenge_answers_' . $id;
+        $session->remove($sessionKey);
+        
+        $this->addFlash('success', 'Vous pouvez maintenant refaire le challenge !');
+        
+        return $this->redirectToRoute('frontchallenge_play', ['id' => $id]);
     }
 }

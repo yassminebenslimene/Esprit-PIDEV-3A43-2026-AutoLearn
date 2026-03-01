@@ -1,221 +1,172 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+{% extends 'frontoffice/base.html.twig' %}
 
-    <title>{{ challenge.titre }} - Scholar</title>
+{% block title %}{{ challenge.titre }} - Scholar{% endblock %}
 
-    {% block stylesheets %}
-        <!-- Bootstrap -->
-        <link rel="stylesheet" href="{{ asset('frontoffice/vendor/bootstrap/css/bootstrap.min.css') }}">
-
-        <!-- FrontOffice CSS -->
-        <link rel="stylesheet" href="{{ asset('frontoffice/css/animate.css') }}">
-        <link rel="stylesheet" href="{{ asset('frontoffice/css/flex-slider.css') }}">
-        <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
-        <link rel="stylesheet" href="{{ asset('frontoffice/css/owl.css') }}">
-        <link rel="stylesheet" href="{{ asset('frontoffice/css/templatemo-scholar.css') }}">
-
-        <!-- Swiper -->
-        <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .challenge-detail {
+            margin-top: 40px;
+            margin-bottom: 80px;
+        }
         
-        <style>
-            .challenge-detail {
-                margin-top: 120px;
-                margin-bottom: 80px;
-            }
-            
-            .challenge-card {
-                background: white;
-                border-radius: 20px;
-                padding: 40px;
-                box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-                max-width: 600px;
-                margin: 0 auto;
-            }
-            
-            .challenge-title {
-                font-size: 32px;
-                font-weight: 700;
-                color: #2a2a2a;
-                margin-bottom: 30px;
-                text-align: center;
-            }
-            
-            .info-item {
-                margin-bottom: 20px;
-                padding: 15px;
-                background: #f9f9f9;
-                border-radius: 10px;
-            }
-            
-            .info-label {
-                font-size: 14px;
-                color: #7a7a7a;
-                margin-bottom: 5px;
-            }
-            
-            .info-value {
-                font-size: 18px;
-                font-weight: 600;
-                color: #2a2a2a;
-            }
-            
-            .info-value i {
-                margin-right: 10px;
-                color: #7fb77e;
-            }
-            
-            .niveau-badge {
-                display: inline-block;
-                padding: 5px 15px;
-                border-radius: 20px;
-                font-size: 14px;
-                font-weight: 600;
-            }
-            
-            .niveau-facile {
-                background: #7fb77e;
-                color: white;
-            }
-            
-            .niveau-intermediaire {
-                background: #f3b562;
-                color: white;
-            }
-            
-            .niveau-difficile {
-                background: #f17b7b;
-                color: white;
-            }
-            
-            .btn-start {
-                display: inline-block;
-                background: #7fb77e;
-                color: white;
-                padding: 12px 40px;
-                border-radius: 25px;
-                font-size: 16px;
-                font-weight: 600;
-                text-decoration: none;
-                transition: all 0.3s;
-                border: none;
-                cursor: pointer;
-                width: 100%;
-                text-align: center;
-                margin-top: 20px;
-            }
-            
-            .btn-start:hover {
-                background: #6da06c;
-                color: white;
-                transform: translateY(-2px);
-            }
-            
-<<<<<<< HEAD
-            .btn-start i {
-                margin-left: 10px;
-            }
-=======
-            .btn-start:disabled, .btn-start.disabled {
-                background: #cccccc;
-                cursor: not-allowed;
-                transform: none;
-                opacity: 0.6;
-            }
-            
-            .btn-start i {
-                margin-left: 10px;
-            }
-            
-            .result-container {
-                background: #f9f9f9;
-                padding: 30px;
-                border-radius: 15px;
-                margin-top: 30px;
-                text-align: center;
-            }
-            
-            .result-score {
-                font-size: 48px;
-                font-weight: 700;
-                color: #7fb77e;
-                margin: 10px 0;
-            }
-            
-            .result-date {
-                color: #7a7a7a;
-                font-size: 14px;
-                margin-top: 10px;
-            }
-            
-            .result-message {
-                font-size: 18px;
-                color: #2a2a2a;
-                margin-bottom: 20px;
-            }
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
-        </style>
-    {% endblock %}
-</head>
-<body>
+        .challenge-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .challenge-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2a2a2a;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .info-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        
+        .info-label {
+            font-size: 14px;
+            color: #7a7a7a;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2a2a2a;
+        }
+        
+        .info-value i {
+            margin-right: 10px;
+            color: #7fb77e;
+        }
+        
+        .niveau-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .niveau-facile {
+            background: #7fb77e;
+            color: white;
+        }
+        
+        .niveau-intermediaire {
+            background: #f3b562;
+            color: white;
+        }
+        
+        .niveau-difficile {
+            background: #f17b7b;
+            color: white;
+        }
+        
+        .btn-action {
+            display: inline-block;
+            padding: 12px 40px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            margin: 10px 5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(105deg, #7fb77e 0%, #4a9b4a 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(127, 183, 126, 0.3);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f3b562;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #f0a53b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(243, 181, 98, 0.3);
+            color: white;
+        }
+        
+        .btn-info {
+            background: #5a9fd4;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #4a8fc4;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(90, 159, 212, 0.3);
+            color: white;
+        }
+        
+        .result-container {
+            background: linear-gradient(135deg, rgba(127, 183, 126, 0.1) 0%, rgba(127, 183, 126, 0.05) 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
+            border: 2px solid #7fb77e;
+        }
+        
+        .result-score {
+            font-size: 48px;
+            font-weight: 700;
+            color: #7fb77e;
+            margin: 10px 0;
+        }
+        
+        .result-date {
+            color: #7a7a7a;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .result-message {
+            font-size: 18px;
+            color: #2a2a2a;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        
+        .btn-action i {
+            margin-left: 8px;
+        }
+    </style>
+{% endblock %}
 
-<!-- ***** Header Area Start ***** -->
-<header class="header-area header-sticky">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <nav class="main-nav">
-                    <!-- ***** Logo Start ***** -->
-                    <a href="{{ path('app_frontoffice') }}" class="logo">
-                        <h1>Scholar</h1>
-                    </a>
-                    <!-- ***** Logo End ***** -->
-                    <!-- ***** Search Start ***** -->
-                    <div class="search-input">
-                        <form id="search" action="#">
-                            <input type="text" placeholder="Type Something" id='searchText' name="searchKeyword" />
-                            <i class="fa fa-search"></i>
-                        </form>
-                    </div>
-                    <!-- ***** Search End ***** -->
-                    <!-- ***** Menu Start ***** -->
-                    <ul class="nav">
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#top">Home</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#services">Services</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#courses">Courses</a></li>
-<<<<<<< HEAD
-                        
-=======
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#team">Team</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#events">Events</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#challenge" class="active">Challenge</a></li>
-                        {% if app.user %}
-                            <li class="scroll-to-section">
-                                <a href="{{ path('app_profile') }}">My Profil</a>
-                            </li>
-                            <li class="scroll-to-section">
-                                <a href="{{ path('backoffice_logout') }}">Logout ({{ app.user.prenom }})</a>
-                            </li>
-                        {% else %}
-                            <li class="scroll-to-section"><a href="{{ path('backoffice_login') }}">Login</a></li>
-                            <li class="scroll-to-section"><a href="{{ path('backoffice_register') }}">Register</a></li>
-                        {% endif %}
-                    </ul>   
-                    <a class='menu-trigger'>
-                        <span>Menu</span>
-                    </a>
-                    <!-- ***** Menu End ***** -->
-                </nav>
-            </div>
-        </div>
-    </div>
-</header>
-<!-- ***** Header Area End ***** -->
-
+{% block body %}
 <div class="challenge-detail">
     <div class="container">
         <div class="challenge-card">
@@ -245,11 +196,7 @@
                 <div class="info-value">
                     <i class="fa fa-signal"></i>
                     <span class="niveau-badge 
-<<<<<<< HEAD
-                        {% if challenge.niveau == 'Facile' %}niveau-facile
-=======
-                        {% if challenge.niveau == 'Débutant' %}niveau-facile
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
+                        {% if challenge.niveau == 'Débutant' or challenge.niveau == 'Facile' %}niveau-facile
                         {% elseif challenge.niveau == 'Intermédiaire' %}niveau-intermediaire
                         {% else %}niveau-difficile
                         {% endif %}">
@@ -258,52 +205,50 @@
                 </div>
             </div>
             
-<<<<<<< HEAD
-            <!-- Bouton commencer -->
-            <a href="{{ path('frontchallenge_play', {'id': challenge.id}) }}" class="btn-start">
-                Commencer <i class="fa fa-arrow-right"></i>
-            </a>
-=======
             {% if userChallenge and userChallenge.completed %}
                 <!-- Résultat du challenge terminé -->
                 <div class="result-container">
-                    <div class="result-message">Vous avez déjà complété ce challenge</div>
+                    <div class="result-message">
+                        <i class="fa fa-trophy"></i> Challenge Complété !
+                    </div>
                     <div class="result-score">{{ userChallenge.score }}/{{ userChallenge.totalPoints }}</div>
-                    <div class="result-date">Terminé le {{ userChallenge.completedAt|date('d M Y à H:i') }}</div>
+                    <div style="font-size: 20px; color: #7fb77e; font-weight: 600; margin: 10px 0;">
+                        {{ ((userChallenge.score / userChallenge.totalPoints) * 100)|round }}% de réussite
+                    </div>
+                    <div class="result-date">
+                        <i class="fa fa-clock-o"></i> Terminé le {{ userChallenge.completedAt|date('d M Y à H:i') }}
+                    </div>
+                </div>
+                
+                <!-- Boutons d'action pour challenge complété -->
+                <div class="action-buttons">
+                    <a href="{{ path('frontchallenge_results', {'id': challenge.id}) }}" class="btn-action btn-info">
+                        <i class="fa fa-bar-chart"></i> Voir les résultats détaillés
+                    </a>
+                    <a href="{{ path('frontchallenge_retry', {'id': challenge.id}) }}" class="btn-action btn-secondary">
+                        <i class="fa fa-refresh"></i> Refaire le challenge
+                    </a>
                 </div>
             {% else %}
                 <!-- Bouton commencer ou continuer -->
-                <a href="{{ path('frontchallenge_play', {'id': challenge.id}) }}" class="btn-start">
-                    {% if userChallenge and userChallenge.currentIndex > 0 %}
-                        Continuer <i class="fa fa-arrow-right"></i>
-                    {% else %}
-                        Commencer <i class="fa fa-arrow-right"></i>
-                    {% endif %}
-                </a>
+                <div class="action-buttons">
+                    <a href="{{ path('frontchallenge_play', {'id': challenge.id}) }}" class="btn-action btn-primary">
+                        {% if userChallenge and userChallenge.currentIndex > 0 %}
+                            <i class="fa fa-play"></i> Continuer le challenge
+                        {% else %}
+                            <i class="fa fa-rocket"></i> Commencer le challenge
+                        {% endif %}
+                    </a>
+                </div>
             {% endif %}
->>>>>>> fb4a43f494307a186b8da2e3098a2944d2e0ef9f
+            
+            <!-- Bouton retour -->
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="{{ path('app_frontoffice') }}#challenge" style="color: #7a7a7a; text-decoration: none; font-size: 14px;">
+                    <i class="fa fa-arrow-left"></i> Retour aux challenges
+                </a>
+            </div>
         </div>
     </div>
 </div>
-
-<footer>
-    <div class="container">
-        <div class="col-lg-12">
-            <p>Copyright © 2036 Scholar Organization. All rights reserved. &nbsp;&nbsp;&nbsp; Design: <a href="https://templatemo.com" rel="nofollow" target="_blank">TemplateMo</a></p>
-        </div>
-    </div>
-</footer>
-
-{% block javascripts %}
-    <!-- jQuery -->
-    <script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
-    
-    <!-- Bootstrap -->
-    <script src="{{ asset('frontoffice/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    
-    <!-- Custom JS -->
-    <script src="{{ asset('frontoffice/js/custom.js') }}"></script>
 {% endblock %}
-
-</body>
-</html>
