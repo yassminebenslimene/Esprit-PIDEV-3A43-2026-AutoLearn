@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Entity;
-
+use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\ChallengeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,28 +16,34 @@ class Challenge
     private ?int $id = null;
 
     #[ORM\Column(length: 20)]
+    #[Assert\NotBlank(message: "Le titre ne peut pas être vide.")]
     private ?string $titre = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: "La description ne peut pas être vide.")]
     private ?string $description = null;
 
     #[ORM\Column]
     private ?\DateTime $date_debut = null;
 
     #[ORM\Column]
+    #[Assert\GreaterThan(propertyPath: "date_debut", message: "La date de fin doit être supérieure à la date de début.")]
     private ?\DateTime $date_fin = null;
 
     #[ORM\Column(length: 15)]
+    #[Assert\NotBlank(message: "Le niveau ne peut pas être vide.")]
+    #[Assert\Choice(choices: ["Débutant", "Intermédiaire", "Avancé"], message: "Le niveau doit être l'un des suivants : Débutant, Intermédiaire, Avancé.")]
     private ?string $niveau = null;
     
-    #[ORM\ManyToOne(inversedBy: 'challenges')]
-    #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: false, onDelete: "CASCADE")]
-    private ?User $created_by = null;
+    #[ORM\ManyToOne(inversedBy: 'Challenges')]
+    #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: false)]
+    private ?User $createdby = null;
 
     /**
      * @var Collection<int, Exercice>
      */
-    #[ORM\OneToMany(targetEntity: Exercice::class, mappedBy: 'challenge', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Exercice::class, mappedBy: 'challenge',    cascade: ['persist', 'remove'],
+    orphanRemoval: true)]
     private Collection $exercices;
 
     /**
@@ -46,10 +52,24 @@ class Challenge
     #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'challenge')]
     private Collection $quizzes;
 
+    /**
+     * @var Collection<int, UserChallenge>
+     */
+    #[ORM\OneToMany(targetEntity: UserChallenge::class, mappedBy: 'challenge')]
+    private Collection $userChallenges;
+
+    /**
+     * @var Collection<int, Vote>
+     */
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'challenge', cascade: ["persist", "remove"])]
+    private Collection $votes;
+
     public function __construct()
     {
         $this->exercices = new ArrayCollection();
         $this->quizzes = new ArrayCollection();
+        $this->userChallenges = new ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
     public function getId(): ?int
     {
@@ -115,14 +135,14 @@ class Challenge
 
         return $this;
     }
-    public function getCreatedBy(): ?User
+    public function getCreatedby(): ?User
     {
-        return $this->created_by;
+        return $this->createdby;
     }
 
-    public function setCreatedBy(?User $created_by): static
+    public function setCreatedby(?User $createdby): static
     {
-        $this->created_by = $created_by;
+        $this->createdby = $createdby;
 
         return $this;
     }
@@ -186,4 +206,85 @@ class Challenge
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, UserChallenge>
+     */
+    public function getUserChallenges(): Collection
+    {
+        return $this->userChallenges;
+    }
+
+    public function addUserChallenge(UserChallenge $userChallenge): static
+    {
+        if (!$this->userChallenges->contains($userChallenge)) {
+            $this->userChallenges->add($userChallenge);
+            $userChallenge->setChallenge($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserChallenge(UserChallenge $userChallenge): static
+    {
+        if ($this->userChallenges->removeElement($userChallenge)) {
+            // set the owning side to null (unless already changed)
+            if ($userChallenge->getChallenge() === $this) {
+                $userChallenge->setChallenge(null);
+            }
+        }
+
+        return $this;
+    }
+    public function getNoteMoyenne(): float
+{
+    // Calcule la moyenne des votes
+    $votes = $this->getVotes();
+    if ($votes->count() === 0) {
+        return 0;
+    }
+    
+    $total = 0;
+    foreach ($votes as $vote) {
+        $total += $vote->getValeur();
+    }
+    
+    return round($total / $votes->count(), 1);
+}
+
+public function getNombreVotes(): int
+{
+    return $this->votes->count();
+}
+
+/**
+ * @return Collection<int, Vote>
+ */
+public function getVotes(): Collection
+{
+    return $this->votes;
+}
+
+public function addVote(Vote $vote): static
+{
+    if (!$this->votes->contains($vote)) {
+        $this->votes->add($vote);
+        $vote->setChallenge($this);
+    }
+
+    return $this;
+}
+
+public function removeVote(Vote $vote): static
+{
+    if ($this->votes->removeElement($vote)) {
+        // set the owning side to null (unless already changed)
+        if ($vote->getChallenge() === $this) {
+            $vote->setChallenge(null);
+        }
+    }
+
+    return $this;
+}
+
 }
