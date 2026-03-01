@@ -211,6 +211,22 @@
             line-height: 1 !important;
         }
         
+        /* Force navbar items to stay on one line */
+        .main-nav .nav {
+            flex-wrap: nowrap !important;
+            white-space: nowrap !important;
+        }
+        
+        /* Reduce padding for compact layout */
+        .main-nav .nav li a {
+            padding: 0 10px !important;
+            font-size: 14px !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-btn {
+            padding: 0 10px !important;
+        }
+        
         @media (max-width: 992px) {
             .main-nav,
             .main-nav .nav,
