@@ -684,7 +684,7 @@ class BackofficeController extends AbstractController
             if (empty($exercicesData)) {
                 return $this->json([
                     'success' => false,
-                    'error' => 'Aucun exercice n\'a pu être généré'
+                    'error' => 'L\'IA n\'a pas pu générer d\'exercices valides. Cela peut être dû à: 1) Une réponse mal formatée de l\'IA, 2) Des réponses trop courtes, 3) Un problème de connexion. Veuillez réessayer avec un sujet plus précis.'
                 ], 500);
             }
             
@@ -709,9 +709,13 @@ class BackofficeController extends AbstractController
             ]);
             
         } catch (\Exception $e) {
+            // Log l'erreur complète
+            error_log('Erreur génération exercices IA: ' . $e->getMessage());
+            error_log('Stack trace: ' . $e->getTraceAsString());
+            
             return $this->json([
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => 'Erreur lors de la génération: ' . $e->getMessage() . '. Vérifiez que votre clé API Groq est valide et que vous avez une connexion internet.'
             ], 500);
         }
     }

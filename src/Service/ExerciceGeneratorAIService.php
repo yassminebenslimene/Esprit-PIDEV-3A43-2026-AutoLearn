@@ -25,53 +25,81 @@ class ExerciceGeneratorAIService
      */
     public function generateExercices(string $sujet, string $niveau, int $nombre = 5): array
     {
-        try {
-            // Vérifier si Groq est disponible
-            if (!$this->groqService->isAvailable()) {
-                $this->logger->warning('Groq API not available for exercise generation');
-                throw new \Exception('Le service de génération IA n\'est pas disponible actuellement.');
+        $maxRetries = 2;
+        $attempt = 0;
+        
+        while ($attempt < $maxRetries) {
+            try {
+                $attempt++;
+                
+                // Vérifier si Groq est disponible
+                if (!$this->groqService->isAvailable()) {
+                    $this->logger->warning('Groq API not available for exercise generation');
+                    throw new \Exception('Le service de génération IA n\'est pas disponible actuellement.');
+                }
+
+                $prompt = $this->buildGenerationPrompt($sujet, $niveau, $nombre);
+                
+                $messages = [
+                    [
+                        'role' => 'system',
+                        'content' => 'Tu es un expert pédagogique qui crée des exercices éducatifs de haute qualité. Tu génères des questions claires et des réponses COMPLÈTES et DÉTAILLÉES (minimum 2-3 phrases). Tes réponses expliquent toujours les concepts en profondeur. Tu réponds UNIQUEMENT en JSON valide, SANS AUCUN TEXTE AVANT OU APRÈS le JSON.'
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => $prompt
+                    ]
+                ];
+
+                $response = $this->groqService->chat($messages, [
+                    'temperature' => 0.8,
+                    'max_tokens' => 3000
+                ]);
+
+                if (!$response) {
+                    $this->logger->error('No response from Groq API for exercise generation');
+                    if ($attempt < $maxRetries) {
+                        $this->logger->info("Retrying... Attempt $attempt/$maxRetries");
+                        sleep(1); // Wait 1 second before retry
+                        continue;
+                    }
+                    throw new \Exception('Aucune réponse de l\'IA. Veuillez réessayer.');
+                }
+
+                // Parser la réponse de l'IA
+                $exercices = $this->parseAIResponse($response);
+                
+                if (empty($exercices)) {
+                    $this->logger->error('Failed to parse AI response for exercises', [
+                        'response' => substr($response, 0, 500),
+                        'attempt' => $attempt
+                    ]);
+                    if ($attempt < $maxRetries) {
+                        $this->logger->info("Retrying... Attempt $attempt/$maxRetries");
+                        sleep(1);
+                        continue;
+                    }
+                    throw new \Exception('Impossible de générer les exercices. Format de réponse invalide.');
+                }
+
+                return $exercices;
+
+            } catch (\Exception $e) {
+                $this->logger->error('Error in exercise generation', [
+                    'message' => $e->getMessage(),
+                    'attempt' => $attempt,
+                    'trace' => $e->getTraceAsString()
+                ]);
+                
+                if ($attempt >= $maxRetries) {
+                    throw $e;
+                }
+                
+                sleep(1); // Wait before retry
             }
-
-            $prompt = $this->buildGenerationPrompt($sujet, $niveau, $nombre);
-            
-            $messages = [
-                [
-                    'role' => 'system',
-                    'content' => 'Tu es un expert pédagogique qui crée des exercices éducatifs de haute qualité. Tu génères des questions claires et des réponses COMPLÈTES et DÉTAILLÉES (minimum 2-3 phrases). Tes réponses expliquent toujours les concepts en profondeur. Tu réponds UNIQUEMENT en JSON valide.'
-                ],
-                [
-                    'role' => 'user',
-                    'content' => $prompt
-                ]
-            ];
-
-            $response = $this->groqService->chat($messages, [
-                'temperature' => 0.8,
-                'max_tokens' => 3000
-            ]);
-
-            if (!$response) {
-                $this->logger->error('No response from Groq API for exercise generation');
-                throw new \Exception('Aucune réponse de l\'IA. Veuillez réessayer.');
-            }
-
-            // Parser la réponse de l'IA
-            $exercices = $this->parseAIResponse($response);
-            
-            if (empty($exercices)) {
-                $this->logger->error('Failed to parse AI response for exercises', ['response' => $response]);
-                throw new \Exception('Impossible de générer les exercices. Format de réponse invalide.');
-            }
-
-            return $exercices;
-
-        } catch (\Exception $e) {
-            $this->logger->error('Error in exercise generation', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            throw $e;
         }
+        
+        throw new \Exception('Impossible de générer les exercices après plusieurs tentatives.');
     }
 
     /**
@@ -124,6 +152,10 @@ Génère exactement {$nombre} exercices pédagogiques de qualité sur le sujet: 
 ✅ BON: "Une fonction en programmation est un bloc de code réutilisable qui effectue une tâche spécifique. Elle peut accepter des paramètres en entrée et retourner un résultat. On la définit avec le mot-clé 'def' suivi du nom et des paramètres entre parenthèses."
 
 **FORMAT DE RÉPONSE OBLIGATOIRE (JSON uniquement):**
+
+⚠️ CRITIQUE: Réponds UNIQUEMENT avec le JSON ci-dessous, SANS AUCUN TEXTE AVANT OU APRÈS!
+⚠️ PAS de "Voici les exercices:", PAS d'explication, JUSTE LE JSON!
+
 {
     "exercices": [
         {
@@ -133,6 +165,8 @@ Génère exactement {$nombre} exercices pédagogiques de qualité sur le sujet: 
         }
     ]
 }
+
+⚠️ RAPPEL: Commence ta réponse directement par { et termine par }
 
 **VALIDATION AVANT D'ENVOYER:**
 - ✅ Chaque réponse fait au moins 2-3 phrases complètes?
@@ -160,13 +194,18 @@ PROMPT;
         $response = preg_replace('/```json\s*/', '', $response);
         $response = preg_replace('/```\s*$/', '', $response);
         $response = trim($response);
+        
+        // Essayer d'extraire le JSON s'il y a du texte avant/après
+        if (preg_match('/\{[\s\S]*"exercices"[\s\S]*\}/i', $response, $matches)) {
+            $response = $matches[0];
+        }
 
         $data = json_decode($response, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             $this->logger->error('JSON decode error in exercise generation', [
                 'error' => json_last_error_msg(),
-                'response' => $response
+                'response' => substr($response, 0, 500) // Log first 500 chars
             ]);
             return [];
         }
@@ -184,10 +223,20 @@ PROMPT;
                 $this->logger->warning('Skipping invalid exercise', ['exercice' => $exercice]);
                 continue;
             }
+            
+            // Vérifier que la réponse n'est pas trop courte
+            $reponse = trim($exercice['reponse']);
+            if (strlen($reponse) < 20) {
+                $this->logger->warning('Skipping exercise with too short answer', [
+                    'question' => $exercice['question'],
+                    'reponse' => $reponse
+                ]);
+                continue;
+            }
 
             $exercices[] = [
                 'question' => trim($exercice['question']),
-                'reponse' => trim($exercice['reponse']),
+                'reponse' => $reponse,
                 'points' => max(1, min(100, (int) $exercice['points']))
             ];
         }
