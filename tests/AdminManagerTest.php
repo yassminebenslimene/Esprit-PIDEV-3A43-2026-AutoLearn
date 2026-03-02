@@ -15,9 +15,7 @@ class AdminManagerTest extends TestCase
         $this->manager = new AdminManager();
     }
 
-    /**
-     * Test 1: Validation d'un admin valide
-     */
+    
     public function testValidAdmin(): void
     {
         $admin = new Admin();
@@ -28,9 +26,7 @@ class AdminManagerTest extends TestCase
         $this->assertTrue($this->manager->validate($admin));
     }
 
-    /**
-     * Test 2: Nom obligatoire
-     */
+ 
     public function testAdminWithoutNom(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -43,9 +39,7 @@ class AdminManagerTest extends TestCase
         $this->manager->validate($admin);
     }
 
-    /**
-     * Test 3: Nom trop court (moins de 2 caractères)
-     */
+   
     public function testAdminWithNomTooShort(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -59,9 +53,6 @@ class AdminManagerTest extends TestCase
         $this->manager->validate($admin);
     }
 
-    /**
-     * Test 4: Nom trop long (plus de 50 caractères)
-     */
     public function testAdminWithNomTooLong(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -75,9 +66,6 @@ class AdminManagerTest extends TestCase
         $this->manager->validate($admin);
     }
 
-    /**
-     * Test 5: Nom avec chiffres (invalide)
-     */
     public function testAdminWithNomContainingNumbers(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -91,9 +79,7 @@ class AdminManagerTest extends TestCase
         $this->manager->validate($admin);
     }
 
-    /**
-     * Test 6: Nom avec caractères spéciaux invalides
-     */
+
     public function testAdminWithNomContainingSpecialChars(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -107,9 +93,7 @@ class AdminManagerTest extends TestCase
         $this->manager->validate($admin);
     }
 
-    /**
-     * Test 7: Prénom obligatoire
-     */
+ 
     public function testAdminWithoutPrenom(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -122,9 +106,7 @@ class AdminManagerTest extends TestCase
         $this->manager->validate($admin);
     }
 
-    /**
-     * Test 8: Prénom trop court
-     */
+ 
     public function testAdminWithPrenomTooShort(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -138,9 +120,7 @@ class AdminManagerTest extends TestCase
         $this->manager->validate($admin);
     }
 
-    /**
-     * Test 9: Prénom avec chiffres
-     */
+
     public function testAdminWithPrenomContainingNumbers(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -154,9 +134,7 @@ class AdminManagerTest extends TestCase
         $this->manager->validate($admin);
     }
 
-    /**
-     * Test 10: Email obligatoire
-     */
+
     public function testAdminWithoutEmail(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -169,9 +147,6 @@ class AdminManagerTest extends TestCase
         $this->manager->validate($admin);
     }
 
-    /**
-     * Test 11: Email invalide (format incorrect)
-     */
     public function testAdminWithInvalidEmail(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -185,9 +160,6 @@ class AdminManagerTest extends TestCase
         $this->manager->validate($admin);
     }
 
-    /**
-     * Test 12: Email sans domaine
-     */
     public function testAdminWithEmailWithoutDomain(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -200,9 +172,6 @@ class AdminManagerTest extends TestCase
         $this->manager->validate($admin);
     }
 
-    /**
-     * Test 13: Admin ne peut pas être suspendu
-     */
     public function testAdminCannotBeSuspended(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -216,17 +185,13 @@ class AdminManagerTest extends TestCase
         $this->manager->canBeSuspended($admin);
     }
 
-    /**
-     * Test 14: Validation mot de passe valide
-     */
+
     public function testValidPassword(): void
     {
         $this->assertTrue($this->manager->validatePassword('Password123!'));
     }
 
-    /**
-     * Test 15: Mot de passe obligatoire
-     */
+
     public function testPasswordRequired(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -235,9 +200,7 @@ class AdminManagerTest extends TestCase
         $this->manager->validatePassword('');
     }
 
-    /**
-     * Test 16: Mot de passe trop court
-     */
+
     public function testPasswordTooShort(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -246,9 +209,7 @@ class AdminManagerTest extends TestCase
         $this->manager->validatePassword('Pas1!');
     }
 
-    /**
-     * Test 17: Mot de passe sans majuscule
-     */
+
     public function testPasswordWithoutUppercase(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -257,9 +218,7 @@ class AdminManagerTest extends TestCase
         $this->manager->validatePassword('password123!');
     }
 
-    /**
-     * Test 18: Mot de passe sans minuscule
-     */
+
     public function testPasswordWithoutLowercase(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -268,9 +227,7 @@ class AdminManagerTest extends TestCase
         $this->manager->validatePassword('PASSWORD123!');
     }
 
-    /**
-     * Test 19: Mot de passe sans chiffre
-     */
+
     public function testPasswordWithoutNumber(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -279,9 +236,7 @@ class AdminManagerTest extends TestCase
         $this->manager->validatePassword('Password!');
     }
 
-    /**
-     * Test 20: Mot de passe sans caractère spécial
-     */
+
     public function testPasswordWithoutSpecialChar(): void
     {
         $this->expectException(\InvalidArgumentException::class);
