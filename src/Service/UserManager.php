@@ -14,6 +14,7 @@ class UserManager
      * 2. Le prénom est obligatoire
      * 3. L'email doit être valide
      * 4. Le rôle doit être valide (ETUDIANT, ENSEIGNANT, ADMIN)
+     * 5. Pour un étudiant, le niveau est obligatoire
      * 
      * @param User $user
      * @return bool
@@ -40,6 +41,18 @@ class UserManager
         $rolesValides = ['ETUDIANT', 'ENSEIGNANT', 'ADMIN'];
         if (!in_array($user->getRole(), $rolesValides)) {
             throw new \InvalidArgumentException('Le rôle doit être ETUDIANT, ENSEIGNANT ou ADMIN');
+        }
+
+        // Règle 5: Pour un étudiant, le niveau est obligatoire
+        if ($user instanceof \App\Entity\Etudiant) {
+            if (empty($user->getNiveau())) {
+                throw new \InvalidArgumentException('Le niveau est obligatoire pour un étudiant');
+            }
+            
+            $niveauxValides = ['DEBUTANT', 'INTERMEDIAIRE', 'AVANCE'];
+            if (!in_array($user->getNiveau(), $niveauxValides)) {
+                throw new \InvalidArgumentException('Le niveau doit être DEBUTANT, INTERMEDIAIRE ou AVANCE');
+            }
         }
 
         return true;

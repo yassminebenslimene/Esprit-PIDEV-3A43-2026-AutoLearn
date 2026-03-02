@@ -3,6 +3,7 @@
 namespace App\Tests\Service;
 
 use App\Entity\Etudiant;
+use App\Entity\Admin;
 use App\Service\UserManager;
 use PHPUnit\Framework\TestCase;
 
@@ -16,148 +17,149 @@ class UserManagerTest extends TestCase
     }
 
     /**
-     * Test 1: Validation d'un utilisateur valide
+     * Test 1: Validation d'un étudiant valide
      */
-    public function testValidUser(): void
+    public function testValidEtudiant(): void
     {
-        $user = new Etudiant();
-        $user->setNom('Dupont');
-        $user->setPrenom('Jean');
-        $user->setEmail('jean.dupont@example.com');
-        $user->setRole('ETUDIANT');
+        $etudiant = new Etudiant();
+        $etudiant->setNom('Dupont');
+        $etudiant->setPrenom('Jean');
+        $etudiant->setEmail('jean.dupont@example.com');
+        $etudiant->setNiveau('DEBUTANT');
 
-        $this->assertTrue($this->manager->validate($user));
+        $this->assertTrue($this->manager->validate($etudiant));
     }
 
     /**
      * Test 2: Validation échoue si le nom est vide
      */
-    public function testUserWithoutNom(): void
+    public function testEtudiantWithoutNom(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Le nom est obligatoire');
 
-        $user = new Etudiant();
-        $user->setPrenom('Jean');
-        $user->setEmail('jean@example.com');
-        $user->setRole('ETUDIANT');
+        $etudiant = new Etudiant();
+        $etudiant->setPrenom('Jean');
+        $etudiant->setEmail('jean@example.com');
+        $etudiant->setNiveau('DEBUTANT');
 
-        $this->manager->validate($user);
+        $this->manager->validate($etudiant);
     }
 
     /**
      * Test 3: Validation échoue si le prénom est vide
      */
-    public function testUserWithoutPrenom(): void
+    public function testEtudiantWithoutPrenom(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Le prénom est obligatoire');
 
-        $user = new Etudiant();
-        $user->setNom('Dupont');
-        $user->setEmail('dupont@example.com');
-        $user->setRole('ETUDIANT');
+        $etudiant = new Etudiant();
+        $etudiant->setNom('Dupont');
+        $etudiant->setEmail('dupont@example.com');
+        $etudiant->setNiveau('DEBUTANT');
 
-        $this->manager->validate($user);
+        $this->manager->validate($etudiant);
     }
 
     /**
      * Test 4: Validation échoue si l'email est invalide
      */
-    public function testUserWithInvalidEmail(): void
+    public function testEtudiantWithInvalidEmail(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Email invalide');
 
-        $user = new Etudiant();
-        $user->setNom('Dupont');
-        $user->setPrenom('Jean');
-        $user->setEmail('email_invalide');
-        $user->setRole('ETUDIANT');
+        $etudiant = new Etudiant();
+        $etudiant->setNom('Dupont');
+        $etudiant->setPrenom('Jean');
+        $etudiant->setEmail('email_invalide');
+        $etudiant->setNiveau('DEBUTANT');
 
-        $this->manager->validate($user);
+        $this->manager->validate($etudiant);
     }
 
     /**
-     * Test 5: Validation échoue si le rôle est invalide
+     * Test 5: Validation échoue si le niveau est vide pour un étudiant
      */
-    public function testUserWithInvalidRole(): void
+    public function testEtudiantWithoutNiveau(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Le rôle doit être ETUDIANT, ENSEIGNANT ou ADMIN');
+        $this->expectExceptionMessage('Le niveau est obligatoire pour un étudiant');
 
-        $user = new Etudiant();
-        $user->setNom('Dupont');
-        $user->setPrenom('Jean');
-        $user->setEmail('jean.dupont@example.com');
-        $user->setRole('ROLE_INVALIDE');
+        $etudiant = new Etudiant();
+        $etudiant->setNom('Dupont');
+        $etudiant->setPrenom('Jean');
+        $etudiant->setEmail('jean.dupont@example.com');
 
-        $this->manager->validate($user);
+        $this->manager->validate($etudiant);
     }
 
     /**
-     * Test 6: Un utilisateur non suspendu peut être suspendu
+     * Test 6: Validation échoue si le niveau est invalide pour un étudiant
      */
-    public function testUserCanBeSuspended(): void
+    public function testEtudiantWithInvalidNiveau(): void
     {
-        $user = new Etudiant();
-        $user->setNom('Dupont');
-        $user->setPrenom('Jean');
-        $user->setEmail('jean.dupont@example.com');
-        $user->setRole('ETUDIANT');
-        $user->setIsSuspended(false);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Le niveau doit être DEBUTANT, INTERMEDIAIRE ou AVANCE');
 
-        $this->assertTrue($this->manager->canBeSuspended($user));
+        $etudiant = new Etudiant();
+        $etudiant->setNom('Dupont');
+        $etudiant->setPrenom('Jean');
+        $etudiant->setEmail('jean.dupont@example.com');
+        $etudiant->setNiveau('NIVEAU_INVALIDE');
+
+        $this->manager->validate($etudiant);
     }
 
     /**
-     * Test 7: Un utilisateur déjà suspendu ne peut pas être suspendu à nouveau
+     * Test 7: Un étudiant non suspendu peut être suspendu
      */
-    public function testAlreadySuspendedUserCannotBeSuspended(): void
+    public function testEtudiantCanBeSuspended(): void
+    {
+        $etudiant = new Etudiant();
+        $etudiant->setNom('Dupont');
+        $etudiant->setPrenom('Jean');
+        $etudiant->setEmail('jean.dupont@example.com');
+        $etudiant->setNiveau('DEBUTANT');
+        $etudiant->setIsSuspended(false);
+
+        $this->assertTrue($this->manager->canBeSuspended($etudiant));
+    }
+
+    /**
+     * Test 8: Un étudiant déjà suspendu ne peut pas être suspendu à nouveau
+     */
+    public function testAlreadySuspendedEtudiantCannotBeSuspended(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('L\'utilisateur est déjà suspendu');
 
-        $user = new Etudiant();
-        $user->setNom('Dupont');
-        $user->setPrenom('Jean');
-        $user->setEmail('jean.dupont@example.com');
-        $user->setRole('ETUDIANT');
-        $user->setIsSuspended(true);
+        $etudiant = new Etudiant();
+        $etudiant->setNom('Dupont');
+        $etudiant->setPrenom('Jean');
+        $etudiant->setEmail('jean.dupont@example.com');
+        $etudiant->setNiveau('DEBUTANT');
+        $etudiant->setIsSuspended(true);
 
-        $this->manager->canBeSuspended($user);
+        $this->manager->canBeSuspended($etudiant);
     }
 
     /**
-     * Test 8: Un administrateur ne peut pas être suspendu
+     * Test 9: Un administrateur ne peut pas être suspendu
      */
     public function testAdminCannotBeSuspended(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Un administrateur ne peut pas être suspendu');
 
-        $user = new Etudiant();
-        $user->setNom('Admin');
-        $user->setPrenom('Super');
-        $user->setEmail('admin@example.com');
-        $user->setRole('ADMIN');
-        $user->setIsSuspended(false);
+        $admin = new Admin();
+        $admin->setNom('Admin');
+        $admin->setPrenom('Super');
+        $admin->setEmail('admin@example.com');
+        $admin->setIsSuspended(false);
 
-        $this->manager->canBeSuspended($user);
-    }
-
-    /**
-     * Test 9: Validation d'un enseignant valide
-     */
-    public function testValidEnseignant(): void
-    {
-        $user = new Etudiant();
-        $user->setNom('Martin');
-        $user->setPrenom('Sophie');
-        $user->setEmail('sophie.martin@example.com');
-        $user->setRole('ENSEIGNANT');
-
-        $this->assertTrue($this->manager->validate($user));
+        $this->manager->canBeSuspended($admin);
     }
 
     /**
@@ -165,12 +167,11 @@ class UserManagerTest extends TestCase
      */
     public function testValidAdmin(): void
     {
-        $user = new Etudiant();
-        $user->setNom('Admin');
-        $user->setPrenom('Super');
-        $user->setEmail('admin@autolearn.com');
-        $user->setRole('ADMIN');
+        $admin = new Admin();
+        $admin->setNom('Admin');
+        $admin->setPrenom('Super');
+        $admin->setEmail('admin@autolearn.com');
 
-        $this->assertTrue($this->manager->validate($user));
+        $this->assertTrue($this->manager->validate($admin));
     }
 }
