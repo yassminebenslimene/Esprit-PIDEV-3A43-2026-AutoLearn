@@ -28,7 +28,7 @@ class NotificationController extends AbstractController
     public function index(): Response
     {
         $user = $this->getUser();
-        
+
         $notifications = $this->notificationRepository->findBy(
             ['user' => $user],
             ['createdAt' => 'DESC']
@@ -71,7 +71,7 @@ class NotificationController extends AbstractController
     public function markAllAsRead(): Response
     {
         $user = $this->getUser();
-        
+
         $notifications = $this->notificationRepository->findBy([
             'user' => $user,
             'isRead' => false
@@ -112,7 +112,7 @@ class NotificationController extends AbstractController
     public function getUnreadCount(): JsonResponse
     {
         $user = $this->getUser();
-        
+
         $count = $this->notificationRepository->count([
             'user' => $user,
             'isRead' => false
@@ -128,7 +128,7 @@ class NotificationController extends AbstractController
     public function getRecent(): JsonResponse
     {
         $user = $this->getUser();
-        
+
         $notifications = $this->notificationRepository->findBy(
             ['user' => $user],
             ['createdAt' => 'DESC'],

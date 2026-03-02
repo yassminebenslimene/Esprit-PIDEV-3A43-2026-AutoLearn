@@ -22,12 +22,12 @@ class CourseGeneratorService
     }
 
     /**
-     * Génère un chapitre basé sur le titre du cours
+     * Génère un chapitre basé sur le titre du cours et un titre de chapitre spécifique
      */
-    public function generateChapter(string $courseTitle, string $subject = '', string $level = ''): array
+    public function generateChapter(string $courseTitle, string $subject = '', string $level = '', string $chapterTitle = '', string $chapterLevel = 'debutant'): array
     {
         try {
-            $prompt = $this->buildChapterPrompt($courseTitle, $subject, $level);
+            $prompt = $this->buildChapterPrompt($courseTitle, $subject, $level, $chapterTitle, $chapterLevel);
             
             $response = $this->httpClient->request('POST', 'https://api.groq.com/openai/v1/chat/completions', [
                 'headers' => [
@@ -86,7 +86,7 @@ class CourseGeneratorService
         }
     }
 
-    private function buildChapterPrompt(string $courseTitle, string $subject, string $level): string
+    private function buildChapterPrompt(string $courseTitle, string $subject, string $level, string $chapterTitle = '', string $chapterLevel = 'debutant'): string
     {
         $context = "Cours: $courseTitle";
         if ($subject) {
@@ -96,9 +96,51 @@ class CourseGeneratorService
             $context .= "\nNiveau: $level";
         }
 
+        // Mapper le niveau en français
+        $levelMap = [
+            'debutant' => 'Débutant',
+            'intermediaire' => 'Intermédiaire',
+            'avance' => 'Avancé'
+        ];
+        $levelText = $levelMap[$chapterLevel] ?? 'Débutant';
+
+        // Si un titre de chapitre est fourni, l'utiliser comme base
+        if ($chapterTitle) {
+            return <<<PROMPT
+Génère un chapitre de cours pour:
+$context
+
+Titre du chapitre demandé: "$chapterTitle"
+Niveau de difficulté: $levelText
+
+Réponds UNIQUEMENT avec un objet JSON valide (sans balises markdown) avec cette structure exacte:
+{
+    "titre": "$chapterTitle",
+    "contenu": "Contenu détaillé du chapitre avec explications complètes (minimum 500 caractères)",
+    "ressources": "Ressources et références utiles"
+}
+
+Le contenu doit être:
+- Spécifiquement adapté au titre "$chapterTitle"
+- Adapté au niveau $levelText (vocabulaire, complexité, profondeur)
+- Pour niveau Débutant: explications simples, exemples basiques, pas de jargon technique
+- Pour niveau Intermédiaire: concepts plus avancés, exemples pratiques, terminologie technique appropriée
+- Pour niveau Avancé: concepts complexes, cas d'usage avancés, optimisations, bonnes pratiques professionnelles
+- Pédagogique et bien structuré
+- Complet avec des explications claires et des exemples concrets
+- En français
+- Minimum 500 caractères pour le contenu
+
+Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
+PROMPT;
+        }
+
+        // Sinon, générer un chapitre générique
         return <<<PROMPT
 Génère un chapitre de cours pour:
 $context
+
+Niveau de difficulté: $levelText
 
 Réponds UNIQUEMENT avec un objet JSON valide (sans balises markdown) avec cette structure exacte:
 {
@@ -108,8 +150,8 @@ Réponds UNIQUEMENT avec un objet JSON valide (sans balises markdown) avec cette
 }
 
 Le contenu doit être:
+- Adapté au niveau $levelText
 - Pédagogique et bien structuré
-- Adapté au niveau du cours
 - Complet avec des explications claires
 - En français
 - Minimum 500 caractères pour le contenu

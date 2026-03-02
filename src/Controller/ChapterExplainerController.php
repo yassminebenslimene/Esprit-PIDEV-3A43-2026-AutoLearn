@@ -49,7 +49,7 @@ class ChapterExplainerController extends AbstractController
         }
 
         $level = $request->request->get('level', 'beginner');
-        
+
         if (!in_array($level, ['beginner', 'advanced'])) {
             return $this->json(['error' => 'Niveau invalide'], 400);
         }

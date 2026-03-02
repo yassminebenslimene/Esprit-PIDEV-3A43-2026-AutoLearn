@@ -11,6 +11,7 @@ use App\Entity\Etudiant;
 use App\Entity\User;
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
+use App\Service\CourseProgressService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,31 +27,31 @@ class FrontofficeController extends AbstractController
         EvenementRepository $evenementRepository,
         EquipeRepository $equipeRepository,
         CoursRepository $coursRepository,
-        \App\Service\CourseProgressService $progressService
+        CourseProgressService $progressService
     ): Response
     {
         // Si l'utilisateur est connecté
         if ($this->getUser()) {
             $user = $this->getUser();
-
+            
             // Si c'est un admin, rediriger vers le backoffice
             if ($user instanceof Admin || in_array('ROLE_ADMIN', $user->getRoles())) {
                 return $this->redirectToRoute('app_backoffice');
             }
         }
-
+        
         // Récupérer les données
         $cours = $coursRepository->findAll();
         $challenges = $challengeRepository->findAll();
         $evenements = $evenementRepository->findAll();
         $equipes = $equipeRepository->findAll();
-
+        
         // Calculer la progression pour chaque cours si l'utilisateur est connecté
         $coursProgress = [];
-        if ($this->getUser() && $this->getUser() instanceof Etudiant) {
+        if ($this->getUser()) {
             $coursProgress = $progressService->getAllCoursesProgress($this->getUser(), $cours);
         }
-
+        
         return $this->render('frontoffice/index.html.twig', [
             'cours' => $cours,
             'challenges' => $challenges,
@@ -59,7 +60,6 @@ class FrontofficeController extends AbstractController
             'coursProgress' => $coursProgress,
         ]);
     }
-
 
     #[Route('/profile', name: 'app_profile', methods: ['GET', 'POST'])]
     public function profile(
@@ -151,13 +151,6 @@ class FrontofficeController extends AbstractController
         return $this->render('frontoffice/communaute/communaute.html.twig');
     }
 
-    #[Route('/chapitres/cours/{coursId}', name: 'app_frontoffice_chapitre_by_cours')]
-    public function chapitresByCours(int $coursId): Response
-    {
-        // Rediriger directement vers la liste des chapitres du cours
-        return $this->redirectToRoute('app_chapitre_index_front', ['id' => $coursId]);
-    }
-
     #[Route('/contact', name: 'app_contact', methods: ['POST'])]
     public function contact(
         Request $request,
@@ -196,6 +189,12 @@ class FrontofficeController extends AbstractController
         }
         
         return $this->redirectToRoute('app_frontoffice', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/about', name: 'app_about')]
+    public function about(): Response
+    {
+        return $this->render('frontoffice/about.html.twig');
     }
 
 }

@@ -1,261 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+{% extends 'frontoffice/base.html.twig' %}
 
-    <title>Mon Profil - Scholar</title>
+{% block title %}Mon Profil - AutoLearn{% endblock %}
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="{{ asset('frontoffice/vendor/bootstrap/css/bootstrap.min.css') }}">
-
-    <!-- FrontOffice CSS -->
-    <link rel="stylesheet" href="{{ asset('frontoffice/css/animate.css') }}">
-    <link rel="stylesheet" href="{{ asset('frontoffice/css/flex-slider.css') }}">
-    <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
-    <link rel="stylesheet" href="{{ asset('frontoffice/css/owl.css') }}">
-    <link rel="stylesheet" href="{{ asset('frontoffice/css/templatemo-scholar.css') }}">
-
-    <!-- Swiper -->
-    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
-    
-    <!-- SIMPLE DROPDOWN FIX - NO BOOTSTRAP DEPENDENCY -->
-    <style>
-    /* Reset any conflicting styles - AVEC CENTRAGE VERTICAL */
-    .main-nav {
-        display: flex !important;
-        align-items: center !important;
-        height: 80px !important;  /* Ajuste si nécessaire */
-    }
-    
-    .main-nav .nav {
-        display: flex !important;
-        align-items: center !important;
-        height: 100% !important;
-        margin-bottom: 0 !important;
-    }
-    
-    .main-nav .nav li {
-        display: flex !important;
-        align-items: center !important;
-        height: 100% !important;
-        margin: 0 !important;
-    }
-    
-    .main-nav .nav li a {
-        display: flex !important;
-        align-items: center !important;
-        height: 100% !important;
-        line-height: 1 !important;
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
-    }
-    
-    .main-nav .nav li.profile-dropdown-container {
-        position: relative !important;
-        display: flex !important;  /* Changé de inline-block à flex */
-        align-items: center !important;
-        height: 100% !important;
-    }
-    
-    .main-nav .nav .profile-dropdown-btn {
-        background: none !important;
-        border: none !important;
-        padding: 0 15px !important;  /* Changé de 10px 15px à 0 15px */
-        color: #1e1e1e !important;
-        font-weight: 500 !important;
-        text-decoration: none !important;
-        cursor: pointer !important;
-        display: flex !important;  /* Changé de inline-block à flex */
-        align-items: center !important;
-        height: 100% !important;
-        line-height: 1 !important;
-        gap: 5px !important;
-    }
-    
-    .main-nav .nav .profile-dropdown-btn i {
-        display: flex !important;
-        align-items: center !important;
-    }
-    
-    .main-nav .nav .profile-dropdown-menu {
-        display: none;
-        position: absolute !important;
-        top: 100% !important;
-        right: 0 !important;
-        z-index: 999999 !important;
-        min-width: 220px !important;
-        background: white !important;
-        border-radius: 8px !important;
-        box-shadow: 0 5px 25px rgba(0,0,0,0.15) !important;
-        padding: 10px 0 !important;
-        margin-top: 0 !important;  /* Changé de 5px à 0 */
-        list-style: none !important;
-    }
-    
-    .main-nav .nav .profile-dropdown-menu.show {
-        display: block !important;
-    }
-    
-    .main-nav .nav .profile-dropdown-menu li {
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        display: block !important;
-        height: auto !important;  /* Reset pour le dropdown */
-    }
-    
-    .main-nav .nav .profile-dropdown-menu a {
-        display: block !important;
-        padding: 12px 20px !important;
-        color: #333 !important;
-        text-decoration: none !important;
-        font-size: 15px !important;
-        transition: all 0.2s !important;
-        line-height: normal !important;
-        height: auto !important;  /* Reset pour le dropdown */
-    }
-    
-    .main-nav .nav .profile-dropdown-menu a:hover {
-        background: linear-gradient(105deg, #7a6ad8 0%, #4e3b9c 100%) !important;
-        color: white !important;
-    }
-    
-    .main-nav .nav .profile-dropdown-menu i {
-        margin-right: 10px !important;
-        width: 18px !important;
-        text-align: center !important;
-    }
-    
-    .main-nav .nav .profile-dropdown-divider {
-        height: 1px !important;
-        background: #eeeeee !important;
-        margin: 8px 0 !important;
-    }
-    
-    /* Fix pour les autres liens de la navbar */
-    .main-nav .nav .scroll-to-section {
-        display: flex !important;
-        align-items: center !important;
-        height: 100% !important;
-    }
-    
-    .main-nav .nav .scroll-to-section a {
-        display: flex !important;
-        align-items: center !important;
-        height: 100% !important;
-        padding: 0 15px !important;
-        line-height: 1 !important;
-    }
-    
-    @media (max-width: 992px) {
-        .main-nav,
-        .main-nav .nav,
-        .main-nav .nav li,
-        .main-nav .nav li a,
-        .main-nav .nav li.profile-dropdown-container,
-        .main-nav .nav .profile-dropdown-btn {
-            height: auto !important;
-            min-height: 50px !important;
-        }
-        
-        .main-nav .nav .profile-dropdown-menu {
-            position: static !important;
-            width: 100% !important;
-            box-shadow: none !important;
-            background: transparent !important;
-        }
-        
-        .main-nav .nav .profile-dropdown-menu a {
-            color: white !important;
-            padding-left: 30px !important;
-        }
-        
-        .main-nav .nav .profile-dropdown-divider {
-            background: rgba(255,255,255,0.2) !important;
-        }
-    }
-</style>
-</head>
-<body>
-
-<!-- ***** Preloader Start ***** -->
-<div id="js-preloader" class="js-preloader">
-    <div class="preloader-inner">
-        <span class="dot"></span>
-        <div class="dots">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-</div>
-<!-- ***** Preloader End ***** -->
-
-<!-- ***** Header Area Start ***** -->
-<header class="header-area header-sticky">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <nav class="main-nav">
-                    <!-- ***** Logo Start ***** -->
-                    <a href="{{ path('app_frontoffice') }}" class="logo">
-                        <h1>AutoLearn</h1>
-                    </a>
-                    <!-- ***** Logo End ***** -->
-                    <!-- ***** Search Start ***** -->
-                    <div class="search-input">
-                        <form id="search" action="#">
-                            <input type="text" placeholder="Type Something" id='searchText' name="searchKeyword" />
-                            <i class="fa fa-search"></i>
-                        </form>
-                    </div>
-                    <!-- ***** Search End ***** -->
-                    <!-- ***** Menu Start ***** -->
-                    <ul class="nav">
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#top">Home</a></li>
-                        <li class="scroll-to-section"><a href="#courses">Courses</a></li>
-                        <li class="scroll-to-section"><a href="#challenge">Challenge</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#events">Events</a></li>
-                        
-                        {% if app.user %}
-                            <li class="profile-dropdown-container">
-                                <a href="javascript:void(0);" onclick="toggleProfileDropdown(event)" class="profile-dropdown-btn">
-                                    <i class="fa fa-user-circle"></i>
-                                    {{ app.user.prenom }} {{ app.user.nom }}
-                                    <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
-                                </a>
-                                <ul class="profile-dropdown-menu" id="profileDropdown">
-                                    <li>
-                                        <a href="{{ path('app_profile') }}">
-                                            <i class="fa fa-id-card"></i> Mon Profil
-                                        </a>
-                                    </li>
-                                    <li class="profile-dropdown-divider"></li>
-                                    <li>
-                                        <a href="{{ path('backoffice_logout') }}">
-                                            <i class="fa fa-sign-out"></i> Déconnexion
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                        {% else %}
-                            <li class="scroll-to-section"><a href="{{ path('backoffice_login') }}">Login</a></li>
-                            <li class="scroll-to-section"><a href="{{ path('backoffice_register') }}">Register</a></li>
-                        {% endif %}
-                    </ul>  
-                    <a class='menu-trigger'>
-                        <span>Menu</span>
-                    </a>
-                    <!-- ***** Menu End ***** -->
-                </nav>
-            </div>
-        </div>
-    </div>
-</header>
-<!-- ***** Header Area End ***** -->
-
+{% block body %}
 <!-- ***** Page Header Banner Start ***** -->
 <div class="page-heading" style="background-image: linear-gradient(127deg, rgb(158, 159, 245) 0%, rgba(187, 183, 231, 0.53) 91%), url({{ asset('frontoffice/images/course-01.jpg') }}); background-position: center center; background-repeat: no-repeat; background-size: cover; padding: 150px 0 80px 0;">
     <div class="container">
@@ -264,8 +11,8 @@
                 <div class="header-text" style="text-align: center;">
                     <h6 style="color: white; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Mon Compte</h6>
                     <h2 style="color: white; font-weight: 800; font-size: 48px; margin: 0; text-transform: capitalize;">
-    {{ app.user.prenom }} {{ app.user.nom }}
-</h2>
+                        {{ app.user.prenom }} {{ app.user.nom }}
+                    </h2>
                 </div>
             </div>
         </div>
@@ -299,9 +46,9 @@
                         <div class="profile-avatar" style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #a19cec 0%, #58379c 100%); color: white; font-size: 42px; font-weight: bold; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 8px 16px rgb(220, 202, 223);">
                             {{ user.prenom[:1]|upper }}{{ user.nom[:1]|upper }}
                         </div>
-                        <h3 style="color: #c37add; font-weight: 700;"><h2 style="color: black ; font-weight: 500; font-size: 35px; margin: 0; text-transform: capitalize;">
-    {{ app.user.prenom }} {{ app.user.nom }}
-</h2></h3>
+                        <h2 style="color: black; font-weight: 500; font-size: 35px; margin: 0; text-transform: capitalize;">
+                            {{ app.user.prenom }} {{ app.user.nom }}
+                        </h2>
                         <p style="color: #777; font-size: 15px;">{{ user.email }}</p>
                         <span style="display: inline-block; padding: 6px 16px; background: #a1abf1; color: white; border-radius: 20px; font-size: 13px; font-weight: 600; margin-top: 8px;">{{ user.role }}</span>
                     </div>
@@ -391,28 +138,6 @@
 </div>
 <!-- ***** Profile Section End ***** -->
 
-<footer>
-    <div class="container">
-        <div class="col-lg-12">
-            <p>Copyright © 2036 Scholar Organization. All rights reserved. &nbsp;&nbsp;&nbsp; Design: <a href="https://templatemo.com" rel="nofollow" target="_blank">TemplateMo</a></p>
-        </div>
-    </div>
-</footer>
-
-<!-- jQuery -->
-<script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
-
-<!-- Bootstrap -->
-<script src="{{ asset('frontoffice/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
-<!-- Plugin JS -->
-<script src="{{ asset('frontoffice/js/isotope.min.js') }}"></script>
-<script src="{{ asset('frontoffice/js/owl-carousel.js') }}"></script>
-<script src="{{ asset('frontoffice/js/counter.js') }}"></script>
-
-<!-- Custom JS -->
-<script src="{{ asset('frontoffice/js/custom.js') }}"></script>
-
 <style>
 input:focus, select:focus, textarea:focus {
     border-color: #a31df7 !important;
@@ -420,44 +145,4 @@ input:focus, select:focus, textarea:focus {
     outline: none;
 }
 </style>
-
-<!-- SIMPLE DROPDOWN TOGGLE - 100% WORKS -->
-<script>
-    // Global function to toggle dropdown
-    function toggleProfileDropdown(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        // Get dropdown menu
-        var dropdown = document.getElementById('profileDropdown');
-        
-        // Close all other dropdowns first
-        var allDropdowns = document.querySelectorAll('.profile-dropdown-menu');
-        allDropdowns.forEach(function(menu) {
-            if (menu.id !== 'profileDropdown') {
-                menu.classList.remove('show');
-            }
-        });
-        
-        // Toggle current dropdown
-        dropdown.classList.toggle('show');
-    }
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-        var dropdown = document.getElementById('profileDropdown');
-        var isClickInside = event.target.closest('.profile-dropdown-container');
-        
-        if (!isClickInside && dropdown) {
-            dropdown.classList.remove('show');
-        }
-    });
-    
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Profile dropdown initialized');
-    });
-</script>
-
-</body>
-</html>
+{% endblock %}

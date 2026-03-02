@@ -13,10 +13,10 @@ class Exercice
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 30)]
+    #[ORM\Column(type: 'text')]
     private ?string $question = null;
 
-    #[ORM\Column(length: 30)]
+    #[ORM\Column(type: 'text')]
     private ?string $reponse = null;
 
     #[ORM\Column]

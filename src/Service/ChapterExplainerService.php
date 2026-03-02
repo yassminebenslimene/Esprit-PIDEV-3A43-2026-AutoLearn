@@ -9,7 +9,7 @@ class ChapterExplainerService
 {
     private const MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct';
     private const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-    
+
     private string $apiKey;
     private HttpClientInterface $httpClient;
     private LoggerInterface $logger;
@@ -26,7 +26,7 @@ class ChapterExplainerService
 
     /**
      * Génère une explication personnalisée d'un chapitre
-     * 
+     *
      * @param string $chapterContent Contenu du chapitre
      * @param string $level Niveau: 'beginner' ou 'advanced'
      * @return array ['summary' => string, 'explanation' => string, 'keyPoints' => array]
@@ -75,7 +75,7 @@ class ChapterExplainerService
             $this->logger->error('Error generating chapter explanation', [
                 'error' => $e->getMessage()
             ]);
-            
+
             return [
                 'summary' => 'Erreur lors de la génération du résumé.',
                 'explanation' => 'Une erreur est survenue. Veuillez réessayer.',
@@ -89,7 +89,7 @@ class ChapterExplainerService
      */
     private function buildPrompt(string $content, string $level): string
     {
-        $levelInstruction = $level === 'advanced' 
+        $levelInstruction = $level === 'advanced'
             ? 'Utilise un vocabulaire technique et des explications approfondies.'
             : 'Utilise un langage simple et des exemples concrets pour les débutants.';
 

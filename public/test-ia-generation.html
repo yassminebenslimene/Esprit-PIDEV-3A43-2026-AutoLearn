@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Génération IA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+        }
+        .container {
+            background: #16213e;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #444;
+            font-size: 16px;
+        }
+        input {
+            background: #0f3460;
+            color: white;
+        }
+        button {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #0f3460;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .error {
+            background: #dc2626;
+        }
+        .success {
+            background: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Test Génération IA de Chapitres</h1>
+        
+        <label>ID du Cours:</label>
+        <input type="number" id="coursId" value="1" placeholder="ID du cours">
+        
+        <label>Titre du Chapitre:</label>
+        <input type="text" id="chapterTitle" placeholder="Ex: Les jointures SQL" value="Test de génération">
+        
+        <label>Niveau de difficulté:</label>
+        <select id="chapterLevel" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #444; font-size: 16px; background: #0f3460; color: white;">
+            <option value="debutant">🟢 Débutant</option>
+            <option value="intermediaire">🟡 Intermédiaire</option>
+            <option value="avance">🔴 Avancé</option>
+        </select>
+        
+        <button onclick="testGeneration()">Tester la Génération</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function testGeneration() {
+            const coursId = document.getElementById('coursId').value;
+            const chapterTitle = document.getElementById('chapterTitle').value;
+            const chapterLevel = document.getElementById('chapterLevel').value;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.textContent = '⏳ Génération en cours...';
+            resultDiv.className = '';
+            
+            try {
+                console.log('Envoi requête:', { coursId, chapterTitle, chapterLevel });
+                
+                const response = await fetch(`/backoffice/ai-generator/generate-chapter/${coursId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chapterTitle: chapterTitle,
+                        chapterLevel: chapterLevel
+                    })
+                });
+                
+                console.log('Status:', response.status);
+                console.log('Headers:', [...response.headers.entries()]);
+                
+                const text = await response.text();
+                console.log('Réponse brute:', text);
+                
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error('Réponse non-JSON: ' + text);
+                }
+                
+                if (data.success) {
+                    resultDiv.className = 'success';
+                    resultDiv.textContent = '✅ Succès!\n\n' + JSON.stringify(data, null, 2);
+                } else {
+                    resultDiv.className = 'error';
+                    resultDiv.textContent = '❌ Erreur:\n\n' + JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                console.error('Erreur complète:', error);
+                resultDiv.className = 'error';
+                resultDiv.textContent = '❌ Erreur: ' + error.message + '\n\nVoir la console pour plus de détails';
+            }
+        }
+    </script>
+</body>
+</html>

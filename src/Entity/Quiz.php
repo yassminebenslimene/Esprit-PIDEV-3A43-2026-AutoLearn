@@ -8,12 +8,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: QuizRepository::class)]
-#[Vich\Uploadable]
 class Quiz
 {
     #[ORM\Id]
@@ -70,27 +67,18 @@ class Quiz
     private ?int $maxTentatives = null;
 
     #[ORM\ManyToOne(inversedBy: 'quizzes')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull(message: "Le chapitre est obligatoire. Un quiz doit appartenir à un chapitre.")]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Chapitre $chapitre = null;
+
+    #[ORM\ManyToOne(inversedBy: 'quizzes')]
+    #[ORM\JoinColumn(name: 'challenge_id', referencedColumnName: 'id', nullable: true)]
+    private ?Challenge $challenge = null;
 
     /**
      * @var Collection<int, Question>
      */
-    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz', orphanRemoval: true, cascade: ['persist'])]
+    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz', orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $questions;
-
-    #[Vich\UploadableField(mapping: 'quiz_images', fileNameProperty: 'imageName', size: 'imageSize')]
-    private ?File $imageFile = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?string $imageName = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $imageSize = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {
@@ -135,41 +123,6 @@ class Quiz
         return $this;
     }
 
-    public function getQuestions(): Collection
-    {
-        return $this->questions;
-    }
-
-    public function addQuestion(Question $question): static
-    {
-        if (!$this->questions->contains($question)) {
-            $this->questions->add($question);
-            $question->setQuiz($this);
-        }
-        return $this;
-    }
-
-    public function removeQuestion(Question $question): static
-    {
-        if ($this->questions->removeElement($question)) {
-            if ($question->getQuiz() === $this) {
-                $question->setQuiz(null);
-            }
-        }
-        return $this;
-    }
-
-    public function getChapitre(): ?Chapitre
-    {
-        return $this->chapitre;
-    }
-
-    public function setChapitre(?Chapitre $chapitre): static
-    {
-        $this->chapitre = $chapitre;
-        return $this;
-    }
-
     public function getDureeMaxMinutes(): ?int
     {
         return $this->dureeMaxMinutes;
@@ -203,47 +156,52 @@ class Quiz
         return $this;
     }
 
-    public function setImageFile(?File $imageFile = null): void
+    public function getChapitre(): ?Chapitre
     {
-        $this->imageFile = $imageFile;
+        return $this->chapitre;
+    }
 
-        if (null !== $imageFile) {
-            $this->updatedAt = new \DateTimeImmutable();
+    public function setChapitre(?Chapitre $chapitre): static
+    {
+        $this->chapitre = $chapitre;
+        return $this;
+    }
+
+    public function getChallenge(): ?Challenge
+    {
+        return $this->challenge;
+    }
+
+    public function setChallenge(?Challenge $challenge): static
+    {
+        $this->challenge = $challenge;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Question>
+     */
+    public function getQuestions(): Collection
+    {
+        return $this->questions;
+    }
+
+    public function addQuestion(Question $question): static
+    {
+        if (!$this->questions->contains($question)) {
+            $this->questions->add($question);
+            $question->setQuiz($this);
         }
+        return $this;
     }
 
-    public function getImageFile(): ?File
+    public function removeQuestion(Question $question): static
     {
-        return $this->imageFile;
-    }
-
-    public function setImageName(?string $imageName): void
-    {
-        $this->imageName = $imageName;
-    }
-
-    public function getImageName(): ?string
-    {
-        return $this->imageName;
-    }
-
-    public function setImageSize(?int $imageSize): void
-    {
-        $this->imageSize = $imageSize;
-    }
-
-    public function getImageSize(): ?int
-    {
-        return $this->imageSize;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
+        if ($this->questions->removeElement($question)) {
+            if ($question->getQuiz() === $this) {
+                $question->setQuiz(null);
+            }
+        }
+        return $this;
     }
 }

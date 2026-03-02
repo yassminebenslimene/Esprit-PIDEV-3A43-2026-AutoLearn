@@ -6,6 +6,7 @@ use App\Entity\Quiz;
 use App\Entity\Etudiant;
 use App\Service\QuizManagementService;
 use App\Service\CourseProgressService;
+use App\Service\QuizCorrectorAIService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +22,7 @@ class QuizPassageController extends AbstractController
     public function __construct(
         private QuizManagementService $quizService,
         private CourseProgressService $progressService,
-        private \App\Service\QuizCorrectorAIService $correctorAI
+        private QuizCorrectorAIService $correctorAI
     ) {}
 
     #[Route('/{id}/start', name: 'app_quiz_start')]
@@ -34,8 +35,8 @@ class QuizPassageController extends AbstractController
             return $this->redirectToRoute('app_frontoffice');
         }
 
-        // Vérifier si l'étudiant peut passer le quiz (avec vérification des tentatives)
-        $check = $this->quizService->canStudentTakeQuiz($etudiant, $quiz, $session);
+        // Vérifier si l'étudiant peut passer le quiz
+        $check = $this->quizService->canStudentTakeQuiz($etudiant, $quiz);
         if (!$check['canTake']) {
             foreach ($check['errors'] as $error) {
                 $this->addFlash('error', $error);
@@ -64,41 +65,14 @@ class QuizPassageController extends AbstractController
             'quiz_data' => $quizData
         ]);
 
-        // Récupérer les quiz précédent et suivant du même chapitre
-        $chapitre = $quiz->getChapitre();
-        $previousQuiz = null;
-        $nextQuiz = null;
-        
-        if ($chapitre) {
-            $allQuizzes = $chapitre->getQuizzes()->toArray();
-            // Filtrer uniquement les quiz actifs
-            $allQuizzes = array_filter($allQuizzes, fn($q) => $q->getEtat() === 'actif');
-            // Réindexer le tableau
-            $allQuizzes = array_values($allQuizzes);
-            
-            // Trouver l'index du quiz actuel
-            $currentIndex = array_search($quiz, $allQuizzes, true);
-            
-            if ($currentIndex !== false) {
-                // Quiz précédent
-                if ($currentIndex > 0) {
-                    $previousQuiz = $allQuizzes[$currentIndex - 1];
-                }
-                // Quiz suivant
-                if ($currentIndex < count($allQuizzes) - 1) {
-                    $nextQuiz = $allQuizzes[$currentIndex + 1];
-                }
-            }
-        }
-
         return $this->render('frontoffice/quiz/passage.html.twig', [
             'quiz' => $quiz,
             'quizData' => $quizData,
-            'chapitre' => $chapitre,
+            'chapitre' => $quiz->getChapitre(),
             'dureeMaxMinutes' => $quiz->getDureeMaxMinutes(),
             'timestampDebut' => $dateDebut->getTimestamp(),
-            'previousQuiz' => $previousQuiz,
-            'nextQuiz' => $nextQuiz
+            'previousQuiz' => null,
+            'nextQuiz' => null
         ]);
     }
 
@@ -147,9 +121,6 @@ class QuizPassageController extends AbstractController
         // Calculer le score
         $result = $this->quizService->calculateScore($quiz, $reponses);
         
-        // Enregistrer la tentative
-        $this->quizService->enregistrerTentative($etudiant, $quiz, $session, $result);
-        
         // Déterminer le statut
         $seuilReussite = $quiz->getSeuilReussite() ?? 50;
         $statut = $result['percentage'] >= $seuilReussite ? 'VALIDÉ' : 'ÉCHEC';
@@ -166,18 +137,6 @@ class QuizPassageController extends AbstractController
         // Nettoyer la tentative en cours
         $session->remove($tentativeKey);
         
-        // Sauvegarder les résultats en session pour le tuteur IA
-        $resultKey = 'quiz_result_' . $quiz->getId() . '_' . $etudiant->getId();
-        $session->set($resultKey, [
-            'details' => $result['details'],
-            'percentage' => $result['percentage'],
-            'score' => $result['score'],
-            'timestamp' => time()
-        ]);
-        
-        // Obtenir les statistiques de l'étudiant
-        $statistiques = $this->quizService->getStatistiquesEtudiant($etudiant, $quiz, $session);
-        
         // Générer les explications IA pour chaque question
         $explications = [];
         $resumePedagogique = [];
@@ -189,6 +148,29 @@ class QuizPassageController extends AbstractController
             $this->addFlash('warning', 'Les explications IA ne sont pas disponibles pour le moment.');
         }
         
+        // Stocker le résultat en session pour le tuteur IA
+        $resultKey = 'quiz_result_' . $quiz->getId() . '_' . $etudiant->getId();
+        $session->set($resultKey, [
+            'score' => $result['score'],
+            'totalPoints' => $result['totalPoints'],
+            'percentage' => $result['percentage'],
+            'details' => $result['details'],
+            'timestamp' => time()
+        ]);
+        
+        // Préparer les statistiques
+        $statistiques = [
+            'nombreTentatives' => 1, // TODO: Implémenter le comptage réel des tentatives
+            'maxTentatives' => $quiz->getMaxTentatives(),
+            'derniersResultats' => [
+                'percentage' => $result['percentage'],
+                'score' => $result['score']
+            ],
+            'aReussi' => $statut === 'VALIDÉ',
+            'seuilReussite' => $seuilReussite,
+            'peutRecommencer' => true // TODO: Vérifier selon les règles du quiz
+        ];
+        
         return $this->render('frontoffice/quiz/result_with_ai.html.twig', [
             'quiz' => $quiz,
             'result' => $result,
@@ -197,9 +179,9 @@ class QuizPassageController extends AbstractController
             'chapitre' => $quiz->getChapitre(),
             'dureeReelle' => $dureeReelleMinutes,
             'tempsDepasse' => $tempsDepasse,
-            'statistiques' => $statistiques,
             'explications' => $explications,
-            'resumePedagogique' => $resumePedagogique
+            'resumePedagogique' => $resumePedagogique,
+            'statistiques' => $statistiques
         ]);
     }
 

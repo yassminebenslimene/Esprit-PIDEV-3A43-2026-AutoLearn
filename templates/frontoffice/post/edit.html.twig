@@ -2,9 +2,72 @@
 
 {% block title %}Modifier le post | Scholar{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.querySelector('.rich-editor');
+            if (!textarea) return;
+
+            // Créer un div pour CKEditor
+            const editorDiv = document.createElement('div');
+            editorDiv.id = 'editor';
+            textarea.style.display = 'none';
+            textarea.parentNode.insertBefore(editorDiv, textarea);
+
+            // Initialiser CKEditor 5
+            ClassicEditor
+                .create(editorDiv, {
+                    language: 'fr',
+                    toolbar: {
+                        items: [
+                            'heading',
+                            '|',
+                            'bold',
+                            'italic',
+                            '|',
+                            'link',
+                            'bulletedList',
+                            'numberedList',
+                            '|',
+                            'blockQuote',
+                            'insertTable',
+                            '|',
+                            'undo',
+                            'redo'
+                        ]
+                    }
+                })
+                .then(editor => {
+                    // Synchroniser avec le textarea
+                    editor.model.document.on('change:data', () => {
+                        textarea.value = editor.getData();
+                    });
+                    
+                    // Charger le contenu initial
+                    if (textarea.value) {
+                        editor.setData(textarea.value);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur CKEditor:', error);
+                });
+        });
+    </script>
+    <style>
+        .ck-editor__editable {
+            min-height: 300px;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
 
-<!-- ===== PAGE HEADING ===== -->
 <div class="page-heading header-text">
     <div class="container">
         <div class="row">
@@ -32,11 +95,6 @@
     box-shadow: 0 12px 32px rgba(0,0,0,0.08);
 }
 
-.post-form-card h4 {
-    margin-bottom: 22px;
-}
-
-/* textarea */
 .post-form-card textarea {
     width: 100%;
     min-height: 140px;
@@ -47,29 +105,10 @@
     font-size: 15px;
 }
 
-/* media fields */
 .media-field {
     margin-top: 20px;
 }
 
-.media-field label {
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 8px;
-    display: block;
-}
-
-/* text inputs */
-.media-field input[type="text"],
-.media-field input[type="url"] {
-    width: 100%;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    padding: 10px 14px;
-    font-size: 14px;
-}
-
-/* file upload */
 .media-field input[type="file"] {
     width: 100%;
     padding: 10px;
@@ -79,21 +118,10 @@
     cursor: pointer;
 }
 
-/* separator */
-.media-separator {
-    text-align: center;
-    font-size: 13px;
-    color: #999;
-    margin: 14px 0;
-}
-
-/* actions */
 .post-actions {
     display: flex;
     gap: 12px;
     margin-top: 30px;
-    position: relative;
-    z-index: 10;
 }
 
 .btn-publish {
@@ -104,13 +132,6 @@
     border-radius: 999px;
     font-weight: 500;
     cursor: pointer;
-    position: relative;
-    z-index: 10;
-}
-
-.btn-publish:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(122, 106, 216, 0.4);
 }
 
 .btn-back {
@@ -120,13 +141,25 @@
     border-radius: 999px;
     text-decoration: none;
     display: inline-block;
-    position: relative;
-    z-index: 10;
 }
 
-.btn-back:hover {
-    background: #e5e7ff;
-    color: #333;
+.current-media {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.current-media img {
+    max-width: 200px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.current-media video {
+    max-width: 300px;
+    border-radius: 8px;
+    margin-top: 10px;
 }
 </style>
 
@@ -136,20 +169,56 @@
 
         <h4>Modifier le post</h4>
 
-        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+        {{ form_start(form) }}
 
-            {{ form_widget(form) }}
+        {# ===== TEXTE ===== #}
+        <div class="form-group">
+            {{ form_label(form.contenu, 'Texte du post') }}
+            {{ form_widget(form.contenu) }}
+            {{ form_errors(form.contenu) }}
+        </div>
 
-            <div class="post-actions">
-                <button type="submit" class="btn-publish">
-                    Mettre à jour
-                </button>
+        {# ================= IMAGE ================= #}
+        <div class="media-field">
+            {{ form_label(form.imageFileUpload, 'Modifier l\'image') }}
+            {{ form_widget(form.imageFileUpload) }}
+            
+            {% if post.imageFile %}
+                <div class="current-media">
+                    <small style="color: #666;">Image actuelle:</small>
+                    <br>
+                    <img src="{{ asset('uploads/images/' ~ post.imageFile) }}" alt="Image actuelle">
+                </div>
+            {% endif %}
+        </div>
 
-                <a href="{{ path('app_communaute_show', { id: post.getCommunaute().getId() }) }}"
-                   class="btn-back">
-                    ← Retour à la communauté
-                </a>
-            </div>
+        {# ================= VIDEO ================= #}
+        <div class="media-field">
+            {{ form_label(form.videoFileUpload, 'Modifier la vidéo') }}
+            {{ form_widget(form.videoFileUpload) }}
+            
+            {% if post.videoFile %}
+                <div class="current-media">
+                    <small style="color: #666;">Vidéo actuelle:</small>
+                    <br>
+                    <video controls>
+                        <source src="{{ asset('uploads/videos/' ~ post.videoFile) }}" type="video/mp4">
+                    </video>
+                </div>
+            {% endif %}
+        </div>
+
+        {# ================= ACTIONS ================= #}
+        <div class="post-actions">
+            <button type="submit" class="btn-publish">
+                Enregistrer les modifications
+            </button>
+
+            <a href="{{ path('app_communaute_show', { id: post.communaute.id }) }}"
+               class="btn-back">
+                ← Retour à la communauté
+            </a>
+        </div>
 
         {{ form_end(form) }}
 

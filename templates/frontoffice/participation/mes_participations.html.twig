@@ -240,9 +240,11 @@
                                     👁️ View Details
                                 </a>
                                 
-                                {# Bouton Feedback - visible uniquement si événement terminé #}
+                                {# Bouton Feedback - visible UNIQUEMENT si: événement terminé + participation acceptée + événement NON annulé #}
                                 {% set now = date() %}
-                                {% if participation.evenement.dateFin < now and participation.statut.value == 'Accepté' %}
+                                {% if participation.evenement.dateFin < now 
+                                   and participation.statut.value == 'Accepté' 
+                                   and participation.evenement.isCanceled == false %}
                                     {% set hasFeedback = participation.hasFeedbackFromEtudiant(app.user.id) %}
                                     <a href="{{ path('app_feedback_form', {'id': participation.id}) }}" 
                                        class="btn" 

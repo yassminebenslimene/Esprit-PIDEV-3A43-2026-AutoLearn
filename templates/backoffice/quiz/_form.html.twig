@@ -49,6 +49,7 @@
             {{ form_errors(form.maxTentatives) }}
         </div>
         
+        {# Image désactivée - propriété imageFile n'existe pas dans l'entité Quiz
         <div>
             {{ form_label(form.imageFile) }}
             {{ form_widget(form.imageFile) }}
@@ -57,6 +58,8 @@
             <small style="color: rgba(255, 255, 255, 0.6); display: block; margin-top: 0.5rem;">
                 Formats acceptés: JPG, PNG, GIF (max 2MB)
             </small>
+        </div>
+        #}
         </div>
     </div>
     

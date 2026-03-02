@@ -73,6 +73,14 @@
 
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#top">Home</a></li>
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#cours">Cours</a></li>
+                        {% if app.user %}
+                            <li style="position: relative; display: inline-block;">
+                                <a href="{{ path('app_notifications_index') }}" style="position: relative; display: inline-block; color: #FFD700; font-weight: bold; text-decoration: none;">
+                                    🔔 Notifications
+                                    <span id="notification-badge" style="display: none; position: absolute; top: -8px; right: -12px; background: #ff4444; color: white; border-radius: 50%; min-width: 20px; height: 20px; padding: 2px 4px; font-size: 11px; font-weight: bold; text-align: center; line-height: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid white;"></span>
+                                </a>
+                            </li>
+                        {% endif %}
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#events">Events</a></li>
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#challenge">Challenge</a></li>
                         <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#contact">Contact</a></li>
@@ -152,6 +160,14 @@
                                     <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Cours
                                 </a>
                             </li>
+                          
+                            <li style="position: relative; display: inline-block;">
+                                <a href="{{ path('app_notifications_index') }}" style="position: relative; display: inline-block; color: #FFD700; font-weight: bold; text-decoration: none;">
+                                    🔔 Notifications
+                                    <span id="notification-badge" style="display: none; position: absolute; top: -8px; right: -12px; background: #ff4444; color: white; border-radius: 50%; min-width: 20px; height: 20px; padding: 2px 4px; font-size: 11px; font-weight: bold; text-align: center; line-height: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid white;"></span>
+                                </a>
+                            </li>
+                     
                             <li style="margin-bottom: 12px;">
                                 <a href="{{ path('app_frontoffice') }}#events" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
                                     <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Événements

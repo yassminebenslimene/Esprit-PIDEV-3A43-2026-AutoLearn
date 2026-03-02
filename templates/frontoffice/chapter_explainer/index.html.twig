@@ -140,17 +140,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const levelSelect = document.getElementById('levelSelect');
     const loadingArea = document.getElementById('loadingArea');
     const resultsArea = document.getElementById('resultsArea');
-    
+
     const summaryText = document.getElementById('summaryText');
     const explanationText = document.getElementById('explanationText');
     const keyPointsList = document.getElementById('keyPointsList');
-    
+
     const playBtn = document.getElementById('playBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     const stopBtn = document.getElementById('stopBtn');
     const speedRange = document.getElementById('speedRange');
     const speedValue = document.getElementById('speedValue');
-    
+
     let currentExplanation = '';
     let speechSynthesis = window.speechSynthesis;
     let utterance = null;
@@ -159,11 +159,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Générer l'explication
     generateBtn.addEventListener('click', async function() {
         const level = levelSelect.value;
-        
+
         loadingArea.style.display = 'block';
         resultsArea.style.display = 'none';
         generateBtn.disabled = true;
-        
+
         try {
             const response = await fetch('{{ path('app_chapter_explainer_api', {id: chapitre.id}) }}', {
                 method: 'POST',
@@ -172,9 +172,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: 'level=' + level
             });
-            
+
             const data = await response.json();
-            
+
             if (data.success) {
                 displayResults(data.data);
                 currentExplanation = formatTextForSpeech(data.data);
@@ -189,12 +189,12 @@ document.addEventListener('DOMContentLoaded', function() {
             generateBtn.disabled = false;
         }
     });
-    
+
     // Afficher les résultats
     function displayResults(data) {
         summaryText.textContent = data.summary;
         explanationText.innerHTML = data.explanation.replace(/\n/g, '<br>');
-        
+
         keyPointsList.innerHTML = '';
         data.keyPoints.forEach(point => {
             const li = document.createElement('li');
@@ -207,11 +207,11 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             keyPointsList.appendChild(li);
         });
-        
+
         resultsArea.style.display = 'block';
         resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    
+
     // Formater le texte pour la synthèse vocale
     function formatTextForSpeech(data) {
         let text = 'Résumé. ' + data.summary + '. ';
@@ -222,14 +222,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         return text;
     }
-    
+
     // Contrôles audio
     playBtn.addEventListener('click', function() {
         if (!currentExplanation) {
             alert('Veuillez d\'abord générer une explication');
             return;
         }
-        
+
         if (isPaused && utterance) {
             speechSynthesis.resume();
             isPaused = false;
@@ -237,36 +237,36 @@ document.addEventListener('DOMContentLoaded', function() {
             utterance = new SpeechSynthesisUtterance(currentExplanation);
             utterance.lang = 'fr-FR';
             utterance.rate = parseFloat(speedRange.value);
-            
+
             utterance.onstart = function() {
                 playBtn.style.display = 'none';
                 pauseBtn.style.display = 'inline-block';
             };
-            
+
             utterance.onend = function() {
                 playBtn.style.display = 'inline-block';
                 pauseBtn.style.display = 'none';
                 isPaused = false;
             };
-            
+
             speechSynthesis.speak(utterance);
         }
     });
-    
+
     pauseBtn.addEventListener('click', function() {
         speechSynthesis.pause();
         isPaused = true;
         playBtn.style.display = 'inline-block';
         pauseBtn.style.display = 'none';
     });
-    
+
     stopBtn.addEventListener('click', function() {
         speechSynthesis.cancel();
         isPaused = false;
         playBtn.style.display = 'inline-block';
         pauseBtn.style.display = 'none';
     });
-    
+
     speedRange.addEventListener('input', function() {
         speedValue.textContent = this.value;
         if (utterance && speechSynthesis.speaking) {

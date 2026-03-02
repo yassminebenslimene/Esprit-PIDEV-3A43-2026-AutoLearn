@@ -14,6 +14,67 @@
     z-index: 1;
 }
 
+/* Style pour le contenu HTML des posts */
+.post-content {
+    line-height: 1.8;
+    color: #333;
+}
+
+.post-content p {
+    margin-bottom: 1em;
+}
+
+.post-content strong {
+    font-weight: 600;
+    color: #000;
+}
+
+.post-content em {
+    font-style: italic;
+}
+
+.post-content ul, .post-content ol {
+    margin: 1em 0;
+    padding-left: 2em;
+}
+
+.post-content li {
+    margin-bottom: 0.5em;
+}
+
+.post-content a {
+    color: #667eea;
+    text-decoration: underline;
+}
+
+.post-content a:hover {
+    color: #764ba2;
+}
+
+.post-content blockquote {
+    border-left: 4px solid #667eea;
+    padding-left: 1em;
+    margin: 1em 0;
+    font-style: italic;
+    color: #666;
+}
+
+.post-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+}
+
+.post-content table td, .post-content table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.post-content table th {
+    background: #f5f5f5;
+    font-weight: 600;
+}
+
 /* En-tête de la page */
 .page-heading {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -471,6 +532,34 @@
         padding: 20px;
     }
 }
+
+/* Styles pour les boutons de réaction */
+.reaction-btn {
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.reaction-btn:hover {
+    background: #f0f0f0 !important;
+    transform: scale(1.05);
+}
+
+.reaction-btn.active {
+    background: #e3f2fd !important;
+    color: #1976d2;
+    font-weight: 600;
+}
+
+.reaction-count {
+    font-weight: 600;
+    color: #666;
+    min-width: 20px;
+    text-align: center;
+}
+
+.reaction-btn.active .reaction-count {
+    color: #1976d2;
+}
 </style>
 
 <div class="community-container">
@@ -533,6 +622,34 @@
                 {% endfor %}
             </ul>
         </div>
+
+        {# Section des demandes d'adhésion #}
+        {% if communaute.pendingMembers|length > 0 %}
+        <div class="members-box" style="background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%); border: 1px solid rgba(255, 193, 7, 0.3);">
+            <strong style="color: #856404;">📬 Demandes d'adhésion ({{ communaute.pendingMembers|length }})</strong>
+            <ul class="members-list">
+                {% for pendingUser in communaute.pendingMembers %}
+                <li>
+                    <span>{{ pendingUser.prenom }} {{ pendingUser.nom }}</span>
+                    <div style="display: flex; gap: 8px;">
+                        <form method="post" action="{{ path('app_communaute_accept_member', {id: communaute.id, userId: pendingUser.id}) }}" style="display: inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('accept_member_' ~ pendingUser.id) }}">
+                            <button type="submit" style="padding: 6px 14px; font-size: 0.85rem; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-weight: 500;">
+                                ✓ Accepter
+                            </button>
+                        </form>
+                        <form method="post" action="{{ path('app_communaute_reject_member', {id: communaute.id, userId: pendingUser.id}) }}" style="display: inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('reject_member_' ~ pendingUser.id) }}">
+                            <button type="submit" style="padding: 6px 14px; font-size: 0.85rem; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-weight: 500;">
+                                ✗ Refuser
+                            </button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
     {% endif %}
 
     {% for post in communaute.posts %}
@@ -554,8 +671,45 @@
             </div>
             {% endif %}
 
+            <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;">
+                <strong style="color: #667eea; font-size: 1rem; display: block;">
+                    {% if post.user %}
+                        {{ post.user.prenom }} {{ post.user.nom }}
+                    {% else %}
+                        Anonyme
+                    {% endif %}
+                </strong>
+                <small style="color: #999; font-size: 0.85rem; display: block; margin-top: 4px;">
+                    {{ post.createdAt|time_ago }}
+                </small>
+            </div>
+
+            {% if post.summary %}
+                <div class="post-summary" style="background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%); padding: 15px 20px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #667eea;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#667eea" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                        </svg>
+                        <strong style="color: #667eea; font-size: 0.9rem;">Résumé AI</strong>
+                    </div>
+                    <p style="margin: 0; color: #4a5568; font-size: 0.95rem; line-height: 1.6;">{{ post.summary }}</p>
+                </div>
+            {% endif %}
+
+            {% if post.titre %}
+                <div class="post-title-ai" style="background: linear-gradient(135deg, #fff4e6 0%, #ffe8cc 100%); padding: 15px 20px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #ff9800;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff9800" stroke-width="2">
+                            <path d="M4 7h16M4 12h16M4 17h10"/>
+                        </svg>
+                        <strong style="color: #ff9800; font-size: 0.9rem;">Titre AI</strong>
+                    </div>
+                    <h4 style="margin: 0; color: #2d3748; font-size: 1.1rem; font-weight: 600;">{{ post.titre }}</h4>
+                </div>
+            {% endif %}
+
             {% if post.contenu %}
-                <p>{{ post.contenu }}</p>
+                <div class="post-content">{{ post.contenu|raw }}</div>
             {% endif %}
 
             {% if post.imageFile %}
@@ -564,14 +718,39 @@
     </div>
 {% endif %}
 
-            <small>
-                Posté le {{ post.createdAt|date('d/m/Y H:i') }}
-                {% if post.user %}
-                    par {{ post.user.prenom }}
-                {% endif %}
-            </small>
-
-            <a href="/post/{{ post.id }}" class="btn-see-post">Voir le post →</a>
+            {# BOUTONS DE RÉACTION #}
+            <div class="post-reactions-bar" style="display: flex; align-items: center; gap: 15px; padding: 15px 0; border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0; margin: 15px 0;">
+                <button class="reaction-btn" data-post-id="{{ post.id }}" data-type="like" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; padding: 8px 12px; border-radius: 20px; transition: all 0.2s;">
+                    <span style="font-size: 1.3rem;">👍</span>
+                    <span class="reaction-label">J'aime</span>
+                    <span class="reaction-count" data-type="like">0</span>
+                </button>
+                <button class="reaction-btn" data-post-id="{{ post.id }}" data-type="love" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; padding: 8px 12px; border-radius: 20px; transition: all 0.2s;">
+                    <span style="font-size: 1.3rem;">❤️</span>
+                    <span class="reaction-label">J'adore</span>
+                    <span class="reaction-count" data-type="love">0</span>
+                </button>
+                <button class="reaction-btn" data-post-id="{{ post.id }}" data-type="wow" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; padding: 8px 12px; border-radius: 20px; transition: all 0.2s;">
+                    <span style="font-size: 1.3rem;">😮</span>
+                    <span class="reaction-label">Wow</span>
+                    <span class="reaction-count" data-type="wow">0</span>
+                </button>
+                <button class="reaction-btn" data-post-id="{{ post.id }}" data-type="haha" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; padding: 8px 12px; border-radius: 20px; transition: all 0.2s;">
+                    <span style="font-size: 1.3rem;">😄</span>
+                    <span class="reaction-label">Haha</span>
+                    <span class="reaction-count" data-type="haha">0</span>
+                </button>
+                <button class="reaction-btn" data-post-id="{{ post.id }}" data-type="sad" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; padding: 8px 12px; border-radius: 20px; transition: all 0.2s;">
+                    <span style="font-size: 1.3rem;">😢</span>
+                    <span class="reaction-label">Triste</span>
+                    <span class="reaction-count" data-type="sad">0</span>
+                </button>
+                <button class="reaction-btn" data-post-id="{{ post.id }}" data-type="angry" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; padding: 8px 12px; border-radius: 20px; transition: all 0.2s;">
+                    <span style="font-size: 1.3rem;">😠</span>
+                    <span class="reaction-label">Grrr</span>
+                    <span class="reaction-count" data-type="angry">0</span>
+                </button>
+            </div>
 
             <hr>
 
@@ -595,7 +774,35 @@
                     </div>
                     {% endif %}
 
-                    {{ commentaire.contenu }}<br>
+                    <strong style="color: #667eea; font-size: 0.95rem;">
+                        {% if commentaire.user %}
+                            {{ commentaire.user.prenom }} {{ commentaire.user.nom }}
+                        {% else %}
+                            Anonyme
+                        {% endif %}
+                    </strong>
+                    
+                    {% if commentaire.sentiment %}
+                        <span style="display: inline-block; margin-left: 10px; padding: 3px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;
+                            {% if commentaire.sentiment == 'positive' %}
+                                background: #d4edda; color: #155724;
+                            {% elseif commentaire.sentiment == 'negative' %}
+                                background: #f8d7da; color: #721c24;
+                            {% else %}
+                                background: #e2e3e5; color: #383d41;
+                            {% endif %}
+                        ">
+                            {% if commentaire.sentiment == 'positive' %}
+                                😊 Positif
+                            {% elseif commentaire.sentiment == 'negative' %}
+                                😞 Négatif
+                            {% else %}
+                                😐 Neutre
+                            {% endif %}
+                        </span>
+                    {% endif %}
+                    
+                    <p style="margin: 8px 0 0 0;">{{ commentaire.contenu }}</p>
                     <small>
                         {{ commentaire.createdAt|date('d/m/Y H:i') }}
                     </small>
@@ -621,5 +828,65 @@
     {% endfor %}
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gérer les clics sur les boutons de réaction
+    document.querySelectorAll('.reaction-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const postId = this.dataset.postId;
+            const type = this.dataset.type;
+            
+            try {
+                const response = await fetch(`/post/${postId}/react`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ type: type })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Mettre à jour les compteurs
+                    const postReactions = document.querySelectorAll(`[data-post-id="${postId}"]`);
+                    postReactions.forEach(reactionBtn => {
+                        const btnType = reactionBtn.dataset.type;
+                        const countSpan = reactionBtn.querySelector('.reaction-count');
+                        const count = data.counts[btnType] || 0;
+                        countSpan.textContent = count > 0 ? count : '';
+                        
+                        // Mettre à jour l'état actif
+                        if (data.action === 'added' && btnType === type) {
+                            reactionBtn.classList.add('active');
+                        } else if (data.action === 'removed' && btnType === type) {
+                            reactionBtn.classList.remove('active');
+                        } else if (data.action === 'added') {
+                            reactionBtn.classList.remove('active');
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Erreur lors de la réaction:', error);
+            }
+        });
+    });
+    
+    // Charger les réactions existantes au chargement de la page
+    document.querySelectorAll('.post-reactions-bar').forEach(bar => {
+        const firstBtn = bar.querySelector('.reaction-btn');
+        if (firstBtn) {
+            const postId = firstBtn.dataset.postId;
+            loadReactions(postId);
+        }
+    });
+});
+
+async function loadReactions(postId) {
+    // Cette fonction pourrait charger les réactions depuis le serveur
+    // Pour l'instant, les compteurs sont à 0 par défaut
+}
+</script>
 
 {% endblock %}

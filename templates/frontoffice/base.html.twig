@@ -23,11 +23,48 @@
     {% endblock %}
     
     <style>
+        /* Fix navbar position */
+        .header-area {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 9999 !important;
+            background-color: rgba(122, 106, 216, 0.95) !important;
+            backdrop-filter: blur(10px) !important;
+            margin-bottom: 0 !important;
+        }
+        
+        /* Add padding to body to compensate for fixed header */
+        body {
+            padding-top: 80px !important;
+        }
+        
+        /* Remove any white space after header */
+        .header-area + * {
+            margin-top: 0 !important;
+        }
+        
         /* Profile Dropdown Styles */
         .main-nav {
             display: flex !important;
             align-items: center !important;
             height: 80px !important;
+        }
+        
+        /* FORCE NAVBAR ON SINGLE LINE */
+        .main-nav .nav {
+            flex-wrap: nowrap !important;
+            white-space: nowrap !important;
+        }
+        
+        .main-nav .nav li a {
+            padding: 0 10px !important;
+            font-size: 14px !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-btn {
+            padding: 0 10px !important;
         }
         
         /* Notification Badge Styles */
@@ -240,25 +277,35 @@
                     <ul class="nav">
                         <li><a href="{{ path('app_frontoffice') }}">{{ 'nav.home'|trans }}</a></li>
                         <li><a href="{{ path('app_frontoffice') }}#cours">{{ 'nav.courses'|trans }}</a></li>
-                        {% if app.user %}
-                            <li><a href="{{ path('app_notifications_index') }}" style="color: #FFD700; font-weight: bold;">🔔 Notifications</a></li>
-                        {% endif %}
                         <li><a href="{{ path('app_events') }}">{{ 'nav.events'|trans }}</a></li>
-                        <li><a href="{{ path('frontchallenge') }}">{{ 'nav.challenges'|trans }}</a></li>
+                        <li><a href="{{ path('app_frontoffice') }}#challenge">{{ 'nav.challenges'|trans }}</a></li>
                         <li><a href="{{ path('front_communaute') }}">{{ 'nav.community'|trans }}</a></li>
+                        <li><a href="{{ path('app_about') }}">{{ 'nav.about'|trans }}</a></li>
+                        
                         {% if app.user %}
-                            <li><a href="{{ path('app_mes_participations') }}">{{ 'nav.my_participations'|trans }}</a></li>
+                            {# Notifications avec badge #}
+                            <li style="position: relative;">
+                                <a href="{{ path('app_notifications_index') }}" style="position: relative; display: inline-flex; align-items: center; gap: 5px;">
+                                    <i class="fa fa-bell"></i>
+                                    <span id="notification-badge" class="notification-badge" style="display: none;"></span>
+                                </a>
+                            </li>
                             
+                            {# Dropdown Profil #}
                             <li class="profile-dropdown-container">
                                 <a href="javascript:void(0);" onclick="toggleProfileDropdown(event)" class="profile-dropdown-btn">
                                     <i class="fa fa-user-circle"></i>
-                                    {{ app.user.prenom }} {{ app.user.nom }}
-                                    <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                                    <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
                                 </a>
                                 <ul class="profile-dropdown-menu" id="profileDropdown">
                                     <li>
                                         <a href="{{ path('app_profile') }}">
                                             <i class="fa fa-id-card"></i> {{ 'nav.profile'|trans }}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ path('app_mes_participations') }}">
+                                            <i class="fa fa-trophy"></i> {{ 'nav.my_participations'|trans }}
                                         </a>
                                     </li>
                                     <li class="profile-dropdown-divider"></li>
@@ -271,43 +318,33 @@
                             </li>
                         {% else %}
                             <li><a href="{{ path('backoffice_login') }}">{{ 'nav.login'|trans }}</a></li>
-                            <li><a href="{{ path('backoffice_register') }}">{{ 'nav.register'|trans }}</a></li>
                         {% endif %}
                         
-                        {# Sélecteur de langue #}
+                        {# Sélecteur de langue compact #}
                         <li class="profile-dropdown-container">
                             <a href="javascript:void(0);" onclick="toggleLanguageDropdown(event)" class="profile-dropdown-btn">
                                 <i class="fa fa-globe"></i>
-                                {% if app.request.locale == 'fr' %}
-                                    {{ 'language.french'|trans }}
-                                {% elseif app.request.locale == 'en' %}
-                                    {{ 'language.english'|trans }}
-                                {% elseif app.request.locale == 'es' %}
-                                    {{ 'language.spanish'|trans }}
-                                {% elseif app.request.locale == 'ar' %}
-                                    {{ 'language.arabic'|trans }}
-                                {% endif %}
-                                <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                                <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
                             </a>
                             <ul class="profile-dropdown-menu" id="languageDropdown">
                                 <li>
                                     <a href="{{ path('app_change_language', {'locale': 'fr'}) }}">
-                                        <i class="fa fa-flag"></i> {{ 'language.french'|trans }}
+                                        <i class="fa fa-flag"></i> Français
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ path('app_change_language', {'locale': 'en'}) }}">
-                                        <i class="fa fa-flag"></i> {{ 'language.english'|trans }}
+                                        <i class="fa fa-flag"></i> English
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ path('app_change_language', {'locale': 'es'}) }}">
-                                        <i class="fa fa-flag"></i> {{ 'language.spanish'|trans }}
+                                        <i class="fa fa-flag"></i> Español
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ path('app_change_language', {'locale': 'ar'}) }}">
-                                        <i class="fa fa-flag"></i> {{ 'language.arabic'|trans }}
+                                        <i class="fa fa-flag"></i> العربية
                                     </a>
                                 </li>
                             </ul>
@@ -412,11 +449,13 @@
                 .then(response => response.json())
                 .then(data => {
                     var badge = document.getElementById('notification-badge');
-                    if (data.count > 0) {
-                        badge.textContent = data.count > 9 ? '9+' : data.count;
-                        badge.style.display = 'flex';
-                    } else {
-                        badge.style.display = 'none';
+                    if (badge) {
+                        if (data.count > 0) {
+                            badge.textContent = data.count > 9 ? '9+' : data.count;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
                     }
                 })
                 .catch(error => console.error('Erreur lors du chargement des notifications:', error));

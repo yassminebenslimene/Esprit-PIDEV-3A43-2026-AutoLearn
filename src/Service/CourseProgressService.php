@@ -53,9 +53,6 @@ class CourseProgressService
         $progress->setCompletedAt(new \DateTime());
         $progress->setQuizScore($quizScore);
 
-        // 🔥 IMPORTANT : Mettre à jour la date de dernière activité
-        $user->setLastActivityAt(new \DateTime());
-
         $this->entityManager->persist($progress);
         $this->entityManager->flush();
 

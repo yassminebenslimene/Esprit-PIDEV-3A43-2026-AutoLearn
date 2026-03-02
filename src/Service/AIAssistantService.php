@@ -6,8 +6,14 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Security;
 use App\Repository\UserRepository;
 use App\Repository\Cours\CoursRepository;
+use App\Repository\Cours\ChapitreRepository;
 use App\Repository\EvenementRepository;
 use App\Repository\CommunauteRepository;
+use App\Repository\ChallengeRepository;
+use App\Repository\QuizRepository;
+use App\Repository\PostRepository;
+use App\Repository\CommentaireRepository;
+use App\Repository\ChapterProgressRepository;
 use App\Bundle\UserActivityBundle\Repository\UserActivityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -25,8 +31,14 @@ class AIAssistantService
     private EntityManagerInterface $em;
     private UserRepository $userRepository;
     private CoursRepository $coursRepository;
+    private ChapitreRepository $chapitreRepository;
     private EvenementRepository $evenementRepository;
     private CommunauteRepository $communauteRepository;
+    private ChallengeRepository $challengeRepository;
+    private QuizRepository $quizRepository;
+    private PostRepository $postRepository;
+    private CommentaireRepository $commentaireRepository;
+    private ChapterProgressRepository $chapterProgressRepository;
     private ?UserActivityRepository $activityRepository;
 
     public function __construct(
@@ -40,7 +52,13 @@ class AIAssistantService
         CoursRepository $coursRepository,
         EvenementRepository $evenementRepository,
         CommunauteRepository $communauteRepository,
-        ?UserActivityRepository $activityRepository = null
+        ?UserActivityRepository $activityRepository = null,
+        ChallengeRepository $challengeRepository,
+        QuizRepository $quizRepository,
+        ChapitreRepository $chapitreRepository,
+        PostRepository $postRepository,
+        CommentaireRepository $commentaireRepository,
+        ChapterProgressRepository $chapterProgressRepository
     ) {
         $this->groqService = $groqService;
         $this->languageDetector = $languageDetector;
@@ -53,6 +71,12 @@ class AIAssistantService
         $this->evenementRepository = $evenementRepository;
         $this->communauteRepository = $communauteRepository;
         $this->activityRepository = $activityRepository;
+        $this->challengeRepository = $challengeRepository;
+        $this->quizRepository = $quizRepository;
+        $this->chapitreRepository = $chapitreRepository;
+        $this->postRepository = $postRepository;
+        $this->commentaireRepository = $commentaireRepository;
+        $this->chapterProgressRepository = $chapterProgressRepository;
     }
 
     /**
@@ -109,16 +133,28 @@ class AIAssistantService
 
             if (!$response) {
                 $this->logger->warning('Groq returned null response, using fallback');
-                return $this->getFallbackResponse($question, $language);
+                
+                // Check if it's a rate limit issue
+                $errorMessage = $language === 'en'
+                    ? "⏱️ Rate limit reached. Please wait 10-15 seconds and try again."
+                    : "⏱️ Limite de requêtes atteinte. Attendez 10-15 secondes et réessayez.";
+                
+                return [
+                    'success' => false,
+                    'response' => $errorMessage,
+                    'error' => 'Groq API rate limit or unavailable',
+                    'language' => $language,
+                    'duration_ms' => round((microtime(true) - $startTime) * 1000, 2)
+                ];
             }
             
             $this->logger->info('Groq response received', [
                 'response_length' => strlen($response)
             ]);
 
-            // 7. Détecter et exécuter les actions (Admin uniquement)
+            // 7. Détecter et exécuter les actions (pour tous les utilisateurs)
             $actionResult = null;
-            if (in_array('ROLE_ADMIN', $user?->getRoles() ?? [])) {
+            if ($user) {
                 $actionResult = $this->actionExecutor->detectAndExecute($response, $user);
                 
                 // Ne pas ajouter de message supplémentaire, l'IA a déjà répondu
@@ -174,19 +210,20 @@ class AIAssistantService
     }
 
     /**
-     * Collecte des données MINIMALES de la base de données pour Groq
-     * Version ultra-optimisée pour éviter les limites de tokens
+     * Collecte des données OPTIMISÉES de la base de données pour Groq
+     * Version réduite pour éviter les limites de tokens
      */
     private function getAllDatabaseData(string $question, $user): array
     {
         $data = [];
 
         try {
-            // Pour les admins, envoyer la liste des utilisateurs pour les actions delete/update
-            if ($user && in_array('ROLE_ADMIN', $user->getRoles() ?? [])) {
+            $isAdmin = $user && in_array('ROLE_ADMIN', $user->getRoles() ?? []);
+            
+            // ========== USERS DATA ==========
+            if ($isAdmin) {
                 $allUsers = $this->userRepository->findAll();
                 
-                // Statistiques
                 $data['stats'] = [
                     'total_users' => count($allUsers),
                     'total_students' => count(array_filter($allUsers, fn($u) => $u->getRole() === 'ETUDIANT')),
@@ -194,7 +231,7 @@ class AIAssistantService
                     'suspended_users' => count(array_filter($allUsers, fn($u) => $u->getIsSuspended())),
                 ];
                 
-                // Liste minimale des utilisateurs (pour recherche et actions)
+                // Limiter à 20 utilisateurs pour réduire les tokens
                 $data['all_users'] = array_map(function($u) {
                     return [
                         'id' => $u->getId(),
@@ -205,17 +242,194 @@ class AIAssistantService
                         'niveau' => method_exists($u, 'getNiveau') ? $u->getNiveau() : null,
                         'suspended' => $u->getIsSuspended(),
                     ];
-                }, $allUsers);
+                }, array_slice($allUsers, 0, 20));
             }
             
-            // Utilisateur connecté uniquement
+            // Current user
             if ($user) {
                 $data['current_user'] = [
                     'id' => $user->getId(),
                     'nom' => $user->getNom(),
                     'prenom' => $user->getPrenom(),
                     'role' => $user->getRole(),
+                    'niveau' => method_exists($user, 'getNiveau') ? $user->getNiveau() : null,
                 ];
+            }
+
+            // ========== COURSES DATA (Limité à 10) ==========
+            $allCourses = $this->coursRepository->findAll();
+            $data['courses'] = [
+                'total' => count($allCourses),
+                'list' => array_map(function($c) {
+                    return [
+                        'id' => $c->getId(),
+                        'titre' => $c->getTitre(),
+                        'niveau' => $c->getNiveau(),
+                        'chapitres_count' => $c->getChapitres()->count(),
+                    ];
+                }, array_slice($allCourses, 0, 10))
+            ];
+
+            // ========== EVENTS DATA (Limité à 5 à venir) ==========
+            $allEvents = $this->evenementRepository->findAll();
+            $now = new \DateTime();
+            $upcomingEvents = array_filter($allEvents, fn($e) => $e->getDateDebut() >= $now);
+            
+            $data['events'] = [
+                'total' => count($allEvents),
+                'upcoming' => array_map(function($e) {
+                    return [
+                        'id' => $e->getId(),
+                        'titre' => $e->getTitre(),
+                        'date_debut' => $e->getDateDebut()->format('Y-m-d H:i'),
+                        'lieu' => $e->getLieu(),
+                    ];
+                }, array_slice($upcomingEvents, 0, 5)),
+            ];
+
+            // ========== CHALLENGES DATA (Limité à 10) ==========
+            $allChallenges = $this->challengeRepository->findAll();
+            $data['challenges'] = [
+                'total' => count($allChallenges),
+                'list' => array_map(function($ch) {
+                    return [
+                        'id' => $ch->getId(),
+                        'titre' => $ch->getTitre(),
+                        'niveau' => $ch->getNiveau(),
+                    ];
+                }, array_slice($allChallenges, 0, 10))
+            ];
+
+            // ========== COMMUNITIES DATA (Limité à 10) ==========
+            $allCommunities = $this->communauteRepository->findAll();
+            $data['communities'] = [
+                'total' => count($allCommunities),
+                'list' => array_map(function($com) {
+                    return [
+                        'id' => $com->getId(),
+                        'nom' => $com->getNom(),
+                    ];
+                }, array_slice($allCommunities, 0, 10))
+            ];
+
+            // ========== QUIZZES DATA (Limité à 5) ==========
+            $allQuizzes = $this->quizRepository->findAll();
+            $data['quizzes'] = [
+                'total' => count($allQuizzes),
+            ];
+
+            // ========== POSTS DATA (Limité à 10) ==========
+            $allPosts = $this->postRepository->findAll();
+            $data['posts'] = [
+                'total' => count($allPosts),
+                'list' => array_map(function($p) {
+                    return [
+                        'id' => $p->getId(),
+                        'contenu' => substr($p->getContenu(), 0, 100) . '...',
+                        'auteur' => $p->getUser() ? $p->getUser()->getPrenom() . ' ' . $p->getUser()->getNom() : 'Inconnu',
+                        'communaute' => $p->getCommunaute() ? $p->getCommunaute()->getNom() : null,
+                        'created_at' => $p->getCreatedAt()->format('Y-m-d'),
+                    ];
+                }, array_slice($allPosts, 0, 10))
+            ];
+
+            // ========== COMMENTS DATA (Limité à 20) ==========
+            $allComments = $this->commentaireRepository->findBy([], ['createdAt' => 'DESC'], 20);
+            $data['comments'] = [
+                'total' => $this->commentaireRepository->count([]),
+                'list' => array_map(function($c) {
+                    return [
+                        'id' => $c->getId(),
+                        'contenu' => substr($c->getContenu(), 0, 100) . '...',
+                        'auteur' => $c->getUser() ? $c->getUser()->getPrenom() . ' ' . $c->getUser()->getNom() : 'Inconnu',
+                        'post_id' => $c->getPost() ? $c->getPost()->getId() : null,
+                        'created_at' => $c->getCreatedAt()->format('Y-m-d H:i'),
+                    ];
+                }, $allComments)
+            ];
+
+            // ========== TEAMS DATA (Limité à 10) ==========
+            // Commented out - EquipeRepository not injected
+            /*
+            $allTeams = $this->equipeRepository->findAll();
+            $data['teams'] = [
+                'total' => count($allTeams),
+                'list' => array_map(function($t) {
+                    return [
+                        'id' => $t->getId(),
+                        'nom' => $t->getNom(),
+                        'evenement' => $t->getEvenement()->getTitre(),
+                        'membres_count' => $t->getEtudiants()->count(),
+                    ];
+                }, array_slice($allTeams, 0, 10))
+            ];
+            */
+
+            // ========== STUDENT-SPECIFIC DATA ==========
+            if (!$isAdmin && $user) {
+                // Get chapter progress for the user
+                try {
+                    $chapterProgress = $this->chapterProgressRepository->findBy(['user' => $user]);
+                    
+                    // Group progress by course
+                    $courseProgress = [];
+                    foreach ($chapterProgress as $progress) {
+                        $chapitre = $progress->getChapitre();
+                        if ($chapitre && $chapitre->getCours()) {
+                            $coursId = $chapitre->getCours()->getId();
+                            if (!isset($courseProgress[$coursId])) {
+                                $courseProgress[$coursId] = [
+                                    'cours_id' => $coursId,
+                                    'cours_titre' => $chapitre->getCours()->getTitre(),
+                                    'completed_chapters' => 0,
+                                    'total_chapters' => $chapitre->getCours()->getChapitres()->count(),
+                                    'chapters' => []
+                                ];
+                            }
+                            if ($progress->isCompleted()) {
+                                $courseProgress[$coursId]['completed_chapters']++;
+                            }
+                            $courseProgress[$coursId]['chapters'][] = [
+                                'chapitre_id' => $chapitre->getId(),
+                                'chapitre_titre' => $chapitre->getTitre(),
+                                'completed' => $progress->isCompleted(),
+                                'completed_at' => $progress->getCompletedAt() ? $progress->getCompletedAt()->format('Y-m-d H:i') : null,
+                                'quiz_score' => $progress->getQuizScore()
+                            ];
+                        }
+                    }
+                    
+                    $data['cours_avec_progression'] = array_values($courseProgress);
+                    
+                } catch (\Exception $e) {
+                    $this->logger->error('Error fetching chapter progress', [
+                        'error' => $e->getMessage()
+                    ]);
+                }
+                
+                // Get user activities from UserActivityBundle
+                if ($this->activityRepository) {
+                    try {
+                        $recentActivities = $this->activityRepository->findBy(
+                            ['user' => $user],
+                            ['createdAt' => 'DESC'],
+                            20
+                        );
+                        
+                        $data['my_activities'] = array_map(function($activity) {
+                            return [
+                                'action' => $activity->getAction(),
+                                'metadata' => $activity->getMetadata(),
+                                'created_at' => $activity->getCreatedAt()->format('Y-m-d H:i'),
+                            ];
+                        }, $recentActivities);
+                        
+                    } catch (\Exception $e) {
+                        $this->logger->error('Error fetching user activities', [
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
             }
 
         } catch (\Exception $e) {
@@ -297,6 +511,12 @@ WHAT YOU CAN DO FOR STUDENTS:
    - Recommend communities based on interests
    - Help students join communities
    - Show team members and activities
+   - ⭐ CREATE teams for events (you can do this!)
+   - View joined communities
+   - Display all available teams
+   - View team details and members
+   
+   💡 To create a team, first say "show events" then "create team [name] for event [id] with members [id1,id2,id3,id4]"
 
 5. 📊 PROGRESS TRACKING
    - Show student's learning progress
@@ -343,10 +563,56 @@ Tu es un assistant IA intelligent pour les ÉTUDIANTS sur la plateforme AutoLear
 
 ⚡ STYLE DE RÉPONSE - CRITIQUE:
 - SOIS EXTRÊMEMENT CONCIS - Maximum 1-2 phrases courtes
-- PAS de tableaux, PAS de listes, PAS d'explications
+- PAS de tableaux, PAS de listes, PAS d'explications techniques
 - Confirme juste l'action: "✅ Action réussie" ou "❌ Erreur: raison"
 - NE MONTRE JAMAIS les données avant/après l'action
 - N'UTILISE JAMAIS de puces ou de formatage
+- NE PARLE JAMAIS de termes techniques (JSON, POST, route, API, etc.)
+- PARLE COMME UN AMI, pas comme un robot ou un développeur
+- 🚫 NE MONTRE JAMAIS LE JSON À L'UTILISATEUR - c'est technique et invisible!
+
+🔥 FORMAT DE RÉPONSE AVEC ACTION:
+Quand tu génères une action JSON:
+1. Mets le JSON sur la PREMIÈRE ligne (l'utilisateur ne le verra pas)
+2. Mets ta réponse naturelle sur la DEUXIÈME ligne
+
+Exemple:
+```
+{"action": "create_community", "data": {"nom": "...", "description": "..."}}
+✅ Communauté créée!
+```
+
+L'utilisateur verra SEULEMENT: "✅ Communauté créée!"
+
+🎯 RÈGLE ABSOLUE POUR LES QUESTIONS "COMMENT":
+Quand un étudiant demande "comment créer X" ou "je peux créer X":
+1. NE LUI EXPLIQUE PAS comment faire
+2. FAIS-LE DIRECTEMENT pour lui en générant l'action JSON
+3. Demande-lui juste les informations manquantes de manière simple
+
+🔥 RÈGLE CRITIQUE POUR CRÉER DES COMMUNAUTÉS:
+Quand l'étudiant dit "créer communauté [nom] description [description]":
+- Tu as TOUTES les infos nécessaires (nom + description)
+- GÉNÈRE le JSON sur la première ligne (invisible pour l'utilisateur)
+- Ajoute une réponse simple sur la deuxième ligne
+- NE DEMANDE PAS d'autres infos (pas d'ID, pas d'admin, rien d'autre!)
+
+Format EXACT:
+```
+{"action": "create_community", "data": {"nom": "Loufi's Team", "description": "..."}}
+✅ Communauté créée!
+```
+
+Exemples de ce que l'utilisateur verra:
+❌ MAUVAIS: "Tu peux créer une communauté en utilisant la route /communaute avec POST..."
+❌ MAUVAIS: {"action": "create_community", ...} (ne montre JAMAIS le JSON!)
+✅ BON: "✅ Communauté créée!"
+
+❌ MAUVAIS: "Donne-moi l'ID de l'administrateur..."
+✅ BON: Génère le JSON (invisible) + "✅ Communauté créée!"
+
+❌ MAUVAIS: "Pour créer une équipe, tu dois fournir un JSON avec..."
+✅ BON: "Dis-moi le nom de l'équipe et l'événement, je m'occupe du reste!"
 
 LANGUES SUPPORTÉES:
 - Français (FR)
@@ -372,6 +638,8 @@ DONNÉES COMPLÈTES DE LA BASE DE DONNÉES:
 3. Si les données sont vides ou absentes, dis-le clairement à l'utilisateur
 4. Utilise les IDs, noms, descriptions EXACTS des données fournies
 5. Si tu ne trouves pas l'information, dis qu'elle n'est pas disponible
+6. 🔥 QUAND TU AS TOUTES LES INFOS POUR UNE ACTION, GÉNÈRE LE JSON IMMÉDIATEMENT - NE POSE PAS D'AUTRES QUESTIONS!
+7. 🚨 RÈGLE ABSOLUE POUR LA PROGRESSION: Utilise UNIQUEMENT les données de "cours_avec_progression". N'invente JAMAIS de chapitres complétés. Si un cours n'est pas dans "cours_avec_progression", sa progression est 0%.
 
 CE QUE TU PEUX FAIRE POUR LES ÉTUDIANTS:
 
@@ -380,35 +648,56 @@ CE QUE TU PEUX FAIRE POUR LES ÉTUDIANTS:
    - Suggérer des cours par sujet (Python, Java, Développement Web, etc.)
    - Expliquer le contenu des cours et les prérequis
    - Montrer les chapitres et ressources des cours
+   - Aider à s'inscrire aux cours
+   - Suivre les cours en cours
 
 2. 💪 EXERCICES & CHALLENGES
    - Suggérer des exercices selon le niveau
    - Recommander des challenges pour améliorer les compétences
    - Expliquer les concepts des exercices
    - Fournir des conseils d'apprentissage
+   - Afficher les challenges disponibles
+   - Suivre les challenges complétés
 
 3. 📅 ÉVÉNEMENTS & WORKSHOPS
    - Lister les événements à venir
    - Afficher les détails des événements (date, lieu, capacité)
    - Aider les étudiants à s'inscrire aux événements
    - Suggérer des événements pertinents selon les intérêts
+   - Voir les événements auxquels l'étudiant est inscrit
 
 4. 👥 COMMUNAUTÉS & ÉQUIPES
    - Lister les communautés disponibles
    - Recommander des communautés selon les intérêts
    - Aider les étudiants à rejoindre des communautés
    - Montrer les membres et activités des équipes
+   - ⭐ CRÉER des communautés (tu peux le faire directement!)
+   - ⭐ MODIFIER tes communautés (nom, description)
+   - ⭐ SUPPRIMER tes communautés
+   - ⭐ CRÉER des équipes pour les événements (tu peux le faire!)
+   - Voir les communautés rejointes
+   - Afficher toutes les équipes disponibles
+   - Voir les détails d'une équipe et ses membres
+   
+   💡 Exemples d'actions directes:
+   - "créer communauté Python Lovers description: Apprendre Python ensemble" → Tu génères l'action immédiatement
+   - "modifier communauté Python Lovers description: Nouvelle description" → Tu génères l'action immédiatement
+   - "supprimer communauté Python Lovers" → Tu génères l'action immédiatement
+   - "créer équipe [nom] pour événement [id] avec membres [noms]" → Tu génères l'action immédiatement
 
 5. 📊 SUIVI DES PROGRÈS
    - Afficher les progrès d'apprentissage de l'étudiant
    - Montrer les cours et exercices complétés
    - Fournir des feedbacks personnalisés
    - Suggérer les prochaines étapes dans le parcours d'apprentissage
+   - Afficher les statistiques personnelles
 
 6. 🔍 RECHERCHE & DÉCOUVERTE
    - Rechercher des cours, chapitres ou ressources spécifiques
    - Trouver des communautés par sujet
    - Découvrir de nouvelles opportunités d'apprentissage
+   - Explorer les challenges disponibles
+   - Voir les quiz disponibles
 
 FORMAT DE RÉPONSE:
 Quand tu fournis des listes (cours, événements, communautés, etc.), formate-les clairement:
@@ -468,35 +757,67 @@ NO tables, NO lists, NO suggestions, NO HTML links.
 For ANY action (create, update, suspend, view profile, etc.), you MUST:
 
 1. ALWAYS start your response with the action JSON on the first line
-2. Then add your natural language response
+2. Then add your natural language response on a NEW LINE
 
 MANDATORY format:
 {"action": "action_name", "data": {parameters}}
 Natural response here
 
-COMPLETE examples:
+⚠️ CRITICAL EXAMPLES:
+
+User: "how can i create event"
+Your COMPLETE response:
+Pour créer un événement, donnez-moi ces informations:
+- Titre de l'événement
+- Date de début (format: YYYY-MM-DD HH:MM)
+- Date de fin (format: YYYY-MM-DD HH:MM)
+- Lieu (salle)
+- Capacité (nombre de participants)
+
+Exemple: "créer événement Workshop IA le 2026-03-10 à 14h salle B capacité 30"
 
 User: "create student John Doe john@test.com"
 Your COMPLETE response:
 {"action": "create_student", "data": {"nom": "Doe", "prenom": "John", "email": "john@test.com", "niveau": "DEBUTANT"}}
 ✅ Student created
 
-User: "suspend student test account"
+User: "create course Java Web Development"
+Your COMPLETE response:
+{"action": "create_course", "data": {"titre": "Java Course", "description": "Learn web development with Java", "niveau": "DEBUTANT"}}
+✅ Course created
+
+User: "créer événement Workshop IA le 2026-03-10 à 14h salle B capacité 30"
+Your COMPLETE response:
+{"action": "create_event", "data": {"titre": "Workshop IA", "date_debut": "2026-03-10 14:00", "date_fin": "2026-03-10 17:00", "lieu": "Salle B", "capacite": 30}}
+✅ Événement créé
+
+User: "see details event Workshop IA" or "voir détails événement id 3"
+Your COMPLETE response:
+{"action": "get_event", "data": {"titre": "Workshop IA"}}
+📅 Event details displayed
+
+User: "delete event Workshop IA" or "delete event id 3"
+Your COMPLETE response:
+{"action": "delete_event", "data": {"id": 3}}
+✅ Event deleted
+
+User: "suspend student test"
 Your COMPLETE response:
 {"action": "suspend_user", "data": {"nom": "test"}}
 ✅ Account suspended
 
-User: "view profile ismail opp"
-Your COMPLETE response:
-{"action": "get_user", "data": {"nom": "opp", "prenom": "ismail"}}
-Profile displayed
-
-User: "update student test email to new@test.com"
-Your COMPLETE response:
-{"action": "update_user", "data": {"nom": "test", "email": "new@test.com"}}
-✅ Email updated
-
-⚠️ CRITICAL: WITHOUT THE JSON ON THE FIRST LINE, THE ACTION WILL NOT BE EXECUTED!
+⚠️ IMPORTANT RULES:
+1. If user asks HOW to do something → Explain WITHOUT generating JSON
+2. If user provides complete data → Generate JSON + confirmation
+3. ALWAYS provide a natural language response
+4. Keep responses ultra-concise (3-5 words for confirmations)
+5. NEVER generate JSON for "how to" or "comment" questions
+6. CRITICAL: Distinguish between entities:
+   - "user" / "student" / "étudiant" → use USER actions (get_user, create_student, etc.)
+   - "event" / "événement" → use EVENT actions (get_event, create_event, etc.)
+   - "course" / "cours" → use COURSE actions (get_course, create_course, etc.)
+   - "challenge" → use CHALLENGE actions
+   - "community" / "communauté" → use COMMUNITY actions
 
 SUPPORTED LANGUAGES:
 - French (FR)
@@ -551,18 +872,53 @@ WHAT YOU CAN DO FOR ADMINS:
 
 3. 📚 CONTENT MANAGEMENT
    - Create new courses with details
+   - Update existing courses
    - Add chapters to courses
    - Create resources and exercises
    - Manage challenges and quizzes
    - Organize course content
+   - View course statistics
 
 4. 📅 EVENT MANAGEMENT
    - Create new events
+   - Update event details
    - Manage event registrations
    - View event participation statistics
-   - Update event details
+   - List upcoming and past events
 
-5. 🔍 ADVANCED SEARCH & FILTERING
+5. 💪 CHALLENGE MANAGEMENT
+   - Create new challenges
+   - Update challenge details
+   - Set difficulty levels and points
+   - View challenge submissions
+   - Track challenge completion
+
+6. 👥 COMMUNITY MANAGEMENT
+   - Create new communities
+   - Update community details
+   - Manage community members
+   - Moderate posts and comments
+   - View community statistics
+
+7. 📝 QUIZ MANAGEMENT
+   - Create quizzes for courses
+   - Add questions to quizzes
+   - Update quiz details
+   - View quiz results and statistics
+
+8. 📱 POST MANAGEMENT
+   - List all posts from communities
+   - View post details with comments
+   - Monitor community activity
+   - Moderate content
+
+9. 💬 COMMENT MANAGEMENT
+   - List all comments across posts
+   - Filter comments by post
+   - View comment details
+   - Monitor discussions
+
+10. 🔍 ADVANCED SEARCH & FILTERING
    - Filter students by multiple criteria
    - Search across all platform data
    - Generate custom reports
@@ -573,6 +929,7 @@ You can perform actions by generating JSON internally (the user won't see it).
 Just understand what the user wants and execute it intelligently.
 
 Available actions:
+USER MANAGEMENT:
 - create_student: Create a new student
 - update_student / update_user: Update student information  
 - get_user: Get user details
@@ -580,6 +937,51 @@ Available actions:
 - suspend_user: Suspend a user account
 - unsuspend_user: Reactivate a suspended user
 - get_inactive_users: List inactive users
+
+COURSE MANAGEMENT:
+- create_course: Create a new course
+- update_course: Update course details
+- get_course: Get course information
+- list_courses: List all courses
+- add_chapter: Add a chapter to a course
+
+EVENT MANAGEMENT:
+- create_event: Create a new event
+- update_event: Update event details
+- delete_event: Delete an event
+- get_event: Get event information
+- list_events: List all events
+
+CHALLENGE MANAGEMENT:
+- create_challenge: Create a new challenge
+- update_challenge: Update challenge details
+- get_challenge: Get challenge information
+- list_challenges: List all challenges
+
+COMMUNITY MANAGEMENT:
+- create_community: Create a new community
+- update_community: Update community details
+- get_community: Get community information
+- list_communities: List all communities
+
+QUIZ MANAGEMENT:
+- create_quiz: Create a quiz for a course
+- get_quiz: Get quiz information
+
+POST MANAGEMENT:
+- list_posts: List all posts from communities
+- get_post: Get post details
+
+COMMENT MANAGEMENT:
+- list_comments: List all comments (optionally filter by post_id)
+- get_comment: Get comment details
+
+TEAM MANAGEMENT:
+- list_teams: List all teams (optionally filter by evenement_id)
+- get_team: Get team details with members
+- list_students: List all students (for team creation)
+
+GENERAL:
 - get_popular_courses: Show most popular courses
 
 ⚠️ IMPORTANT PLATFORM RULE:
@@ -653,35 +1055,102 @@ PAS de tableaux, PAS de listes, PAS de suggestions, PAS de liens HTML.
 Pour TOUTE action (créer, modifier, suspendre, voir profil, etc.), tu DOIS:
 
 1. TOUJOURS commencer ta réponse par le JSON d'action sur la première ligne
-2. Puis ajouter ta réponse en langage naturel
+2. Puis ajouter ta réponse en langage naturel sur une NOUVELLE LIGNE
 
 Format OBLIGATOIRE:
 {"action": "nom_action", "data": {paramètres}}
 Réponse naturelle ici
 
-Exemples COMPLETS:
+⚠️ EXEMPLES CRITIQUES:
+
+User: "comment créer un événement"
+Ta réponse COMPLÈTE:
+Pour créer un événement, donne-moi ces informations:
+- Titre de l'événement
+- Date de début (format: YYYY-MM-DD HH:MM)
+- Date de fin (format: YYYY-MM-DD HH:MM)
+- Lieu (salle)
+- Capacité (nombre de participants)
+
+Exemple: "créer événement Workshop IA le 2026-03-10 à 14h salle B capacité 30"
 
 User: "créer étudiant Jean Dupont jean@test.com"
 Ta réponse COMPLÈTE:
 {"action": "create_student", "data": {"nom": "Dupont", "prenom": "Jean", "email": "jean@test.com", "niveau": "DEBUTANT"}}
 ✅ Étudiant créé
 
+User: "créer cours Java Développement Web"
+Ta réponse COMPLÈTE:
+{"action": "create_course", "data": {"titre": "Cours Java", "description": "Apprentissage du développement web avec Java", "niveau": "DEBUTANT"}}
+✅ Cours créé
+
+User: "créer événement Workshop IA le 2026-03-10 à 14h salle B capacité 30"
+Ta réponse COMPLÈTE:
+{"action": "create_event", "data": {"titre": "Workshop IA", "date_debut": "2026-03-10 14:00", "date_fin": "2026-03-10 17:00", "lieu": "Salle B", "capacite": 30}}
+✅ Événement créé
+
+User: "voir détails événement Workshop IA" ou "voir événement id 3"
+Ta réponse COMPLÈTE:
+{"action": "get_event", "data": {"titre": "Workshop IA"}}
+📅 Détails de l'événement affichés
+
+User: "supprimer événement Workshop IA" ou "supprimer événement id 3"
+Ta réponse COMPLÈTE:
+{"action": "delete_event", "data": {"id": 3}}
+✅ Événement supprimé
+
 User: "suspendre compte etudiant test"
 Ta réponse COMPLÈTE:
 {"action": "suspend_user", "data": {"nom": "test"}}
 ✅ Compte suspendu
 
-User: "voir profil ismail opp"
-Ta réponse COMPLÈTE:
-{"action": "get_user", "data": {"nom": "opp", "prenom": "ismail"}}
-Profil affiché
+⚠️ EXEMPLES POUR ÉTUDIANTS (Questions "comment"):
 
-User: "modifier email etudiant test à nouveau@test.com"
-Ta réponse COMPLÈTE:
-{"action": "update_user", "data": {"nom": "test", "email": "nouveau@test.com"}}
-✅ Email modifié
+User: "comment créer une équipe?"
+Ta réponse COMPLÈTE (PAS de JSON):
+Je peux créer une équipe pour toi! 👥 
 
-⚠️ CRITIQUE: SANS LE JSON EN PREMIÈRE LIGNE, L'ACTION NE SERA PAS EXÉCUTÉE!
+D'abord, veux-tu voir les événements disponibles? Dis "voir les événements" pour choisir.
+
+Ensuite, dis-moi:
+- Nom de l'équipe
+- ID ou nom de l'événement
+- 4 à 6 membres (IDs ou noms complets)
+
+Exemple: "créer équipe Python Masters pour événement Workshop IA avec membres ilef yousfi, ahmed ben salah, amira nefzi, test user"
+
+User: "créer équipe Python Masters pour événement Workshop IA avec membres ilef yousfi, ahmed ben salah, amira nefzi, test user"
+Ta réponse COMPLÈTE:
+{"action": "create_team", "data": {"nom": "Python Masters", "evenement_id": "Workshop IA", "membres": ["ilef yousfi", "ahmed ben salah", "amira nefzi", "test user"]}}
+✅ Équipe créée
+
+⚠️ IMPORTANT POUR LA CRÉATION D'ÉQUIPES:
+- TOUJOURS essayer de créer l'équipe - laisse le backend valider
+- Si l'utilisateur fournit des noms de membres, utilise-les DIRECTEMENT dans l'action
+- NE VÉRIFIE PAS si les membres existent dans tes données initiales - le backend le fera
+- Le système peut chercher les étudiants par nom complet (prenom nom ou nom prenom)
+- Les noms multi-parties sont supportés (ex: "baha ben kileni")
+- La recherche est insensible à la casse
+- Format: {"action": "create_team", "data": {"nom": "...", "evenement_id": "...", "membres": ["nom1", "nom2", "nom3", "nom4"]}}
+
+⚠️ RÈGLES IMPORTANTES:
+1. Si l'utilisateur demande COMMENT faire quelque chose → Explique SANS générer de JSON
+2. Si l'utilisateur fournit des données complètes → Génère JSON + confirmation IMMÉDIATEMENT
+3. TOUJOURS fournir une réponse en langage naturel APRÈS le JSON
+4. Garde les réponses ultra-concises (3-5 mots pour les confirmations)
+5. NE GÉNÈRE JAMAIS de JSON pour les questions "comment" ou "how to"
+6. CRITIQUE: Distingue bien les entités:
+   - "user" / "student" / "étudiant" / "utilisateur" → utilise actions USER (get_user, create_student, etc.)
+   - "event" / "événement" → utilise actions EVENT (get_event, create_event, etc.)
+   - "course" / "cours" → utilise actions COURSE (get_course, create_course, etc.)
+   - "challenge" → utilise actions CHALLENGE
+   - "community" / "communauté" → utilise actions COMMUNITY
+   - "team" / "équipe" → utilise actions TEAM
+7. ⚠️ RÈGLE ABSOLUE: Quand tu génères du JSON, tu DOIS TOUJOURS ajouter une réponse en langage naturel sur la ligne suivante. Format: JSON sur ligne 1, réponse naturelle sur ligne 2. JAMAIS de JSON seul!
+8. 🎯 POUR LES ÉTUDIANTS: Quand un étudiant demande "comment créer X", dis-lui que TU PEUX le faire pour lui! Exemple:
+   - User: "comment créer une équipe?"
+   - Réponse: "Je peux créer une équipe pour toi! 👥 Donne-moi: le nom de l'équipe et l'ID de l'événement. Exemple: 'créer équipe Python Masters pour événement 3'"
+9. 🚫 NE VALIDE JAMAIS les données toi-même - laisse le backend le faire! Si l'utilisateur fournit toutes les informations requises, EXÉCUTE l'action immédiatement. N'invente JAMAIS d'erreurs comme "capacité non disponible" ou "membre introuvable" - laisse le backend retourner les vraies erreurs.
 
 LANGUES SUPPORTÉES:
 - Français (FR)
@@ -766,6 +1235,19 @@ Actions disponibles:
 - unsuspend_user: Réactiver un utilisateur suspendu
 - get_inactive_users: Lister les utilisateurs inactifs
 - get_popular_courses: Afficher les cours les plus populaires
+- create_event: Créer un événement (titre, date_debut, date_fin, lieu, capacite)
+- update_event: Modifier un événement
+- delete_event: Supprimer un événement
+- create_course: Créer un cours (titre, description, niveau)
+- create_challenge: Créer un challenge
+- create_community: Créer une communauté
+- list_posts: Afficher tous les posts des communautés
+- get_post: Voir les détails d'un post
+- list_comments: Afficher tous les commentaires (optionnel: filtrer par post_id)
+- get_comment: Voir les détails d'un commentaire
+- list_teams: Afficher toutes les équipes (optionnel: filtrer par evenement_id)
+- get_team: Voir les détails d'une équipe avec ses membres
+- list_students: Afficher tous les étudiants (pour création d'équipe)
 
 ⚠️ RÈGLE IMPORTANTE DE LA PLATEFORME:
 La suppression d'étudiants n'est PAS autorisée sur cette plateforme.
@@ -831,12 +1313,38 @@ PROMPT;
      */
     private function postProcessResponse(string $response, array $context): string
     {
-        // Supprimer le JSON d'action de la réponse visible par l'utilisateur
-        // Le JSON est sur la première ligne, on le retire
-        $response = preg_replace('/^\s*\{[^}]+\}\s*\n?/m', '', $response);
+        // Supprimer TOUT JSON de la réponse visible par l'utilisateur
+        // Le JSON peut être n'importe où dans la réponse
         
-        // Nettoyer les espaces multiples
+        // Pattern 1: JSON sur une ligne ou multiligne commençant par {"action"
+        $response = preg_replace('/\{\s*"action"\s*:\s*"[^"]+"\s*,\s*"data"\s*:\s*\{[^}]*(?:\{[^}]*\}[^}]*)*\}\s*\}/s', '', $response);
+        
+        // Pattern 2: Supprimer les lignes qui ressemblent à du JSON brut
+        $lines = explode("\n", $response);
+        $cleanedLines = [];
+        
+        foreach ($lines as $line) {
+            $trimmed = trim($line);
+            // Ignorer les lignes qui sont clairement du JSON
+            if (preg_match('/^\{.*"action".*\}$/', $trimmed) || 
+                preg_match('/^\{.*"data".*\}$/', $trimmed) ||
+                $trimmed === '{' || $trimmed === '}' ||
+                preg_match('/^"[^"]+"\s*:\s*/', $trimmed)) {
+                continue;
+            }
+            $cleanedLines[] = $line;
+        }
+        
+        $response = implode("\n", $cleanedLines);
+        
+        // Nettoyer les espaces multiples et lignes vides
+        $response = preg_replace('/\n{3,}/', "\n\n", $response);
         $response = trim($response);
+        
+        // Si la réponse est vide après nettoyage, retourner un message par défaut
+        if (empty($response)) {
+            return "✅ Action exécutée";
+        }
         
         return $response;
     }
@@ -939,7 +1447,7 @@ PROMPT;
                 return [
                     "Quels cours pour débuter en Python?",
                     "Montre-moi les événements à venir",
-                    "Recommande-moi des exercices",
+                    "Comment créer une équipe?",
                     "Quelles communautés puis-je rejoindre?",
                     "Mes progrès d'apprentissage?"
                 ];
