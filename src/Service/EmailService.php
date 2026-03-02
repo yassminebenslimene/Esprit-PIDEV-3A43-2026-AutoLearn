@@ -29,9 +29,11 @@ class EmailService
         $this->twig = $twig;
         $this->certificateService = $certificateService;
         $this->badgeService = $badgeService;
-        // L'email de ton sender identity SendGrid
-        $this->fromEmail = 'autolearnplateforme@gmail.com';
-        $this->fromName = 'Autolearn Platform';
+        
+        // ✅ Email vérifié dans Brevo (Sender Identity)
+        // Cet email DOIT être vérifié dans ton compte Brevo
+        $this->fromEmail = 'autolearn66@gmail.com';
+        $this->fromName = 'AutoLearn Platform';
     }
 
     /**
