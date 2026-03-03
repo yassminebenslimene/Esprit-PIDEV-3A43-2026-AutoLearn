@@ -22,18 +22,17 @@ class AuditController extends AbstractController
     public function index(): Response
     {
         $connection = $this->entityManager->getConnection();
+        
+        // Direct simple test
+        $testQuery = "SELECT COUNT(*) as count FROM user_audit WHERE discr = 'etudiant'";
+        $testResult = $connection->executeQuery($testQuery)->fetchAssociative();
+        
         $studentRevisions = [];
         $contentRevisions = [];
         
-        try {
-            // Check if revisions table exists
-            $revisionsExists = $connection->executeQuery(
-                "SELECT COUNT(*) FROM information_schema.tables 
-                 WHERE table_schema = DATABASE() AND table_name = 'revisions'"
-            )->fetchOne();
-            
-            if ($revisionsExists) {
-                // Query 1: Admin actions on STUDENTS only with action type detection
+        // If we have data, try the full query
+        if ($testResult['count'] > 0) {
+            try {
                 $studentSql = "
                     SELECT 
                         'student' as entity_type, 
@@ -47,91 +46,46 @@ class AuditController extends AbstractController
                         ua.isSuspended, 
                         ua.suspendedAt, 
                         ua.suspensionReason,
-                        prev.isSuspended as prev_isSuspended,
                         CASE 
                             WHEN ua.revtype = 'INS' THEN 'CREATE'
                             WHEN ua.revtype = 'DEL' THEN 'DELETE'
-                            WHEN ua.revtype = 'UPD' AND ua.isSuspended = 1 AND (prev.isSuspended IS NULL OR prev.isSuspended = 0) THEN 'SUSPEND'
-                            WHEN ua.revtype = 'UPD' AND ua.isSuspended = 0 AND prev.isSuspended = 1 THEN 'REACTIVATE'
                             WHEN ua.revtype = 'UPD' THEN 'UPDATE'
                             ELSE 'UPDATE'
                         END as action_type
                     FROM revisions r
                     INNER JOIN user_audit ua ON r.id = ua.rev
-                    LEFT JOIN user_audit prev ON prev.userId = ua.userId 
-                        AND prev.rev = (
-                            SELECT MAX(ua2.rev) 
-                            FROM user_audit ua2 
-                            WHERE ua2.userId = ua.userId AND ua2.rev < ua.rev
-                        )
                     WHERE ua.userId IS NOT NULL AND ua.discr = 'etudiant'
                     ORDER BY r.timestamp DESC 
                     LIMIT 100
                 ";
                 
                 $studentRevisions = $connection->executeQuery($studentSql)->fetchAllAssociative();
-                
-                // Debug: Log the count
-                error_log("Student revisions found: " . count($studentRevisions));
-                
-                // Query 2: Admin actions on CONTENT (courses, challenges, events, etc.)
-                $contentSql = "
-                    SELECT 'cours' as entity_type, r.id, r.timestamp, r.username,
-                           ca.id as entity_id, ca.revtype, ca.titre as nom, NULL as prenom
-                    FROM revisions r
-                    LEFT JOIN cours_audit ca ON r.id = ca.rev
-                    WHERE ca.id IS NOT NULL
-                    
-                    UNION ALL
-                    
-                    SELECT 'chapitre' as entity_type, r.id, r.timestamp, r.username,
-                           ch.id as entity_id, ch.revtype, ch.titre as nom, NULL as prenom
-                    FROM revisions r
-                    LEFT JOIN chapitre_audit ch ON r.id = ch.rev
-                    WHERE ch.id IS NOT NULL
-                    
-                    UNION ALL
-                    
-                    SELECT 'challenge' as entity_type, r.id, r.timestamp, r.username,
-                           chal.id as entity_id, chal.revtype, chal.titre as nom, NULL as prenom
-                    FROM revisions r
-                    LEFT JOIN challenge_audit chal ON r.id = chal.rev
-                    WHERE chal.id IS NOT NULL
-                    
-                    UNION ALL
-                    
-                    SELECT 'evenement' as entity_type, r.id, r.timestamp, r.username,
-                           ev.id as entity_id, ev.revtype, ev.titre as nom, NULL as prenom
-                    FROM revisions r
-                    LEFT JOIN evenement_audit ev ON r.id = ev.rev
-                    WHERE ev.id IS NOT NULL
-                    
-                    UNION ALL
-                    
-                    SELECT 'communaute' as entity_type, r.id, r.timestamp, r.username,
-                           com.id as entity_id, com.revtype, com.nom as nom, NULL as prenom
-                    FROM revisions r
-                    LEFT JOIN communaute_audit com ON r.id = com.rev
-                    WHERE com.id IS NOT NULL
-                    
-                    ORDER BY timestamp DESC 
-                    LIMIT 100
-                ";
-                
-                $contentRevisions = $connection->executeQuery($contentSql)->fetchAllAssociative();
-                
-                // Debug: Log the count
-                error_log("Content revisions found: " . count($contentRevisions));
+            } catch (\Exception $e) {
+                // Store error for display
+                $studentRevisions = [];
             }
+        }
+        
+        try {
+            $contentSql = "
+                SELECT 'cours' as entity_type, r.id, r.timestamp, r.username,
+                       ca.id as entity_id, ca.revtype, ca.titre as nom, NULL as prenom
+                FROM revisions r
+                LEFT JOIN cours_audit ca ON r.id = ca.rev
+                WHERE ca.id IS NOT NULL
+                ORDER BY r.timestamp DESC 
+                LIMIT 100
+            ";
+            
+            $contentRevisions = $connection->executeQuery($contentSql)->fetchAllAssociative();
         } catch (\Exception $e) {
-            error_log("Audit error: " . $e->getMessage());
-            $studentRevisions = [];
             $contentRevisions = [];
         }
 
         return $this->render('backoffice/audit/index.html.twig', [
             'studentRevisions' => $studentRevisions,
             'contentRevisions' => $contentRevisions,
+            'testCount' => $testResult['count'] ?? 0,
         ]);
     }
 
