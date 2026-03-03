@@ -19,9 +19,11 @@ final class Version20260221111139 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        // Migration déjà appliquée manuellement - colonnes existent déjà
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('DROP TABLE notification');
-        $this->addSql('ALTER TABLE quiz ADD duree_max_minutes INT DEFAULT NULL, ADD seuil_reussite INT DEFAULT NULL, ADD max_tentatives INT DEFAULT NULL');
+        // Vérifier si la table existe avant de la supprimer
+        // $this->addSql('DROP TABLE IF EXISTS notification');
+        // $this->addSql('ALTER TABLE quiz ADD duree_max_minutes INT DEFAULT NULL, ADD seuil_reussite INT DEFAULT NULL, ADD max_tentatives INT DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
