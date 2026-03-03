@@ -75,28 +75,72 @@ class AuditController extends AbstractController
             }
         }
         
+        $contentRevisions = [];
+        $contentError = null;
+        
         try {
-            // Only query cours_audit for now (other audit tables will be created as entities are modified)
-            $contentSql = "
-                SELECT 'cours' as entity_type, r.id, r.timestamp, r.username,
-                       ca.id as entity_id, ca.revtype, ca.titre as nom, NULL as prenom
-                FROM revisions r
-                INNER JOIN cours_audit ca ON r.id = ca.rev
-                WHERE ca.id IS NOT NULL
-                ORDER BY r.timestamp DESC 
-                LIMIT 100
-            ";
+            // Check which audit tables exist
+            $tables = $connection->executeQuery(
+                "SELECT TABLE_NAME FROM information_schema.TABLES 
+                 WHERE TABLE_SCHEMA = DATABASE() 
+                 AND TABLE_NAME LIKE '%_audit' 
+                 AND TABLE_NAME != 'user_audit'"
+            )->fetchAllAssociative();
             
-            $contentRevisions = $connection->executeQuery($contentSql)->fetchAllAssociative();
+            // Query each table separately to avoid collation issues
+            foreach ($tables as $table) {
+                $tableName = $table['TABLE_NAME'];
+                
+                // Determine the display name column based on table
+                $nameColumn = 'titre'; // Default for most tables
+                if ($tableName === 'communaute_audit' || $tableName === 'equipe_audit') {
+                    $nameColumn = 'nom';
+                } elseif ($tableName === 'commentaire_audit') {
+                    $nameColumn = 'contenu';
+                } elseif ($tableName === 'exercice_audit') {
+                    $nameColumn = 'question';
+                }
+                
+                // Extract entity type from table name (remove _audit suffix)
+                $entityType = str_replace('_audit', '', $tableName);
+                
+                try {
+                    $sql = "
+                        SELECT '$entityType' as entity_type, r.id, r.timestamp, r.username,
+                               t.id as entity_id, t.revtype, t.$nameColumn as nom
+                        FROM revisions r
+                        INNER JOIN $tableName t ON r.id = t.rev
+                        WHERE t.id IS NOT NULL
+                        ORDER BY r.timestamp DESC
+                        LIMIT 100
+                    ";
+                    
+                    $results = $connection->executeQuery($sql)->fetchAllAssociative();
+                    $contentRevisions = array_merge($contentRevisions, $results);
+                } catch (\Exception $e) {
+                    // Skip tables with errors
+                    continue;
+                }
+            }
+            
+            // Sort all results by timestamp
+            usort($contentRevisions, function($a, $b) {
+                return strtotime($b['timestamp']) - strtotime($a['timestamp']);
+            });
+            
+            // Limit to 100 most recent
+            $contentRevisions = array_slice($contentRevisions, 0, 100);
+            
         } catch (\Exception $e) {
-            // If cours_audit doesn't have data yet, return empty
-            $contentRevisions = [];
+            // Store error for debugging
+            $contentError = $e->getMessage();
         }
 
         return $this->render('backoffice/audit/index.html.twig', [
             'studentRevisions' => $studentRevisions,
             'contentRevisions' => $contentRevisions,
             'testCount' => $testResult['count'] ?? 0,
+            'contentError' => $contentError ?? null,
         ]);
     }
 

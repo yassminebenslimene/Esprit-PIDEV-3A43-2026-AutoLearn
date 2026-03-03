@@ -203,6 +203,13 @@
             <span class="badge">{{ contentRevisions|length }} actions</span>
         </div>
 
+        {% if contentError %}
+            <div style="padding: 20px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; margin: 20px;">
+                <p style="color: #ef4444; font-weight: bold;">⚠️ Error loading content revisions:</p>
+                <p style="color: #fca5a5; font-size: 13px; font-family: monospace;">{{ contentError }}</p>
+            </div>
+        {% endif %}
+
         {% if contentRevisions is empty %}
             <div class="empty-state">
                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -223,8 +230,14 @@
                         <option value="cours" style="background: #1f2937; color: white;">📚 Courses</option>
                         <option value="chapitre" style="background: #1f2937; color: white;">📖 Chapters</option>
                         <option value="challenge" style="background: #1f2937; color: white;">💪 Challenges</option>
+                        <option value="exercice" style="background: #1f2937; color: white;">✏️ Exercises</option>
+                        <option value="quiz" style="background: #1f2937; color: white;">❓ Quizzes</option>
                         <option value="evenement" style="background: #1f2937; color: white;">📅 Events</option>
                         <option value="communaute" style="background: #1f2937; color: white;">👥 Communities</option>
+                        <option value="post" style="background: #1f2937; color: white;">📝 Posts</option>
+                        <option value="commentaire" style="background: #1f2937; color: white;">💬 Comments</option>
+                        <option value="equipe" style="background: #1f2937; color: white;">👨‍👩‍👧‍👦 Teams</option>
+                        <option value="ressource" style="background: #1f2937; color: white;">📎 Resources</option>
                     </select>
                     <select id="contentActionFilter" style="padding: 10px 15px; border: 2px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px; min-width: 150px;">
                         <option value="" style="background: #1f2937; color: white;">All Actions</option>
@@ -267,27 +280,47 @@
                                     </div>
                                 </td>
                                 <td>
+                                    {% set entityIcon = '📄' %}
+                                    {% set entityColor = 'linear-gradient(135deg, #60a5fa, #3b82f6)' %}
+                                    
                                     {% if revision.entity_type == 'cours' %}
-                                        <span class="user-badge" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
-                                            📚 {{ revision.nom }}
-                                        </span>
+                                        {% set entityIcon = '📚' %}
+                                        {% set entityColor = 'linear-gradient(135deg, #22c55e, #16a34a)' %}
                                     {% elseif revision.entity_type == 'chapitre' %}
-                                        <span class="user-badge" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
-                                            📖 {{ revision.nom }}
-                                        </span>
+                                        {% set entityIcon = '📖' %}
+                                        {% set entityColor = 'linear-gradient(135deg, #06b6d4, #0891b2)' %}
                                     {% elseif revision.entity_type == 'challenge' %}
-                                        <span class="user-badge" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
-                                            💪 {{ revision.nom }}
-                                        </span>
+                                        {% set entityIcon = '💪' %}
+                                        {% set entityColor = 'linear-gradient(135deg, #f59e0b, #d97706)' %}
+                                    {% elseif revision.entity_type == 'exercice' %}
+                                        {% set entityIcon = '✏️' %}
+                                        {% set entityColor = 'linear-gradient(135deg, #3b82f6, #2563eb)' %}
+                                    {% elseif revision.entity_type == 'quiz' %}
+                                        {% set entityIcon = '❓' %}
+                                        {% set entityColor = 'linear-gradient(135deg, #a855f7, #9333ea)' %}
                                     {% elseif revision.entity_type == 'evenement' %}
-                                        <span class="user-badge" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
-                                            📅 {{ revision.nom }}
-                                        </span>
+                                        {% set entityIcon = '📅' %}
+                                        {% set entityColor = 'linear-gradient(135deg, #8b5cf6, #7c3aed)' %}
                                     {% elseif revision.entity_type == 'communaute' %}
-                                        <span class="user-badge" style="background: linear-gradient(135deg, #ec4899, #db2777);">
-                                            👥 {{ revision.nom }}
-                                        </span>
+                                        {% set entityIcon = '👥' %}
+                                        {% set entityColor = 'linear-gradient(135deg, #ec4899, #db2777)' %}
+                                    {% elseif revision.entity_type == 'post' %}
+                                        {% set entityIcon = '📝' %}
+                                        {% set entityColor = 'linear-gradient(135deg, #14b8a6, #0d9488)' %}
+                                    {% elseif revision.entity_type == 'commentaire' %}
+                                        {% set entityIcon = '💬' %}
+                                        {% set entityColor = 'linear-gradient(135deg, #84cc16, #65a30d)' %}
+                                    {% elseif revision.entity_type == 'equipe' %}
+                                        {% set entityIcon = '👨‍👩‍👧‍👦' %}
+                                        {% set entityColor = 'linear-gradient(135deg, #f97316, #ea580c)' %}
+                                    {% elseif revision.entity_type == 'ressource' %}
+                                        {% set entityIcon = '📎' %}
+                                        {% set entityColor = 'linear-gradient(135deg, #6366f1, #4f46e5)' %}
                                     {% endif %}
+                                    
+                                    <span class="user-badge" style="background: {{ entityColor }};">
+                                        {{ entityIcon }} {{ revision.nom|length > 50 ? revision.nom|slice(0, 50) ~ '...' : revision.nom }}
+                                    </span>
                                 </td>
                                 <td>
                                     {% if revision.revtype == 'INS' %}
