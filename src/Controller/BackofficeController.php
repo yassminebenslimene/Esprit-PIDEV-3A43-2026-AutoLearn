@@ -13,6 +13,12 @@ use App\Repository\QuizRepository;
 use App\Entity\User;
 use App\Entity\Etudiant;
 use App\Entity\Admin;
+use App\Entity\GestionDeCours\Cours;
+use App\Entity\GestionDeCours\Chapitre;
+use App\Entity\Quiz;
+use App\Entity\Evenement;
+use App\Entity\Communaute;
+use App\Entity\Post;
 use App\Repository\UserRepository;
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
@@ -27,9 +33,38 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class BackofficeController extends AbstractController
 {
     #[Route('/backoffice', name: 'app_backoffice')]
-    public function index(): Response
+    public function index(
+        EntityManagerInterface $entityManager
+    ): Response
     {
-        return $this->render('backoffice/index.html.twig');
+        // Fetch real platform statistics
+        $stats = [
+            'totalUsers' => $entityManager->getRepository(User::class)->count([]),
+            'totalEtudiants' => $entityManager->getRepository(Etudiant::class)->count([]),
+            'totalAdmins' => $entityManager->getRepository(Admin::class)->count([]),
+            'totalCours' => $entityManager->getRepository(Cours::class)->count([]),
+            'totalChapitres' => $entityManager->getRepository(Chapitre::class)->count([]),
+            'totalQuiz' => $entityManager->getRepository(Quiz::class)->count([]),
+            'totalChallenges' => $entityManager->getRepository(Challenge::class)->count([]),
+            'totalExercices' => $entityManager->getRepository(Exercice::class)->count([]),
+            'totalEvenements' => $entityManager->getRepository(Evenement::class)->count([]),
+            'totalCommunautes' => $entityManager->getRepository(Communaute::class)->count([]),
+            'totalPosts' => $entityManager->getRepository(Post::class)->count([]),
+        ];
+        
+        // Recent activity - last 5 users
+        $recentUsers = $entityManager->getRepository(User::class)
+            ->findBy([], ['id' => 'DESC'], 5);
+        
+        // Active challenges
+        $activeChallenges = $entityManager->getRepository(Challenge::class)
+            ->findBy([], ['id' => 'DESC'], 5);
+        
+        return $this->render('backoffice/index.html.twig', [
+            'stats' => $stats,
+            'recentUsers' => $recentUsers,
+            'activeChallenges' => $activeChallenges,
+        ]);
     }
 
     /**
@@ -113,9 +148,52 @@ class BackofficeController extends AbstractController
     }
 
     #[Route('/backoffice/analytics', name: 'backoffice_analytics')]
-    public function analytics(): Response
+    public function analytics(
+        EntityManagerInterface $entityManager
+    ): Response
     {
-        return $this->render('backoffice/analytics.html.twig');
+        // Different stats from dashboard - focus on content depth
+        $stats = [
+            'totalChapitres' => $entityManager->getRepository(Chapitre::class)->count([]),
+            'totalExercices' => $entityManager->getRepository(Exercice::class)->count([]),
+            'totalPosts' => $entityManager->getRepository(Post::class)->count([]),
+            'totalCommunautes' => $entityManager->getRepository(Communaute::class)->count([]),
+            'totalQuiz' => $entityManager->getRepository(Quiz::class)->count([]),
+            'totalEtudiants' => $entityManager->getRepository(Etudiant::class)->count([]),
+            'totalAdmins' => $entityManager->getRepository(Admin::class)->count([]),
+            'totalEvenements' => $entityManager->getRepository(Evenement::class)->count([]),
+        ];
+        
+        // Top courses by chapters count
+        $topCours = $entityManager->getRepository(Cours::class)
+            ->createQueryBuilder('c')
+            ->leftJoin('c.chapitres', 'ch')
+            ->groupBy('c.id')
+            ->orderBy('COUNT(ch.id)', 'DESC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+        
+        // Recent events
+        $recentEvents = $entityManager->getRepository(Evenement::class)
+            ->findBy([], ['dateDebut' => 'DESC'], 5);
+        
+        // Top challenges by exercises count
+        $topChallenges = $entityManager->getRepository(Challenge::class)
+            ->createQueryBuilder('ch')
+            ->leftJoin('ch.exercices', 'ex')
+            ->groupBy('ch.id')
+            ->orderBy('COUNT(ex.id)', 'DESC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+        
+        return $this->render('backoffice/analytics.html.twig', [
+            'stats' => $stats,
+            'topCours' => $topCours,
+            'recentEvents' => $recentEvents,
+            'topChallenges' => $topChallenges,
+        ]);
     }
 
     #[Route('/backoffice/users', name: 'backoffice_users')]
