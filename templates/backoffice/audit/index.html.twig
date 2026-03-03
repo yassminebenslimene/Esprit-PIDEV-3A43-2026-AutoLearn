@@ -41,13 +41,7 @@
             <div class="info-content">
                 <h3>{{ studentRevisions|length }}</h3>
                 <p>Student Actions</p>
-                <!-- DEBUG -->
-                <p style="color: yellow; font-size: 11px;">DB has {{ testCount|default(0) }} student records</p>
-                {% if studentRevisions is empty %}
-                    <p style="color: red; font-size: 11px;">Array is EMPTY</p>
-                {% else %}
-                    <p style="color: green; font-size: 11px;">Array has {{ studentRevisions|length }} items</p>
-                {% endif %}
+                
             </div>
         </div>
 
