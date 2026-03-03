@@ -20,15 +20,10 @@ final class Version20260221112129 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-<<<<<<< HEAD
-        $this->addSql('DROP TABLE notification');
-        $this->addSql('ALTER TABLE chapter_progress ADD CONSTRAINT FK_C4189F43A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
-=======
         $this->addSql('DROP TABLE IF EXISTS notification');
         // Créer la table chapter_progress si elle n'existe pas
         $this->addSql('CREATE TABLE IF NOT EXISTS chapter_progress (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, chapitre_id INT NOT NULL, is_completed TINYINT(1) DEFAULT 0 NOT NULL, completed_at DATETIME DEFAULT NULL, INDEX IDX_C4189F43A76ED395 (user_id), INDEX IDX_C4189F431FBEEF7B (chapitre_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4');
         $this->addSql('ALTER TABLE chapter_progress ADD CONSTRAINT FK_C4189F43A76ED395 FOREIGN KEY (user_id) REFERENCES user (userId)');
->>>>>>> cf32977d311ea069ba23a14c2cf5417034d537b8
         $this->addSql('ALTER TABLE chapter_progress ADD CONSTRAINT FK_C4189F431FBEEF7B FOREIGN KEY (chapitre_id) REFERENCES chapitre (id)');
     }
 
