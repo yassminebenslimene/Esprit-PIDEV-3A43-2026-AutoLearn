@@ -93,42 +93,6 @@ class QuestionType extends AbstractType
                 // Texte d'aide pour informer l'utilisateur des formats acceptés
                 'help' => 'JPG, PNG, GIF (max 2MB)'
             ])
-            // Champ d'upload de fichier audio via VichUploaderBundle
-            // VichFileType est générique pour tous types de fichiers (audio, vidéo, PDF, etc.)
-            ->add('audioFile', VichFileType::class, [
-                // Label du champ
-                'label' => 'Audio (optionnel)',
-                // Champ optionnel (pour les questions audio/prononciation)
-                'required' => false,
-                // Permet de supprimer le fichier audio existant
-                'allow_delete' => true,
-                // Label de la checkbox de suppression
-                'delete_label' => 'Supprimer',
-                // Afficher un lien de téléchargement pour écouter l'audio actuel
-                'download_uri' => true,
-                // Utiliser l'asset helper pour générer les URLs
-                'asset_helper' => true,
-                // Texte d'aide pour les formats audio acceptés
-                'help' => 'MP3, WAV, OGG (max 5MB)'
-            ])
-            // Champ d'upload de fichier vidéo via VichUploaderBundle
-            // Utilise VichFileType car les vidéos ne nécessitent pas d'aperçu dans le formulaire
-            ->add('videoFile', VichFileType::class, [
-                // Label du champ
-                'label' => 'Vidéo (optionnel)',
-                // Champ optionnel (pour les questions vidéo/tutoriels)
-                'required' => false,
-                // Permet de supprimer la vidéo existante
-                'allow_delete' => true,
-                // Label de la checkbox de suppression
-                'delete_label' => 'Supprimer',
-                // Afficher un lien de téléchargement pour voir la vidéo actuelle
-                'download_uri' => true,
-                // Utiliser l'asset helper pour générer les URLs
-                'asset_helper' => true,
-                // Texte d'aide pour les formats vidéo acceptés
-                'help' => 'MP4, WEBM (max 20MB)'
-            ])
         ;
     }
 
