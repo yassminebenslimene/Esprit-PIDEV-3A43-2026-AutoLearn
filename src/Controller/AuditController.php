@@ -71,6 +71,9 @@ class AuditController extends AbstractController
                 
                 $studentRevisions = $connection->executeQuery($studentSql)->fetchAllAssociative();
                 
+                // Debug: Log the count
+                error_log("Student revisions found: " . count($studentRevisions));
+                
                 // Query 2: Admin actions on CONTENT (courses, challenges, events, etc.)
                 $contentSql = "
                     SELECT 'cours' as entity_type, r.id, r.timestamp, r.username,
@@ -116,8 +119,12 @@ class AuditController extends AbstractController
                 ";
                 
                 $contentRevisions = $connection->executeQuery($contentSql)->fetchAllAssociative();
+                
+                // Debug: Log the count
+                error_log("Content revisions found: " . count($contentRevisions));
             }
         } catch (\Exception $e) {
+            error_log("Audit error: " . $e->getMessage());
             $studentRevisions = [];
             $contentRevisions = [];
         }
