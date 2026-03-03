@@ -72,6 +72,10 @@ class Evenement
 
     #[ORM\Column(type:"boolean")]
     private bool $isCanceled = false;
+    
+    // Propriété pour le Workflow Component
+    #[ORM\Column(type:"string", length: 50)]
+    private string $workflowStatus = 'planifie';
 
     #[ORM\Column(type:"integer")]
     #[Assert\NotBlank(message: "Le nombre maximum d'équipes est obligatoire")]
@@ -98,26 +102,24 @@ class Evenement
     // Met à jour le status automatiquement
     public function updateStatus(): void
     {
-        $today = new \DateTime();
-        $today->setTime(0, 0, 0);
+        $now = new \DateTime();
         
-        $dateDebut = (clone $this->getDateDebut())->setTime(0, 0, 0);
-        $dateFin = (clone $this->getDateFin())->setTime(0, 0, 0);
-
         // Si l'événement est annulé, le statut reste ANNULE
         if ($this->getIsCanceled()) {
             $this->setStatus(StatutEvenement::ANNULE);
         } 
-        // Si la date d'aujourd'hui est entre dateDebut et dateFin (inclus)
-        elseif ($today >= $dateDebut && $today <= $dateFin) {
+        // Si la date/heure actuelle est après la date de fin
+        elseif ($now > $this->getDateFin()) {
+            $this->setStatus(StatutEvenement::PASSE);
+        }
+        // Si la date/heure actuelle est entre dateDebut et dateFin
+        elseif ($now >= $this->getDateDebut() && $now <= $this->getDateFin()) {
             $this->setStatus(StatutEvenement::EN_COURS);
         } 
-        // Si la date d'aujourd'hui est avant dateDebut
-        elseif ($today < $dateDebut) {
+        // Si la date/heure actuelle est avant dateDebut
+        elseif ($now < $this->getDateDebut()) {
             $this->setStatus(StatutEvenement::PLANIFIE);
         }
-        // Si la date d'aujourd'hui est après dateFin, on garde le statut actuel
-        // (l'événement est terminé mais on ne change pas le statut)
     }
 
     // ===== Getters / Setters =====
@@ -146,6 +148,26 @@ class Evenement
 
     public function getIsCanceled(): bool { return $this->isCanceled; }
     public function setIsCanceled(bool $isCanceled): self { $this->isCanceled = $isCanceled; return $this; }
+    
+    public function getWorkflowStatus(): string { return $this->workflowStatus; }
+    public function setWorkflowStatus(string $workflowStatus): self { 
+        $this->workflowStatus = $workflowStatus;
+        // Synchroniser avec l'enum StatutEvenement
+        $this->syncStatusFromWorkflow();
+        return $this;
+    }
+    
+    // Synchronise le status (enum) avec le workflowStatus (string)
+    private function syncStatusFromWorkflow(): void
+    {
+        match($this->workflowStatus) {
+            'planifie' => $this->status = StatutEvenement::PLANIFIE,
+            'en_cours' => $this->status = StatutEvenement::EN_COURS,
+            'termine' => $this->status = StatutEvenement::PASSE,
+            'annule' => $this->status = StatutEvenement::ANNULE,
+            default => $this->status = StatutEvenement::PLANIFIE,
+        };
+    }
 
     public function getNbMax(): int { return $this->nbMax; }
     public function setNbMax(int $nbMax): self { $this->nbMax = $nbMax; return $this; }
@@ -160,5 +182,29 @@ class Evenement
     public function addParticipation(Participation $p): self {
         if (!$this->participations->contains($p)) $this->participations[] = $p;
         return $this;
+    }
+    
+    /**
+     * Vérifie si les participations sont ouvertes pour cet événement
+     * Les participations sont ouvertes si:
+     * - L'événement est planifié (pas encore commencé) OU en cours
+     * - L'événement n'est pas annulé
+     * - L'événement n'est pas terminé
+     */
+    public function areParticipationsOpen(): bool
+    {
+        // Vérifier le workflow status
+        // Permettre les participations pour les événements planifiés ET en cours
+        return ($this->workflowStatus === 'planifie' || $this->workflowStatus === 'en_cours') 
+               && !$this->isCanceled;
+    }
+    
+    /**
+     * Vérifie si l'événement peut accepter de nouvelles participations
+     * (alias de areParticipationsOpen pour plus de clarté)
+     */
+    public function canAcceptParticipations(): bool
+    {
+        return $this->areParticipationsOpen();
     }
 }

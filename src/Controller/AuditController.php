@@ -33,13 +33,37 @@ class AuditController extends AbstractController
             )->fetchOne();
             
             if ($revisionsExists) {
-                // Query 1: Admin actions on STUDENTS only
+                // Query 1: Admin actions on STUDENTS only with action type detection
                 $studentSql = "
-                    SELECT 'student' as entity_type, r.id, r.timestamp, r.username, 
-                           ua.userId as entity_id, ua.revtype, ua.nom, ua.prenom,
-                           ua.isSuspended, ua.suspendedAt, ua.suspensionReason
+                    SELECT 
+                        'student' as entity_type, 
+                        r.id, 
+                        r.timestamp, 
+                        r.username, 
+                        ua.userId as entity_id, 
+                        ua.revtype, 
+                        ua.nom, 
+                        ua.prenom,
+                        ua.isSuspended, 
+                        ua.suspendedAt, 
+                        ua.suspensionReason,
+                        prev.isSuspended as prev_isSuspended,
+                        CASE 
+                            WHEN ua.revtype = 'INS' THEN 'CREATE'
+                            WHEN ua.revtype = 'DEL' THEN 'DELETE'
+                            WHEN ua.revtype = 'UPD' AND ua.isSuspended = 1 AND (prev.isSuspended IS NULL OR prev.isSuspended = 0) THEN 'SUSPEND'
+                            WHEN ua.revtype = 'UPD' AND ua.isSuspended = 0 AND prev.isSuspended = 1 THEN 'REACTIVATE'
+                            WHEN ua.revtype = 'UPD' THEN 'UPDATE'
+                            ELSE 'UPDATE'
+                        END as action_type
                     FROM revisions r
-                    LEFT JOIN user_audit ua ON r.id = ua.rev
+                    INNER JOIN user_audit ua ON r.id = ua.rev
+                    LEFT JOIN user_audit prev ON prev.userId = ua.userId 
+                        AND prev.rev = (
+                            SELECT MAX(ua2.rev) 
+                            FROM user_audit ua2 
+                            WHERE ua2.userId = ua.userId AND ua2.rev < ua.rev
+                        )
                     WHERE ua.userId IS NOT NULL AND ua.discr = 'etudiant'
                     ORDER BY r.timestamp DESC 
                     LIMIT 100
@@ -187,7 +211,8 @@ class AuditController extends AbstractController
             'total_changes' => 0,
             'by_type' => [],
             'recent_activity' => [],
-            'active_users' => []
+            'active_admins' => [],
+            'active_students' => []
         ];
         
         try {
@@ -205,11 +230,27 @@ class AuditController extends AbstractController
             )->fetchOne();
             
             $stats['by_type'] = $connection->executeQuery(
-                "SELECT 'INS' as revtype, COUNT(*) as count FROM user_audit WHERE revtype = 'INS'
-                 UNION ALL
-                 SELECT 'UPD' as revtype, COUNT(*) as count FROM user_audit WHERE revtype = 'UPD'
-                 UNION ALL
-                 SELECT 'DEL' as revtype, COUNT(*) as count FROM user_audit WHERE revtype = 'DEL'"
+                "SELECT 
+                    CASE 
+                        WHEN ua.revtype = 'INS' THEN 'CREATE'
+                        WHEN ua.revtype = 'DEL' THEN 'DELETE'
+                        WHEN ua.revtype = 'UPD' AND ua.isSuspended = 1 AND (prev.isSuspended IS NULL OR prev.isSuspended = 0) THEN 'SUSPEND'
+                        WHEN ua.revtype = 'UPD' AND ua.isSuspended = 0 AND prev.isSuspended = 1 THEN 'REACTIVATE'
+                        WHEN ua.revtype = 'UPD' THEN 'UPDATE'
+                        ELSE 'UPDATE'
+                    END as revtype,
+                    COUNT(*) as count 
+                 FROM user_audit ua
+                 LEFT JOIN user_audit prev ON prev.userId = ua.userId 
+                     AND prev.rev = (
+                         SELECT MAX(ua2.rev) 
+                         FROM user_audit ua2 
+                         WHERE ua2.userId = ua.userId AND ua2.rev < ua.rev
+                     )
+                 WHERE ua.discr = 'etudiant'
+                 GROUP BY 1
+                 HAVING count > 0
+                 ORDER BY count DESC"
             )->fetchAllAssociative();
             
             $stats['recent_activity'] = $connection->executeQuery(
@@ -220,20 +261,39 @@ class AuditController extends AbstractController
                  ORDER BY date DESC"
             )->fetchAllAssociative();
             
-            $stats['active_users'] = $connection->executeQuery(
+            // Most active admins
+            $stats['active_admins'] = $connection->executeQuery(
                 "SELECT r.username, COUNT(*) as count 
-                 FROM revisions r 
-                 WHERE r.username IS NOT NULL
+                 FROM revisions r
+                 INNER JOIN user u ON u.email = r.username
+                 WHERE r.username IS NOT NULL AND u.role = 'ADMIN'
                  GROUP BY r.username 
                  ORDER BY count DESC 
                  LIMIT 10"
             )->fetchAllAssociative();
             
-            // Get admin info for active users
-            foreach ($stats['active_users'] as &$activeUser) {
+            // Get admin info for active admins
+            foreach ($stats['active_admins'] as &$activeAdmin) {
                 $admin = $this->entityManager->getRepository(User::class)
-                    ->findOneBy(['email' => $activeUser['username']]);
-                $activeUser['admin'] = $admin;
+                    ->findOneBy(['email' => $activeAdmin['username']]);
+                $activeAdmin['admin'] = $admin;
+            }
+            
+            // Most active students (students who were modified the most)
+            $stats['active_students'] = $connection->executeQuery(
+                "SELECT ua.userId, ua.nom, ua.prenom, COUNT(*) as count 
+                 FROM user_audit ua
+                 WHERE ua.discr = 'etudiant'
+                 GROUP BY ua.userId, ua.nom, ua.prenom
+                 ORDER BY count DESC 
+                 LIMIT 10"
+            )->fetchAllAssociative();
+            
+            // Get student info for active students
+            foreach ($stats['active_students'] as &$activeStudent) {
+                $student = $this->entityManager->getRepository(User::class)
+                    ->find($activeStudent['userId']);
+                $activeStudent['student'] = $student;
             }
         } catch (\Exception $e) {
             // Tables don't exist yet

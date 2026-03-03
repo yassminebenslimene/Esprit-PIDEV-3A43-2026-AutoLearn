@@ -59,7 +59,7 @@
                 </svg>
             </div>
             <div class="stat-content">
-                <h3>{{ stats.active_users|length }}</h3>
+                <h3>{{ (stats.active_admins|length) + (stats.active_students|length) }}</h3>
                 <p>Active Users</p>
             </div>
         </div>
@@ -81,12 +81,18 @@
                         <div class="type-stat-item">
                             <div class="type-stat-header">
                                 <span class="type-badge type-badge-{{ type.revtype|lower }}">
-                                    {% if type.revtype == 'INS' %}
-                                        ➕ INSERT
-                                    {% elseif type.revtype == 'UPD' %}
+                                    {% if type.revtype == 'CREATE' %}
+                                        ➕ CREATE
+                                    {% elseif type.revtype == 'UPDATE' %}
                                         ✏️ UPDATE
-                                    {% elseif type.revtype == 'DEL' %}
+                                    {% elseif type.revtype == 'SUSPEND' %}
+                                        🚫 SUSPEND
+                                    {% elseif type.revtype == 'REACTIVATE' %}
+                                        ✅ REACTIVATE
+                                    {% elseif type.revtype == 'DELETE' %}
                                         🗑️ DELETE
+                                    {% elseif type.revtype == 'VIEW' %}
+                                        👁️ VIEW
                                     {% endif %}
                                 </span>
                                 <span class="type-count">{{ type.count }}</span>
@@ -141,35 +147,70 @@
         </div>
     </div>
 
-    <!-- Most Active Users -->
+    <!-- Most Active Admins -->
     <div class="glass-card" style="margin-top: 30px;">
         <div class="card-header">
             <h3>👨‍💼 Most Active Admins</h3>
             <span class="badge badge-info">Who performed the most actions</span>
         </div>
         <div class="active-users-list">
-            {% if stats.active_users is empty %}
+            {% if stats.active_admins is empty %}
                 <div class="empty-state">
                     <p>No admin activity recorded yet</p>
                 </div>
             {% else %}
-                {% for user in stats.active_users %}
+                {% for admin in stats.active_admins %}
                     <div class="active-user-item">
                         <div class="user-rank">{{ loop.index }}</div>
                         <div class="user-details">
-                            {% if user.admin %}
+                            {% if admin.admin %}
                                 <span class="user-name">
-                                    🔑 {{ user.admin.prenom }} {{ user.admin.nom }}
+                                    🔑 {{ admin.admin.prenom }} {{ admin.admin.nom }}
                                 </span>
-                                <span class="user-email">{{ user.username }}</span>
+                                <span class="user-email">{{ admin.username }}</span>
                             {% else %}
-                                <span class="user-name">{{ user.username }}</span>
+                                <span class="user-name">{{ admin.username }}</span>
                             {% endif %}
-                            <span class="user-actions">{{ user.count }} actions</span>
+                            <span class="user-actions">{{ admin.count }} actions</span>
                         </div>
                         <div class="user-progress">
                             <div class="user-progress-bar" 
-                                 style="width: {{ (user.count / stats.active_users[0].count * 100)|round }}%">
+                                 style="width: {{ (admin.count / stats.active_admins[0].count * 100)|round }}%">
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Most Active Students -->
+    <div class="glass-card" style="margin-top: 30px;">
+        <div class="card-header">
+            <h3>👨‍🎓 Most Active Students</h3>
+            <span class="badge badge-info">Students with most changes</span>
+        </div>
+        <div class="active-users-list">
+            {% if stats.active_students is empty %}
+                <div class="empty-state">
+                    <p>No student activity recorded yet</p>
+                </div>
+            {% else %}
+                {% for student in stats.active_students %}
+                    <div class="active-user-item">
+                        <div class="user-rank">{{ loop.index }}</div>
+                        <div class="user-details">
+                            <span class="user-name">
+                                👨‍🎓 {{ student.prenom }} {{ student.nom }}
+                            </span>
+                            {% if student.student %}
+                                <span class="user-email">{{ student.student.email }}</span>
+                            {% endif %}
+                            <span class="user-actions">{{ student.count }} changes</span>
+                        </div>
+                        <div class="user-progress">
+                            <div class="user-progress-bar" 
+                                 style="width: {{ (student.count / stats.active_students[0].count * 100)|round }}%">
                             </div>
                         </div>
                     </div>
@@ -227,12 +268,14 @@
 
 .chart-container {
     padding: 30px;
+    min-height: 350px;
 }
 
 .type-stats {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    min-height: 300px;
 }
 
 .type-stat-item {
@@ -254,16 +297,28 @@
     font-weight: 600;
 }
 
-.type-badge-ins {
+.type-badge-create {
     background: linear-gradient(135deg, #22c55e, #4ade80);
 }
 
-.type-badge-upd {
+.type-badge-update {
     background: linear-gradient(135deg, #0ea5e9, #38bdf8);
 }
 
-.type-badge-del {
+.type-badge-suspend {
     background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+.type-badge-reactivate {
+    background: linear-gradient(135deg, #10b981, #34d399);
+}
+
+.type-badge-delete {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+}
+
+.type-badge-view {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
 }
 
 .type-count {
@@ -283,16 +338,28 @@
     transition: width 0.5s ease;
 }
 
-.type-bar-ins {
+.type-bar-create {
     background: linear-gradient(90deg, #22c55e, #4ade80);
 }
 
-.type-bar-upd {
+.type-bar-update {
     background: linear-gradient(90deg, #0ea5e9, #38bdf8);
 }
 
-.type-bar-del {
+.type-bar-suspend {
     background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+.type-bar-reactivate {
+    background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.type-bar-delete {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.type-bar-view {
+    background: linear-gradient(90deg, #8b5cf6, #a78bfa);
 }
 
 .type-percentage {

@@ -1,0 +1,164 @@
+{% extends 'backoffice/base.html.twig' %}
+
+{% block title %}Générer un Quiz IA - {{ chapitre.titre }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card glass-card">
+                <div class="card-header pb-0">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h3 class="mb-0">🤖 Génération automatique de Quiz</h3>
+                            <p class="text-sm mb-0">Chapitre: <strong>{{ chapitre.titre }}</strong></p>
+                        </div>
+                        <a href="{{ path('app_quiz_generate_select_chapitre') }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-arrow-left me-2"></i>Retour
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+
+                    <form method="post" action="{{ path('app_quiz_generate_from_chapitre', {'id': chapitre.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('generate_quiz_' ~ chapitre.id) }}">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="titre" class="form-label">Titre du Quiz</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="titre" 
+                                       name="titre" 
+                                       value="Quiz - {{ chapitre.titre }}" 
+                                       required>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" 
+                                          id="description" 
+                                          name="description" 
+                                          rows="3">Quiz généré automatiquement à partir du contenu du chapitre "{{ chapitre.titre }}"</textarea>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="nombre_questions" class="form-label">
+                                    <i class="fas fa-question-circle me-2"></i>Nombre de questions
+                                </label>
+                                <select class="form-select" id="nombre_questions" name="nombre_questions" required>
+                                    <option value="3">3 questions</option>
+                                    <option value="5" selected>5 questions</option>
+                                    <option value="7">7 questions</option>
+                                    <option value="10">10 questions</option>
+                                </select>
+                                <small class="text-muted">Maximum 10 questions par génération</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="difficulte" class="form-label">
+                                    <i class="fas fa-chart-line me-2"></i>Niveau de difficulté
+                                </label>
+                                <select class="form-select" id="difficulte" name="difficulte" required>
+                                    <option value="facile">😊 Facile</option>
+                                    <option value="moyen" selected>😐 Moyen</option>
+                                    <option value="difficile">😰 Difficile</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="seuil_reussite" class="form-label">
+                                    <i class="fas fa-percentage me-2"></i>Seuil de réussite (%)
+                                </label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="seuil_reussite" 
+                                       name="seuil_reussite" 
+                                       value="60" 
+                                       min="0" 
+                                       max="100" 
+                                       required>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="max_tentatives" class="form-label">
+                                    <i class="fas fa-redo me-2"></i>Tentatives max
+                                </label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="max_tentatives" 
+                                       name="max_tentatives" 
+                                       placeholder="Illimité" 
+                                       min="1">
+                                <small class="text-muted">Laisser vide pour illimité</small>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="duree_max" class="form-label">
+                                    <i class="fas fa-clock me-2"></i>Durée max (min)
+                                </label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="duree_max" 
+                                       name="duree_max" 
+                                       placeholder="Pas de limite" 
+                                       min="1">
+                                <small class="text-muted">Laisser vide pour pas de limite</small>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mt-3">
+                            <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Informations importantes</h6>
+                            <ul class="mb-0">
+                                <li>Le quiz sera créé en mode <strong>brouillon</strong> pour révision</li>
+                                <li>L'IA analyse le contenu du chapitre pour créer des questions pertinentes</li>
+                                <li>Chaque question aura 4 options avec une seule réponse correcte</li>
+                                <li>Vous pourrez modifier les questions après génération</li>
+                                <li>La génération prend quelques secondes</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ path('app_quiz_generate_select_chapitre') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-magic me-2"></i>Générer le Quiz avec l'IA
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Aperçu du contenu du chapitre -->
+            <div class="card glass-card mt-4">
+                <div class="card-header pb-0">
+                    <h5 class="mb-0"><i class="fas fa-book-open me-2"></i>Aperçu du contenu du chapitre</h5>
+                </div>
+                <div class="card-body">
+                    <div class="content-preview" style="max-height: 300px; overflow-y: auto;">
+                        {{ chapitre.contenu|raw }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.content-preview {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+</style>
+{% endblock %}

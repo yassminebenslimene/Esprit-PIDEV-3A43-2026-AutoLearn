@@ -121,6 +121,9 @@ private Collection $activities;
     #[ORM\Column(name: 'lastLoginAt', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $lastLoginAt = null;
 
+    #[ORM\Column(name: 'lastActivityAt', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $lastActivityAt = null;
+
    
     public function __construct()
     {
@@ -128,6 +131,7 @@ private Collection $activities;
         $this->challenges = new ArrayCollection();
         $this->isSuspended = false;
         $this->lastLoginAt = new \DateTime(); // Initialize with current time
+        $this->lastActivityAt = new \DateTime(); // Initialize with current time
         $this->activities = new ArrayCollection();
     }
 
@@ -319,6 +323,17 @@ public function getLastLoginAt(): ?\DateTimeInterface
 public function setLastLoginAt(?\DateTimeInterface $lastLoginAt): static
 {
     $this->lastLoginAt = $lastLoginAt;
+    return $this;
+}
+
+public function getLastActivityAt(): ?\DateTimeInterface
+{
+    return $this->lastActivityAt;
+}
+
+public function setLastActivityAt(?\DateTimeInterface $lastActivityAt): static
+{
+    $this->lastActivityAt = $lastActivityAt;
     return $this;
 }
 

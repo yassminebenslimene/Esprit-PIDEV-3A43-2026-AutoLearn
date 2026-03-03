@@ -69,17 +69,51 @@ class EmailService
     public function sendEventCancellation(
         string $toEmail,
         string $studentName,
-        string $eventName
+        string $teamName,
+        string $eventName,
+        \DateTimeInterface $eventDate,
+        string $eventLocation
     ): void {
         $html = $this->twig->render('emails/event_cancelled.html.twig', [
             'studentName' => $studentName,
+            'teamName' => $teamName,
             'eventName' => $eventName,
+            'eventDate' => $eventDate,
+            'eventLocation' => $eventLocation,
         ]);
 
         $email = (new Email())
             ->from(new Address($this->fromEmail, $this->fromName))
             ->to($toEmail)
-            ->subject('Event Cancelled - ' . $eventName)
+            ->subject('⚠️ Event Cancelled - ' . $eventName)
+            ->html($html);
+
+        $this->mailer->send($email);
+    }
+    
+    /**
+     * Envoie un email de démarrage d'événement à tous les participants
+     */
+    public function sendEventStarted(
+        string $toEmail,
+        string $studentName,
+        string $teamName,
+        string $eventName,
+        \DateTimeInterface $eventDate,
+        string $eventLocation
+    ): void {
+        $html = $this->twig->render('emails/event_started.html.twig', [
+            'studentName' => $studentName,
+            'teamName' => $teamName,
+            'eventName' => $eventName,
+            'eventDate' => $eventDate,
+            'eventLocation' => $eventLocation,
+        ]);
+
+        $email = (new Email())
+            ->from(new Address($this->fromEmail, $this->fromName))
+            ->to($toEmail)
+            ->subject('🚀 Event Started - ' . $eventName)
             ->html($html);
 
         $this->mailer->send($email);
@@ -132,6 +166,35 @@ class EmailService
             ->from(new Address($this->fromEmail, $this->fromName))
             ->to($toEmail)
             ->subject('Invitation à rejoindre ' . $communityName)
+            ->html($html);
+
+        $this->mailer->send($email);
+    }
+
+    /**
+     * Envoie un email de confirmation de complétion de challenge
+     */
+    public function sendChallengeReceipt(
+        string $toEmail,
+        string $challengeName,
+        int $earnedPoints,
+        int $totalPoints,
+        \DateTimeInterface $completedAt
+    ): void {
+        $percentage = $totalPoints > 0 ? round(($earnedPoints / $totalPoints) * 100, 2) : 0;
+        
+        $html = $this->twig->render('emails/challenge_receipt.html.twig', [
+            'challengeName' => $challengeName,
+            'earnedPoints' => $earnedPoints,
+            'totalPoints' => $totalPoints,
+            'percentage' => $percentage,
+            'completedAt' => $completedAt,
+        ]);
+
+        $email = (new Email())
+            ->from(new Address($this->fromEmail, $this->fromName))
+            ->to($toEmail)
+            ->subject('🎉 Challenge Completed - ' . $challengeName)
             ->html($html);
 
         $this->mailer->send($email);

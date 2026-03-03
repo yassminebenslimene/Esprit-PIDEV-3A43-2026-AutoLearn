@@ -1,38 +1,24 @@
 simple_things_entity_audit:
-    # Track concrete child entities (not abstract parent)
     audited_entities:
-        # User Management (track concrete classes, not abstract User)
         - App\Entity\Etudiant
         - App\Entity\Admin
-        
-        # Course Management (GestionDeCours namespace)
         - App\Entity\GestionDeCours\Cours
         - App\Entity\GestionDeCours\Chapitre
         - App\Entity\GestionDeCours\Ressource
-        
-        # Exercise & Challenge
         - App\Entity\Exercice
         - App\Entity\Challenge
         - App\Entity\Quiz
-        
-        # Events
         - App\Entity\Evenement
-        
-        # Community
         - App\Entity\Communaute
         - App\Entity\Post
         - App\Entity\Commentaire
-        
-        # Teams
         - App\Entity\Equipe
-    
-    # Ignore these fields (they change automatically)
-    global_ignore_columns: 
+
+    global_ignore_columns:
         - createdAt
         - updatedAt
         - lastModifiedAt
-    
-    # Table naming
+
     table_prefix: ''
     table_suffix: '_audit'
     revision_table_name: 'revisions'

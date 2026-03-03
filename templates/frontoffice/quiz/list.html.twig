@@ -245,6 +245,106 @@
             color: white;
         }
         
+        .btn-start-quiz.retry {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+        }
+        
+        .btn-start-quiz.retry:hover {
+            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.6);
+        }
+        
+        .btn-start-quiz.success {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-start-quiz.success:hover {
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.6);
+        }
+        
+        .btn-start-quiz.disabled {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            box-shadow: 0 6px 20px rgba(149, 165, 166, 0.4);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .btn-start-quiz.disabled:hover {
+            transform: none;
+            box-shadow: 0 6px 20px rgba(149, 165, 166, 0.4);
+        }
+        
+        /* Informations sur les tentatives */
+        .quiz-attempts-info {
+            background: rgba(70, 23, 143, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #46178f;
+        }
+        
+        .attempts-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            color: #46178f;
+            font-size: 16px;
+        }
+        
+        .attempts-stats {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1f2937;
+        }
+        
+        .stat-value.success {
+            color: #2ecc71;
+        }
+        
+        .stat-value.failed {
+            color: #e74c3c;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+        
+        .success-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+        
         /* Empty State */
         .empty-state {
             background: white;
@@ -365,7 +465,7 @@
 </head>
 <body>
     <div class="quiz-list-header">
-        <a href="{{ path('app_chapitre_index_front') }}" class="back-link">
+        <a href="{{ path('app_chapitre_index_front', {'id': chapitre.cours.id}) }}" class="back-link">
             <i class="fa fa-arrow-left"></i>
             <span>Retour aux chapitres</span>
         </a>
@@ -456,10 +556,83 @@
                             {% endif %}
                         </div>
                         
-                        <a href="{{ path('app_quiz_start', {'id': quiz.id}) }}" class="btn-start-quiz">
-                            <i class="fa fa-play-circle"></i>
-                            <span>Commencer le quiz</span>
-                        </a>
+                        {% if quizStatistiques[quiz.id] is defined %}
+                            {% set stats = quizStatistiques[quiz.id] %}
+                            
+                            {% if stats.nombreTentatives > 0 %}
+                                <div class="quiz-attempts-info">
+                                    <div class="attempts-header">
+                                        <i class="fa fa-history"></i>
+                                        <span>Vos tentatives</span>
+                                    </div>
+                                    
+                                    <div class="attempts-stats">
+                                        <div class="stat-item">
+                                            <span class="stat-value">{{ stats.nombreTentatives }}</span>
+                                            <span class="stat-label">
+                                                {% if stats.maxTentatives %}
+                                                    / {{ stats.maxTentatives }}
+                                                {% endif %}
+                                                tentative{{ stats.nombreTentatives > 1 ? 's' : '' }}
+                                            </span>
+                                        </div>
+                                        
+                                        {% if stats.derniersResultats %}
+                                            <div class="stat-item">
+                                                <span class="stat-value {{ stats.aReussi ? 'success' : 'failed' }}">
+                                                    {{ stats.derniersResultats.percentage|round(1) }}%
+                                                </span>
+                                                <span class="stat-label">dernier score</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    {% if stats.aReussi %}
+                                        <div class="success-badge">
+                                            <i class="fa fa-check-circle"></i>
+                                            <span>Quiz réussi !</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                        
+                        {% if quizStatistiques[quiz.id] is defined %}
+                            {% set stats = quizStatistiques[quiz.id] %}
+                            
+                            {% if not stats.peutRecommencer %}
+                                <button class="btn-start-quiz disabled" disabled>
+                                    <i class="fa fa-ban"></i>
+                                    <span>
+                                        {% if stats.nombreTentatives >= stats.maxTentatives %}
+                                            Tentatives épuisées ({{ stats.nombreTentatives }}/{{ stats.maxTentatives }})
+                                        {% else %}
+                                            Quiz non disponible
+                                        {% endif %}
+                                    </span>
+                                </button>
+                            {% elseif stats.aReussi %}
+                                <a href="{{ path('app_quiz_start', {'id': quiz.id}) }}" class="btn-start-quiz success">
+                                    <i class="fa fa-redo"></i>
+                                    <span>Refaire le quiz</span>
+                                </a>
+                            {% elseif stats.nombreTentatives > 0 %}
+                                <a href="{{ path('app_quiz_start', {'id': quiz.id}) }}" class="btn-start-quiz retry">
+                                    <i class="fa fa-redo"></i>
+                                    <span>Nouvelle tentative</span>
+                                </a>
+                            {% else %}
+                                <a href="{{ path('app_quiz_start', {'id': quiz.id}) }}" class="btn-start-quiz">
+                                    <i class="fa fa-play-circle"></i>
+                                    <span>Commencer le quiz</span>
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{{ path('app_quiz_start', {'id': quiz.id}) }}" class="btn-start-quiz">
+                                <i class="fa fa-play-circle"></i>
+                                <span>Commencer le quiz</span>
+                            </a>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>

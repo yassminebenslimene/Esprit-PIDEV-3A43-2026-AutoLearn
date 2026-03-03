@@ -23,11 +23,84 @@
     {% endblock %}
     
     <style>
+        /* Fix navbar position */
+        .header-area {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 9999 !important;
+            background-color: rgba(122, 106, 216, 0.95) !important;
+            backdrop-filter: blur(10px) !important;
+            margin-bottom: 0 !important;
+        }
+        
+        /* Add padding to body to compensate for fixed header */
+        body {
+            padding-top: 80px !important;
+        }
+        
+        /* Remove any white space after header */
+        .header-area + * {
+            margin-top: 0 !important;
+        }
+        
         /* Profile Dropdown Styles */
         .main-nav {
             display: flex !important;
             align-items: center !important;
             height: 80px !important;
+        }
+        
+        /* FORCE NAVBAR ON SINGLE LINE */
+        .main-nav .nav {
+            flex-wrap: nowrap !important;
+            white-space: nowrap !important;
+        }
+        
+        .main-nav .nav li a {
+            padding: 0 10px !important;
+            font-size: 14px !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-btn {
+            padding: 0 10px !important;
+        }
+        
+        /* Notification Badge Styles */
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(255, 68, 68, 0.6);
+            animation: pulse 2s infinite;
+            z-index: 10;
+        }
+        
+        .badge-count {
+            color: white;
+            font-size: 10px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 6px rgba(255, 68, 68, 0.6);
+            }
+            50% {
+                transform: scale(1.2);
+                box-shadow: 0 4px 12px rgba(255, 68, 68, 0.8);
+            }
         }
         
         .main-nav .nav {
@@ -205,21 +278,34 @@
                         <li><a href="{{ path('app_frontoffice') }}">{{ 'nav.home'|trans }}</a></li>
                         <li><a href="{{ path('app_frontoffice') }}#cours">{{ 'nav.courses'|trans }}</a></li>
                         <li><a href="{{ path('app_events') }}">{{ 'nav.events'|trans }}</a></li>
-                        <li><a href="{{ path('frontchallenge') }}">{{ 'nav.challenges'|trans }}</a></li>
+                        <li><a href="{{ path('app_frontoffice') }}#challenge">{{ 'nav.challenges'|trans }}</a></li>
                         <li><a href="{{ path('front_communaute') }}">{{ 'nav.community'|trans }}</a></li>
+                        <li><a href="{{ path('app_about') }}">{{ 'nav.about'|trans }}</a></li>
+                        
                         {% if app.user %}
-                            <li><a href="{{ path('app_mes_participations') }}">{{ 'nav.my_participations'|trans }}</a></li>
+                            {# Notifications avec badge #}
+                            <li style="position: relative;">
+                                <a href="{{ path('app_notifications_index') }}" style="position: relative; display: inline-flex; align-items: center; gap: 5px;">
+                                    <i class="fa fa-bell"></i>
+                                    <span id="notification-badge" class="notification-badge" style="display: none;"></span>
+                                </a>
+                            </li>
                             
+                            {# Dropdown Profil #}
                             <li class="profile-dropdown-container">
                                 <a href="javascript:void(0);" onclick="toggleProfileDropdown(event)" class="profile-dropdown-btn">
                                     <i class="fa fa-user-circle"></i>
-                                    {{ app.user.prenom }} {{ app.user.nom }}
-                                    <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                                    <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
                                 </a>
                                 <ul class="profile-dropdown-menu" id="profileDropdown">
                                     <li>
                                         <a href="{{ path('app_profile') }}">
                                             <i class="fa fa-id-card"></i> {{ 'nav.profile'|trans }}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ path('app_mes_participations') }}">
+                                            <i class="fa fa-trophy"></i> {{ 'nav.my_participations'|trans }}
                                         </a>
                                     </li>
                                     <li class="profile-dropdown-divider"></li>
@@ -232,43 +318,33 @@
                             </li>
                         {% else %}
                             <li><a href="{{ path('backoffice_login') }}">{{ 'nav.login'|trans }}</a></li>
-                            <li><a href="{{ path('backoffice_register') }}">{{ 'nav.register'|trans }}</a></li>
                         {% endif %}
                         
-                        {# Sélecteur de langue #}
+                        {# Sélecteur de langue compact #}
                         <li class="profile-dropdown-container">
                             <a href="javascript:void(0);" onclick="toggleLanguageDropdown(event)" class="profile-dropdown-btn">
                                 <i class="fa fa-globe"></i>
-                                {% if app.request.locale == 'fr' %}
-                                    {{ 'language.french'|trans }}
-                                {% elseif app.request.locale == 'en' %}
-                                    {{ 'language.english'|trans }}
-                                {% elseif app.request.locale == 'es' %}
-                                    {{ 'language.spanish'|trans }}
-                                {% elseif app.request.locale == 'ar' %}
-                                    {{ 'language.arabic'|trans }}
-                                {% endif %}
-                                <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                                <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
                             </a>
                             <ul class="profile-dropdown-menu" id="languageDropdown">
                                 <li>
                                     <a href="{{ path('app_change_language', {'locale': 'fr'}) }}">
-                                        <i class="fa fa-flag"></i> {{ 'language.french'|trans }}
+                                        <i class="fa fa-flag"></i> Français
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ path('app_change_language', {'locale': 'en'}) }}">
-                                        <i class="fa fa-flag"></i> {{ 'language.english'|trans }}
+                                        <i class="fa fa-flag"></i> English
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ path('app_change_language', {'locale': 'es'}) }}">
-                                        <i class="fa fa-flag"></i> {{ 'language.spanish'|trans }}
+                                        <i class="fa fa-flag"></i> Español
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ path('app_change_language', {'locale': 'ar'}) }}">
-                                        <i class="fa fa-flag"></i> {{ 'language.arabic'|trans }}
+                                        <i class="fa fa-flag"></i> العربية
                                     </a>
                                 </li>
                             </ul>
@@ -289,6 +365,123 @@
 <!-- ***** Header Area End ***** -->
 
 {% block body %}{% endblock %}
+
+<!-- ***** Footer Start ***** -->
+<footer style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 60px 0 20px; margin-top: 80px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h4 style="color: white; margin-bottom: 20px; font-weight: 700;">
+                        <i class="fa fa-graduation-cap" style="margin-right: 10px;"></i>
+                        AutoLearn
+                    </h4>
+                    <p style="color: rgba(255,255,255,0.9); line-height: 1.8; margin-bottom: 25px;">
+                        Plateforme d'apprentissage en ligne dédiée à la programmation et au développement de compétences techniques. Apprenez à votre rythme avec nos cours interactifs.
+                    </p>
+                    <div style="margin-top: 20px;">
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; text-align: center; line-height: 40px; color: white; margin-right: 10px; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; text-align: center; line-height: 40px; color: white; margin-right: 10px; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; text-align: center; line-height: 40px; color: white; margin-right: 10px; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fa fa-linkedin"></i>
+                        </a>
+                        <a href="#" style="display: inline-block; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; text-align: center; line-height: 40px; color: white; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h5 style="color: white; margin-bottom: 20px; font-weight: 600;">Navigation</h5>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 12px;">
+                            <a href="{{ path('app_frontoffice') }}#top" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Accueil
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="{{ path('app_frontoffice') }}#cours" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Cours
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="{{ path('app_frontoffice') }}#events" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Événements
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="{{ path('app_frontoffice') }}#challenge" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Challenges
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h5 style="color: white; margin-bottom: 20px; font-weight: 600;">Ressources</h5>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 12px;">
+                            <a href="{{ path('front_communaute') }}" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Communauté
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="{{ path('app_mes_participations') }}" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Mes Participations
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="{{ path('app_profile') }}" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Mon Profil
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="{{ path('app_frontoffice') }}#contact" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s; display: block;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">
+                                <i class="fa fa-angle-right" style="margin-right: 8px;"></i> Contact
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="footer-section">
+                    <h5 style="color: white; margin-bottom: 20px; font-weight: 600;">Newsletter</h5>
+                    <p style="color: rgba(255,255,255,0.9); margin-bottom: 15px; font-size: 14px;">Restez informé de nos nouveaux cours et événements.</p>
+                    <form style="display: flex; margin-bottom: 20px;">
+                        <input type="email" placeholder="Votre email..." style="flex: 1; padding: 12px 15px; border: none; border-radius: 5px 0 0 5px; outline: none; font-size: 14px;">
+                        <button type="submit" style="padding: 12px 20px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 0 5px 5px 0; cursor: pointer; transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </form>
+                    <div style="color: rgba(255,255,255,0.9); font-size: 14px;">
+                        <i class="fa fa-envelope" style="margin-right: 8px;"></i>
+                        autolearn66@gmail.com
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row" style="margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.2);">
+            <div class="col-lg-12 text-center">
+                <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 14px;">
+                    Copyright © {{ "now"|date("Y") }} <strong style="color: white;">AutoLearn</strong>. Tous droits réservés. 
+                    <span style="margin: 0 10px;">|</span>
+                    Plateforme d'apprentissage en ligne
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- ***** Footer End ***** -->
 
 <!-- Scripts -->
 {% block javascripts %}
@@ -358,7 +551,33 @@
                     return true;
                 });
             }
+            
+            // Charger le nombre de notifications non lues
+            {% if app.user %}
+            updateNotificationBadge();
+            // Actualiser toutes les 30 secondes
+            setInterval(updateNotificationBadge, 30000);
+            {% endif %}
         });
+        
+        {% if app.user %}
+        function updateNotificationBadge() {
+            fetch('{{ path('app_notifications_unread_count') }}')
+                .then(response => response.json())
+                .then(data => {
+                    var badge = document.getElementById('notification-badge');
+                    if (badge) {
+                        if (data.count > 0) {
+                            badge.textContent = data.count > 9 ? '9+' : data.count;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => console.error('Erreur lors du chargement des notifications:', error));
+        }
+        {% endif %}
     </script>
 {% endblock %}
 

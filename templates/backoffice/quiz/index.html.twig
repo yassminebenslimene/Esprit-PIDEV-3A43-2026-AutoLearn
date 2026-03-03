@@ -11,6 +11,13 @@
                 <p class="card-subtitle">Gérez vos quiz et questionnaires</p>
             </div>
             <div class="card-actions">
+                <a href="{{ path('app_quiz_generate_select_chapitre') }}" class="card-btn" style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; margin-right: 0.5rem;">
+                    <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                    🤖 Générer avec IA
+                </a>
                 <a href="{{ path('app_quiz_new') }}" class="card-btn" style="background: linear-gradient(135deg, var(--emerald-light), var(--emerald)); color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none;">
                     <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="5" x2="12" y2="19"/>

@@ -12,7 +12,7 @@
             padding: 20px;
         }
         .header {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -23,21 +23,20 @@
             padding: 30px;
             border-radius: 0 0 10px 10px;
         }
-        .alert-box {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
+        .event-details {
+            background: white;
             padding: 20px;
             border-radius: 8px;
             margin: 20px 0;
+            border-left: 4px solid #e53e3e;
         }
-        .button {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 12px 30px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
+        .alert-box {
+            background: #fee2e2;
+            border: 2px solid #e53e3e;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
         }
         .footer {
             text-align: center;
@@ -49,26 +48,41 @@
 </head>
 <body>
     <div class="header">
-        <h1>⚠️ Event Cancelled</h1>
+        <h1>❌ Event Cancelled</h1>
     </div>
     
     <div class="content">
         <p>Hello <strong>{{ studentName }}</strong>,</p>
         
+        <p>We regret to inform you that the following event has been <strong>cancelled</strong>:</p>
+        
+        <div class="event-details">
+            <h2>📅 {{ eventName }}</h2>
+            <p><strong>Team:</strong> {{ teamName }}</p>
+            <p><strong>Originally scheduled:</strong> {{ eventDate|date('F d, Y \\a\\t H:i') }}</p>
+            <p><strong>Location:</strong> {{ eventLocation }}</p>
+        </div>
+        
         <div class="alert-box">
-            <h2>{{ eventName }}</h2>
-            <p><strong>We regret to inform you that this event has been cancelled.</strong></p>
+            <h3 style="margin: 0 0 10px 0; color: #991b1b;">⚠️ Important Notice</h3>
+            <p style="margin: 0; color: #991b1b; font-weight: bold;">
+                This event will NOT take place. Please do not go to the venue.
+            </p>
         </div>
         
-        <p>We apologize for any inconvenience this may cause. Your participation has been automatically removed.</p>
+        <p><strong>What happens next?</strong></p>
+        <ul>
+            <li>✅ Your registration has been automatically cancelled</li>
+            <li>✅ No action is required from you</li>
+            <li>✅ Watch for announcements about future events</li>
+            <li>✅ We apologize for any inconvenience</li>
+        </ul>
         
-        <p>Please check our platform regularly for new upcoming events that might interest you.</p>
+        <p>We understand this may be disappointing. We'll notify you as soon as new events are scheduled!</p>
         
-        <div style="text-align: center;">
-            <a href="http://localhost:8000/frontoffice/evenement" class="button">
-                Browse Other Events
-            </a>
-        </div>
+        <p style="text-align: center; margin-top: 30px; font-size: 16px; color: #667eea; font-weight: bold;">
+            📧 Stay tuned for upcoming events!
+        </p>
     </div>
     
     <div class="footer">

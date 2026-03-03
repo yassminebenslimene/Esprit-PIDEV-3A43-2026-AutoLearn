@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #7fb77e 0%, #4a9b4a 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .header .icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .content h2 {
+            color: #2a2a2a;
+            margin-top: 0;
+        }
+        .content p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        .score-card {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .score-card .score {
+            font-size: 48px;
+            font-weight: bold;
+            color: #7fb77e;
+            margin: 10px 0;
+        }
+        .score-card .label {
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .stats {
+            display: table;
+            width: 100%;
+            margin: 20px 0;
+        }
+        .stat-item {
+            display: table-cell;
+            text-align: center;
+            padding: 15px;
+            border-right: 1px solid #e0e0e0;
+        }
+        .stat-item:last-child {
+            border-right: none;
+        }
+        .stat-item .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2a2a2a;
+        }
+        .stat-item .label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #7fb77e 0%, #4a9b4a 100%);
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .footer {
+            background-color: #f9f9f9;
+            padding: 20px;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .badge.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .badge.warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="icon">🎉</div>
+            <h1>Challenge Completed!</h1>
+        </div>
+        
+        <div class="content">
+            <h2>Félicitations!</h2>
+            <p>Vous avez terminé le challenge <strong>{{ challengeName }}</strong> avec succès!</p>
+            
+            <div class="score-card">
+                <div class="label">Votre Score</div>
+                <div class="score">{{ earnedPoints }}/{{ totalPoints }}</div>
+                <div class="badge {% if percentage >= 70 %}success{% else %}warning{% endif %}">
+                    {{ percentage }}% de réussite
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="value">{{ earnedPoints }}</div>
+                    <div class="label">Points Gagnés</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value">{{ totalPoints }}</div>
+                    <div class="label">Points Total</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value">{{ completedAt|date('d/m/Y') }}</div>
+                    <div class="label">Date</div>
+                </div>
+            </div>
+            
+            <p>Continuez à relever des défis et à améliorer vos compétences!</p>
+            
+            <center>
+                <a href="{{ url('app_frontoffice') }}" class="button">Voir Plus de Challenges</a>
+            </center>
+        </div>
+        
+        <div class="footer">
+            <p>© {{ 'now'|date('Y') }} AutoLearn Platform. Tous droits réservés.</p>
+            <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+        </div>
+    </div>
+</body>
+</html>

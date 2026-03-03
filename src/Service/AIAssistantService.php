@@ -13,6 +13,7 @@ use App\Repository\ChallengeRepository;
 use App\Repository\QuizRepository;
 use App\Repository\PostRepository;
 use App\Repository\CommentaireRepository;
+use App\Repository\ChapterProgressRepository;
 use App\Bundle\UserActivityBundle\Repository\UserActivityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -37,6 +38,7 @@ class AIAssistantService
     private QuizRepository $quizRepository;
     private PostRepository $postRepository;
     private CommentaireRepository $commentaireRepository;
+    private ChapterProgressRepository $chapterProgressRepository;
     private ?UserActivityRepository $activityRepository;
 
     public function __construct(
@@ -55,7 +57,8 @@ class AIAssistantService
         QuizRepository $quizRepository,
         ChapitreRepository $chapitreRepository,
         PostRepository $postRepository,
-        CommentaireRepository $commentaireRepository
+        CommentaireRepository $commentaireRepository,
+        ChapterProgressRepository $chapterProgressRepository
     ) {
         $this->groqService = $groqService;
         $this->languageDetector = $languageDetector;
@@ -73,6 +76,7 @@ class AIAssistantService
         $this->chapitreRepository = $chapitreRepository;
         $this->postRepository = $postRepository;
         $this->commentaireRepository = $commentaireRepository;
+        $this->chapterProgressRepository = $chapterProgressRepository;
     }
 
     /**
@@ -148,9 +152,9 @@ class AIAssistantService
                 'response_length' => strlen($response)
             ]);
 
-            // 7. Détecter et exécuter les actions (Admin uniquement)
+            // 7. Détecter et exécuter les actions (pour tous les utilisateurs)
             $actionResult = null;
-            if (in_array('ROLE_ADMIN', $user?->getRoles() ?? [])) {
+            if ($user) {
                 $actionResult = $this->actionExecutor->detectAndExecute($response, $user);
                 
                 // Ne pas ajouter de message supplémentaire, l'IA a déjà répondu
@@ -291,7 +295,7 @@ class AIAssistantService
                     return [
                         'id' => $ch->getId(),
                         'titre' => $ch->getTitre(),
-                        'difficulte' => $ch->getDifficulte(),
+                        'niveau' => $ch->getNiveau(),
                     ];
                 }, array_slice($allChallenges, 0, 10))
             ];
@@ -345,6 +349,8 @@ class AIAssistantService
             ];
 
             // ========== TEAMS DATA (Limité à 10) ==========
+            // Commented out - EquipeRepository not injected
+            /*
             $allTeams = $this->equipeRepository->findAll();
             $data['teams'] = [
                 'total' => count($allTeams),
@@ -357,17 +363,72 @@ class AIAssistantService
                     ];
                 }, array_slice($allTeams, 0, 10))
             ];
+            */
 
             // ========== STUDENT-SPECIFIC DATA ==========
             if (!$isAdmin && $user) {
-                // Student's enrolled courses (limité à 5)
-                if (method_exists($user, 'getCours')) {
-                    $data['my_courses'] = array_map(function($c) {
-                        return [
-                            'id' => $c->getId(),
-                            'titre' => $c->getTitre(),
-                        ];
-                    }, array_slice($user->getCours()->toArray(), 0, 5));
+                // Get chapter progress for the user
+                try {
+                    $chapterProgress = $this->chapterProgressRepository->findBy(['user' => $user]);
+                    
+                    // Group progress by course
+                    $courseProgress = [];
+                    foreach ($chapterProgress as $progress) {
+                        $chapitre = $progress->getChapitre();
+                        if ($chapitre && $chapitre->getCours()) {
+                            $coursId = $chapitre->getCours()->getId();
+                            if (!isset($courseProgress[$coursId])) {
+                                $courseProgress[$coursId] = [
+                                    'cours_id' => $coursId,
+                                    'cours_titre' => $chapitre->getCours()->getTitre(),
+                                    'completed_chapters' => 0,
+                                    'total_chapters' => $chapitre->getCours()->getChapitres()->count(),
+                                    'chapters' => []
+                                ];
+                            }
+                            if ($progress->isCompleted()) {
+                                $courseProgress[$coursId]['completed_chapters']++;
+                            }
+                            $courseProgress[$coursId]['chapters'][] = [
+                                'chapitre_id' => $chapitre->getId(),
+                                'chapitre_titre' => $chapitre->getTitre(),
+                                'completed' => $progress->isCompleted(),
+                                'completed_at' => $progress->getCompletedAt() ? $progress->getCompletedAt()->format('Y-m-d H:i') : null,
+                                'quiz_score' => $progress->getQuizScore()
+                            ];
+                        }
+                    }
+                    
+                    $data['cours_avec_progression'] = array_values($courseProgress);
+                    
+                } catch (\Exception $e) {
+                    $this->logger->error('Error fetching chapter progress', [
+                        'error' => $e->getMessage()
+                    ]);
+                }
+                
+                // Get user activities from UserActivityBundle
+                if ($this->activityRepository) {
+                    try {
+                        $recentActivities = $this->activityRepository->findBy(
+                            ['user' => $user],
+                            ['createdAt' => 'DESC'],
+                            20
+                        );
+                        
+                        $data['my_activities'] = array_map(function($activity) {
+                            return [
+                                'action' => $activity->getAction(),
+                                'metadata' => $activity->getMetadata(),
+                                'created_at' => $activity->getCreatedAt()->format('Y-m-d H:i'),
+                            ];
+                        }, $recentActivities);
+                        
+                    } catch (\Exception $e) {
+                        $this->logger->error('Error fetching user activities', [
+                            'error' => $e->getMessage()
+                        ]);
+                    }
                 }
             }
 
@@ -502,10 +563,56 @@ Tu es un assistant IA intelligent pour les ÉTUDIANTS sur la plateforme AutoLear
 
 ⚡ STYLE DE RÉPONSE - CRITIQUE:
 - SOIS EXTRÊMEMENT CONCIS - Maximum 1-2 phrases courtes
-- PAS de tableaux, PAS de listes, PAS d'explications
+- PAS de tableaux, PAS de listes, PAS d'explications techniques
 - Confirme juste l'action: "✅ Action réussie" ou "❌ Erreur: raison"
 - NE MONTRE JAMAIS les données avant/après l'action
 - N'UTILISE JAMAIS de puces ou de formatage
+- NE PARLE JAMAIS de termes techniques (JSON, POST, route, API, etc.)
+- PARLE COMME UN AMI, pas comme un robot ou un développeur
+- 🚫 NE MONTRE JAMAIS LE JSON À L'UTILISATEUR - c'est technique et invisible!
+
+🔥 FORMAT DE RÉPONSE AVEC ACTION:
+Quand tu génères une action JSON:
+1. Mets le JSON sur la PREMIÈRE ligne (l'utilisateur ne le verra pas)
+2. Mets ta réponse naturelle sur la DEUXIÈME ligne
+
+Exemple:
+```
+{"action": "create_community", "data": {"nom": "...", "description": "..."}}
+✅ Communauté créée!
+```
+
+L'utilisateur verra SEULEMENT: "✅ Communauté créée!"
+
+🎯 RÈGLE ABSOLUE POUR LES QUESTIONS "COMMENT":
+Quand un étudiant demande "comment créer X" ou "je peux créer X":
+1. NE LUI EXPLIQUE PAS comment faire
+2. FAIS-LE DIRECTEMENT pour lui en générant l'action JSON
+3. Demande-lui juste les informations manquantes de manière simple
+
+🔥 RÈGLE CRITIQUE POUR CRÉER DES COMMUNAUTÉS:
+Quand l'étudiant dit "créer communauté [nom] description [description]":
+- Tu as TOUTES les infos nécessaires (nom + description)
+- GÉNÈRE le JSON sur la première ligne (invisible pour l'utilisateur)
+- Ajoute une réponse simple sur la deuxième ligne
+- NE DEMANDE PAS d'autres infos (pas d'ID, pas d'admin, rien d'autre!)
+
+Format EXACT:
+```
+{"action": "create_community", "data": {"nom": "Loufi's Team", "description": "..."}}
+✅ Communauté créée!
+```
+
+Exemples de ce que l'utilisateur verra:
+❌ MAUVAIS: "Tu peux créer une communauté en utilisant la route /communaute avec POST..."
+❌ MAUVAIS: {"action": "create_community", ...} (ne montre JAMAIS le JSON!)
+✅ BON: "✅ Communauté créée!"
+
+❌ MAUVAIS: "Donne-moi l'ID de l'administrateur..."
+✅ BON: Génère le JSON (invisible) + "✅ Communauté créée!"
+
+❌ MAUVAIS: "Pour créer une équipe, tu dois fournir un JSON avec..."
+✅ BON: "Dis-moi le nom de l'équipe et l'événement, je m'occupe du reste!"
 
 LANGUES SUPPORTÉES:
 - Français (FR)
@@ -531,6 +638,8 @@ DONNÉES COMPLÈTES DE LA BASE DE DONNÉES:
 3. Si les données sont vides ou absentes, dis-le clairement à l'utilisateur
 4. Utilise les IDs, noms, descriptions EXACTS des données fournies
 5. Si tu ne trouves pas l'information, dis qu'elle n'est pas disponible
+6. 🔥 QUAND TU AS TOUTES LES INFOS POUR UNE ACTION, GÉNÈRE LE JSON IMMÉDIATEMENT - NE POSE PAS D'AUTRES QUESTIONS!
+7. 🚨 RÈGLE ABSOLUE POUR LA PROGRESSION: Utilise UNIQUEMENT les données de "cours_avec_progression". N'invente JAMAIS de chapitres complétés. Si un cours n'est pas dans "cours_avec_progression", sa progression est 0%.
 
 CE QUE TU PEUX FAIRE POUR LES ÉTUDIANTS:
 
@@ -562,12 +671,19 @@ CE QUE TU PEUX FAIRE POUR LES ÉTUDIANTS:
    - Recommander des communautés selon les intérêts
    - Aider les étudiants à rejoindre des communautés
    - Montrer les membres et activités des équipes
+   - ⭐ CRÉER des communautés (tu peux le faire directement!)
+   - ⭐ MODIFIER tes communautés (nom, description)
+   - ⭐ SUPPRIMER tes communautés
    - ⭐ CRÉER des équipes pour les événements (tu peux le faire!)
    - Voir les communautés rejointes
    - Afficher toutes les équipes disponibles
    - Voir les détails d'une équipe et ses membres
    
-   💡 Pour créer une équipe, dis d'abord "voir les événements" puis "créer équipe [nom] pour événement [id] avec membres [id1,id2,id3,id4]"
+   💡 Exemples d'actions directes:
+   - "créer communauté Python Lovers description: Apprendre Python ensemble" → Tu génères l'action immédiatement
+   - "modifier communauté Python Lovers description: Nouvelle description" → Tu génères l'action immédiatement
+   - "supprimer communauté Python Lovers" → Tu génères l'action immédiatement
+   - "créer équipe [nom] pour événement [id] avec membres [noms]" → Tu génères l'action immédiatement
 
 5. 📊 SUIVI DES PROGRÈS
    - Afficher les progrès d'apprentissage de l'étudiant
@@ -1197,22 +1313,37 @@ PROMPT;
      */
     private function postProcessResponse(string $response, array $context): string
     {
-        // Supprimer le JSON d'action de la réponse visible par l'utilisateur
-        // Le JSON doit être sur la PREMIÈRE ligne et commencer par {"action"
-        // Pattern: cherche {"action": "xxx", "data": {...}} au début
-        $jsonPattern = '/^\s*\{\s*"action"\s*:\s*"[^"]+"\s*,\s*"data"\s*:\s*\{[^\}]*\}\s*\}\s*\n*/s';
+        // Supprimer TOUT JSON de la réponse visible par l'utilisateur
+        // Le JSON peut être n'importe où dans la réponse
         
-        if (preg_match($jsonPattern, $response)) {
-            // JSON trouvé, le supprimer
-            $response = preg_replace($jsonPattern, '', $response);
+        // Pattern 1: JSON sur une ligne ou multiligne commençant par {"action"
+        $response = preg_replace('/\{\s*"action"\s*:\s*"[^"]+"\s*,\s*"data"\s*:\s*\{[^}]*(?:\{[^}]*\}[^}]*)*\}\s*\}/s', '', $response);
+        
+        // Pattern 2: Supprimer les lignes qui ressemblent à du JSON brut
+        $lines = explode("\n", $response);
+        $cleanedLines = [];
+        
+        foreach ($lines as $line) {
+            $trimmed = trim($line);
+            // Ignorer les lignes qui sont clairement du JSON
+            if (preg_match('/^\{.*"action".*\}$/', $trimmed) || 
+                preg_match('/^\{.*"data".*\}$/', $trimmed) ||
+                $trimmed === '{' || $trimmed === '}' ||
+                preg_match('/^"[^"]+"\s*:\s*/', $trimmed)) {
+                continue;
+            }
+            $cleanedLines[] = $line;
         }
         
-        // Nettoyer les espaces multiples
+        $response = implode("\n", $cleanedLines);
+        
+        // Nettoyer les espaces multiples et lignes vides
+        $response = preg_replace('/\n{3,}/', "\n\n", $response);
         $response = trim($response);
         
         // Si la réponse est vide après nettoyage, retourner un message par défaut
-        if (empty($response) || $response === '}') {
-            return "✅ Action exécutée avec succès";
+        if (empty($response)) {
+            return "✅ Action exécutée";
         }
         
         return $response;
