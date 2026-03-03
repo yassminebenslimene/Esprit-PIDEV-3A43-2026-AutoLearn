@@ -78,6 +78,72 @@
         </div>
 
         {% if studentRevisions is empty %}
+            {% if userActivities is not empty %}
+                <!-- Show NEW UserActivity data -->
+                <div style="padding: 20px; background: rgba(96, 165, 250, 0.1); border-radius: 8px; margin: 20px;">
+                    <p style="color: #60a5fa; margin: 0;">
+                        ℹ️ Showing data from the new Activity Tracking system. 
+                        <a href="{{ path('admin_user_activity_index') }}" style="color: #93c5fd; text-decoration: underline;">View full activity dashboard →</a>
+                    </p>
+                </div>
+                
+                <div style="overflow-x: auto; padding: 20px;">
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th>Date/Time</th>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Status</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in userActivities|slice(0, 50) %}
+                            <tr>
+                                <td>{{ activity.createdAt|date('Y-m-d H:i:s') }}</td>
+                                <td>
+                                    <a href="{{ path('admin_user_activity_show', {id: activity.user.id}) }}" style="color: #60a5fa; text-decoration: none;">
+                                        {{ activity.user.prenom }} {{ activity.user.nom }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% set actionType = 'default' %}
+                                    {% set actionIcon = '📋' %}
+                                    {% if 'login' in activity.action %}
+                                        {% set actionType = 'login' %}
+                                        {% set actionIcon = '🔐' %}
+                                    {% elseif 'suspend' in activity.action %}
+                                        {% set actionType = 'suspend' %}
+                                        {% set actionIcon = '⛔' %}
+                                    {% elseif 'reactivat' in activity.action %}
+                                        {% set actionType = 'reactivate' %}
+                                        {% set actionIcon = '✅' %}
+                                    {% elseif 'created' in activity.action %}
+                                        {% set actionType = 'create' %}
+                                        {% set actionIcon = '➕' %}
+                                    {% elseif 'updated' in activity.action %}
+                                        {% set actionType = 'update' %}
+                                        {% set actionIcon = '✏️' %}
+                                    {% endif %}
+                                    <span class="action-badge {{ actionType }}">{{ actionIcon }} {{ activity.action }}</span>
+                                </td>
+                                <td>
+                                    {% if activity.success %}
+                                        <span class="status-badge success">✓ Success</span>
+                                    {% else %}
+                                        <span class="status-badge failed">✗ Failed</span>
+                                    {% endif %}
+                                </td>
+                                <td style="font-size: 12px; color: rgba(255,255,255,0.7);">
+                                    {{ activity.ipAddress ?? 'N/A' }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
             <div class="empty-state">
                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -89,6 +155,7 @@
                     Go to User Management
                 </a>
             </div>
+            {% endif %}
         {% else %}
             <!-- Search and Filter Bar for Students -->
             <div style="padding: 20px; border-bottom: 1px solid var(--glass-border);">
@@ -431,6 +498,63 @@
 .empty-state h3 {
     font-size: 24px;
     margin-bottom: 10px;
+}
+
+.action-badge {
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.action-badge.login { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+.action-badge.suspend { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+.action-badge.reactivate { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+.action-badge.create { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
+.action-badge.update { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; }
+.action-badge.delete { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+.action-badge.view { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; }
+.action-badge.default { background: linear-gradient(135deg, #6b7280, #4b5563); color: white; }
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.status-badge.success { background: #10b981; color: white; }
+.status-badge.failed { background: #ef4444; color: white; }
+
+.audit-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.audit-table thead tr {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.audit-table th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+}
+
+.audit-table td {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.9);
+}
+
+.audit-table tbody tr:hover {
+    background: rgba(255,255,255,0.05);
+}
 }
 
 .empty-state p {
