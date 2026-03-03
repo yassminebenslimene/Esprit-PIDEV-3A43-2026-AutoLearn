@@ -511,3 +511,9 @@ body {
         font-size: 0.9rem;
     }
 }
+
+
+/* Position relative pour les badges de complétion */
+.chapter-card {
+    position: relative !important;
+}

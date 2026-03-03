@@ -22,8 +22,9 @@ class AIReportService
     ) {
         $this->httpClient = $httpClient;
         $this->analyticsService = $analyticsService;
-        $this->apiKey = $huggingfaceApiKey;
-        $this->model = $huggingfaceModel;
+        // Utiliser Groq au lieu de Hugging Face
+        $this->apiKey = $_ENV['GROQ_API_KEY'] ?? $huggingfaceApiKey;
+        $this->model = $_ENV['GROQ_MODEL'] ?? 'meta-llama/llama-4-scout-17b-16e-instruct';
     }
 
     /**
@@ -202,84 +203,61 @@ PROMPT;
     }
 
     /**
-     * Appelle l'API Mistral via Hugging Face (nouvelle API router)
+     * Appelle l'API Groq pour générer les rapports
      */
     private function callMistralAPI(string $prompt): ?string
     {
         try {
-            // Vérifier que la clé API est configurée
-            if (empty($this->apiKey) || $this->apiKey === 'your_huggingface_token_here') {
-                error_log('ERREUR: Clé API Hugging Face non configurée ou invalide');
-                throw new \Exception('Clé API Hugging Face non configurée. Vérifiez HUGGINGFACE_API_KEY dans .env.local');
+            // Utiliser Groq API
+            $groqApiKey = $this->apiKey;
+            $groqModel = $this->model;
+            $groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
+            
+            if (empty($groqApiKey) || $groqApiKey === 'your_groq_api_key_here') {
+                throw new \Exception('Clé API Groq non configurée. Vérifiez GROQ_API_KEY dans .env');
             }
 
-            // Vérifier que le modèle est configuré
-            if (empty($this->model)) {
-                error_log('ERREUR: Modèle Hugging Face non configuré');
-                throw new \Exception('Modèle Hugging Face non configuré. Vérifiez HUGGINGFACE_MODEL dans .env.local');
-            }
+            error_log('Appel API Groq - Modèle: ' . $groqModel);
 
-            error_log('Appel API Mistral - Modèle: ' . $this->model);
-            error_log('Token commence par: ' . substr($this->apiKey, 0, 7) . '...');
-
-            // Utiliser la nouvelle API router avec format OpenAI-compatible
-            $response = $this->httpClient->request('POST', 
-                "https://router.huggingface.co/v1/chat/completions", 
-                [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->apiKey,
-                        'Content-Type' => 'application/json',
+            $response = $this->httpClient->request('POST', $groqApiUrl, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $groqApiKey,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'model' => $groqModel,
+                    'messages' => [
+                        [
+                            'role' => 'user',
+                            'content' => $prompt
+                        ]
                     ],
-                    'json' => [
-                        'model' => $this->model . ':fastest', // Utiliser le provider le plus rapide
-                        'messages' => [
-                            [
-                                'role' => 'user',
-                                'content' => $prompt
-                            ]
-                        ],
-                        'max_tokens' => 1500,
-                        'temperature' => 0.7,
-                    ],
-                    'timeout' => 60,
-                ]
-            );
+                    'max_tokens' => 1500,
+                    'temperature' => 0.7,
+                ],
+                'timeout' => 60,
+            ]);
 
             $statusCode = $response->getStatusCode();
-            error_log('Status Code API: ' . $statusCode);
-
+            
             if ($statusCode !== 200) {
                 $errorBody = $response->getContent(false);
-                error_log('Erreur API Response: ' . $errorBody);
-                
-                // Messages d'erreur plus clairs
-                if ($statusCode === 401) {
-                    throw new \Exception('Token Hugging Face invalide ou expiré. Créez un nouveau token sur https://huggingface.co/settings/tokens avec la permission "Make calls to Inference Providers"');
-                } elseif ($statusCode === 403) {
-                    throw new \Exception('Accès refusé. Vérifiez que votre token a la permission "Make calls to Inference Providers"');
-                } else {
-                    throw new \Exception('API Hugging Face a retourné le code ' . $statusCode . ': ' . $errorBody);
-                }
+                error_log('Erreur API Groq Response: ' . $errorBody);
+                throw new \Exception('API Groq a retourné le code ' . $statusCode);
             }
 
             $data = $response->toArray();
-            error_log('Réponse API reçue: ' . json_encode($data));
-            
-            // Extraire le texte généré (format OpenAI)
             $generatedText = $data['choices'][0]['message']['content'] ?? null;
             
             if (!$generatedText) {
-                error_log('ERREUR: Aucun texte généré dans la réponse');
                 throw new \Exception('Aucun texte généré par l\'API');
             }
             
             return trim($generatedText);
             
         } catch (\Exception $e) {
-            // Log l'erreur détaillée
-            error_log('ERREUR COMPLÈTE API Mistral: ' . $e->getMessage());
-            error_log('Stack trace: ' . $e->getTraceAsString());
-            throw $e; // Relancer l'exception pour que le controller puisse la gérer
+            error_log('ERREUR API Groq: ' . $e->getMessage());
+            throw $e;
         }
     }
 

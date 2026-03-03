@@ -706,7 +706,10 @@
                 throw new Error('La réponse n\'est pas du JSON. Vérifiez que vous êtes connecté.');
             }
             if (!res.ok) {
-                throw new Error(`HTTP error! status: ${res.status}`);
+                if (res.status === 429) {
+                    throw new Error('Limite de requêtes Groq atteinte (6000 tokens/min). Attendez 10-15 secondes.');
+                }
+                throw new Error(`Erreur HTTP ${res.status}: ${res.statusText}`);
             }
             return res.json();
         })
@@ -719,7 +722,9 @@
             if (data.success) {
                 addMessage(data.response, 'bot');
             } else {
-                addMessage('❌ Désolé, une erreur est survenue: ' + (data.error || 'Erreur inconnue'), 'bot');
+                // Show the actual error from the server
+                const errorMsg = data.error || 'Erreur inconnue';
+                addMessage('❌ ' + errorMsg, 'bot');
             }
         })
         .catch(err => {
@@ -729,11 +734,16 @@
             sendBtn.disabled = false;
             textarea.focus();
             
-            let errorMsg = '❌ Erreur de connexion. ';
+            // Show the actual error message to help debugging
+            let errorMsg = '❌ Erreur: ';
             if (err.message.includes('JSON')) {
-                errorMsg += 'Veuillez vous reconnecter à la plateforme.';
+                errorMsg += 'Réponse invalide du serveur. Veuillez vous reconnecter.';
+            } else if (err.message.includes('429')) {
+                errorMsg += 'Limite de requêtes atteinte. Attendez 10 secondes et réessayez.';
+            } else if (err.message.includes('timeout')) {
+                errorMsg += 'Délai d\'attente dépassé. Réessayez.';
             } else {
-                errorMsg += 'Vérifiez votre connexion internet.';
+                errorMsg += err.message || 'Erreur inconnue';
             }
             addMessage(errorMsg, 'bot');
         });

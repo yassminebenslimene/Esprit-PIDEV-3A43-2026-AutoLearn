@@ -3,122 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Traduction</title>
+    <title>Test API Traduction</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             max-width: 800px;
             margin: 50px auto;
             padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        button {
+            background: #667eea;
             color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
         }
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        button:hover {
+            background: #5568d3;
         }
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .test-link {
-            display: block;
+        .result {
             background: white;
-            color: #667eea;
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: bold;
-            text-align: center;
-            transition: all 0.3s;
-        }
-        .test-link:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-        }
-        .instructions {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 30px;
-        }
-        .instructions h2 {
-            margin-top: 0;
-        }
-        .instructions ol {
-            margin: 10px 0;
-            padding-left: 20px;
-        }
-        .instructions li {
-            margin: 10px 0;
-        }
-        .status {
-            background: rgba(76, 175, 80, 0.3);
             padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .error {
+            background: #fee;
+            border-color: #fcc;
+        }
+        .success {
+            background: #efe;
+            border-color: #cfc;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🧪 Test du Système de Traduction</h1>
-        
-        <div class="status">
-            ✅ Serveur Symfony en cours d'exécution sur http://127.0.0.1:8000
-        </div>
-
-        <h2>📍 Pages à tester:</h2>
-
-        <a href="http://127.0.0.1:8000" class="test-link">
-            🏠 Page d'accueil
-        </a>
-
-        <a href="http://127.0.0.1:8000/chapitre" class="test-link">
-            📚 Liste des chapitres (RECOMMANDÉ)
-        </a>
-
-        <a href="http://127.0.0.1:8000/cours" class="test-link">
-            📖 Liste des cours (Backoffice)
-        </a>
-
-        <div class="instructions">
-            <h2>📋 Instructions de test:</h2>
-            <ol>
-                <li>Cliquez sur un des liens ci-dessus</li>
-                <li>Cherchez l'icône <strong>globe 🌐</strong> dans la navbar (en haut à droite)</li>
-                <li>Cliquez sur le globe pour ouvrir le sélecteur de langue</li>
-                <li>Choisissez une langue:
-                    <ul>
-                        <li>🇫🇷 Français</li>
-                        <li>🇬🇧 English</li>
-                        <li>🇪🇸 Español</li>
-                        <li>🇸🇦 العربية (Arabe)</li>
-                    </ul>
-                </li>
-                <li>La page se recharge automatiquement</li>
-                <li>Vérifiez que TOUS les textes sont traduits</li>
-            </ol>
-
-            <h3>✅ Ce qui doit changer en Espagnol:</h3>
-            <ul>
-                <li>"Chapitre 7" → "Capítulo 7"</li>
-                <li>"Lecture estimée" → "Lectura estimada"</li>
-                <li>"Niveau débutant" → "Nivel principiante"</li>
-                <li>"Retour à la liste" → "Volver a la lista"</li>
-                <li>"Lire le chapitre" → "Leer capítulo"</li>
-                <li>"Passer le quiz" → "Hacer el cuestionario"</li>
-            </ul>
-        </div>
-
-        <div style="text-align: center; margin-top: 30px; font-size: 14px; opacity: 0.8;">
-            Cache vidé ✅ | Serveur démarré ✅ | Traductions chargées ✅
-        </div>
+    <h1>🧪 Test API Traduction</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Liste des langues</h2>
+        <button onclick="testLanguages()">Tester /api/languages</button>
+        <div id="result1" class="result" style="display:none;"></div>
     </div>
+
+    <div class="test-section">
+        <h2>Test 2: Traduction Chapitre 1</h2>
+        <button onclick="testTranslate(1, 'en')">Anglais</button>
+        <button onclick="testTranslate(1, 'es')">Espagnol</button>
+        <button onclick="testTranslate(1, 'ar')">Arabe</button>
+        <button onclick="testTranslate(1, 'de')">Allemand</button>
+        <div id="result2" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Erreurs</h2>
+        <button onclick="testTranslate(99999, 'en')">Chapitre inexistant</button>
+        <button onclick="testTranslate(1, 'xx')">Langue invalide</button>
+        <div id="result3" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        async function testLanguages() {
+            const resultDiv = document.getElementById('result1');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.innerHTML = '<p>⏳ Chargement...</p>';
+
+            try {
+                const response = await fetch('/api/languages');
+                const data = await response.json();
+                
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `
+                    <p><strong>✅ Succès!</strong></p>
+                    <p>Status: ${response.status}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <p><strong>❌ Erreur!</strong></p>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+
+        async function testTranslate(id, lang) {
+            const resultDiv = document.getElementById('result2');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.innerHTML = '<p>⏳ Traduction en cours...</p>';
+
+            try {
+                const url = `/api/chapitres/${id}/translate?lang=${lang}`;
+                console.log('Fetching:', url);
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.status === 'error') {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `
+                        <p><strong>⚠️ Erreur API</strong></p>
+                        <p>Status: ${response.status}</p>
+                        <p>Message: ${data.message}</p>
+                    `;
+                } else {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <p><strong>✅ Traduction réussie!</strong></p>
+                        <p>Status: ${response.status}</p>
+                        <p><strong>Titre:</strong> ${data.titre}</p>
+                        <p><strong>Contenu (100 premiers caractères):</strong></p>
+                        <p>${data.contenu.substring(0, 100)}...</p>
+                        <p><strong>Depuis cache:</strong> ${data.cached ? 'Oui' : 'Non'}</p>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <p><strong>❌ Erreur réseau!</strong></p>
+                    <p>${error.message}</p>
+                    <p><em>Le serveur est-il démarré sur http://localhost:8000 ?</em></p>
+                `;
+            }
+        }
+
+        // Test automatique au chargement
+        window.addEventListener('load', () => {
+            console.log('Page de test chargée');
+            console.log('URL de base:', window.location.origin);
+        });
+    </script>
 </body>
 </html>

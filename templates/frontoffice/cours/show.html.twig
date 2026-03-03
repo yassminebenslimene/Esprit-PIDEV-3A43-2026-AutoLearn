@@ -1,0 +1,214 @@
+{% extends 'frontoffice/base.html.twig' %}
+
+{% block title %}{{ cours.titre }} - AutoLearn{% endblock %}
+
+{% block body %}
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            {# En-tête du cours #}
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h1 class="h2 mb-3">{{ cours.titre }}</h1>
+                            <p class="text-muted mb-3">{{ cours.description }}</p>
+                        </div>
+                        <a href="{{ path('app_frontoffice') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </a>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <small class="text-muted">Matière</small>
+                            <p class="mb-0"><strong>{{ cours.matiere }}</strong></p>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">Niveau</small>
+                            <p class="mb-0"><strong>{{ cours.niveau }}</strong></p>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">Durée</small>
+                            <p class="mb-0"><strong>{{ cours.duree }}h</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Barre de progression (si connecté) #}
+            {% if app.user and progress_stats %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="fas fa-chart-line text-primary"></i> Votre progression
+                        </h5>
+                        
+                        {# Barre de progression #}
+                        <div class="progress mb-3" style="height: 35px;">
+                            <div class="progress-bar 
+                                        {% if progress_stats.percentage >= 100 %}bg-success
+                                        {% elseif progress_stats.percentage >= 75 %}bg-info
+                                        {% elseif progress_stats.percentage >= 50 %}bg-primary
+                                        {% else %}bg-warning{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ progress_stats.percentage }}%"
+                                 aria-valuenow="{{ progress_stats.percentage }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                <strong style="font-size: 1.1rem;">{{ progress_stats.percentage }}%</strong>
+                            </div>
+                        </div>
+                        
+                        {# Statistiques #}
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="p-3 bg-light rounded">
+                                    <h3 class="mb-0 text-success">{{ progress_stats.completed_chapters }}</h3>
+                                    <small class="text-muted">Complétés</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-3 bg-light rounded">
+                                    <h3 class="mb-0 text-warning">{{ progress_stats.remaining_chapters }}</h3>
+                                    <small class="text-muted">Restants</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-3 bg-light rounded">
+                                    <h3 class="mb-0 text-primary">{{ progress_stats.total_chapters }}</h3>
+                                    <small class="text-muted">Total</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if progress_stats.is_completed %}
+                            <div class="alert alert-success mt-3 mb-0">
+                                <i class="fas fa-trophy"></i> <strong>Félicitations !</strong> Vous avez terminé ce cours ! 🎉
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% elseif not app.user %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> 
+                    <a href="{{ path('backoffice_login') }}" class="alert-link">Connectez-vous</a> pour suivre votre progression dans ce cours.
+                </div>
+            {% endif %}
+
+            {# Liste des chapitres #}
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-book"></i> Chapitres ({{ chapitres|length }})
+                    </h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for chapitre in chapitres %}
+                        <li class="list-group-item 
+                                   {% if app.user and is_chapter_completed(app.user, chapitre) %}
+                                       bg-light border-start border-success border-4
+                                   {% endif %}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="flex-grow-1">
+                                    {% if app.user and is_chapter_completed(app.user, chapitre) %}
+                                        <span class="badge bg-success me-2">
+                                            <i class="fas fa-check"></i> Validé
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary me-2">
+                                            <i class="far fa-circle"></i>
+                                        </span>
+                                    {% endif %}
+                                    
+                                    <a href="{{ path('chapitre_front_show', {id: chapitre.id}) }}" 
+                                       class="text-decoration-none text-dark">
+                                        <strong>Chapitre {{ chapitre.ordre }}</strong> - {{ chapitre.titre }}
+                                    </a>
+                                </div>
+                                
+                                <a href="{{ path('chapitre_front_show', {id: chapitre.id}) }}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-arrow-right"></i> Voir
+                                </a>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="list-group-item text-center text-muted py-4">
+                            <i class="fas fa-inbox fa-2x mb-2"></i>
+                            <p class="mb-0">Aucun chapitre disponible pour le moment.</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        {# Sidebar #}
+        <div class="col-lg-4">
+            <div class="card shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-body">
+                    <h5 class="card-title">À propos de ce cours</h5>
+                    <hr>
+                    
+                    <div class="mb-3">
+                        <i class="fas fa-book-open text-primary"></i>
+                        <strong>{{ chapitres|length }}</strong> chapitres
+                    </div>
+                    
+                    <div class="mb-3">
+                        <i class="fas fa-clock text-primary"></i>
+                        <strong>{{ cours.duree }}</strong> heures de contenu
+                    </div>
+                    
+                    <div class="mb-3">
+                        <i class="fas fa-graduation-cap text-primary"></i>
+                        Niveau <strong>{{ cours.niveau }}</strong>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <i class="fas fa-tag text-primary"></i>
+                        <strong>{{ cours.matiere }}</strong>
+                    </div>
+                    
+                    <hr>
+                    
+                    {% if app.user %}
+                        <a href="{{ path('chapitre_front_index') }}" class="btn btn-primary w-100 mb-2">
+                            <i class="fas fa-play"></i> Commencer
+                        </a>
+                    {% else %}
+                        <a href="{{ path('backoffice_login') }}" class="btn btn-success w-100 mb-2">
+                            <i class="fas fa-sign-in-alt"></i> Se connecter pour commencer
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.progress {
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.progress-bar {
+    font-weight: bold;
+    transition: width 0.6s ease;
+}
+
+.list-group-item {
+    transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+}
+
+.badge {
+    font-size: 0.85rem;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,194 @@
+/* ========================================
+   BARRES DE PROGRESSION - SYSTÈME DE COULEURS
+   Rouge < 50% | Orange 50-80% | Vert > 80%
+   ======================================== */
+
+.progress-container {
+    width: 100%;
+    margin: 20px 0;
+}
+
+.progress-bar-wrapper {
+    background: #e9ecef;
+    border-radius: 50px;
+    height: 35px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 2px solid #dee2e6;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 50px;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Couleur ROUGE pour < 50% */
+.progress-bar.progress-danger {
+    background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+    box-shadow: 0 3px 10px rgba(231, 76, 60, 0.5);
+}
+
+/* Couleur ORANGE pour 50% - 80% */
+.progress-bar.progress-warning {
+    background: linear-gradient(90deg, #f39c12 0%, #e67e22 100%);
+    box-shadow: 0 3px 10px rgba(243, 156, 18, 0.5);
+}
+
+/* Couleur VERT pour > 80% */
+.progress-bar.progress-success {
+    background: linear-gradient(90deg, #27ae60 0%, #229954 100%);
+    box-shadow: 0 3px 10px rgba(39, 174, 96, 0.5);
+}
+
+/* Animation de remplissage */
+@keyframes fillProgress {
+    from {
+        width: 0%;
+    }
+}
+
+.progress-bar {
+    animation: fillProgress 1.5s ease-out;
+}
+
+/* Texte de progression - VERSION AMÉLIORÉE */
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    font-size: 15px;
+    color: #495057;
+}
+
+.progress-label {
+    font-weight: 600;
+    color: #6c757d;
+}
+
+.progress-percentage {
+    font-weight: 800;
+    font-size: 18px;
+    color: #2c3e50;
+}
+
+/* Badge de statut chapitre - VERSION AMÉLIORÉE */
+.chapter-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+.chapter-status-badge.completed {
+    background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+    color: white;
+    border: 2px solid #1e8449;
+}
+
+.chapter-status-badge.not-completed {
+    background: white;
+    color: #6c757d;
+    border: 2px solid #dee2e6;
+}
+
+.chapter-status-badge i {
+    font-size: 15px;
+}
+
+/* Carte de progression globale - VERSION AMÉLIORÉE */
+.course-progress-card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 40px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.course-progress-card h3 {
+    color: #2c3e50;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.course-progress-card h3 i {
+    color: #3498db;
+    font-size: 24px;
+}
+
+.progress-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.progress-stat-item {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    border: 2px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.progress-stat-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.progress-stat-value {
+    font-size: 36px;
+    font-weight: 800;
+    color: #2c3e50;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.progress-stat-label {
+    font-size: 14px;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .progress-bar-wrapper {
+        height: 25px;
+    }
+    
+    .progress-bar {
+        font-size: 12px;
+    }
+    
+    .progress-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .progress-stat-value {
+        font-size: 24px;
+    }
+}

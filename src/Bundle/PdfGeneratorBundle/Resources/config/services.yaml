@@ -1,0 +1,21 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    # Service principal de génération PDF
+    App\Bundle\PdfGeneratorBundle\Service\PdfService:
+        arguments:
+            $twig: '@twig'
+            $options:
+                defaultFont: 'DejaVu Sans'
+                isRemoteEnabled: true
+                isHtml5ParserEnabled: true
+                isFontSubsettingEnabled: true
+        public: true
+
+    # Alias pour faciliter l'utilisation
+    pdf.generator:
+        alias: App\Bundle\PdfGeneratorBundle\Service\PdfService
+        public: true

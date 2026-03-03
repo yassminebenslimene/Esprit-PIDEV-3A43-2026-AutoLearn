@@ -16,6 +16,21 @@ class CommunauteRepository extends ServiceEntityRepository
         parent::__construct($registry, Communaute::class);
     }
 
+    /**
+     * Recherche des communautés par nom ou description
+     * @return Communaute[]
+     */
+    public function searchByNameOrDescription(string $search): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.nom LIKE :search')
+            ->orWhere('c.description LIKE :search')
+            ->setParameter('search', '%' . $search . '%')
+            ->orderBy('c.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Communaute[] Returns an array of Communaute objects
     //     */

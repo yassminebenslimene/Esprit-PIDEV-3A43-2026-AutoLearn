@@ -1,0 +1,53 @@
+{# 
+    Composant: Barre de progression avec couleurs dynamiques
+    
+    Paramètres:
+    - percentage: Le pourcentage de progression (0-100)
+    - show_text: Afficher le texte dans la barre (défaut: true)
+    - show_label: Afficher le label en dessous (défaut: false)
+    - label: Texte du label (optionnel)
+    - completed: Nombre de chapitres complétés (optionnel)
+    - total: Nombre total de chapitres (optionnel)
+    
+    Couleurs automatiques:
+    - Rouge: < 50%
+    - Orange: 50% - 80%
+    - Vert: > 80%
+#}
+
+{% set percentage = percentage|default(0) %}
+{% set show_text = show_text is defined ? show_text : true %}
+{% set show_label = show_label is defined ? show_label : false %}
+
+{# Déterminer la couleur #}
+{% if percentage < 50 %}
+    {% set bar_color = 'linear-gradient(90deg, #e74c3c 0%, #c0392b 100%)' %}
+{% elseif percentage < 80 %}
+    {% set bar_color = 'linear-gradient(90deg, #f39c12 0%, #e67e22 100%)' %}
+{% else %}
+    {% set bar_color = 'linear-gradient(90deg, #27ae60 0%, #229954 100%)' %}
+{% endif %}
+
+<div style="width: 100%; margin: 20px 0;">
+    {# Barre de progression #}
+    <div style="background: #e9ecef; border-radius: 50px; height: 35px; overflow: hidden; position: relative; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); border: 2px solid #dee2e6;">
+        <div style="height: 100%; border-radius: 50px; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); background: {{ bar_color }}; width: {{ percentage }}%; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);">
+        </div>
+    </div>
+    
+    {# Texte en dessous #}
+    {% if show_label %}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 15px; color: #495057;">
+            <span style="font-weight: 600; color: #6c757d;">
+                {% if label is defined %}
+                    {{ label }}
+                {% elseif completed is defined and total is defined %}
+                    {{ completed }} / {{ total }} chapitres complétés
+                {% else %}
+                    Progression
+                {% endif %}
+            </span>
+            <span style="font-weight: 800; font-size: 18px; color: #2c3e50;">{{ percentage|number_format(1) }}%</span>
+        </div>
+    {% endif %}
+</div>

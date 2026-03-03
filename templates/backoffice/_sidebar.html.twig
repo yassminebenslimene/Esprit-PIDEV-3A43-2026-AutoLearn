@@ -1,0 +1,191 @@
+{# Sidebar Component - Reusable across all backoffice pages #}
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="logo">G</div>
+        <span class="logo-text">AutoLearn</span>
+    </div>
+
+    <ul class="nav-menu">
+        <li class="nav-section">
+            <span class="nav-section-title">MAIN MENU</span>
+            <ul>
+                <li class="nav-item">
+                    <a href="{{ path('app_backoffice') }}" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1"/>
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ path('backoffice_analytics') }}" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                        Analytics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ path('backoffice_users') }}" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        Utilisateurs
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ path('backoffice_audit_index') }}" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <line x1="10" y1="9" x2="8" y2="9"/>
+                        </svg>
+                        Audit
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ path('admin_user_activity_index') }}" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 20h9"/>
+                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                        </svg>
+                        Activity Log
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="nav-section">
+            <span class="nav-section-title">GESTION</span>
+            <ul>
+                <li class="nav-item">
+                    <a href="{{ path('app_cours_index') }}" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                        </svg>
+                        Cours
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ path('backoffice_quiz_management') }}" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3h7v7H3z"/>
+                            <path d="M14 3h7v7h-7z"/>
+                            <path d="M14 14h7v7h-7z"/>
+                            <path d="M3 14h7v7H3z"/>
+                        </svg>
+                        Gestion Quiz
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ path('backoffice_challenges') }}" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                        Challenges
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ path('backoffice_exercices') }}" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                        Exercices
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ path('backoffice_evenements') }}" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                        Événements
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ path('backoffice_communaute_index') }}" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        Communauté
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ path('backoffice_post_index') }}" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        Posts
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ path('backoffice_commentaire_index') }}" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        Commentaires
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="nav-section">
+            <span class="nav-section-title">COMPTE</span>
+            <ul>
+                <li class="nav-item">
+                    <a href="{{ path('backoffice_settings') }}" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        Mon Profil
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ path('backoffice_logout') }}" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        Déconnexion
+                    </a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <div class="user-avatar">AD</div>
+            <div class="user-info">
+                <div class="user-name">Admin</div>
+                <div class="user-role">Administrator</div>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+            </svg>
+        </div>
+    </div>
+</aside>

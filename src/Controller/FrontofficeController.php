@@ -11,6 +11,7 @@ use App\Entity\Etudiant;
 use App\Entity\User;
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
+use App\Service\CourseProgressService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +26,8 @@ class FrontofficeController extends AbstractController
         ChallengeRepository $challengeRepository,
         EvenementRepository $evenementRepository,
         EquipeRepository $equipeRepository,
-        CoursRepository $coursRepository
+        CoursRepository $coursRepository,
+        CourseProgressService $progressService
     ): Response
     {
         // Si l'utilisateur est connecté
@@ -44,11 +46,18 @@ class FrontofficeController extends AbstractController
         $evenements = $evenementRepository->findAll();
         $equipes = $equipeRepository->findAll();
         
+        // Calculer la progression pour chaque cours si l'utilisateur est connecté
+        $coursProgress = [];
+        if ($this->getUser()) {
+            $coursProgress = $progressService->getAllCoursesProgress($this->getUser(), $cours);
+        }
+        
         return $this->render('frontoffice/index.html.twig', [
             'cours' => $cours,
             'challenges' => $challenges,
             'evenements' => $evenements,
             'equipes' => $equipes,
+            'coursProgress' => $coursProgress,
         ]);
     }
 
@@ -180,6 +189,12 @@ class FrontofficeController extends AbstractController
         }
         
         return $this->redirectToRoute('app_frontoffice', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/about', name: 'app_about')]
+    public function about(): Response
+    {
+        return $this->render('frontoffice/about.html.twig');
     }
 
 }

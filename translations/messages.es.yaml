@@ -1,10 +1,11 @@
-# Spanish translations - Traducciones en español
+# Spanish translations
 nav:
   home: Inicio
   events: Eventos
   challenges: Desafíos
   community: Comunidad
   courses: Cursos
+  about: Acerca de
   my_participations: Mis Participaciones
   login: Iniciar sesión
   register: Registrarse
@@ -18,129 +19,3 @@ language:
   arabic: Árabe
   spanish: Español
   select: Seleccionar idioma
-
-frontoffice:
-  banner:
-    our_courses: Nuestros Cursos
-    learn_programming: Aprende Programación con Expertos
-    discover_courses: Descubre nuestros cursos de programación diseñados por profesionales. Domina lenguajes modernos como Python, JavaScript, Java y mucho más con proyectos prácticos y desafíos estimulantes.
-    view_courses: Ver Cursos
-    start_now: Comenzar Ahora
-    best_results: Mejores Resultados
-    develop_skills: Desarrolla tus Habilidades de Programación
-    progress_fast: Progresa rápidamente gracias a nuestros métodos de aprendizaje interactivos. Ejercicios prácticos, cuestionarios y proyectos reales para transformar tus esfuerzos en habilidades concretas y buscadas en el mercado.
-    take_challenge: Aceptar un Desafío
-    explore_courses: Explorar Cursos
-    online_learning: Aprendizaje en Línea
-    learn_at_pace: Aprende a Programar a tu Ritmo
-    access_247: Accede a nuestros cursos de programación 24/7 desde cualquier lugar. Aprende tecnologías web, desarrollo móvil, inteligencia artificial y más, con seguimiento personalizado de tu progreso.
-    register_free: Registrarse Gratis
-    discover_autolearn: Descubrir AutoLearn
-  
-  chapter:
-    chapter: Capítulo
-    reading_time: Lectura estimada
-    minutes: min
-    level_beginner: Nivel principiante
-    level_intermediate: Nivel intermedio
-    level_advanced: Nivel avanzado
-    additional_resources: Recursos adicionales
-    no_resources: No hay recursos adicionales para este capítulo
-    back_to_list: Volver a la lista de capítulos
-    discover_chapters: Descubre nuestros capítulos
-    no_chapters: No hay capítulos disponibles
-    chapters_soon: Los capítulos estarán disponibles pronto. ¡Vuelve más tarde!
-    read_chapter: Leer capítulo
-    take_quiz: Hacer el cuestionario
-    back_to_courses: Volver a los cursos
-
-dashboard:
-  title: Panel de control
-  analytics: Analíticas
-  management: Gestión
-  community: Comunidad
-  system: Sistema
-  account: Cuenta
-
-courses:
-  title: Cursos
-  list: Lista de cursos
-  new: Nuevo curso
-  edit: Editar curso
-  delete: Eliminar curso
-  view: Ver curso
-  no_courses: No hay cursos disponibles en este momento
-  chapters: Capítulos
-  quizzes: Cuestionarios
-  resources: Recursos
-
-chapters:
-  title: Capítulos
-  new: Nuevo capítulo
-  edit: Editar capítulo
-  delete: Eliminar capítulo
-  view: Ver capítulo
-  order: Orden
-  content: Contenido
-  no_chapters: No hay capítulos disponibles
-
-quiz:
-  title: Cuestionario
-  new: Nuevo cuestionario
-  edit: Editar cuestionario
-  delete: Eliminar cuestionario
-  view: Ver cuestionario
-  management: Gestión de Cuestionarios
-  no_quizzes: No hay cuestionarios disponibles
-
-events:
-  title: Eventos
-  list: Lista de eventos
-  upcoming: Próximos eventos
-  past: Eventos pasados
-
-users:
-  title: Usuarios
-  list: Lista de usuarios
-  profile: Perfil
-
-settings:
-  title: Configuración
-  general: General
-  preferences: Preferencias
-
-actions:
-  create: Crear
-  edit: Editar
-  delete: Eliminar
-  save: Guardar
-  cancel: Cancelar
-  back: Volver
-  search: Buscar
-  view: Ver
-  actions: Acciones
-
-messages:
-  success:
-    created: Creado con éxito
-    updated: Actualizado con éxito
-    deleted: Eliminado con éxito
-  error:
-    general: Ocurrió un error
-    not_found: Elemento no encontrado
-
-search:
-  placeholder: Buscar cursos, capítulos, cuestionarios...
-  results: Resultados de búsqueda
-  results_for: Resultados de búsqueda para
-  results_found: resultados encontrados
-  result_found: resultado encontrado
-  no_results: No se encontraron resultados
-  try_different: Intenta con palabras clave diferentes
-  view_details: Ver detalles
-  type:
-    cours: Curso
-    chapitre: Capítulo
-    quiz: Cuestionario
-    event: Evento
-    challenge: Desafío

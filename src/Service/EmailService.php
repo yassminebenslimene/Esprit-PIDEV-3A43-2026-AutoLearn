@@ -30,10 +30,10 @@ class EmailService
         $this->certificateService = $certificateService;
         $this->badgeService = $badgeService;
         
-        // ✅ Email vérifié dans Brevo (Sender Identity)
+        // Configuration Brevo - Email vérifié dans Brevo (Sender Identity)
         // Cet email DOIT être vérifié dans ton compte Brevo
-        $this->fromEmail = 'autolearn66@gmail.com';
-        $this->fromName = 'AutoLearn Platform';
+        $this->fromEmail = 'autolearnplateforme@gmail.com';
+        $this->fromName = 'Autolearn Platform';
     }
 
     /**
@@ -45,7 +45,7 @@ class EmailService
             ->from(new Address($this->fromEmail, $this->fromName))
             ->to($toEmail)
             ->subject('Test Email - Autolearn Platform')
-            ->html('<h1>Test réussi !</h1><p>Ton intégration SendGrid fonctionne parfaitement.</p>');
+            ->html('<h1>Test réussi !</h1><p>Ton intégration Brevo fonctionne parfaitement.</p>');
 
         $this->mailer->send($email);
     }
@@ -208,6 +208,61 @@ class EmailService
             ->from(new Address($this->fromEmail, $this->fromName))
             ->to($toEmail)
             ->subject('Reminder: ' . $eventName . ' in 3 days')
+            ->html($html);
+
+        $this->mailer->send($email);
+    }
+
+    /**
+     * Envoie un email d'invitation à rejoindre une communauté
+     */
+    public function sendCommunityInvitation(
+        string $toEmail,
+        string $memberName,
+        string $communityName,
+        string $inviterName,
+        string $communityUrl
+    ): void {
+        $html = $this->twig->render('emails/community_invitation.html.twig', [
+            'memberName' => $memberName,
+            'communityName' => $communityName,
+            'inviterName' => $inviterName,
+            'communityUrl' => $communityUrl,
+        ]);
+
+        $email = (new Email())
+            ->from(new Address($this->fromEmail, $this->fromName))
+            ->to($toEmail)
+            ->subject('Invitation à rejoindre ' . $communityName)
+            ->html($html);
+
+        $this->mailer->send($email);
+    }
+
+    /**
+     * Envoie un email de confirmation de complétion de challenge
+     */
+    public function sendChallengeReceipt(
+        string $toEmail,
+        string $challengeName,
+        int $earnedPoints,
+        int $totalPoints,
+        \DateTimeInterface $completedAt
+    ): void {
+        $percentage = $totalPoints > 0 ? round(($earnedPoints / $totalPoints) * 100, 2) : 0;
+        
+        $html = $this->twig->render('emails/challenge_receipt.html.twig', [
+            'challengeName' => $challengeName,
+            'earnedPoints' => $earnedPoints,
+            'totalPoints' => $totalPoints,
+            'percentage' => $percentage,
+            'completedAt' => $completedAt,
+        ]);
+
+        $email = (new Email())
+            ->from(new Address($this->fromEmail, $this->fromName))
+            ->to($toEmail)
+            ->subject('🎉 Challenge Completed - ' . $challengeName)
             ->html($html);
 
         $this->mailer->send($email);

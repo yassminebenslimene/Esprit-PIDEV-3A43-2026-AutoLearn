@@ -5,7 +5,8 @@ namespace App\Controller;
 use App\Entity\GestionDeCours\Chapitre;
 use App\Form\GestionCours\ChapitreType;
 use App\Repository\Cours\ChapitreRepository;
-use App\Service\PdfGeneratorService;
+use App\Bundle\PdfGeneratorBundle\Service\PdfService;
+use App\Service\CourseProgressService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,11 +24,42 @@ class ChapitreController extends AbstractController
         ]);
     }
 
-    #[Route('/front', name: 'app_chapitre_index_front', methods: ['GET'])]
-    public function indexFront(ChapitreRepository $chapitreRepository): Response
+    #[Route('/cours/{id}/chapitres', name: 'app_chapitre_index_front', methods: ['GET'])]
+    public function indexFront(
+        int $id,
+        ChapitreRepository $chapitreRepository,
+        CourseProgressService $progressService,
+        EntityManagerInterface $entityManager
+    ): Response
     {
+        // Récupérer le cours
+        $cours = $entityManager->getRepository(\App\Entity\GestionDeCours\Cours::class)->find($id);
+        
+        if (!$cours) {
+            throw $this->createNotFoundException('Le cours avec l\'ID ' . $id . ' n\'existe pas');
+        }
+        
+        // Récupérer les chapitres du cours
+        $chapitres = $chapitreRepository->findBy(['cours' => $cours], ['ordre' => 'ASC']);
+        $user = $this->getUser();
+        $progressStats = null;
+        $chaptersCompletion = [];
+        
+        // Si l'utilisateur est connecté, calculer la progression
+        if ($user) {
+            $progressStats = $progressService->getCourseProgressStats($user, $cours);
+            
+            // Vérifier la complétion de chaque chapitre
+            foreach ($chapitres as $chapitre) {
+                $chaptersCompletion[$chapitre->getId()] = $progressService->isChapterCompleted($user, $chapitre);
+            }
+        }
+        
         return $this->render('frontoffice/chapitre/index.html.twig', [
-            'chapitres' => $chapitreRepository->findAll(),
+            'chapitres' => $chapitres,
+            'cours' => $cours,
+            'progress_stats' => $progressStats,
+            'chapters_completion' => $chaptersCompletion,
         ]);
     }
 
@@ -91,10 +123,22 @@ class ChapitreController extends AbstractController
 
     // ==================== FRONTOFFICE ====================
     #[Route('/front/{id}', name: 'app_chapitre_show_front', methods: ['GET'])]
-    public function showFront(Chapitre $chapitre): Response
+    public function showFront(
+        Chapitre $chapitre,
+        CourseProgressService $progressService
+    ): Response
     {
+        $user = $this->getUser();
+        $progressStats = null;
+        
+        // Si l'utilisateur est connecté, calculer la progression du cours
+        if ($user && $chapitre->getCours()) {
+            $progressStats = $progressService->getCourseProgressStats($user, $chapitre->getCours());
+        }
+        
         return $this->render('frontoffice/chapitre/show.html.twig', [
             'chapitre' => $chapitre,
+            'progress_stats' => $progressStats,
         ]);
     }
 
@@ -104,10 +148,10 @@ class ChapitreController extends AbstractController
      * Afficher le chapitre en PDF dans le navigateur
      */
     #[Route('/front/{id}/pdf', name: 'app_chapitre_pdf_preview', methods: ['GET'])]
-    public function pdfPreview(Chapitre $chapitre, PdfGeneratorService $pdfGenerator): Response
+    public function pdfPreview(Chapitre $chapitre, PdfService $pdfService): Response
     {
-        // Générer le PDF
-        $dompdf = $pdfGenerator->generateChapterPdf($chapitre);
+        // Générer le PDF avec le bundle
+        $dompdf = $pdfService->generateChapterPdf($chapitre);
         
         // Afficher dans le navigateur (inline)
         return new Response(
@@ -124,10 +168,10 @@ class ChapitreController extends AbstractController
      * Télécharger le chapitre en PDF
      */
     #[Route('/front/{id}/pdf/download', name: 'app_chapitre_pdf_download', methods: ['GET'])]
-    public function pdfDownload(Chapitre $chapitre, PdfGeneratorService $pdfGenerator): Response
+    public function pdfDownload(Chapitre $chapitre, PdfService $pdfService): Response
     {
-        // Générer le PDF
-        $dompdf = $pdfGenerator->generateChapterPdf($chapitre);
+        // Générer le PDF avec le bundle
+        $dompdf = $pdfService->generateChapterPdf($chapitre);
         
         // Forcer le téléchargement (attachment)
         return new Response(

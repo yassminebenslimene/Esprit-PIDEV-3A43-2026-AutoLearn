@@ -1,54 +1,242 @@
-{% extends 'base.html.twig' %}
+{% extends 'frontoffice/base.html.twig' %}
 
-{% block title %}{{ challenge.titre }}{% endblock %}
+{% block title %}{{ challenge.titre }} - Scholar{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .challenge-detail {
+            margin-top: 40px;
+            margin-bottom: 80px;
+        }
+        
+        .challenge-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .challenge-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2a2a2a;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .info-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        
+        .info-label {
+            font-size: 14px;
+            color: #7a7a7a;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2a2a2a;
+        }
+        
+        .info-value i {
+            margin-right: 10px;
+            color: #7fb77e;
+        }
+        
+        .niveau-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .niveau-facile {
+            background: #7fb77e;
+            color: white;
+        }
+        
+        .niveau-intermediaire {
+            background: #f3b562;
+            color: white;
+        }
+        
+        .niveau-difficile {
+            background: #f17b7b;
+            color: white;
+        }
+        
+        .btn-action {
+            display: inline-block;
+            padding: 12px 40px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            margin: 10px 5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(105deg, #7fb77e 0%, #4a9b4a 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(127, 183, 126, 0.3);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f3b562;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #f0a53b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(243, 181, 98, 0.3);
+            color: white;
+        }
+        
+        .btn-info {
+            background: #5a9fd4;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #4a8fc4;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(90, 159, 212, 0.3);
+            color: white;
+        }
+        
+        .result-container {
+            background: linear-gradient(135deg, rgba(127, 183, 126, 0.1) 0%, rgba(127, 183, 126, 0.05) 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
+            border: 2px solid #7fb77e;
+        }
+        
+        .result-score {
+            font-size: 48px;
+            font-weight: 700;
+            color: #7fb77e;
+            margin: 10px 0;
+        }
+        
+        .result-date {
+            color: #7a7a7a;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .result-message {
+            font-size: 18px;
+            color: #2a2a2a;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        
+        .btn-action i {
+            margin-left: 8px;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h1 class="h3 mb-0">{{ challenge.titre }}</h1>
-        </div>
-        <div class="card-body">
-            <p class="lead">{{ challenge.description }}</p>
+<div class="challenge-detail">
+    <div class="container">
+        <div class="challenge-card">
+            <h1 class="challenge-title">{{ challenge.titre }}</h1>
             
-            <hr>
-            
-            <div class="row mt-4">
-                <div class="col-md-4">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Niveau</h5>
-                            <span class="badge badge-pill badge-{{ challenge.niveau == 'Facile' ? 'success' : (challenge.niveau == 'Intermédiaire' ? 'warning' : 'danger') }}" 
-                                  style="font-size: 1.2rem; padding: 8px 16px;">
-                                {{ challenge.niveau }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Date de début</h5>
-                            <p class="card-text font-weight-bold">{{ challenge.dateDebut|date('d/m/Y') }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Date de fin</h5>
-                            <p class="card-text font-weight-bold">{{ challenge.dateFin|date('d/m/Y') }}</p>
-                        </div>
-                    </div>
+            <!-- Durée -->
+            <div class="info-item">
+                <div class="info-label">Durée</div>
+                <div class="info-value">
+                    <i class="fa fa-clock-o"></i>
+                    {{ challenge.duree }} minutes
                 </div>
             </div>
             
-            <div class="mt-5 text-center">
-                <a href="{{ path('app_frontoffice') }}#challenge" class="btn btn-secondary">
+            <!-- Niveau -->
+            <div class="info-item">
+                <div class="info-label">Niveau</div>
+                <div class="info-value">
+                    <i class="fa fa-signal"></i>
+                    <span class="niveau-badge 
+                        {% if challenge.niveau == 'Débutant' or challenge.niveau == 'Facile' %}niveau-facile
+                        {% elseif challenge.niveau == 'Intermédiaire' %}niveau-intermediaire
+                        {% else %}niveau-difficile
+                        {% endif %}">
+                        {{ challenge.niveau }}
+                    </span>
+                </div>
+            </div>
+            
+            {% if userChallenge and userChallenge.completed %}
+                <!-- Résultat du challenge terminé -->
+                <div class="result-container">
+                    <div class="result-message">
+                        <i class="fa fa-trophy"></i> Challenge Complété !
+                    </div>
+                    <div class="result-score">{{ userChallenge.score }}/{{ userChallenge.totalPoints }}</div>
+                    <div style="font-size: 20px; color: #7fb77e; font-weight: 600; margin: 10px 0;">
+                        {{ ((userChallenge.score / userChallenge.totalPoints) * 100)|round }}% de réussite
+                    </div>
+                    <div class="result-date">
+                        <i class="fa fa-clock-o"></i> Terminé le {{ userChallenge.completedAt|date('d M Y à H:i') }}
+                    </div>
+                </div>
+                
+                <!-- Boutons d'action pour challenge complété -->
+                <div class="action-buttons">
+                    <a href="{{ path('frontchallenge_results', {'id': challenge.id}) }}" class="btn-action btn-info">
+                        <i class="fa fa-bar-chart"></i> Voir les résultats détaillés
+                    </a>
+                    <a href="{{ path('frontchallenge_retry', {'id': challenge.id}) }}" class="btn-action btn-secondary">
+                        <i class="fa fa-refresh"></i> Refaire le challenge
+                    </a>
+                </div>
+            {% else %}
+                <!-- Bouton commencer ou continuer -->
+                <div class="action-buttons">
+                    <a href="{{ path('frontchallenge_play', {'id': challenge.id}) }}" class="btn-action btn-primary">
+                        {% if userChallenge and userChallenge.currentIndex > 0 %}
+                            <i class="fa fa-play"></i> Continuer le challenge
+                        {% else %}
+                            <i class="fa fa-rocket"></i> Commencer le challenge
+                        {% endif %}
+                    </a>
+                </div>
+            {% endif %}
+            
+            <!-- Bouton retour -->
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="{{ path('app_frontoffice') }}#challenge" style="color: #7a7a7a; text-decoration: none; font-size: 14px;">
                     <i class="fa fa-arrow-left"></i> Retour aux challenges
-                </a>
-                <a href="#" class="btn btn-primary">
-                    <i class="fa fa-trophy"></i> Participer
                 </a>
             </div>
         </div>

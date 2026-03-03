@@ -1,0 +1,448 @@
+{% extends 'frontoffice/base.html.twig' %}
+
+{% block title %}Challenge Complété - {{ challenge.titre }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .completion-page {
+            margin-top: 40px;
+            margin-bottom: 80px;
+        }
+        
+        .completion-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 40px;
+        }
+        
+        .success-icon.rouge { background: linear-gradient(135deg, #f17b7b, #e05a5a); }
+        .success-icon.jaune { background: linear-gradient(135deg, #f3b562, #f0a53b); }
+        .success-icon.vert { background: linear-gradient(135deg, #7fb77e, #5a9e59); }
+        
+        .score-container {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .score-value {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .score-value.rouge { color: #f17b7b; }
+        .score-value.jaune { color: #f3b562; }
+        .score-value.vert { color: #7fb77e; }
+        
+        .results-section {
+            margin-top: 40px;
+            text-align: left;
+        }
+        
+        .result-item {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid #ddd;
+        }
+        
+        .result-item.correct { border-left-color: #7fb77e; background: rgba(127, 183, 126, 0.05); }
+        .result-item.incorrect { border-left-color: #f17b7b; background: rgba(241, 123, 123, 0.05); }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .result-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .result-badge.correct { background: #7fb77e; color: white; }
+        .result-badge.incorrect { background: #f17b7b; color: white; }
+        
+        .result-question {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2a2a2a;
+            margin-bottom: 15px;
+        }
+        
+        .result-answers {
+            margin: 15px 0;
+        }
+        
+        .answer-row {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .answer-row.user { background: #f0f0f0; }
+        .answer-row.correct { background: rgba(127, 183, 126, 0.1); }
+        
+        .answer-label {
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .ai-feedback {
+            margin-top: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+            border-radius: 10px;
+            border-left: 4px solid #7fb77e;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .ai-feedback h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #7fb77e;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .ai-feedback p {
+            font-size: 14px;
+            color: #555;
+            margin: 12px 0;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .ai-feedback p strong {
+            color: #2a2a2a;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .ai-feedback p i {
+            position: absolute;
+            left: 0;
+            top: 3px;
+            color: #7fb77e;
+        }
+        
+        .btn-action {
+            padding: 12px 40px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(105deg, #7fb77e 0%, #4a9b4a 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(127, 183, 126, 0.3);
+            color: white;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+{% set percentage = (score / totalPoints * 100)|round %}
+{% if score == 0 %}
+    {% set colorClass = 'rouge' %}
+    {% set message = 'Essayez encore !' %}
+{% elseif score < totalPoints / 2 %}
+    {% set colorClass = 'rouge' %}
+    {% set message = 'Vous pouvez faire mieux !' %}
+{% elseif score == totalPoints / 2 %}
+    {% set colorClass = 'jaune' %}
+    {% set message = 'Passable !' %}
+{% elseif score < totalPoints %}
+    {% set colorClass = 'jaune' %}
+    {% set message = 'Bon travail !' %}
+{% else %}
+    {% set colorClass = 'vert' %}
+    {% set message = 'Excellent !' %}
+{% endif %}
+
+<div class="completion-page">
+    <div class="container">
+        <div class="completion-card">
+            <div class="success-icon {{ colorClass }}">
+                {% if colorClass == 'rouge' %}
+                    <i class="fa fa-frown-o"></i>
+                {% elseif colorClass == 'jaune' %}
+                    <i class="fa fa-meh-o"></i>
+                {% else %}
+                    <i class="fa fa-smile-o"></i>
+                {% endif %}
+            </div>
+            
+            <h1>Challenge terminé !</h1>
+            <p>Vous avez complété le challenge "{{ challenge.titre }}"</p>
+            
+            <div class="score-container">
+                <div style="font-size: 14px; color: #7a7a7a; margin-bottom: 10px;">VOTRE SCORE</div>
+                <div class="score-value {{ colorClass }}">{{ score }}/{{ totalPoints }}</div>
+                <div style="font-size: 16px; color: #7a7a7a;">{{ percentage }}% de réussite</div>
+                <div style="font-size: 18px; font-weight: 600; color: {{ colorClass == 'rouge' ? '#f17b7b' : (colorClass == 'jaune' ? '#f3b562' : '#7fb77e') }}; margin-top: 10px;">
+                    {{ message }}
+                </div>
+            </div>
+            
+            <!-- Système de rating -->
+            <div style="margin: 30px 0; padding: 25px; background: #f9f9f9; border-radius: 15px;">
+                <h3 style="font-size: 18px; margin-bottom: 15px; color: #2a2a2a;">⭐ Évaluez ce challenge</h3>
+                <p style="font-size: 14px; color: #7a7a7a; margin-bottom: 15px;">Votre avis nous aide à améliorer nos contenus</p>
+                <div id="ratingStars" style="display: flex; justify-content: center; gap: 10px; font-size: 32px; margin-bottom: 15px;">
+                    <span class="star" data-value="1" onclick="rateChallenge(1)" style="cursor: pointer; color: #ddd; transition: all 0.2s;">★</span>
+                    <span class="star" data-value="2" onclick="rateChallenge(2)" style="cursor: pointer; color: #ddd; transition: all 0.2s;">★</span>
+                    <span class="star" data-value="3" onclick="rateChallenge(3)" style="cursor: pointer; color: #ddd; transition: all 0.2s;">★</span>
+                    <span class="star" data-value="4" onclick="rateChallenge(4)" style="cursor: pointer; color: #ddd; transition: all 0.2s;">★</span>
+                    <span class="star" data-value="5" onclick="rateChallenge(5)" style="cursor: pointer; color: #ddd; transition: all 0.2s;">★</span>
+                </div>
+                <div id="ratingMessage" style="font-size: 14px; color: #7fb77e; display: none;"></div>
+            </div>
+            
+            <a href="{{ path('app_frontoffice') }}#challenge" class="btn-action">
+                Retour aux challenges <i class="fa fa-arrow-right"></i>
+            </a>
+        </div>
+        
+        <div class="results-section">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2a2a2a;">Détails des réponses</h2>
+            
+            {% for result in results %}
+                <div class="result-item {{ result.isCorrect ? 'correct' : 'incorrect' }}">
+                    <div class="result-header">
+                        <span class="result-badge {{ result.isCorrect ? 'correct' : 'incorrect' }}">
+                            {% if result.isCorrect %}
+                                <i class="fa fa-check"></i> Correct
+                            {% else %}
+                                <i class="fa fa-times"></i> Incorrect
+                            {% endif %}
+                        </span>
+                        <span style="font-weight: 600; color: #7a7a7a;">
+                            {{ result.earnedPoints }}/{{ result.points }} points
+                        </span>
+                    </div>
+                    
+                    <div class="result-question">{{ result.question }}</div>
+                    
+                    <div class="result-answers">
+                        <div class="answer-row user">
+                            <span class="answer-label">Votre réponse:</span>
+                            {{ result.userAnswer }}
+                        </div>
+                        {% if not result.isCorrect %}
+                            <div class="answer-row correct">
+                                <span class="answer-label">Réponse correcte:</span>
+                                {{ result.correctAnswer }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if result.type == 'exercice' %}
+                        <div class="ai-feedback">
+                            <h4><i class="fa fa-robot"></i> Analyse IA - Exercice</h4>
+                            <div style="margin-top: 10px;">
+                                <p><strong><i class="fa fa-comment"></i> Feedback:</strong> {{ result.feedback }}</p>
+                                <p><strong><i class="fa fa-lightbulb-o"></i> Explication:</strong> {{ result.explanation }}</p>
+                                {% if result.advice %}
+                                    <p><strong><i class="fa fa-graduation-cap"></i> Conseil pour s'améliorer:</strong> {{ result.advice }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="ai-feedback">
+                            <h4><i class="fa fa-robot"></i> Analyse IA - Quiz</h4>
+                            <div style="margin-top: 10px;">
+                                <p><strong><i class="fa fa-comment"></i> Feedback:</strong> {{ result.feedback }}</p>
+                                <p><strong><i class="fa fa-lightbulb-o"></i> Pourquoi cette réponse:</strong> {{ result.explanation }}</p>
+                                {% if result.advice %}
+                                    <p><strong><i class="fa fa-graduation-cap"></i> Comment s'améliorer:</strong> {{ result.advice }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="completion-card" style="margin-top: 40px; text-align: left;">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2a2a2a;">
+                <i class="fa fa-star"></i> Recommandations Globales
+            </h2>
+            
+            <div style="background: linear-gradient(135deg, rgba(127, 183, 126, 0.1) 0%, rgba(127, 183, 126, 0.05) 100%); padding: 25px; border-radius: 15px; border-left: 4px solid #7fb77e;">
+                {% if percentage >= 90 %}
+                    <h3 style="color: #7fb77e; margin-bottom: 15px;"><i class="fa fa-trophy"></i> Performance Excellente!</h3>
+                    <p style="color: #555; line-height: 1.8;">
+                        Félicitations! Vous maîtrisez très bien ce sujet. Votre compréhension est solide et vos réponses démontrent une excellente connaissance.
+                    </p>
+                    <p style="color: #555; line-height: 1.8; margin-top: 10px;">
+                        <strong>Prochaines étapes:</strong>
+                    </p>
+                    <ul style="color: #555; line-height: 1.8; margin-left: 20px;">
+                        <li>Essayez des challenges plus avancés pour continuer à progresser</li>
+                        <li>Partagez vos connaissances avec d'autres apprenants</li>
+                        <li>Explorez des sujets connexes pour élargir vos compétences</li>
+                    </ul>
+                {% elseif percentage >= 70 %}
+                    <h3 style="color: #7fb77e; margin-bottom: 15px;"><i class="fa fa-thumbs-up"></i> Bonne Performance!</h3>
+                    <p style="color: #555; line-height: 1.8;">
+                        Très bon travail! Vous avez une bonne compréhension du sujet. Quelques points méritent encore d'être approfondis.
+                    </p>
+                    <p style="color: #555; line-height: 1.8; margin-top: 10px;">
+                        <strong>Recommandations:</strong>
+                    </p>
+                    <ul style="color: #555; line-height: 1.8; margin-left: 20px;">
+                        <li>Revoyez les questions où vous avez fait des erreurs</li>
+                        <li>Pratiquez davantage sur les concepts moins maîtrisés</li>
+                        <li>Consultez les ressources complémentaires sur ces sujets</li>
+                        <li>Refaites le challenge dans quelques jours pour consolider</li>
+                    </ul>
+                {% elseif percentage >= 50 %}
+                    <h3 style="color: #f3b562; margin-bottom: 15px;"><i class="fa fa-exclamation-triangle"></i> Performance Moyenne</h3>
+                    <p style="color: #555; line-height: 1.8;">
+                        Vous avez des bases, mais il y a encore beaucoup à apprendre. Ne vous découragez pas, la pratique est la clé du succès!
+                    </p>
+                    <p style="color: #555; line-height: 1.8; margin-top: 10px;">
+                        <strong>Plan d'amélioration:</strong>
+                    </p>
+                    <ul style="color: #555; line-height: 1.8; margin-left: 20px;">
+                        <li>Relisez attentivement toutes les explications ci-dessus</li>
+                        <li>Prenez le temps d'étudier les concepts de base</li>
+                        <li>Pratiquez avec des exercices similaires</li>
+                        <li>N'hésitez pas à demander de l'aide si nécessaire</li>
+                        <li>Refaites ce challenge après avoir révisé</li>
+                    </ul>
+                {% else %}
+                    <h3 style="color: #f17b7b; margin-bottom: 15px;"><i class="fa fa-book"></i> Besoin de Révision</h3>
+                    <p style="color: #555; line-height: 1.8;">
+                        Ce sujet nécessite plus de travail. Ne vous inquiétez pas, tout le monde apprend à son rythme. L'important est de persévérer!
+                    </p>
+                    <p style="color: #555; line-height: 1.8; margin-top: 10px;">
+                        <strong>Actions recommandées:</strong>
+                    </p>
+                    <ul style="color: #555; line-height: 1.8; margin-left: 20px;">
+                        <li>Commencez par revoir les bases du sujet</li>
+                        <li>Étudiez chaque explication IA fournie ci-dessus</li>
+                        <li>Pratiquez avec des exercices plus simples d'abord</li>
+                        <li>Demandez de l'aide à un mentor ou dans la communauté</li>
+                        <li>Prenez votre temps et ne vous précipitez pas</li>
+                        <li>Refaites ce challenge quand vous vous sentirez prêt</li>
+                    </ul>
+                {% endif %}
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="{{ path('app_frontoffice') }}#challenge" class="btn-action">
+                    <i class="fa fa-rocket"></i> Explorer d'autres challenges
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    
+    <script>
+        let selectedRating = 0;
+        const challengeId = {{ challenge.id }};
+        
+        // Hover effect sur les étoiles
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('mouseenter', function() {
+                const value = parseInt(this.dataset.value);
+                highlightStars(value);
+            });
+        });
+        
+        document.getElementById('ratingStars').addEventListener('mouseleave', function() {
+            highlightStars(selectedRating);
+        });
+        
+        function highlightStars(count) {
+            document.querySelectorAll('.star').forEach((star, index) => {
+                if (index < count) {
+                    star.style.color = '#f3b562';
+                    star.style.transform = 'scale(1.1)';
+                } else {
+                    star.style.color = '#ddd';
+                    star.style.transform = 'scale(1)';
+                }
+            });
+        }
+        
+        async function rateChallenge(rating) {
+            selectedRating = rating;
+            highlightStars(rating);
+            
+            const messageDiv = document.getElementById('ratingMessage');
+            messageDiv.style.display = 'block';
+            messageDiv.style.color = '#7a7a7a';
+            messageDiv.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Envoi de votre évaluation...';
+            
+            try {
+                const response = await fetch('{{ path('frontchallenge_vote') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        challengeId: challengeId,
+                        valeur: rating
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    messageDiv.style.color = '#7fb77e';
+                    messageDiv.innerHTML = '<i class="fa fa-check-circle"></i> ' + data.message;
+                } else {
+                    throw new Error(data.error || 'Erreur inconnue');
+                }
+            } catch (error) {
+                messageDiv.style.color = '#f17b7b';
+                messageDiv.innerHTML = '<i class="fa fa-exclamation-circle"></i> Erreur: ' + error.message;
+            }
+        }
+    </script>
+{% endblock %}

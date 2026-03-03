@@ -1,0 +1,49 @@
+# Configuration du bundle KnpPaginatorBundle
+# Ce bundle permet de paginer facilement les résultats de requêtes Doctrine
+# Il génère automatiquement les liens de navigation (Précédent, 1, 2, 3, Suivant)
+knp_paginator:
+    # Nombre de numéros de pages affichés dans la barre de pagination
+    # Exemple avec page_range: 5 → [1] [2] [3] [4] [5] ... [10]
+    # Si on est sur la page 7 → [5] [6] [7] [8] [9]
+    page_range: 5
+    
+    # Options par défaut appliquées à toutes les paginations
+    default_options:
+        # Nom du paramètre GET utilisé pour le numéro de page dans l'URL
+        # Exemple : /quiz-management?page=2
+        page_name: page
+        
+        # Nom du paramètre GET pour le champ de tri
+        # Permet de trier les résultats : /quiz-management?sort=titre
+        sort_field_name: sort
+        
+        # Nom du paramètre GET pour la direction du tri (ASC ou DESC)
+        # Exemple : /quiz-management?sort=titre&direction=desc
+        sort_direction_name: direction
+        
+        # Assure que les résultats sont uniques (évite les doublons avec les jointures)
+        # Important quand on utilise leftJoin() dans les requêtes Doctrine
+        distinct: true
+        
+        # Nom du paramètre GET pour le champ de filtrage
+        # Permet de filtrer les résultats : /quiz-management?filterField=etat
+        filter_field_name: filterField
+        
+        # Nom du paramètre GET pour la valeur du filtre
+        # Exemple : /quiz-management?filterField=etat&filterValue=actif
+        filter_value_name: filterValue
+    
+    # Templates Twig utilisés pour le rendu de la pagination
+    template:
+        # Template pour afficher les liens de pagination (Précédent, 1, 2, 3, Suivant)
+        # Utilise le style Bootstrap 4 pour un design moderne
+        # Ce template est appelé par la fonction knp_pagination_render() dans Twig
+        pagination: '@KnpPaginator/Pagination/twitter_bootstrap_v4_pagination.html.twig'
+        
+        # Template pour afficher les liens de tri cliquables dans les tableaux
+        # Permet de trier en cliquant sur les en-têtes de colonnes
+        sortable: '@KnpPaginator/Pagination/sortable_link.html.twig'
+        
+        # Template pour afficher les formulaires de filtrage
+        # Permet de filtrer les résultats par différents critères
+        filtration: '@KnpPaginator/Pagination/filtration.html.twig'
