@@ -19,18 +19,14 @@ class AuditController extends AbstractController
     }
 
     #[Route('/', name: 'backoffice_audit_index')]
-    public function index(\App\Bundle\UserActivityBundle\Repository\UserActivityRepository $activityRepository): Response
+    public function index(): Response
     {
         $connection = $this->entityManager->getConnection();
         $studentRevisions = [];
         $contentRevisions = [];
-        $userActivities = [];
         
         try {
-            // Get data from NEW UserActivity system
-            $userActivities = $activityRepository->findRecentActivities(100);
-            
-            // Check if revisions table exists (OLD audit system)
+            // Check if revisions table exists
             $revisionsExists = $connection->executeQuery(
                 "SELECT COUNT(*) FROM information_schema.tables 
                  WHERE table_schema = DATABASE() AND table_name = 'revisions'"
@@ -129,7 +125,6 @@ class AuditController extends AbstractController
         return $this->render('backoffice/audit/index.html.twig', [
             'studentRevisions' => $studentRevisions,
             'contentRevisions' => $contentRevisions,
-            'userActivities' => $userActivities,
         ]);
     }
 
