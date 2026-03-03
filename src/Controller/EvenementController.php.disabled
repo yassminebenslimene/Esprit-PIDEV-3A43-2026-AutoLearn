@@ -1,0 +1,12 @@
+<?php
+
+// FICHIER DÉSACTIVÉ - Nécessite symfony/workflow
+// Pour réactiver: composer require symfony/workflow
+// Puis renommer en .php
+
+/*
+namespace App\Controller;
+
+// Ce contrôleur nécessite WorkflowInterface qui n'est pas installé
+// Voir src/Controller/EvenementController.php.disabled pour le code complet
+*/
