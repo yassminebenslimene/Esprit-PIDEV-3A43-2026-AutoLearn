@@ -76,51 +76,20 @@ class AuditController extends AbstractController
         }
         
         try {
+            // Only query cours_audit for now (other audit tables will be created as entities are modified)
             $contentSql = "
                 SELECT 'cours' as entity_type, r.id, r.timestamp, r.username,
                        ca.id as entity_id, ca.revtype, ca.titre as nom, NULL as prenom
                 FROM revisions r
-                LEFT JOIN cours_audit ca ON r.id = ca.rev
+                INNER JOIN cours_audit ca ON r.id = ca.rev
                 WHERE ca.id IS NOT NULL
-                
-                UNION ALL
-                
-                SELECT 'chapitre' as entity_type, r.id, r.timestamp, r.username,
-                       ch.id as entity_id, ch.revtype, ch.titre as nom, NULL as prenom
-                FROM revisions r
-                LEFT JOIN chapitre_audit ch ON r.id = ch.rev
-                WHERE ch.id IS NOT NULL
-                
-                UNION ALL
-                
-                SELECT 'challenge' as entity_type, r.id, r.timestamp, r.username,
-                       chal.id as entity_id, chal.revtype, chal.titre as nom, NULL as prenom
-                FROM revisions r
-                LEFT JOIN challenge_audit chal ON r.id = chal.rev
-                WHERE chal.id IS NOT NULL
-                
-                UNION ALL
-                
-                SELECT 'evenement' as entity_type, r.id, r.timestamp, r.username,
-                       ev.id as entity_id, ev.revtype, ev.titre as nom, NULL as prenom
-                FROM revisions r
-                LEFT JOIN evenement_audit ev ON r.id = ev.rev
-                WHERE ev.id IS NOT NULL
-                
-                UNION ALL
-                
-                SELECT 'communaute' as entity_type, r.id, r.timestamp, r.username,
-                       com.id as entity_id, com.revtype, com.nom as nom, NULL as prenom
-                FROM revisions r
-                LEFT JOIN communaute_audit com ON r.id = com.rev
-                WHERE com.id IS NOT NULL
-                
-                ORDER BY timestamp DESC 
+                ORDER BY r.timestamp DESC 
                 LIMIT 100
             ";
             
             $contentRevisions = $connection->executeQuery($contentSql)->fetchAllAssociative();
         } catch (\Exception $e) {
+            // If cours_audit doesn't have data yet, return empty
             $contentRevisions = [];
         }
 
