@@ -16,6 +16,14 @@ class PostType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('titre', null, [
+                'label' => 'Titre du post',
+                'required' => true,
+                'attr' => [
+                    'placeholder' => 'Donnez un titre à votre post...',
+                    'class' => 'form-control'
+                ],
+            ])
             ->add('contenu', TextareaType::class, [
                 'label' => 'Texte du post',
                 'required' => false,
