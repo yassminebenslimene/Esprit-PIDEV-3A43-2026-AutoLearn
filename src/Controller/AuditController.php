@@ -46,14 +46,23 @@ class AuditController extends AbstractController
                         ua.isSuspended, 
                         ua.suspendedAt, 
                         ua.suspensionReason,
+                        prev.isSuspended as prev_isSuspended,
                         CASE 
                             WHEN ua.revtype = 'INS' THEN 'CREATE'
                             WHEN ua.revtype = 'DEL' THEN 'DELETE'
+                            WHEN ua.revtype = 'UPD' AND ua.isSuspended = 1 AND (prev.isSuspended IS NULL OR prev.isSuspended = 0) THEN 'SUSPEND'
+                            WHEN ua.revtype = 'UPD' AND ua.isSuspended = 0 AND prev.isSuspended = 1 THEN 'REACTIVATE'
                             WHEN ua.revtype = 'UPD' THEN 'UPDATE'
                             ELSE 'UPDATE'
                         END as action_type
                     FROM revisions r
                     INNER JOIN user_audit ua ON r.id = ua.rev
+                    LEFT JOIN user_audit prev ON prev.userId = ua.userId 
+                        AND prev.rev = (
+                            SELECT MAX(ua2.rev) 
+                            FROM user_audit ua2 
+                            WHERE ua2.userId = ua.userId AND ua2.rev < ua.rev
+                        )
                     WHERE ua.userId IS NOT NULL AND ua.discr = 'etudiant'
                     ORDER BY r.timestamp DESC 
                     LIMIT 100
@@ -73,7 +82,40 @@ class AuditController extends AbstractController
                 FROM revisions r
                 LEFT JOIN cours_audit ca ON r.id = ca.rev
                 WHERE ca.id IS NOT NULL
-                ORDER BY r.timestamp DESC 
+                
+                UNION ALL
+                
+                SELECT 'chapitre' as entity_type, r.id, r.timestamp, r.username,
+                       ch.id as entity_id, ch.revtype, ch.titre as nom, NULL as prenom
+                FROM revisions r
+                LEFT JOIN chapitre_audit ch ON r.id = ch.rev
+                WHERE ch.id IS NOT NULL
+                
+                UNION ALL
+                
+                SELECT 'challenge' as entity_type, r.id, r.timestamp, r.username,
+                       chal.id as entity_id, chal.revtype, chal.titre as nom, NULL as prenom
+                FROM revisions r
+                LEFT JOIN challenge_audit chal ON r.id = chal.rev
+                WHERE chal.id IS NOT NULL
+                
+                UNION ALL
+                
+                SELECT 'evenement' as entity_type, r.id, r.timestamp, r.username,
+                       ev.id as entity_id, ev.revtype, ev.titre as nom, NULL as prenom
+                FROM revisions r
+                LEFT JOIN evenement_audit ev ON r.id = ev.rev
+                WHERE ev.id IS NOT NULL
+                
+                UNION ALL
+                
+                SELECT 'communaute' as entity_type, r.id, r.timestamp, r.username,
+                       com.id as entity_id, com.revtype, com.nom as nom, NULL as prenom
+                FROM revisions r
+                LEFT JOIN communaute_audit com ON r.id = com.rev
+                WHERE com.id IS NOT NULL
+                
+                ORDER BY timestamp DESC 
                 LIMIT 100
             ";
             
