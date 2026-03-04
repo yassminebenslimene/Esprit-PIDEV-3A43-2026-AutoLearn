@@ -16,6 +16,22 @@ class ExerciceRepository extends ServiceEntityRepository
         parent::__construct($registry, Exercice::class);
     }
 
+    /**
+     * Find all exercises with optional limit
+     * @return Exercice[]
+     */
+    public function findAllWithLimit(?int $limit = null): array
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->orderBy('e.id', 'DESC');
+        
+        if ($limit !== null) {
+            $qb->setMaxResults($limit);
+        }
+        
+        return $qb->getQuery()->getResult();
+    }
+
 //    /**
 //     * @return Exercice[] Returns an array of Exercice objects
 //     */

@@ -52,13 +52,13 @@ class AIAssistantService
         CoursRepository $coursRepository,
         EvenementRepository $evenementRepository,
         CommunauteRepository $communauteRepository,
-        ?UserActivityRepository $activityRepository = null,
         ChallengeRepository $challengeRepository,
         QuizRepository $quizRepository,
         ChapitreRepository $chapitreRepository,
         PostRepository $postRepository,
         CommentaireRepository $commentaireRepository,
-        ChapterProgressRepository $chapterProgressRepository
+        ChapterProgressRepository $chapterProgressRepository,
+        ?UserActivityRepository $activityRepository = null
     ) {
         $this->groqService = $groqService;
         $this->languageDetector = $languageDetector;
@@ -183,7 +183,7 @@ class AIAssistantService
                 'error' => $e->getMessage()
             ]);
 
-            $errorMessage = $language === 'en' 
+            $errorMessage = ($language ?? 'fr') === 'en' 
                 ? "Sorry, I'm experiencing a technical issue. Please try again in a few moments."
                 : "Désolé, je rencontre un problème technique. Veuillez réessayer dans quelques instants.";
 

@@ -35,13 +35,13 @@ class Challenge
     private ?string $niveau = null;
 
     #[ORM\ManyToOne(inversedBy: 'challenges')]
-    #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: false, onDelete: "CASCADE")]
+    #[ORM\JoinColumn(name: "created_by_id", referencedColumnName: "userId", nullable: false, onDelete: "CASCADE")]
     private ?User $createdBy = null;
 
     /**
      * @var Collection<int, Exercice>
      */
-    #[ORM\OneToMany(targetEntity: Exercice::class, mappedBy: 'challenge', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Exercice::class, mappedBy: 'challenge', cascade: ['persist'])]
     private Collection $exercices;
 
     /**
@@ -59,7 +59,7 @@ class Challenge
     /**
      * @var Collection<int, Vote>
      */
-    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'challenge', cascade: ["persist", "remove"])]
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'challenge', orphanRemoval: true)]
     private Collection $votes;
 
     public function __construct()

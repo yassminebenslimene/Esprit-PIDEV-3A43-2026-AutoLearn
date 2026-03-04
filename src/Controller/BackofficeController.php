@@ -404,7 +404,11 @@ class BackofficeController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function exportUsers(UserRepository $userRepository): Response
     {
-        $users = $userRepository->findAll();
+        // Optimisation: Utiliser un itérateur pour éviter de charger tous les users en mémoire
+        $users = $userRepository->createQueryBuilder('u')
+            ->setMaxResults(10000) // Limite de sécurité
+            ->getQuery()
+            ->toIterable(); // Utilise un itérateur pour économiser la mémoire
         
         $csvData = "ID,Nom,Prenom,Email,Role,Niveau,Created At\n";
         
@@ -667,7 +671,11 @@ class BackofficeController extends AbstractController
     #[Route('/backoffice/exercices', name: 'backoffice_exercices')]
     public function listExercices(ExerciceRepository $repo): Response
     {
-        $exercices = $repo->findAll();
+        $exercices = $repo->createQueryBuilder('e')
+            ->setMaxResults(100) // Limite de 100 exercices par page
+            ->orderBy('e.id', 'DESC')
+            ->getQuery()
+            ->getResult();
 
         return $this->render('backoffice/exercice.html.twig', [
             'exercices' => $exercices,
@@ -800,7 +808,11 @@ class BackofficeController extends AbstractController
     #[Route('/backoffice/challenges', name: 'backoffice_challenges')]
     public function showchallenge(ChallengeRepository $repository): Response
     {
-        $challenges = $repository->findAll();
+        $challenges = $repository->createQueryBuilder('c')
+            ->setMaxResults(50) // Limite de 50 challenges par page
+            ->orderBy('c.id', 'DESC')
+            ->getQuery()
+            ->getResult();
 
         return $this->render('backoffice/challenge.html.twig', [
             'challenges' => $challenges
@@ -818,9 +830,9 @@ class BackofficeController extends AbstractController
         $form = $this->createForm(ChallengeType::class, $challenge);
         $form->handleRequest($request);
 
-        // Récupérer tous les exercices et quiz disponibles
-        $allExercices = $exerciceRepository->findAll();
-        $allQuizs = $quizRepository->findAll();
+        // Récupérer tous les exercices et quiz disponibles (limité à 500 pour performance)
+        $allExercices = $exerciceRepository->findAllWithLimit(500);
+        $allQuizs = $quizRepository->findAllWithLimit(500);
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Récupérer les exercices sélectionnés depuis la requête
@@ -882,9 +894,9 @@ class BackofficeController extends AbstractController
         $form = $this->createForm(ChallengeType::class, $challenge);
         $form->handleRequest($request);
 
-        // Récupérer tous les exercices et quiz disponibles
-        $allExercices = $exerciceRepository->findAll();
-        $allQuizs = $quizRepository->findAll();
+        // Récupérer tous les exercices et quiz disponibles (limité à 500 pour performance)
+        $allExercices = $exerciceRepository->findAllWithLimit(500);
+        $allQuizs = $quizRepository->findAllWithLimit(500);
         
         // Récupérer les IDs des exercices déjà associés
         $exerciceIds = [];

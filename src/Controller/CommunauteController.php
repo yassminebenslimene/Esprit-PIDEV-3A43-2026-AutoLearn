@@ -25,7 +25,7 @@ final class CommunauteController extends AbstractController
         if ($search) {
             $communautes = $communauteRepository->searchByNameOrDescription($search);
         } else {
-            $communautes = $communauteRepository->findAll();
+            $communautes = $communauteRepository->findAllWithLimit(100); // Limit to 100 communities
         }
         
         return $this->render('frontoffice/communaute/index.html.twig', [

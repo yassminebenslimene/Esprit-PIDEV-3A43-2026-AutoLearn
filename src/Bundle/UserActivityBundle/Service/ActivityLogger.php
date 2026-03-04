@@ -148,7 +148,7 @@ class ActivityLogger
             $metadata['updated_by_role'] = $admin->getRole();
         }
         
-        if ($changes && !empty($changes)) {
+        if ($changes !== null && $changes !== []) {
             $metadata['changes'] = $changes;
             $metadata['fields_changed'] = array_keys($changes);
             $metadata['changes_count'] = count($changes);

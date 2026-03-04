@@ -50,7 +50,7 @@ class ActivityController extends AbstractController
                 'success' => $activity->isSuccess(),
                 'errorMessage' => $activity->getErrorMessage(),
                 'metadata' => $activity->getMetadata(),
-                'createdAt' => $activity->getCreatedAt()->format('Y-m-d H:i:s'),
+                'createdAt' => $activity->getCreatedAt()?->format('Y-m-d H:i:s') ?? '',
             ];
         }
         

@@ -31,6 +31,22 @@ class CommunauteRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * Find all communities with optional limit
+     * @return Communaute[]
+     */
+    public function findAllWithLimit(?int $limit = null): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->orderBy('c.id', 'DESC');
+        
+        if ($limit !== null) {
+            $qb->setMaxResults($limit);
+        }
+        
+        return $qb->getQuery()->getResult();
+    }
+
     //    /**
     //     * @return Communaute[] Returns an array of Communaute objects
     //     */

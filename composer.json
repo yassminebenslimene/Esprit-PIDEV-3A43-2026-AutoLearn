@@ -107,6 +107,7 @@
         }
     },
     "require-dev": {
+        "ahmed-bhs/doctrine-doctor": "*",
         "doctrine/doctrine-fixtures-bundle": "^4.3",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^9.5",
