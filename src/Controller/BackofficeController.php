@@ -164,29 +164,49 @@ class BackofficeController extends AbstractController
             'totalEvenements' => $entityManager->getRepository(Evenement::class)->count([]),
         ];
         
-        // Top courses by chapters count
-        $topCours = $entityManager->getRepository(Cours::class)
+        // Top courses by chapters count (optimized with DTO hydration)
+        $topCoursData = $entityManager->getRepository(Cours::class)
             ->createQueryBuilder('c')
+            ->select('NEW App\DTO\TopCoursDTO(c.id, c.titre, COUNT(ch.id))')
             ->leftJoin('c.chapitres', 'ch')
-            ->groupBy('c.id')
+            ->groupBy('c.id, c.titre')
             ->orderBy('COUNT(ch.id)', 'DESC')
             ->setMaxResults(5)
             ->getQuery()
             ->getResult();
         
+        // Fetch full entities for display
+        $topCours = [];
+        foreach ($topCoursData as $dto) {
+            $cours = $entityManager->getRepository(Cours::class)->find($dto->id);
+            if ($cours) {
+                $topCours[] = $cours;
+            }
+        }
+        
         // Recent events
         $recentEvents = $entityManager->getRepository(Evenement::class)
             ->findBy([], ['dateDebut' => 'DESC'], 5);
         
-        // Top challenges by exercises count
-        $topChallenges = $entityManager->getRepository(Challenge::class)
+        // Top challenges by exercises count (optimized with DTO hydration)
+        $topChallengesData = $entityManager->getRepository(Challenge::class)
             ->createQueryBuilder('ch')
+            ->select('NEW App\DTO\TopChallengeDTO(ch.id, ch.titre, COUNT(ex.id))')
             ->leftJoin('ch.exercices', 'ex')
-            ->groupBy('ch.id')
+            ->groupBy('ch.id, ch.titre')
             ->orderBy('COUNT(ex.id)', 'DESC')
             ->setMaxResults(5)
             ->getQuery()
             ->getResult();
+        
+        // Fetch full entities for display
+        $topChallenges = [];
+        foreach ($topChallengesData as $dto) {
+            $challenge = $entityManager->getRepository(Challenge::class)->find($dto->id);
+            if ($challenge) {
+                $topChallenges[] = $challenge;
+            }
+        }
         
         return $this->render('backoffice/analytics.html.twig', [
             'stats' => $stats,

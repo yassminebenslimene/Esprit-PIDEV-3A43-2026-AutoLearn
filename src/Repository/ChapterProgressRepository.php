@@ -48,6 +48,37 @@ class ChapterProgressRepository extends ServiceEntityRepository
     }
 
     /**
+     * Compte les chapitres complétés pour plusieurs cours en une seule requête (optimisé avec DTO)
+     * Évite le problème N+1 en récupérant toutes les progressions en une fois
+     */
+    public function countCompletedChaptersByCoursesForUser(User $user, array $coursIds): array
+    {
+        if (empty($coursIds)) {
+            return [];
+        }
+
+        $results = $this->createQueryBuilder('cp')
+            ->select('NEW App\DTO\CourseProgressDTO(IDENTITY(ch.cours), COUNT(cp.id))')
+            ->join('cp.chapitre', 'ch')
+            ->where('cp.user = :user')
+            ->andWhere('ch.cours IN (:coursIds)')
+            ->andWhere('cp.completedAt IS NOT NULL')
+            ->setParameter('user', $user)
+            ->setParameter('coursIds', $coursIds)
+            ->groupBy('ch.cours')
+            ->getQuery()
+            ->getResult();
+
+        // Convert DTOs to associative array [coursId => count]
+        $progressMap = [];
+        foreach ($results as $dto) {
+            $progressMap[$dto->coursId] = $dto->completedChapters;
+        }
+
+        return $progressMap;
+    }
+
+    /**
      * Récupère tous les chapitres complétés par un utilisateur dans un cours
      */
     public function findCompletedChaptersByCourse(User $user, Cours $cours): array
