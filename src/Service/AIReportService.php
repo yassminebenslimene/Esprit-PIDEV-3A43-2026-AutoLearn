@@ -17,8 +17,7 @@ class AIReportService
     public function __construct(
         HttpClientInterface $httpClient,
         FeedbackAnalyticsService $analyticsService,
-        string $huggingfaceApiKey,
-        string $huggingfaceModel
+        string $huggingfaceApiKey
     ) {
         $this->httpClient = $httpClient;
         $this->analyticsService = $analyticsService;
