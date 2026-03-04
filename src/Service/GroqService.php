@@ -120,8 +120,8 @@ class GroqService
         
         $this->logger->info('Groq isAvailable check', [
             'available' => $available,
-            'apiKey_length' => strlen($this->apiKey ?? ''),
-            'apiKey_first_chars' => substr($this->apiKey ?? '', 0, 10)
+            'apiKey_length' => strlen($this->apiKey),
+            'apiKey_first_chars' => substr($this->apiKey, 0, 10)
         ]);
         
         return $available;

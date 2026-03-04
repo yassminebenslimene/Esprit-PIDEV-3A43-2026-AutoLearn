@@ -1,0 +1,5 @@
+<?php
+
+// FICHIER DÉSACTIVÉ - Nécessite CalendarBundle
+// Pour réactiver: composer require tattali/calendar-bundle
+// Puis renommer en .php

@@ -23,7 +23,7 @@ class Evenement
     #[ORM\Column(length:255)]
     #[Assert\NotBlank(message: "Le titre est obligatoire")]
     #[Assert\Length(
-        min: 3,
+        min: 5,
         max: 255,
         minMessage: "Le titre doit contenir au moins {{ limit }} caractères",
         maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères"
@@ -90,7 +90,7 @@ class Evenement
     #[ORM\OneToMany(mappedBy: "evenement", targetEntity: Equipe::class)]
     private Collection $equipes;
 
-    #[ORM\OneToMany(mappedBy: "evenement", targetEntity: Participation::class)]
+    #[ORM\OneToMany(mappedBy: "evenement", targetEntity: Participation::class, cascade: ["persist", "remove"], orphanRemoval: true)]
     private Collection $participations;
 
     public function __construct()

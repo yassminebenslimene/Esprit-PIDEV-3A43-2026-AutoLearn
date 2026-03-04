@@ -22,18 +22,17 @@ class AuditController extends AbstractController
     public function index(): Response
     {
         $connection = $this->entityManager->getConnection();
+        
+        // Direct simple test
+        $testQuery = "SELECT COUNT(*) as count FROM user_audit WHERE discr = 'etudiant'";
+        $testResult = $connection->executeQuery($testQuery)->fetchAssociative();
+        
         $studentRevisions = [];
         $contentRevisions = [];
         
-        try {
-            // Check if revisions table exists
-            $revisionsExists = $connection->executeQuery(
-                "SELECT COUNT(*) FROM information_schema.tables 
-                 WHERE table_schema = DATABASE() AND table_name = 'revisions'"
-            )->fetchOne();
-            
-            if ($revisionsExists) {
-                // Query 1: Admin actions on STUDENTS only with action type detection
+        // If we have data, try the full query
+        if ($testResult['count'] > 0) {
+            try {
                 $studentSql = "
                     SELECT 
                         'student' as entity_type, 
@@ -70,61 +69,78 @@ class AuditController extends AbstractController
                 ";
                 
                 $studentRevisions = $connection->executeQuery($studentSql)->fetchAllAssociative();
-                
-                // Query 2: Admin actions on CONTENT (courses, challenges, events, etc.)
-                $contentSql = "
-                    SELECT 'cours' as entity_type, r.id, r.timestamp, r.username,
-                           ca.id as entity_id, ca.revtype, ca.titre as nom, NULL as prenom
-                    FROM revisions r
-                    LEFT JOIN cours_audit ca ON r.id = ca.rev
-                    WHERE ca.id IS NOT NULL
-                    
-                    UNION ALL
-                    
-                    SELECT 'chapitre' as entity_type, r.id, r.timestamp, r.username,
-                           ch.id as entity_id, ch.revtype, ch.titre as nom, NULL as prenom
-                    FROM revisions r
-                    LEFT JOIN chapitre_audit ch ON r.id = ch.rev
-                    WHERE ch.id IS NOT NULL
-                    
-                    UNION ALL
-                    
-                    SELECT 'challenge' as entity_type, r.id, r.timestamp, r.username,
-                           chal.id as entity_id, chal.revtype, chal.titre as nom, NULL as prenom
-                    FROM revisions r
-                    LEFT JOIN challenge_audit chal ON r.id = chal.rev
-                    WHERE chal.id IS NOT NULL
-                    
-                    UNION ALL
-                    
-                    SELECT 'evenement' as entity_type, r.id, r.timestamp, r.username,
-                           ev.id as entity_id, ev.revtype, ev.titre as nom, NULL as prenom
-                    FROM revisions r
-                    LEFT JOIN evenement_audit ev ON r.id = ev.rev
-                    WHERE ev.id IS NOT NULL
-                    
-                    UNION ALL
-                    
-                    SELECT 'communaute' as entity_type, r.id, r.timestamp, r.username,
-                           com.id as entity_id, com.revtype, com.nom as nom, NULL as prenom
-                    FROM revisions r
-                    LEFT JOIN communaute_audit com ON r.id = com.rev
-                    WHERE com.id IS NOT NULL
-                    
-                    ORDER BY timestamp DESC 
-                    LIMIT 100
-                ";
-                
-                $contentRevisions = $connection->executeQuery($contentSql)->fetchAllAssociative();
+            } catch (\Exception $e) {
+                // Store error for display
+                $studentRevisions = [];
             }
+        }
+        
+        $contentRevisions = [];
+        $contentError = null;
+        
+        try {
+            // Check which audit tables exist
+            $tables = $connection->executeQuery(
+                "SELECT TABLE_NAME FROM information_schema.TABLES 
+                 WHERE TABLE_SCHEMA = DATABASE() 
+                 AND TABLE_NAME LIKE '%_audit' 
+                 AND TABLE_NAME != 'user_audit'"
+            )->fetchAllAssociative();
+            
+            // Query each table separately to avoid collation issues
+            foreach ($tables as $table) {
+                $tableName = $table['TABLE_NAME'];
+                
+                // Determine the display name column based on table
+                $nameColumn = 'titre'; // Default for most tables
+                if ($tableName === 'communaute_audit' || $tableName === 'equipe_audit') {
+                    $nameColumn = 'nom';
+                } elseif ($tableName === 'commentaire_audit') {
+                    $nameColumn = 'contenu';
+                } elseif ($tableName === 'exercice_audit') {
+                    $nameColumn = 'question';
+                }
+                
+                // Extract entity type from table name (remove _audit suffix)
+                $entityType = str_replace('_audit', '', $tableName);
+                
+                try {
+                    $sql = "
+                        SELECT '$entityType' as entity_type, r.id, r.timestamp, r.username,
+                               t.id as entity_id, t.revtype, t.$nameColumn as nom
+                        FROM revisions r
+                        INNER JOIN $tableName t ON r.id = t.rev
+                        WHERE t.id IS NOT NULL
+                        ORDER BY r.timestamp DESC
+                        LIMIT 100
+                    ";
+                    
+                    $results = $connection->executeQuery($sql)->fetchAllAssociative();
+                    $contentRevisions = array_merge($contentRevisions, $results);
+                } catch (\Exception $e) {
+                    // Skip tables with errors
+                    continue;
+                }
+            }
+            
+            // Sort all results by timestamp
+            usort($contentRevisions, function($a, $b) {
+                return strtotime($b['timestamp']) - strtotime($a['timestamp']);
+            });
+            
+            // Limit to 100 most recent
+            $contentRevisions = array_slice($contentRevisions, 0, 100);
+            
         } catch (\Exception $e) {
-            $studentRevisions = [];
-            $contentRevisions = [];
+            // Store error for debugging
+            $contentError = $e->getMessage();
         }
 
         return $this->render('backoffice/audit/index.html.twig', [
             'studentRevisions' => $studentRevisions,
             'contentRevisions' => $contentRevisions,
+            'testCount' => $testResult['count'] ?? 0,
+            'contentError' => $contentError ?? null,
         ]);
     }
 

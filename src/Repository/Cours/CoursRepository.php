@@ -16,6 +16,23 @@ class CoursRepository extends ServiceEntityRepository
         parent::__construct($registry, Cours::class);
     }
 
+    /**
+     * Trouve tous les cours avec pagination
+     * 
+     * @param int $limit Nombre maximum de résultats
+     * @param int $offset Décalage pour la pagination
+     * @return Cours[] Returns an array of Cours objects
+     */
+    public function findAllPaginated(int $limit = 50, int $offset = 0): array
+    {
+        return $this->createQueryBuilder('c')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->orderBy('c.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Cours[] Returns an array of Cours objects
 //     */

@@ -93,7 +93,7 @@ class AIAssistantController extends AbstractController
         
         $user = $this->getUser();
         $role = $user ? $user->getRole() : 'ETUDIANT';
-        $language = $request->query->get('language', 'fr');
+        $language = (string) $request->query->get('language', 'fr');
 
         try {
             $suggestions = $this->aiAssistant->getSuggestions($role, $language);

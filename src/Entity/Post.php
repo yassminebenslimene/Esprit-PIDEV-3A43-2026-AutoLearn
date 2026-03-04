@@ -56,7 +56,7 @@ class Post
     #[ORM\JoinColumn(referencedColumnName: 'userId', nullable: true)]
     private ?User $user = null;
 
-    #[ORM\OneToMany(mappedBy: 'post', targetEntity: Commentaire::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'post', targetEntity: Commentaire::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $commentaires;
 
     public function __construct()

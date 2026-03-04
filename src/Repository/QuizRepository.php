@@ -33,6 +33,22 @@ class QuizRepository extends ServiceEntityRepository
         parent::__construct($registry, Quiz::class);
     }
 
+    /**
+     * Find all quizzes with optional limit
+     * @return Quiz[]
+     */
+    public function findAllWithLimit(?int $limit = null): array
+    {
+        $qb = $this->createQueryBuilder('q')
+            ->orderBy('q.id', 'DESC');
+        
+        if ($limit !== null) {
+            $qb->setMaxResults($limit);
+        }
+        
+        return $qb->getQuery()->getResult();
+    }
+
     // Exemples de méthodes personnalisées commentées (à décommenter si besoin)
     
 //    /**

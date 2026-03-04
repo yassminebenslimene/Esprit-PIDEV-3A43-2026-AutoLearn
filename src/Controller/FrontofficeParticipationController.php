@@ -210,13 +210,10 @@ class FrontofficeParticipationController extends AbstractController
                 try {
                     $emailService->sendParticipationConfirmation(
                         $email,
-                        $etudiant->getPrenom(),
-                        $etudiant->getNom(),
-                        $equipe->getNom(),
+                        $etudiant->getPrenom() . ' ' . $etudiant->getNom(),
                         $evenement->getTitre(),
                         $evenement->getDateDebut(),
-                        $evenement->getLieu(),
-                        $participation->getId()
+                        $evenement->getLieu()
                     );
                     $successCount++;
                     $debugInfo[] = '  ✅ Email sent successfully to ' . $email;

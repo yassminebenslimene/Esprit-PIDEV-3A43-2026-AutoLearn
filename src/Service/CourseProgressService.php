@@ -77,12 +77,13 @@ class CourseProgressService
 
     /**
      * Récupère les statistiques de progression pour un cours
+     * Optimisé: Une seule requête au lieu de deux
      */
     public function getCourseProgressStats(User $user, Cours $cours): array
     {
         $totalChapters = $cours->getChapitres()->count();
         $completedChapters = $this->progressRepository->countCompletedChaptersByCourse($user, $cours);
-        $percentage = $this->calculateCourseProgress($user, $cours);
+        $percentage = $totalChapters > 0 ? round(($completedChapters / $totalChapters) * 100, 2) : 0.0;
 
         return [
             'total_chapters' => $totalChapters,
@@ -95,13 +96,33 @@ class CourseProgressService
 
     /**
      * Récupère la progression de tous les cours d'un utilisateur
+     * Optimisé: Une seule requête au lieu de N requêtes (évite N+1)
      */
     public function getAllCoursesProgress(User $user, array $courses): array
     {
-        $progressData = [];
+        if (empty($courses)) {
+            return [];
+        }
 
+        // Extract course IDs
+        $coursIds = array_map(fn($cours) => $cours->getId(), $courses);
+        
+        // Fetch all progress data in ONE query (optimized with DTO hydration)
+        $progressMap = $this->progressRepository->countCompletedChaptersByCoursesForUser($user, $coursIds);
+
+        $progressData = [];
         foreach ($courses as $cours) {
-            $progressData[$cours->getId()] = $this->getCourseProgressStats($user, $cours);
+            $totalChapters = $cours->getChapitres()->count();
+            $completedChapters = $progressMap[$cours->getId()] ?? 0;
+            $percentage = $totalChapters > 0 ? round(($completedChapters / $totalChapters) * 100, 2) : 0.0;
+
+            $progressData[$cours->getId()] = [
+                'total_chapters' => $totalChapters,
+                'completed_chapters' => $completedChapters,
+                'remaining_chapters' => $totalChapters - $completedChapters,
+                'percentage' => $percentage,
+                'is_completed' => $percentage >= 100
+            ];
         }
 
         return $progressData;

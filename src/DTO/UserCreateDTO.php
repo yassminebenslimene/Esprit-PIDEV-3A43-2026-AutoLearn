@@ -3,6 +3,7 @@
 namespace App\DTO;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 class UserCreateDTO
 {
@@ -52,6 +53,7 @@ class UserCreateDTO
         message: 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&)',
         groups: ['registration']
     )]
+    #[Ignore] // Prevent password from being serialized in JSON/API responses
     public ?string $password = null;
 
     #[Assert\NotBlank(message: 'Le rôle est obligatoire')]

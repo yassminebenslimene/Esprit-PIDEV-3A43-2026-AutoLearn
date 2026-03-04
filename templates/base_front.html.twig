@@ -87,12 +87,12 @@
                         <li><a href="{{ path('app_communaute_index') }}">Communauté</a></li>
                         {% if app.user %}
                             <li class="scroll-to-section nav-user-name">
-                                <span class="nav-account-label">Mon compte :</span>
-                                <strong>{{ app.user.prenom }} {{ app.user.nom }}</strong>
+                                <span class="nav-account-label" style="color: #000000 !important;">Mon compte :</span>
+                                <strong style="color: #000000 !important;">{{ app.user.prenom }} {{ app.user.nom }}</strong>
                             </li>
-                            <li><a href="{{ path('app_profile') }}">Mon profil</a></li>
+                            <li><a href="{{ path('app_profile') }}" style="color: #000000 !important;">Mon profil</a></li>
                             <li>
-                                <a href="{{ path('backoffice_logout') }}" class="nav-logout-btn">
+                                <a href="{{ path('backoffice_logout') }}" class="nav-logout-btn" style="color: #000000 !important;">
                                     <i class="fa fa-sign-out-alt"></i> Déconnexion
                                 </a>
                             </li>

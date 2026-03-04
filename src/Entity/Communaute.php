@@ -25,7 +25,7 @@ class Communaute
     #[ORM\JoinColumn(name: "owner_id", referencedColumnName: "userId", nullable: true)]
     private ?User $owner = null;
 
-    #[ORM\OneToMany(mappedBy: 'communaute', targetEntity: Post::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'communaute', targetEntity: Post::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $posts;
 
     #[ORM\ManyToMany(targetEntity: User::class)]

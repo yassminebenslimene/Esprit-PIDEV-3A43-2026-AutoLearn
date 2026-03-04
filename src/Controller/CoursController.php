@@ -24,7 +24,7 @@ class CoursController extends AbstractController
     public function index(CoursRepository $coursRepository): Response
     {
         return $this->render('backoffice/cours/index.html.twig', [
-            'cours' => $coursRepository->findAll(),
+            'cours' => $coursRepository->findAllPaginated(100), // Limit to 100 courses
         ]);
     }
 

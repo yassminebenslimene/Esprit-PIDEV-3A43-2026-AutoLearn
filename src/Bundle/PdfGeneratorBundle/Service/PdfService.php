@@ -15,8 +15,12 @@ use Twig\Environment;
 class PdfService
 {
     private Environment $twig;
+    /** @var array<string, mixed> */
     private array $defaultOptions;
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function __construct(Environment $twig, array $options = [])
     {
         $this->twig = $twig;
@@ -33,8 +37,8 @@ class PdfService
      * Génère un PDF depuis un template Twig
      * 
      * @param string $template Chemin du template Twig
-     * @param array $data Données à passer au template
-     * @param array $options Options Dompdf supplémentaires
+     * @param array<string, mixed> $data Données à passer au template
+     * @param array<string, mixed> $options Options Dompdf supplémentaires
      * @return Dompdf Instance Dompdf avec le PDF généré
      */
     public function generateFromTemplate(string $template, array $data = [], array $options = []): Dompdf
@@ -76,8 +80,8 @@ class PdfService
      * Génère un PDF et retourne le contenu en string
      * 
      * @param string $template Chemin du template Twig
-     * @param array $data Données à passer au template
-     * @param array $options Options Dompdf
+     * @param array<string, mixed> $data Données à passer au template
+     * @param array<string, mixed> $options Options Dompdf
      * @return string Contenu du PDF
      */
     public function generatePdfString(string $template, array $data = [], array $options = []): string
@@ -102,7 +106,7 @@ class PdfService
     /**
      * Génère un certificat PDF
      * 
-     * @param array $data Données du certificat
+     * @param array<string, mixed> $data Données du certificat
      * @return string Contenu du PDF
      */
     public function generateCertificate(array $data): string
@@ -115,7 +119,7 @@ class PdfService
     /**
      * Génère un badge PDF
      * 
-     * @param array $data Données du badge
+     * @param array<string, mixed> $data Données du badge
      * @return string Contenu du PDF
      */
     public function generateBadge(array $data): string

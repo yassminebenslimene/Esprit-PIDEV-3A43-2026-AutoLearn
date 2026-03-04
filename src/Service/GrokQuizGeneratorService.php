@@ -300,8 +300,8 @@ class GrokQuizGeneratorService
             // Valide et normalise les données des questions
             return $this->validerEtNormaliserQuestions($questionsData);
 
-        } catch (\Symfony\Contracts\HttpClient\Exception\TransportException $e) {
-            // Capture les erreurs de connexion réseau
+        } catch (\Exception $e) {
+            // Capture les erreurs de connexion réseau et autres
             $this->logger->error('Erreur de connexion à l\'API Groq', [
                 // Message d'erreur
                 'error' => $e->getMessage(),

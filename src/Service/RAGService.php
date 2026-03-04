@@ -171,7 +171,8 @@ class RAGService
         $niveau = $user && method_exists($user, 'getNiveau') ? $user->getNiveau() : null;
         
         try {
-            $cours = $this->coursRepository->findAll();
+            // Limit to 20 courses to avoid performance issues
+            $cours = $this->coursRepository->findAllPaginated(20, 0);
             
             // Vérification de sécurité
             if (!is_array($cours) && !($cours instanceof \Traversable)) {
@@ -180,6 +181,14 @@ class RAGService
             
             $coursData = [];
             $userProgress = [];
+            
+            // Fetch all progress data in ONE batch query (optimized)
+            $progressMap = [];
+            if ($user) {
+                $userId = method_exists($user, 'getUserId') ? $user->getUserId() : $user->getId();
+                $coursIds = array_map(fn($c) => $c->getId(), $cours);
+                $progressData = $this->progressService->getAllCoursesProgress($user, $cours);
+            }
             
             foreach ($cours as $c) {
                 $coursInfo = [
@@ -192,63 +201,36 @@ class RAGService
                     'description' => substr($c->getDescription(), 0, 150) . '...'
                 ];
                 
-                // Récupérer la progression DIRECTEMENT depuis la BD avec SQL
-                if ($user) {
-                    try {
-                        $userId = method_exists($user, 'getUserId') ? $user->getUserId() : $user->getId();
-                        $coursId = $c->getId();
-                        
-                        // Requête SQL directe pour les vraies données
-                        $conn = $this->em->getConnection();
-                        $sql = "
-                            SELECT 
-                                COUNT(DISTINCT cp.id) as chapitres_completes,
-                                (SELECT COUNT(*) FROM chapitre WHERE cours_id = :cours_id) as total_chapitres
-                            FROM chapter_progress cp
-                            JOIN chapitre ch ON cp.chapitre_id = ch.id
-                            WHERE cp.user_id = :user_id 
-                            AND ch.cours_id = :cours_id
-                            AND cp.completed_at IS NOT NULL
-                        ";
-                        
-                        $stmt = $conn->prepare($sql);
-                        $result = $stmt->executeQuery([
-                            'user_id' => $userId,
-                            'cours_id' => $coursId
-                        ]);
-                        $data = $result->fetchAssociative();
-                        
-                        $completedChapters = (int)($data['chapitres_completes'] ?? 0);
-                        $totalChapters = (int)($data['total_chapitres'] ?? $c->getChapitres()->count());
-                        $percentage = $totalChapters > 0 ? round(($completedChapters / $totalChapters) * 100, 1) : 0;
-                        
-                        $coursInfo['progression'] = [
-                            'pourcentage' => $percentage,
-                            'chapitres_completes' => $completedChapters,
-                            'chapitres_total' => $totalChapters,
-                            'chapitres_restants' => $totalChapters - $completedChapters,
-                            'cours_termine' => $percentage >= 100
-                        ];
-                        
-                        // Ajouter aux cours en progression SEULEMENT si > 0
-                        if ($completedChapters > 0) {
-                            $userProgress[] = [
-                                'cours' => $c->getTitre(),
-                                'progression' => $percentage . '%',
-                                'chapitres_completes' => $completedChapters,
-                                'chapitres_total' => $totalChapters,
-                                'details' => $completedChapters . '/' . $totalChapters . ' chapitres'
-                            ];
-                        }
-                    } catch (\Exception $e) {
-                        // En cas d'erreur, progression = 0
-                        $coursInfo['progression'] = [
-                            'pourcentage' => 0,
-                            'chapitres_completes' => 0,
-                            'chapitres_total' => $c->getChapitres()->count(),
-                            'error' => $e->getMessage()
+                // Use pre-fetched progress data (no query in loop)
+                if ($user && isset($progressData[$c->getId()])) {
+                    $stats = $progressData[$c->getId()];
+                    $coursInfo['progression'] = [
+                        'pourcentage' => $stats['percentage'],
+                        'chapitres_completes' => $stats['completed_chapters'],
+                        'chapitres_total' => $stats['total_chapters'],
+                        'chapitres_restants' => $stats['remaining_chapters'],
+                        'cours_termine' => $stats['is_completed']
+                    ];
+                    
+                    // Ajouter aux cours en progression SEULEMENT si > 0
+                    if ($stats['completed_chapters'] > 0) {
+                        $userProgress[] = [
+                            'cours' => $c->getTitre(),
+                            'progression' => $stats['percentage'] . '%',
+                            'chapitres_completes' => $stats['completed_chapters'],
+                            'chapitres_total' => $stats['total_chapters'],
+                            'details' => $stats['completed_chapters'] . '/' . $stats['total_chapters'] . ' chapitres'
                         ];
                     }
+                } elseif ($user) {
+                    // Fallback if no progress data
+                    $coursInfo['progression'] = [
+                        'pourcentage' => 0,
+                        'chapitres_completes' => 0,
+                        'chapitres_total' => $c->getChapitres()->count(),
+                        'chapitres_restants' => $c->getChapitres()->count(),
+                        'cours_termine' => false
+                    ];
                 }
                 
                 $coursData[] = $coursInfo;

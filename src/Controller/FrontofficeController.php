@@ -40,11 +40,30 @@ class FrontofficeController extends AbstractController
             }
         }
         
-        // Récupérer les données
-        $cours = $coursRepository->findAll();
-        $challenges = $challengeRepository->findAll();
-        $evenements = $evenementRepository->findAll();
-        $equipes = $equipeRepository->findAll();
+        // Récupérer les données avec limite pour la page d'accueil
+        $cours = $coursRepository->createQueryBuilder('c')
+            ->setMaxResults(12) // Afficher seulement les 12 premiers cours
+            ->orderBy('c.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+            
+        $challenges = $challengeRepository->createQueryBuilder('ch')
+            ->setMaxResults(8) // Afficher seulement les 8 premiers challenges
+            ->orderBy('ch.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+            
+        $evenements = $evenementRepository->createQueryBuilder('e')
+            ->setMaxResults(6) // Afficher seulement les 6 premiers événements
+            ->orderBy('e.dateDebut', 'DESC')
+            ->getQuery()
+            ->getResult();
+            
+        $equipes = $equipeRepository->createQueryBuilder('eq')
+            ->setMaxResults(10) // Afficher seulement les 10 premières équipes
+            ->orderBy('eq.id', 'DESC')
+            ->getQuery()
+            ->getResult();
         
         // Calculer la progression pour chaque cours si l'utilisateur est connecté
         $coursProgress = [];

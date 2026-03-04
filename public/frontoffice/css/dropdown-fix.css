@@ -1,0 +1,151 @@
+/* Fix pour mettre tous les textes des dropdowns en noir */
+
+/* Dropdowns généraux */
+.dropdown-menu,
+.dropdown-menu .dropdown-item,
+.dropdown-menu a,
+.dropdown-menu button,
+.dropdown-menu li,
+.dropdown-menu li a {
+    color: #000000 !important;
+}
+
+/* Hover state */
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu a:hover {
+    color: #000000 !important;
+    background-color: #f8f9fa !important;
+}
+
+/* Select elements */
+select,
+select option {
+    color: #000000 !important;
+}
+
+/* Form controls */
+.form-select,
+.form-select option,
+.form-control option {
+    color: #000000 !important;
+}
+
+/* Navigation dropdowns */
+.nav-item .dropdown-menu,
+.nav-item .dropdown-menu .dropdown-item {
+    color: #000000 !important;
+}
+
+/* Profile menu - FORCE BLACK TEXT */
+.dropdown-menu[aria-labelledby*="profile"],
+.dropdown-menu[aria-labelledby*="user"],
+.dropdown-menu[aria-labelledby*="Profile"],
+.dropdown-menu[aria-labelledby*="User"] {
+    background-color: #ffffff !important;
+}
+
+.dropdown-menu[aria-labelledby*="profile"] .dropdown-item,
+.dropdown-menu[aria-labelledby*="user"] .dropdown-item,
+.dropdown-menu[aria-labelledby*="Profile"] .dropdown-item,
+.dropdown-menu[aria-labelledby*="User"] .dropdown-item,
+.dropdown-menu[aria-labelledby*="profile"] a,
+.dropdown-menu[aria-labelledby*="user"] a,
+.dropdown-menu[aria-labelledby*="Profile"] a,
+.dropdown-menu[aria-labelledby*="User"] a {
+    color: #000000 !important;
+}
+
+/* Language dropdown */
+.dropdown-menu[aria-labelledby*="language"],
+.dropdown-menu[aria-labelledby*="lang"] {
+    color: #000000 !important;
+}
+
+/* Quiz dropdowns */
+.quiz-dropdown,
+.quiz-dropdown .dropdown-item,
+.quiz-select,
+.quiz-select option {
+    color: #000000 !important;
+}
+
+/* Chapter dropdowns */
+.chapter-dropdown,
+.chapter-dropdown .dropdown-item,
+.chapter-select,
+.chapter-select option {
+    color: #000000 !important;
+}
+
+/* Niveau dropdown (registration) */
+select[name="niveau"],
+select[name="niveau"] option,
+#registration_form_niveau,
+#registration_form_niveau option {
+    color: #000000 !important;
+}
+
+/* Tous les selects dans les formulaires */
+form select,
+form select option {
+    color: #000000 !important;
+}
+
+/* Bootstrap dropdowns */
+.btn-group .dropdown-menu,
+.btn-group .dropdown-menu .dropdown-item {
+    color: #000000 !important;
+}
+
+/* Navbar dropdowns - FORCE BLACK */
+.navbar .dropdown-menu,
+.navbar .dropdown-menu .dropdown-item,
+.navbar .dropdown-menu a,
+.header-area .dropdown-menu,
+.header-area .dropdown-menu .dropdown-item,
+.header-area .dropdown-menu a {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+}
+
+/* Main nav dropdowns */
+.main-nav .dropdown-menu,
+.main-nav .dropdown-menu .dropdown-item,
+.main-nav .dropdown-menu a {
+    color: #000000 !important;
+}
+
+/* Active state */
+.dropdown-menu .dropdown-item.active,
+.dropdown-menu .dropdown-item:active {
+    color: #000000 !important;
+    background-color: #e9ecef !important;
+}
+
+/* Disabled state */
+.dropdown-menu .dropdown-item.disabled,
+.dropdown-menu .dropdown-item:disabled {
+    color: #6c757d !important;
+}
+
+/* Force all dropdown links to be black */
+.dropdown-menu > li > a,
+.dropdown-menu > .dropdown-item,
+ul.dropdown-menu li a,
+ul.dropdown-menu .dropdown-item {
+    color: #000000 !important;
+}
+
+/* Profile dropdown specific */
+#profileDropdown + .dropdown-menu,
+#profileDropdown + .dropdown-menu a,
+#profileDropdown + .dropdown-menu .dropdown-item {
+    color: #000000 !important;
+}
+
+/* User icon dropdown */
+.nav-item.dropdown .dropdown-menu,
+.nav-item.dropdown .dropdown-menu a,
+.nav-item.dropdown .dropdown-menu .dropdown-item {
+    color: #000000 !important;
+}

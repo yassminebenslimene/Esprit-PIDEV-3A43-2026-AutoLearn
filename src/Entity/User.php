@@ -10,6 +10,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Bundle\UserActivityBundle\Entity\UserActivity;
+use Symfony\Component\Serializer\Annotation\Ignore;
+use SensitiveParameter;
 
 
 
@@ -22,10 +24,16 @@ use App\Bundle\UserActivityBundle\Entity\UserActivity;
 abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
 
-#[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Challenge::class)]
+#[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Challenge::class)]
 private Collection $challenges;
 
-#[ORM\OneToMany(mappedBy: 'user', targetEntity: UserActivity::class, cascade: ['persist', 'remove'])]
+#[ORM\OneToMany(mappedBy: 'user', targetEntity: UserChallenge::class)]
+private Collection $userChallenges;
+
+#[ORM\OneToMany(mappedBy: 'user', targetEntity: Vote::class)]
+private Collection $votes;
+
+#[ORM\OneToMany(mappedBy: 'user', targetEntity: UserActivity::class, cascade: ['persist'])]
 private Collection $activities;
 
     #[ORM\Id]
@@ -93,6 +101,7 @@ private Collection $activities;
         message: 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&)',
         groups: ['registration']
     )]
+    #[Ignore] // Prevent password from being serialized in JSON/API responses
     private ?string $password = null;
 
     #[ORM\Column(type: 'string', length: 20)]
@@ -129,10 +138,12 @@ private Collection $activities;
     {
         $this->createdAt = new \DateTime();
         $this->challenges = new ArrayCollection();
+        $this->userChallenges = new ArrayCollection();
+        $this->votes = new ArrayCollection();
+        $this->activities = new ArrayCollection();
         $this->isSuspended = false;
         $this->lastLoginAt = new \DateTime(); // Initialize with current time
         $this->lastActivityAt = new \DateTime(); // Initialize with current time
-        $this->activities = new ArrayCollection();
     }
 
     public function getRoles(): array
@@ -199,7 +210,7 @@ private Collection $activities;
         return $this->password;
     }
 
-    public function setPassword(string $password): static
+    public function setPassword(#[SensitiveParameter] string $password): static
     {
         $this->password = $password;
         return $this;
@@ -367,7 +378,63 @@ public function removeActivity(UserActivity $activity): static
     return $this;
 }
 
+/**
+ * @return Collection<int, UserChallenge>
+ */
+public function getUserChallenges(): Collection
+{
+    return $this->userChallenges;
+}
 
+public function addUserChallenge(UserChallenge $userChallenge): static
+{
+    if (!$this->userChallenges->contains($userChallenge)) {
+        $this->userChallenges->add($userChallenge);
+        $userChallenge->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removeUserChallenge(UserChallenge $userChallenge): static
+{
+    if ($this->userChallenges->removeElement($userChallenge)) {
+        if ($userChallenge->getUser() === $this) {
+            $userChallenge->setUser(null);
+        }
+    }
+
+    return $this;
+}
+
+/**
+ * @return Collection<int, Vote>
+ */
+public function getVotes(): Collection
+{
+    return $this->votes;
+}
+
+public function addVote(Vote $vote): static
+{
+    if (!$this->votes->contains($vote)) {
+        $this->votes->add($vote);
+        $vote->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removeVote(Vote $vote): static
+{
+    if ($this->votes->removeElement($vote)) {
+        if ($vote->getUser() === $this) {
+            $vote->setUser(null);
+        }
+    }
+
+    return $this;
+}
 
 
 }
