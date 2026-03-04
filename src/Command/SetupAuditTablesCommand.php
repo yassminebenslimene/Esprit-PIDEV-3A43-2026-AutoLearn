@@ -58,6 +58,7 @@ class SetupAuditTablesCommand extends Command
                     suspensionReason VARCHAR(500),
                     suspendedBy INT,
                     lastLoginAt DATETIME,
+                    lastActivityAt DATETIME,
                     discr VARCHAR(255),
                     niveau VARCHAR(50),
                     PRIMARY KEY (id, rev),

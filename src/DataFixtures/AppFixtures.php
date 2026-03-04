@@ -19,37 +19,37 @@ class AppFixtures extends Fixture
     {
         // Créer des événements de test
         $evenement1 = new Evenement();
-        $evenement1->setNom('Hackathon IA 2026');
+        $evenement1->setTitre('Hackathon IA 2026');
         $evenement1->setDescription('Compétition de développement d\'applications IA');
         $evenement1->setDateDebut(new \DateTime('2026-03-15 09:00:00'));
         $evenement1->setDateFin(new \DateTime('2026-03-15 18:00:00'));
         $evenement1->setLieu('Campus Esprit');
         $evenement1->setType(TypeEvenement::HACKATHON);
-        $evenement1->setStatut(StatutEvenement::PLANIFIE);
+        $evenement1->setStatus(StatutEvenement::PLANIFIE);
         $evenement1->setNbMax(10);
         $evenement1->setWorkflowStatus('planifie');
         $manager->persist($evenement1);
 
         $evenement2 = new Evenement();
-        $evenement2->setNom('Workshop Machine Learning');
+        $evenement2->setTitre('Workshop Machine Learning');
         $evenement2->setDescription('Atelier pratique sur le Machine Learning');
         $evenement2->setDateDebut(new \DateTime('2026-04-20 10:00:00'));
         $evenement2->setDateFin(new \DateTime('2026-04-20 16:00:00'));
         $evenement2->setLieu('Salle A101');
         $evenement2->setType(TypeEvenement::WORKSHOP);
-        $evenement2->setStatut(StatutEvenement::PLANIFIE);
+        $evenement2->setStatus(StatutEvenement::PLANIFIE);
         $evenement2->setNbMax(8);
         $evenement2->setWorkflowStatus('planifie');
         $manager->persist($evenement2);
 
         $evenement3 = new Evenement();
-        $evenement3->setNom('Conférence Tech 2026');
+        $evenement3->setTitre('Conférence Tech 2026');
         $evenement3->setDescription('Conférence sur les nouvelles technologies');
         $evenement3->setDateDebut(new \DateTime('2026-05-10 14:00:00'));
         $evenement3->setDateFin(new \DateTime('2026-05-10 17:00:00'));
         $evenement3->setLieu('Amphithéâtre Central');
         $evenement3->setType(TypeEvenement::CONFERENCE);
-        $evenement3->setStatut(StatutEvenement::PLANIFIE);
+        $evenement3->setStatus(StatutEvenement::PLANIFIE);
         $evenement3->setNbMax(15);
         $evenement3->setWorkflowStatus('planifie');
         $manager->persist($evenement3);
