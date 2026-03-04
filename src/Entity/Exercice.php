@@ -14,11 +14,9 @@ class Exercice
     private ?int $id = null;
 
     #[ORM\Column(length: 30)]
-    #[Assert\NotBlank(message: "La question ne peut pas être vide.")]
     private ?string $question = null;
 
     #[ORM\Column(length: 30)]
-    #[Assert\NotBlank(message: "La réponse ne peut pas être vide.")]
     private ?string $reponse = null;
 
     #[ORM\Column]

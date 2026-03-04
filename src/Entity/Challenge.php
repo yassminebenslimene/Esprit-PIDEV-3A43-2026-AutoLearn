@@ -28,7 +28,6 @@ class Challenge
     private ?\DateTime $date_debut = null;
 
     #[ORM\Column]
-    #[Assert\GreaterThan(propertyPath: "date_debut", message: "La date de fin doit être supérieure à la date de début.")]
     private ?\DateTime $date_fin = null;
 
     #[ORM\Column(length: 15)]
@@ -39,7 +38,10 @@ class Challenge
     #[ORM\ManyToOne(inversedBy: 'challenges')]
     #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: false, onDelete: "CASCADE")]
     private ?User $createdBy = null;
-
+    #[ORM\Column(type: 'integer')]
+    #[Assert\NotBlank(message: "La durée ne peut pas être vide.")]
+    #[Assert\Positive(message: "La durée doit être un nombre positif.")]
+    private ?int $duree = null;
     /**
      * @var Collection<int, Exercice>
      */
@@ -99,44 +101,68 @@ class Challenge
         return $this;
     }
 
+    /**
+     * Get the start date
+     */
     public function getDateDebut(): ?\DateTime
     {
         return $this->date_debut;
     }
 
+    /**
+     * Set the start date
+     */
     public function setDateDebut(\DateTime $date_debut): static
     {
         $this->date_debut = $date_debut;
         return $this;
     }
 
+    /**
+     * Get the end date
+     */
     public function getDateFin(): ?\DateTime
     {
         return $this->date_fin;
     }
 
+    /**
+     * Set the end date
+     */
     public function setDateFin(\DateTime $date_fin): static
     {
         $this->date_fin = $date_fin;
         return $this;
     }
 
+    /**
+     * Get the level
+     */
     public function getNiveau(): ?string
     {
         return $this->niveau;
     }
 
+    /**
+     * Set the level
+     */
     public function setNiveau(string $niveau): static
     {
         $this->niveau = $niveau;
         return $this;
     }
 
+    /**
+     * Get the creator
+     */
     public function getCreatedBy(): ?User
     {
         return $this->createdBy;
     }
 
+    /**
+     * Set the creator
+     */
     public function setCreatedBy(?User $createdBy): static
     {
         $this->createdBy = $createdBy;
@@ -268,6 +294,16 @@ class Challenge
                 $vote->setChallenge(null);
             }
         }
+        return $this;
+    }
+    public function getDuree(): ?int
+    {
+        return $this->duree;
+    }
+
+    public function setDuree(int $duree): static
+    {
+        $this->duree = $duree;
         return $this;
     }
 }

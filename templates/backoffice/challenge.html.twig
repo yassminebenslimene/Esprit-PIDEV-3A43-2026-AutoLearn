@@ -257,29 +257,6 @@ https://templatemo.com/tm-607-glass-admin
                                 Événements
                             </a>
                         </li>
-                        <li class="nav-item">
-            <a href="{{ path('backoffice_challenges') }}" class="nav-link {% if app.request.get('_route') starts with 'backoffice_challenge' %}active{% endif %}">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                </svg>
-                Challenges
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ path('backoffice_exercices') }}" class="nav-link {% if app.request.get('_route') starts with 'backoffice_exercice' %}active{% endif %}">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                </svg>
-                Exercices
-            </a>
-        </li>
-
                     </ul>
                 </li>
 
@@ -331,7 +308,7 @@ https://templatemo.com/tm-607-glass-admin
                                 Utilisateurs
                             </a>
                         </li>
-                        <li class="nav-item">
+                                                <li class="nav-item">
                             <a href="{{ path('backoffice_audit_index') }}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -482,8 +459,7 @@ https://templatemo.com/tm-607-glass-admin
                             <tr>
                                 <th>Titre</th>
                                 <th>Description</th>
-                                <th>Date début</th>
-                                <th>Date fin</th>
+                                <th>Durée</th>
                                 <th>Niveau</th>
                                 <th>Créé par</th>
                                 <th>Actions</th>
@@ -494,8 +470,7 @@ https://templatemo.com/tm-607-glass-admin
                             <tr>
                                 <td>{{ challenge.titre }}</td>
                                 <td>{{ challenge.description }}</td>
-                                <td>{{ challenge.dateDebut|date('Y-m-d') }}</td>
-                                <td>{{ challenge.dateFin|date('Y-m-d') }}</td>
+                                <td>{{ challenge.duree }} min</td>
                                 <td>
                                     <span class="status-badge {% if challenge.niveau == 'Débutant' %}completed{% elseif challenge.niveau == 'Intermédiaire' %}processing{% else %}pending{% endif %}">
                                         {{ challenge.niveau }}
@@ -552,196 +527,177 @@ https://templatemo.com/tm-607-glass-admin
     </footer>
 
     <script src="{{ asset('backoffice/js/templatemo-glass-admin-script.js') }}"></script>
-    <script>
-        // Variables pour les filtres
-        let searchTimeout;
+    <!-- TemplateMo 607 Glass Admin -->
+</body>
+<script>
+    // Variables pour les filtres
+    let searchTimeout;
+    
+    // Éléments DOM
+    const searchTitle = document.getElementById('searchTitle');
+    const filterNiveau = document.getElementById('filterNiveau');
+    const searchCreatedBy = document.getElementById('searchCreatedBy');
+    const applyBtn = document.getElementById('applyFilters');
+    const resetBtn = document.getElementById('resetFilters');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const tableBody = document.getElementById('challengesTableBody');
+    const resultsCount = document.getElementById('resultsCount');
+    
+    // Fonction pour charger les challenges filtrés via AJAX
+    function loadFilteredChallenges() {
+        // Afficher le loader
+        if (loadingOverlay) loadingOverlay.classList.add('active');
         
-        // Éléments DOM
-        const searchTitle = document.getElementById('searchTitle');
-        const filterNiveau = document.getElementById('filterNiveau');
-        const searchCreatedBy = document.getElementById('searchCreatedBy');
-        const applyBtn = document.getElementById('applyFilters');
-        const resetBtn = document.getElementById('resetFilters');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const tableBody = document.getElementById('challengesTableBody');
-        const resultsCount = document.getElementById('resultsCount');
+        // Récupérer les valeurs des filtres
+        const filters = {
+            titre: searchTitle ? searchTitle.value : '',
+            niveau: filterNiveau ? filterNiveau.value : '',
+            createdBy: searchCreatedBy ? searchCreatedBy.value : ''
+        };
         
-        // Fonction pour charger les challenges filtrés via AJAX
-        function loadFilteredChallenges() {
-            // Afficher le loader
-            loadingOverlay.classList.add('active');
-            
-            // Récupérer les valeurs des filtres
-            const filters = {
-                titre: searchTitle.value,
-                niveau: filterNiveau.value,
-                createdBy: searchCreatedBy.value
-            };
-            
-            // Envoyer la requête AJAX
-            fetch('{{ path('backoffice_challenges_filter') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(filters)
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Mettre à jour le tableau
-                updateTable(data.challenges);
-                // Mettre à jour le compteur
-                resultsCount.innerHTML = `<span>${data.count}</span> résultat(s) trouvé(s)`;
-            })
-            .catch(error => {
-                console.error('Erreur lors du filtrage:', error);
-            })
-            .finally(() => {
-                // Cacher le loader
-                loadingOverlay.classList.remove('active');
-            });
-        }
+        console.log('🔍 Filtres envoyés:', filters);
         
-        // Fonction pour mettre à jour le tableau
-        function updateTable(challenges) {
-            if (challenges.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
-                            Aucun challenge trouvé
-                        </td>
-                    </tr>
-                `;
-                return;
+        // Envoyer la requête AJAX
+        fetch('{{ path('backoffice_challenges_filter') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(filters)
+        })
+        .then(response => {
+            console.log('📡 Statut réponse:', response.status);
+            if (!response.ok) {
+                throw new Error('Erreur HTTP: ' + response.status);
             }
+            return response.json();
+        })
+        .then(data => {
+            console.log('✅ Données reçues:', data);
+            // Mettre à jour le tableau
+            updateTable(data.challenges);
+            // Mettre à jour le compteur
+            if (resultsCount) {
+                resultsCount.innerHTML = `<span>${data.count}</span> résultat(s) trouvé(s)`;
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erreur lors du filtrage:', error);
+        })
+        .finally(() => {
+            // Cacher le loader
+            if (loadingOverlay) loadingOverlay.classList.remove('active');
+        });
+    }
+    
+    // Fonction pour mettre à jour le tableau
+    function updateTable(challenges) {
+        if (!tableBody) return;
+        
+        if (challenges.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        Aucun challenge trouvé
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        let html = '';
+        challenges.forEach(challenge => {
+            const niveauClass = challenge.niveau === 'Débutant' ? 'completed' : 
+                               (challenge.niveau === 'Intermédiaire' ? 'processing' : 'pending');
             
-            let html = '';
-            challenges.forEach(challenge => {
-                const niveauClass = challenge.niveau === 'Débutant' ? 'completed' : 
-                                   (challenge.niveau === 'Intermédiaire' ? 'processing' : 'pending');
-                
-                html += `
-                    <tr>
-                        <td>${escapeHtml(challenge.titre)}</td>
-                        <td>${escapeHtml(challenge.description)}</td>
-                        <td>${challenge.dateDebut}</td>
-                        <td>${challenge.dateFin}</td>
-                        <td>
-                            <span class="status-badge ${niveauClass}">
-                                ${escapeHtml(challenge.niveau)}
-                            </span>
-                        </td>
-                        <td>${challenge.createdBy ? escapeHtml(challenge.createdBy.nom) : 'N/A'}</td>
-                        <td>
-                            <div style="display: flex; gap: 8px;">
-                                <a href="/backoffice/challenge/edit/${challenge.id}" 
-                                   class="btn btn-warning btn-sm" 
-                                   style="background: linear-gradient(135deg, var(--gold), var(--amber)); color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px;">
-                                    ✏ Edit
-                                </a>
-                                <a href="/backoffice/challenge/delete/${challenge.id}" 
-                                   class="btn btn-danger btn-sm" 
-                                   onclick="return confirm('Confirmer la suppression ?')"
-                                   style="background: linear-gradient(135deg, var(--coral), var(--gold)); color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px;">
-                                    🗑 Delete
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            tableBody.innerHTML = html;
-        }
+            html += `
+                <tr>
+                    <td>${escapeHtml(challenge.titre)}</td>
+                    <td>${escapeHtml(challenge.description)}</td>
+                    <td>${challenge.duree || ''} min</td>
+                    <td>
+                        <span class="status-badge ${niveauClass}">
+                            ${escapeHtml(challenge.niveau)}
+                        </span>
+                    </td>
+                    <td>${challenge.createdBy ? escapeHtml(challenge.createdBy.nom) : 'N/A'}</td>
+                    <td>
+                        <div style="display: flex; gap: 8px;">
+                            <a href="/backoffice/challenge/edit/${challenge.id}" 
+                               class="btn btn-warning btn-sm" 
+                               style="background: linear-gradient(135deg, var(--gold), var(--amber)); color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px;">
+                                ✏ Edit
+                            </a>
+                            <a href="/backoffice/challenge/delete/${challenge.id}" 
+                               class="btn btn-danger btn-sm" 
+                               onclick="return confirm('Confirmer la suppression ?')"
+                               style="background: linear-gradient(135deg, var(--coral), var(--gold)); color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px;">
+                                🗑 Delete
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
         
-        // Fonction pour échapper les caractères HTML
-        function escapeHtml(unsafe) {
-            if (!unsafe) return unsafe;
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-        
-        // Fonction pour réinitialiser les filtres
-        function resetFilters() {
-            searchTitle.value = '';
-            filterNiveau.value = '';
-            searchCreatedBy.value = '';
-            loadFilteredChallenges();
-        }
-        
-        // Événements
+        tableBody.innerHTML = html;
+    }
+    
+    // Fonction pour échapper les caractères HTML
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+    
+    // Fonction pour réinitialiser les filtres
+    function resetFilters() {
+        if (searchTitle) searchTitle.value = '';
+        if (filterNiveau) filterNiveau.value = '';
+        if (searchCreatedBy) searchCreatedBy.value = '';
+        loadFilteredChallenges();
+    }
+    
+    // Événements
+    if (applyBtn) {
         applyBtn.addEventListener('click', loadFilteredChallenges);
+    }
+    
+    if (resetBtn) {
         resetBtn.addEventListener('click', resetFilters);
-        
-        // Filtrage en temps réel avec debounce
-        [searchTitle, filterNiveau, searchCreatedBy].forEach(input => {
-            if (input) {
+    }
+    
+    // Filtrage en temps réel avec debounce
+    [searchTitle, filterNiveau, searchCreatedBy].forEach(input => {
+        if (input) {
+            // Pour les champs de texte
+            if (input.tagName === 'INPUT') {
                 input.addEventListener('input', function() {
                     clearTimeout(searchTimeout);
                     searchTimeout = setTimeout(loadFilteredChallenges, 500);
                 });
-                // Pour le select, on utilise 'change' au lieu de 'input'
-                if (input.tagName === 'SELECT') {
-                    input.addEventListener('change', function() {
-                        clearTimeout(searchTimeout);
-                        searchTimeout = setTimeout(loadFilteredChallenges, 500);
-                    });
-                }
             }
-        });
-        
-        // Initialisation du compteur
-        document.addEventListener('DOMContentLoaded', function() {
-            const initialCount = {{ challenges|length }};
-            resultsCount.innerHTML = `<span>${initialCount}</span> résultat(s) trouvé(s)`;
-        });
-        function loadFilteredChallenges() {
-    // Afficher le loader
-    loadingOverlay.classList.add('active');
-    
-    // Récupérer les valeurs des filtres
-    const filters = {
-        titre: searchTitle.value,
-        niveau: filterNiveau.value,
-        createdBy: searchCreatedBy.value
-    };
-    
-    console.log('🔍 Filtres envoyés:', filters); // Vérifiez dans la console F12
-    
-    // Envoyer la requête AJAX
-    fetch('{{ path('backoffice_challenges_filter') }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify(filters)
-    })
-    .then(response => {
-        console.log('📡 Statut réponse:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('✅ Données reçues:', data); // Vérifiez ce que le serveur renvoie
-        // Mettre à jour le tableau
-        updateTable(data.challenges);
-        // Mettre à jour le compteur
-        resultsCount.innerHTML = `<span>${data.count}</span> résultat(s) trouvé(s)`;
-    })
-    .catch(error => {
-        console.error('❌ Erreur lors du filtrage:', error);
-    })
-    .finally(() => {
-        // Cacher le loader
-        loadingOverlay.classList.remove('active');
+            // Pour le select
+            if (input.tagName === 'SELECT') {
+                input.addEventListener('change', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(loadFilteredChallenges, 500);
+                });
+            }
+        }
     });
-}
-    </script>
-    <!-- TemplateMo 607 Glass Admin -->
-</body>
+    
+    // Initialisation du compteur
+    document.addEventListener('DOMContentLoaded', function() {
+        const initialCount = {{ challenges|length }};
+        if (resultsCount) {
+            resultsCount.innerHTML = `<span>${initialCount}</span> résultat(s) trouvé(s)`;
+        }
+    });
+</script>
 </html>

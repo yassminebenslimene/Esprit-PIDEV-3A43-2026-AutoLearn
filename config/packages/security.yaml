@@ -18,12 +18,10 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-
             form_login:
                 login_path: backoffice_login
                 check_path: backoffice_login
                 default_target_path: app_frontoffice
-
             logout:
                 path: backoffice_logout
                 target: app_frontoffice
@@ -34,35 +32,10 @@ security:
 
 when@test:
     security:
-    password_hashers:
-        App\Entity\User: 'auto'
-        App\Entity\Admin: 'auto'
-        App\Entity\Etudiant: 'auto'
+        password_hashers:
+            App\Entity\User: 'auto'
+            App\Entity\Admin: 'auto'
+            App\Entity\Etudiant: 'auto'
 
-    providers:
-        app_user_provider:
-            entity:
-                class: App\Entity\User
-                property: email
-
-    firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-
-        main:
-            lazy: true
-            provider: app_user_provider
-            form_login:
-                login_path: backoffice_login
-                check_path: backoffice_login
-                default_target_path: app_frontoffice
-                always_use_default_target_path: true
-            logout:
-                path: backoffice_logout
-                target: app_frontoffice
-
-    access_control:
-        - { path: ^/backoffice, roles: ROLE_ADMIN }
-        - { path: ^/login, roles: PUBLIC_ACCESS }
-        - { path: ^/register, roles: PUBLIC_ACCESS }
+        # NE PAS RÉPÉTER access_control ici !
+        # La configuration access_control est héritée de la section principale

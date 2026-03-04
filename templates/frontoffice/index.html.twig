@@ -24,6 +24,163 @@
         <!-- Swiper -->
         <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
     {% endblock %}
+    
+    <style>
+        /* Reset any conflicting styles - AVEC CENTRAGE VERTICAL */
+        .main-nav {
+            display: flex !important;
+            align-items: center !important;
+            height: 80px !important;
+        }
+        
+        .main-nav .nav {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .main-nav .nav li {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            margin: 0 !important;
+        }
+        
+        .main-nav .nav li a {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            line-height: 1 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        
+        .main-nav .nav li.profile-dropdown-container {
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-btn {
+            background: none !important;
+            border: none !important;
+            padding: 0 15px !important;
+            color: #1e1e1e !important;
+            font-weight: 500 !important;
+            text-decoration: none !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            line-height: 1 !important;
+            gap: 5px !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-btn i {
+            display: flex !important;
+            align-items: center !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu {
+            display: none;
+            position: absolute !important;
+            top: 100% !important;
+            right: 0 !important;
+            z-index: 999999 !important;
+            min-width: 220px !important;
+            background: white !important;
+            border-radius: 8px !important;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.15) !important;
+            padding: 10px 0 !important;
+            margin-top: 0 !important;
+            list-style: none !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu.show {
+            display: block !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu li {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            display: block !important;
+            height: auto !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu a {
+            display: block !important;
+            padding: 12px 20px !important;
+            color: #333 !important;
+            text-decoration: none !important;
+            font-size: 15px !important;
+            transition: all 0.2s !important;
+            line-height: normal !important;
+            height: auto !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu a:hover {
+            background: linear-gradient(105deg, #7a6ad8 0%, #4e3b9c 100%) !important;
+            color: white !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-menu i {
+            margin-right: 10px !important;
+            width: 18px !important;
+            text-align: center !important;
+        }
+        
+        .main-nav .nav .profile-dropdown-divider {
+            height: 1px !important;
+            background: #eeeeee !important;
+            margin: 8px 0 !important;
+        }
+        
+        /* Fix pour les autres liens de la navbar */
+        .main-nav .nav .scroll-to-section {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+        }
+        
+        .main-nav .nav .scroll-to-section a {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            padding: 0 15px !important;
+            line-height: 1 !important;
+        }
+        
+        @media (max-width: 992px) {
+            .main-nav,
+            .main-nav .nav,
+            .main-nav .nav li,
+            .main-nav .nav li a,
+            .main-nav .nav li.profile-dropdown-container,
+            .main-nav .nav .profile-dropdown-btn {
+                height: auto !important;
+                min-height: 50px !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-menu {
+                position: static !important;
+                width: 100% !important;
+                box-shadow: none !important;
+                background: transparent !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-menu a {
+                color: white !important;
+                padding-left: 30px !important;
+            }
+            
+            .main-nav .nav .profile-dropdown-divider {
+                background: rgba(255,255,255,0.2) !important;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -69,62 +226,33 @@
                         <li class="scroll-to-section"><a href="#cours">{{ 'nav.courses'|trans }}</a></li>
                         <li class="scroll-to-section"><a href="#events">{{ 'nav.events'|trans }}</a></li>
                         <li class="scroll-to-section"><a href="#challenge">{{ 'nav.challenges'|trans }}</a></li>
-                        <li class="scroll-to-section"><a href="#contact">{{ 'nav.contact'|trans }}</a></li>
                         <li><a href="{{ path('front_communaute') }}">{{ 'nav.community'|trans }}</a></li>
-                        
-                        {# Sélecteur de langue - VISIBLE POUR TOUS #}
-                        <li class="profile-dropdown-container">
-                            <a href="javascript:void(0);" onclick="toggleLanguageDropdown(event)" class="profile-dropdown-btn" style="padding: 0 15px;">
-                                <i class="fa fa-globe"></i>
-                                {% if app.request.locale == 'fr' %}
-                                    FR
-                                {% elseif app.request.locale == 'en' %}
-                                    EN
-                                {% elseif app.request.locale == 'es' %}
-                                    ES
-                                {% elseif app.request.locale == 'ar' %}
-                                    AR
-                                {% endif %}
-                                <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
-                            </a>
-                            <ul class="profile-dropdown-menu" id="languageDropdown">
-                                <li>
-                                    <a href="{{ path('app_change_language', {'locale': 'fr'}) }}">
-                                        🇫🇷 {{ 'language.french'|trans }}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ path('app_change_language', {'locale': 'en'}) }}">
-                                        🇬🇧 {{ 'language.english'|trans }}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ path('app_change_language', {'locale': 'es'}) }}">
-                                        🇪🇸 {{ 'language.spanish'|trans }}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ path('app_change_language', {'locale': 'ar'}) }}">
-                                        🇸🇦 {{ 'language.arabic'|trans }}
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                        <li><a href="{{ path('app_about') }}">{{ 'nav.about'|trans }}</a></li>
                         
                         {% if app.user %}
-                            <!-- User Logged In - Profile Dropdown -->
-                            <li><a href="{{ path('app_mes_participations') }}">{{ 'nav.my_participations'|trans }}</a></li>
-
+                            {# Notifications avec badge #}
+                            <li style="position: relative;">
+                                <a href="{{ path('app_notifications_index') }}" style="position: relative; display: inline-flex; align-items: center; gap: 5px;">
+                                    <i class="fa fa-bell"></i>
+                                    <span id="notification-badge" class="notification-badge" style="display: none;"></span>
+                                </a>
+                            </li>
+                            
+                            {# Dropdown Profil #}
                             <li class="profile-dropdown-container">
                                 <a href="javascript:void(0);" onclick="toggleProfileDropdown(event)" class="profile-dropdown-btn">
                                     <i class="fa fa-user-circle"></i>
-                                    {{ app.user.prenom }} {{ app.user.nom }}
-                                    <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                                    <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
                                 </a>
                                 <ul class="profile-dropdown-menu" id="profileDropdown">
                                     <li>
                                         <a href="{{ path('app_profile') }}">
                                             <i class="fa fa-id-card"></i> {{ 'nav.profile'|trans }}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ path('app_mes_participations') }}">
+                                            <i class="fa fa-trophy"></i> {{ 'nav.my_participations'|trans }}
                                         </a>
                                     </li>
                                     <li class="profile-dropdown-divider"></li>
@@ -136,11 +264,39 @@
                                 </ul>
                             </li>
                         {% else %}
-                            <!-- User Not Logged In -->
                             <li><a href="{{ path('backoffice_login') }}">{{ 'nav.login'|trans }}</a></li>
-                            <li><a href="{{ path('backoffice_register') }}">{{ 'nav.register'|trans }}</a></li>
                         {% endif %}
-                    </ul> 
+                        
+                        {# Sélecteur de langue compact #}
+                        <li class="profile-dropdown-container">
+                            <a href="javascript:void(0);" onclick="toggleLanguageDropdown(event)" class="profile-dropdown-btn">
+                                <i class="fa fa-globe"></i>
+                                <i class="fa fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i>
+                            </a>
+                            <ul class="profile-dropdown-menu" id="languageDropdown">
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'fr'}) }}">
+                                        <i class="fa fa-flag"></i> Français
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'en'}) }}">
+                                        <i class="fa fa-flag"></i> English
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'es'}) }}">
+                                        <i class="fa fa-flag"></i> Español
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_change_language', {'locale': 'ar'}) }}">
+                                        <i class="fa fa-flag"></i> العربية
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                     
                     <form id="logout-form-nav" action="{{ path('backoffice_logout') }}" method="POST" style="display: none;">
                         <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
@@ -291,6 +447,7 @@
 </div>
 <!-- ***** Cours Section End ***** -->
 
+<!-- ***** About Us Section Start ***** -->
 <div class="section about-us">
     <div class="container">
         <div class="row">
@@ -359,6 +516,7 @@
         </div>
     </div>
 </div>
+<!-- ***** About Us Section End ***** -->
 
 <!-- ***** Fun Facts Section Start ***** -->
 <div class="section fun-facts">
@@ -397,6 +555,7 @@
         </div>
     </div>
 </div>
+<!-- ***** Fun Facts Section End ***** -->
 
 <!-- ***** Testimonials Section Start ***** -->
 <div class="section testimonials">
@@ -440,7 +599,9 @@
         </div>
     </div>
 </div>
+<!-- ***** Testimonials Section End ***** -->
 
+<!-- ***** Events Section Start ***** -->
 <div class="section events" id="events">
     <div class="container">
         <div class="row">
@@ -450,20 +611,22 @@
                     <h2>Nos Événements</h2>
                 </div>
             </div>
-        </div>
-        
-        <div class="row">
-            <div class="col-lg-12">
-                <p style="text-align: center; margin-bottom: 40px;">
-                    <a href="{{ path('app_events') }}" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; border-radius: 10px; text-decoration: none; font-weight: 600; display: inline-block;">
-                        🎯 View All Events
-                    </a>
-                </p>
+            
+            <div class="row">
+                <div class="col-lg-12">
+                    <p style="text-align: center; margin-bottom: 40px;">
+                        <a href="{{ path('app_events') }}" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; border-radius: 10px; text-decoration: none; font-weight: 600; display: inline-block;">
+                            🎯 View All Events
+                        </a>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 </div>
+<!-- ***** Events Section End ***** -->
 
+<!-- ***** Challenges Section Start ***** -->
 <section id="challenge" class="section events">
     <div class="container">
         <div class="row">
@@ -471,38 +634,6 @@
                 <div class="section-heading">
                     <h6>Défis</h6>
                     <h2>Challenges à Relever</h2>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bouton pour afficher le calendrier -->
-        <div class="row mb-4">
-            <div class="col-lg-12 text-center">
-                <button id="calendarToggleBtn" class="btn btn-primary" style="background: linear-gradient(105deg, #7fb77e 0%, #4a9b4a 100%); border: none; padding: 12px 30px; font-size: 16px; border-radius: 25px;">
-                    <i class="fa fa-calendar"></i> Voir le calendrier des challenges
-                </button>
-            </div>
-        </div>
-
-        <!-- Conteneur du calendrier (caché par défaut) -->
-        <div id="calendar-container" style="display: none; margin-bottom: 40px;">
-            <div style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
-                <div id="calendar-holder"></div>
-                
-                <!-- Légende des couleurs -->
-                <div class="legend mt-4 d-flex justify-content-center gap-4" style="margin-top: 20px;">
-                    <div>
-                        <span style="display: inline-block; width: 15px; height: 15px; background: #7fb77e; border-radius: 3px;"></span>
-                        <span style="margin-left: 5px;">Facile</span>
-                    </div>
-                    <div>
-                        <span style="display: inline-block; width: 15px; height: 15px; background: #f3b562; border-radius: 3px;"></span>
-                        <span style="margin-left: 5px;">Intermédiaire</span>
-                    </div>
-                    <div>
-                        <span style="display: inline-block; width: 15px; height: 15px; background: #f17b7b; border-radius: 3px;"></span>
-                        <span style="margin-left: 5px;">Avancé</span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -565,27 +696,28 @@
                                                 {{ challenge.niveau }}
                                             </h6>
                                         </li>
-                                        <!-- Rating Stars -->
+                                        <!-- Rating Stars avec le bundle -->
                                         <li style="margin-top: 10px;">
-                                            <div class="rating-stars">
-                                                {% set note = challenge.noteMoyenne|default(0) %}
-                                                {% set fullStars = note|round %}
-                                                {% set hasHalf = (note - fullStars) >= 0.5 %}
-                                                
-                                                <div class="stars-display" style="color: #ffc107;">
-                                                    {% for i in 1..5 %}
-                                                        {% if i <= fullStars %}
-                                                            <i class="fa fa-star"></i>
-                                                        {% elseif i == fullStars + 1 and hasHalf %}
-                                                            <i class="fa fa-star-half-o"></i>
-                                                        {% else %}
-                                                            <i class="fa fa-star-o"></i>
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                    <span style="margin-left: 8px; color: #7a7a7a; font-size: 14px;">
-                                                        {{ note|number_format(1) }} ({{ challenge.nombreVotes|default(0) }})
-                                                    </span>
-                                                </div>
+                                            <div class="rating-display">
+                                                {% if challenge.noteMoyenne is defined %}
+                                                    {% set rating = challenge.noteMoyenne %}
+                                                    {% set fullStars = rating|round %}
+                                                    
+                                                    <div class="stars" style="display: inline-flex; align-items: center;">
+                                                        {% for i in 1..5 %}
+                                                            {% if i <= fullStars %}
+                                                                <i class="fa fa-star" style="color: #ffc107;"></i>
+                                                            {% else %}
+                                                                <i class="fa fa-star-o" style="color: #ffc107;"></i>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                        <span style="margin-left: 8px; color: #7a7a7a; font-size: 14px;">
+                                                            {{ rating|number_format(1) }} ({{ challenge.nombreVotes|default(0) }} {{ 'avis'|trans }})
+                                                        </span>
+                                                    </div>
+                                                {% else %}
+                                                    <span class="text-muted">{{ 'Aucun avis'|trans }}</span>
+                                                {% endif %}
                                             </div>
                                         </li>
                                     </ul>
@@ -601,7 +733,9 @@
         {% endif %}
     </div>
 </section>
+<!-- ***** Challenges Section End ***** -->
 
+<!-- ***** Contact Section Start ***** -->
 <div class="contact-us section" id="contact">
     <div class="container">
         <div class="row">
@@ -683,6 +817,7 @@
         </div>
     </div>
 </div>
+<!-- ***** Contact Section End ***** -->
 
 <!-- ***** Footer Start ***** -->
 <footer style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 60px 0 20px; margin-top: 80px;">
@@ -799,6 +934,7 @@
         </div>
     </div>
 </footer>
+<!-- ***** Footer End ***** -->
 
 {% block javascripts %}
     <!-- jQuery -->
@@ -860,6 +996,13 @@
                 });
             }
             
+            // Charger le nombre de notifications non lues
+            {% if app.user %}
+            updateNotificationBadge();
+            // Actualiser toutes les 30 secondes
+            setInterval(updateNotificationBadge, 30000);
+            {% endif %}
+            
             setTimeout(function() {
                 var alerts = document.querySelectorAll('.alert');
                 alerts.forEach(function(alert) {
@@ -872,84 +1015,6 @@
                 setTimeout(function() {
                     document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
                 }, 100);
-            }
-        });
-        
-        function loadFullCalendar() {
-            return new Promise((resolve, reject) => {
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css';
-                document.head.appendChild(link);
-                
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js';
-                script.onload = resolve;
-                script.onerror = reject;
-                document.body.appendChild(script);
-                
-                const localeScript = document.createElement('script');
-                localeScript.src = 'https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales/fr.global.min.js';
-                document.body.appendChild(localeScript);
-            });
-        }
-
-        function initCalendar() {
-            const calendarEl = document.getElementById('calendar-holder');
-            if (!calendarEl) return;
-            
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                headerToolbar: {
-                    start: 'prev,next today',
-                    center: 'title',
-                    end: 'dayGridMonth,timeGridWeek,timeGridDay'
-                },
-                locale: 'fr',
-                height: 'auto',
-                events: {
-                    url: '{{ path('fc_load_events') }}',
-                    method: 'POST',
-                    failure: function(error) {
-                        console.error('Erreur chargement événements:', error);
-                    }
-                },
-                eventClick: function(info) {
-                    if (info.event.url) {
-                        window.location.href = info.event.url;
-                        return false;
-                    }
-                }
-            });
-            
-            calendar.render();
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const btn = document.getElementById('calendarToggleBtn');
-            const container = document.getElementById('calendar-container');
-            
-            if (btn && container) {
-                btn.addEventListener('click', async function() {
-                    if (container.style.display === 'none' || container.style.display === '') {
-                        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Chargement...';
-                        
-                        if (!window.fullCalendarLoaded) {
-                            await loadFullCalendar();
-                            window.fullCalendarLoaded = true;
-                        }
-                        
-                        container.style.display = 'block';
-                        btn.innerHTML = '<i class="fa fa-calendar"></i> Masquer le calendrier';
-                        
-                        setTimeout(() => {
-                            initCalendar();
-                        }, 100);
-                    } else {
-                        container.style.display = 'none';
-                        btn.innerHTML = '<i class="fa fa-calendar"></i> Voir le calendrier des challenges';
-                    }
-                });
             }
         });
     </script>

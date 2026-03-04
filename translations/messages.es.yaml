@@ -1,0 +1,21 @@
+# Spanish translations
+nav:
+  home: Inicio
+  events: Eventos
+  challenges: Desafíos
+  community: Comunidad
+  courses: Cursos
+  about: Acerca de
+  my_participations: Mis Participaciones
+  login: Iniciar sesión
+  register: Registrarse
+  logout: Cerrar sesión
+  profile: Mi Perfil
+  contact: Contacto
+
+language:
+  french: Francés
+  english: Inglés
+  arabic: Árabe
+  spanish: Español
+  select: Seleccionar idioma

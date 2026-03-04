@@ -23,48 +23,49 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class FrontofficeController extends AbstractController
 {
     #[Route('/', name: 'app_frontoffice')]
-public function index(
-    ChallengeRepository $challengeRepository,
-    EvenementRepository $evenementRepository,
-    EquipeRepository $equipeRepository,
-    CoursRepository $coursRepository,
-    CourseProgressService $progressService
-): Response {
-    // Si l'utilisateur est connecté
-    if ($this->getUser()) {
-        $user = $this->getUser();
-        
-        // Si c'est un admin, rediriger vers le backoffice
-        if ($user instanceof Admin || $user->getRoles() === 'ADMIN') {
-            return $this->redirectToRoute('app_backoffice');
+    public function index(
+        ChallengeRepository $challengeRepository,
+        EvenementRepository $evenementRepository,
+        EquipeRepository $equipeRepository,
+        CoursRepository $coursRepository,
+        CourseProgressService $progressService
+    ): Response {
+        // Si l'utilisateur est connecté
+        if ($this->getUser()) {
+            $user = $this->getUser();
+            
+            // Si c'est un admin, rediriger vers le backoffice
+            if ($user instanceof Admin || $user->getRoles() === 'ADMIN') {
+                return $this->redirectToRoute('app_backoffice');
+            }
+            
+            // Utilisateur connecté (étudiant) - calculer la progression
+            $cours = $coursRepository->findAll();
+            $challenges = $challengeRepository->findAll();
+            $evenements = $evenementRepository->findAll();
+            $equipes = $equipeRepository->findAll();
+            
+            $coursProgress = $progressService->getAllCoursesProgress($user, $cours);
+            
+            return $this->render('frontoffice/index.html.twig', [
+                'cours' => $cours,
+                'challenges' => $challenges,
+                'evenements' => $evenements,
+                'equipes' => $equipes,
+                'coursProgress' => $coursProgress,
+            ]);
         }
         
-        // Utilisateur connecté (étudiant) - calculer la progression
-        $cours = $coursRepository->findAll();
+        // Sinon, afficher le frontoffice normalement
         $challenges = $challengeRepository->findAll();
-        $evenements = $evenementRepository->findAll();
-        $equipes = $equipeRepository->findAll();
-        
-        $coursProgress = $progressService->getAllCoursesProgress($user, $cours);
+        $cours = $coursRepository->findAll();
         
         return $this->render('frontoffice/index.html.twig', [
             'cours' => $cours,
-            'challenges' => $challenges,
-            'evenements' => $evenements,
-            'equipes' => $equipes,
-            'coursProgress' => $coursProgress,
+            'challenges' => $challenges
         ]);
     }
-    
-    // Sinon, afficher le frontoffice normalement
-    $challenges = $challengeRepository->findAll();
-    $cours = $coursRepository->findAll(); // AJOUTÉ
-    
-    return $this->render('frontoffice/index.html.twig', [
-        'cours' => $cours,           // AJOUTÉ
-        'challenges' => $challenges
-    ]);
-}
+
     #[Route('/profile', name: 'app_profile', methods: ['GET', 'POST'])]
     public function profile(
         Request $request,
@@ -194,5 +195,11 @@ public function index(
         }
         
         return $this->redirectToRoute('app_frontoffice', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/about', name: 'app_about')]
+    public function about(): Response
+    {
+        return $this->render('frontoffice/about.html.twig');
     }
 }

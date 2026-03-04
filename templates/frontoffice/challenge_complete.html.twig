@@ -1,380 +1,180 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+{% extends 'frontoffice/base.html.twig' %}
 
-    <title>Challenge Complété - Scholar</title>
+{% block title %}Challenge Complété - {{ challenge.titre }}{% endblock %}
 
-    {% block stylesheets %}
-        <!-- Bootstrap -->
-        <link rel="stylesheet" href="{{ asset('frontoffice/vendor/bootstrap/css/bootstrap.min.css') }}">
+{% block stylesheets %}
+    {{ parent() }}
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <!-- CSS du bundle StarRating -->
+    <link rel="stylesheet" href="{{ asset('bundles/starrating/css/rating.css') }}">
+    
+    <style>
+        .completion-page {
+            margin-top: 40px;
+            margin-bottom: 80px;
+        }
         
-        <!-- Font Awesome (obligatoire pour le bundle) -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        .completion-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
         
-        <!-- CSS du bundle StarRating -->
-        <link rel="stylesheet" href="{{ asset('bundles/starrating/css/rating.css') }}">
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 40px;
+        }
         
-        <!-- FrontOffice CSS -->
-        <link rel="stylesheet" href="{{ asset('frontoffice/css/animate.css') }}">
-        <link rel="stylesheet" href="{{ asset('frontoffice/css/flex-slider.css') }}">
-        <link rel="stylesheet" href="{{ asset('frontoffice/css/fontawesome.css') }}">
-        <link rel="stylesheet" href="{{ asset('frontoffice/css/owl.css') }}">
-        <link rel="stylesheet" href="{{ asset('frontoffice/css/templatemo-scholar.css') }}">
+        .success-icon.rouge { background: linear-gradient(135deg, #f17b7b, #e05a5a); }
+        .success-icon.jaune { background: linear-gradient(135deg, #f3b562, #f0a53b); }
+        .success-icon.vert { background: linear-gradient(135deg, #7fb77e, #5a9e59); }
         
-        <!-- Swiper -->
-        <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css"/>
+        .score-container {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
         
-        <style>
-            .completion-page {
-                margin-top: 120px;
-                margin-bottom: 80px;
-                min-height: 60vh;
-                display: flex;
-                align-items: center;
-            }
-            
-            .completion-card {
-                background: white;
-                padding: 60px;
-                border-radius: 30px;
-                box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-                text-align: center;
-                max-width: 600px;
-                margin: 0 auto;
-            }
-            
-            .success-icon {
-                width: 100px;
-                height: 100px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin: 0 auto 30px;
-                color: white;
-                font-size: 40px;
-                transition: all 0.3s ease;
-            }
-            
-            .success-icon.rouge {
-                background: linear-gradient(135deg, #f17b7b, #e05a5a);
-                box-shadow: 0 10px 20px rgba(241, 123, 123, 0.3);
-            }
-            
-            .success-icon.jaune {
-                background: linear-gradient(135deg, #f3b562, #f0a53b);
-                box-shadow: 0 10px 20px rgba(243, 181, 98, 0.3);
-            }
-            
-            .success-icon.vert {
-                background: linear-gradient(135deg, #7fb77e, #5a9e59);
-                box-shadow: 0 10px 20px rgba(127, 183, 126, 0.3);
-            }
-            
-            .completion-card h1 {
-                font-size: 36px;
-                font-weight: 700;
-                margin-bottom: 20px;
-                color: #2a2a2a;
-            }
-            
-            .completion-card p {
-                font-size: 18px;
-                color: #7a7a7a;
-                margin-bottom: 30px;
-            }
-            
-            .score-container {
-                background: #f9f9f9;
-                padding: 40px;
-                border-radius: 20px;
-                margin: 30px 0;
-                transition: all 0.3s ease;
-            }
-            
-            .score-container.rouge {
-                background: rgba(241, 123, 123, 0.1);
-                border: 2px solid #f17b7b;
-            }
-            
-            .score-container.jaune {
-                background: rgba(243, 181, 98, 0.1);
-                border: 2px solid #f3b562;
-            }
-            
-            .score-container.vert {
-                background: rgba(127, 183, 126, 0.1);
-                border: 2px solid #7fb77e;
-            }
-            
-            .score-label {
-                font-size: 18px;
-                color: #7a7a7a;
-                margin-bottom: 15px;
-                text-transform: uppercase;
-                letter-spacing: 2px;
-            }
-            
-            .score-value {
-                font-size: 64px;
-                font-weight: 700;
-                line-height: 1.2;
-                margin-bottom: 10px;
-            }
-            
-            .score-value.rouge {
-                color: #f17b7b;
-            }
-            
-            .score-value.jaune {
-                color: #f3b562;
-            }
-            
-            .score-value.vert {
-                color: #7fb77e;
-            }
-            
-            .score-percentage {
-                font-size: 18px;
-                color: #7a7a7a;
-                font-weight: 500;
-            }
-            
-            .score-message {
-                font-size: 16px;
-                margin-top: 15px;
-                font-weight: 500;
-            }
-            
-            .score-message.rouge {
-                color: #f17b7b;
-            }
-            
-            .score-message.jaune {
-                color: #f3b562;
-            }
-            
-            .score-message.vert {
-                color: #7fb77e;
-            }
-            
-            /* Styles pour la section rating */
-            .rating-section {
-                margin-top: 30px;
-                padding: 30px;
-                background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
-                border-radius: 20px;
-                border: 1px solid rgba(0,0,0,0.05);
-            }
-            
-            .rating-title {
-                font-size: 20px;
-                font-weight: 600;
-                color: #2a2a2a;
-                margin-bottom: 15px;
-            }
-            
-            .rating-stars {
-                display: flex;
-                justify-content: center;
-                gap: 15px;
-                margin: 20px 0;
-            }
-            
-            .rating-stars .rating-input {
-                display: none;
-            }
-            
-            .rating-stars .rating-star {
-                cursor: pointer;
-                font-size: 40px;
-                color: #ddd;
-                transition: all 0.2s ease;
-            }
-            
-            .rating-stars .rating-star:hover,
-            .rating-stars .rating-star:hover ~ .rating-star,
-            .rating-stars .rating-input:checked ~ .rating-star {
-                color: #ffc107;
-            }
-            
-            .rating-value {
-                font-size: 18px;
-                color: #7a7a7a;
-                margin: 15px 0;
-            }
-            
-            .rating-value span {
-                font-weight: 700;
-                color: #ffc107;
-                font-size: 24px;
-            }
-            
-            .btn-rating {
-                background: linear-gradient(105deg, #7fb77e 0%, #4a9b4a 100%);
-                color: white;
-                border: none;
-                padding: 12px 40px;
-                border-radius: 25px;
-                font-weight: 600;
-                font-size: 16px;
-                cursor: pointer;
-                transition: all 0.3s;
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                margin-top: 10px;
-            }
-            
-            .btn-rating:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(127, 183, 126, 0.3);
-            }
-            
-            .btn-rating i {
-                font-size: 18px;
-            }
-            
-            .rating-message {
-                margin-top: 15px;
-                padding: 10px;
-                border-radius: 8px;
-                font-size: 14px;
-                display: none;
-            }
-            
-            .rating-message.success {
-                display: block;
-                background: rgba(127, 183, 126, 0.1);
-                color: #7fb77e;
-                border: 1px solid #7fb77e;
-            }
-            
-            .rating-message.error {
-                display: block;
-                background: rgba(241, 123, 123, 0.1);
-                color: #f17b7b;
-                border: 1px solid #f17b7b;
-            }
-            
-            .rating-message.warning {
-                display: block;
-                background: rgba(243, 181, 98, 0.1);
-                color: #f3b562;
-                border: 1px solid #f3b562;
-            }
-            
-            .action-buttons {
-                display: flex;
-                gap: 20px;
-                justify-content: center;
-                margin-top: 40px;
-            }
-            
-            .btn-action {
-                padding: 15px 50px;
-                border-radius: 30px;
-                font-weight: 600;
-                text-decoration: none;
-                transition: all 0.3s;
-                font-size: 18px;
-                display: inline-flex;
-                align-items: center;
-                gap: 10px;
-                border: none;
-                cursor: pointer;
-            }
-            
-            .btn-primary {
-                background: linear-gradient(105deg, #7fb77e 0%, #4a9b4a 100%);
-                color: white;
-                box-shadow: 0 5px 15px rgba(127, 183, 126, 0.3);
-            }
-            
-            .btn-primary:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 10px 25px rgba(127, 183, 126, 0.4);
-                color: white;
-            }
-            
-            .btn-primary i {
-                transition: transform 0.3s;
-            }
-            
-            .btn-primary:hover i {
-                transform: translateX(5px);
-            }
-            
-            /* Message si déjà noté */
-            .already-rated {
-                background: #f9f9f9;
-                padding: 15px;
-                border-radius: 10px;
-                margin-top: 15px;
-                font-size: 14px;
-                color: #7a7a7a;
-                border-left: 4px solid #7fb77e;
-            }
-            
-            .already-rated i {
-                color: #7fb77e;
-                margin-right: 8px;
-            }
-            
-            @media (max-width: 768px) {
-                .completion-card {
-                    padding: 40px 20px;
-                }
-                
-                .score-value {
-                    font-size: 48px;
-                }
-                
-                .btn-action {
-                    padding: 12px 40px;
-                    font-size: 16px;
-                }
-                
-                .rating-stars .rating-star {
-                    font-size: 30px;
-                }
-            }
-        </style>
-    {% endblock %}
-</head>
-<body>
+        .score-value {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .score-value.rouge { color: #f17b7b; }
+        .score-value.jaune { color: #f3b562; }
+        .score-value.vert { color: #7fb77e; }
+        
+        .rating-section {
+            margin: 30px 0;
+            padding: 25px;
+            background: #f9f9f9;
+            border-radius: 15px;
+        }
+        
+        .rating-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #2a2a2a;
+        }
+        
+        .rating-stars {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .rating-stars .rating-input {
+            display: none;
+        }
+        
+        .rating-stars .rating-star {
+            cursor: pointer;
+            font-size: 40px;
+            color: #ddd;
+            transition: all 0.2s ease;
+        }
+        
+        .rating-stars .rating-star:hover,
+        .rating-stars .rating-star:hover ~ .rating-star {
+            color: #ffc107;
+        }
+        
+        .rating-stars .rating-input:checked ~ .rating-star {
+            color: #ffc107;
+        }
+        
+        .already-rated {
+            background: rgba(127, 183, 126, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border-left: 4px solid #7fb77e;
+        }
+        
+        .btn-rating {
+            background: linear-gradient(105deg, #7fb77e 0%, #4a9b4a 100%);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .btn-rating:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(127, 183, 126, 0.3);
+        }
+        
+        .rating-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .rating-message.success {
+            display: block;
+            background: rgba(127, 183, 126, 0.1);
+            color: #7fb77e;
+            border: 1px solid #7fb77e;
+        }
+        
+        .rating-message.error {
+            display: block;
+            background: rgba(241, 123, 123, 0.1);
+            color: #f17b7b;
+            border: 1px solid #f17b7b;
+        }
+        
+        .btn-action {
+            padding: 12px 40px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(105deg, #7fb77e 0%, #4a9b4a 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(127, 183, 126, 0.3);
+            color: white;
+        }
+    </style>
+{% endblock %}
 
-<!-- ***** Header Area Start ***** -->
-<header class="header-area header-sticky">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <nav class="main-nav">
-                    <!-- ***** Logo Start ***** -->
-                    <a href="{{ path('app_frontoffice') }}" class="logo">
-                        <h1>Scholar</h1>
-                    </a>
-                    <!-- ***** Logo End ***** -->
-                    <!-- ***** Menu Start ***** -->
-                    <ul class="nav">
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}">Home</a></li>
-                        <li class="scroll-to-section"><a href="{{ path('app_frontoffice') }}#challenge">Challenges</a></li>
-                    </ul>   
-                    <a class='menu-trigger'>
-                        <span>Menu</span>
-                    </a>
-                    <!-- ***** Menu End ***** -->
-                </nav>
-            </div>
-        </div>
-    </div>
-</header>
-<!-- ***** Header Area End ***** -->
-
-{# Calcul du pourcentage et détermination de la couleur #}
+{% block body %}
 {% set percentage = (score / totalPoints * 100)|round %}
 {% if score == 0 %}
     {% set colorClass = 'rouge' %}
@@ -409,11 +209,13 @@
             <h1>Challenge terminé !</h1>
             <p>Vous avez complété le challenge "{{ challenge.titre }}"</p>
             
-            <div class="score-container {{ colorClass }}">
-                <div class="score-label">Votre score</div>
+            <div class="score-container">
+                <div style="font-size: 14px; color: #7a7a7a; margin-bottom: 10px;">VOTRE SCORE</div>
                 <div class="score-value {{ colorClass }}">{{ score }}/{{ totalPoints }}</div>
-                <div class="score-percentage">{{ percentage }}% de réussite</div>
-                <div class="score-message {{ colorClass }}">{{ message }}</div>
+                <div style="font-size: 16px; color: #7a7a7a;">{{ percentage }}% de réussite</div>
+                <div style="font-size: 18px; font-weight: 600; color: {{ colorClass == 'rouge' ? '#f17b7b' : (colorClass == 'jaune' ? '#f3b562' : '#7fb77e') }}; margin-top: 10px;">
+                    {{ message }}
+                </div>
             </div>
 
             <!-- Section Rating 5 étoiles -->
@@ -462,10 +264,6 @@
                         </label>
                     </div>
                     
-                    <div class="rating-value" id="ratingValue" style="margin: 15px 0; font-size: 16px; color: #7a7a7a;">
-                        Sélectionnez une note
-                    </div>
-                    
                     <input type="hidden" id="selectedRating" value="0">
                     <input type="hidden" id="challengeId" value="{{ challenge.id }}">
                     
@@ -477,110 +275,31 @@
                 {% endif %}
             </div>
             
-            <div class="action-buttons">
-                <a href="{{ path('app_frontoffice') }}#challenge" class="btn-action btn-primary">
-                    Retour aux challenges <i class="fa fa-arrow-right"></i>
-                </a>
-            </div>
+            <a href="{{ path('app_frontoffice') }}#challenge" class="btn-action">
+                Retour aux challenges <i class="fa fa-arrow-right"></i>
+            </a>
         </div>
     </div>
 </div>
-
-<footer>
-    <div class="container">
-        <div class="col-lg-12">
-            <p>Copyright © 2036 Scholar Organization. All rights reserved.</p>
-        </div>
-    </div>
-</footer>
+{% endblock %}
 
 {% block javascripts %}
-    <script src="{{ asset('frontoffice/vendor/jquery/jquery.min.js') }}"></script>
-    <script src="{{ asset('frontoffice/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('frontoffice/js/custom.js') }}"></script>
-    
-    <!-- JS du bundle StarRating -->
-    <script src="{{ asset('bundles/starrating/js/rating.js') }}"></script>
+    {{ parent() }}
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const stars = document.querySelectorAll('.rating-input');
-            const labels = document.querySelectorAll('.rating-star');
-            const ratingValue = document.getElementById('ratingValue');
             const selectedRating = document.getElementById('selectedRating');
             
-            console.log('Nombre d\'étoiles trouvées:', stars.length); // Pour déboguer
+            if (stars.length === 0) return;
             
-            // Gérer le survol et le clic des étoiles
-            stars.forEach((star, index) => {
-                // Survol
-                star.addEventListener('mouseenter', function() {
-                    const value = this.value;
-                    highlightStars(value);
-                });
-                
-                // Clic
+            // Gérer le changement des étoiles
+            stars.forEach(star => {
                 star.addEventListener('change', function() {
-                    const value = this.value;
-                    selectedRating.value = value;
-                    
-                    // Mettre à jour le texte
-                    updateRatingText(value);
-                    
-                    // Marquer comme actif
-                    stars.forEach(s => {
-                        const label = document.querySelector('label[for="' + s.id + '"]');
-                        const icon = label.querySelector('i');
-                        if (s.value <= value) {
-                            icon.classList.remove('fa-star-o');
-                            icon.classList.add('fa-star');
-                        } else {
-                            icon.classList.remove('fa-star');
-                            icon.classList.add('fa-star-o');
-                        }
-                    });
+                    selectedRating.value = this.value;
                 });
-            });
-            
-            // Quitter le survol
-            document.querySelector('.rating-stars').addEventListener('mouseleave', function() {
-                const value = selectedRating.value;
-                if (value > 0) {
-                    highlightStars(value);
-                } else {
-                    stars.forEach(s => {
-                        const label = document.querySelector('label[for="' + s.id + '"]');
-                        const icon = label.querySelector('i');
-                        icon.classList.remove('fa-star');
-                        icon.classList.add('fa-star-o');
-                    });
-                }
             });
         });
-        
-        function highlightStars(value) {
-            const stars = document.querySelectorAll('.rating-input');
-            stars.forEach(s => {
-                const label = document.querySelector('label[for="' + s.id + '"]');
-                const icon = label.querySelector('i');
-                if (s.value <= value) {
-                    icon.classList.remove('fa-star-o');
-                    icon.classList.add('fa-star');
-                } else {
-                    icon.classList.remove('fa-star');
-                    icon.classList.add('fa-star-o');
-                }
-            });
-        }
-        
-        function updateRatingText(value) {
-            const ratingValue = document.getElementById('ratingValue');
-            if (value == 1) ratingValue.innerHTML = '<span style="color: #ffc107;">★</span> 1 étoile - Très décevant';
-            else if (value == 2) ratingValue.innerHTML = '<span style="color: #ffc107;">★★</span> 2 étoiles - Passable';
-            else if (value == 3) ratingValue.innerHTML = '<span style="color: #ffc107;">★★★</span> 3 étoiles - Bien';
-            else if (value == 4) ratingValue.innerHTML = '<span style="color: #ffc107;">★★★★</span> 4 étoiles - Très bien';
-            else if (value == 5) ratingValue.innerHTML = '<span style="color: #ffc107;">★★★★★</span> 5 étoiles - Excellent';
-        }
         
         function submitRating() {
             const rating = document.getElementById('selectedRating').value;
@@ -589,7 +308,7 @@
             const submitBtn = document.getElementById('submitRating');
             
             if (rating == 0) {
-                messageDiv.className = 'rating-message warning';
+                messageDiv.className = 'rating-message error';
                 messageDiv.innerHTML = '<i class="fa fa-exclamation-triangle"></i> Veuillez sélectionner une note';
                 return;
             }
@@ -621,16 +340,12 @@
                     messageDiv.className = 'rating-message success';
                     messageDiv.innerHTML = '<i class="fa fa-check-circle"></i> ' + data.message;
                     
-                    // Recharger après 2 secondes pour afficher la note
+                    // Recharger après 2 secondes
                     setTimeout(() => {
                         location.reload();
                     }, 2000);
                 } else {
-                    messageDiv.className = 'rating-message error';
-                    messageDiv.innerHTML = '<i class="fa fa-exclamation-circle"></i> ' + data.error;
-                    
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fa fa-star"></i> Noter ce challenge';
+                    throw new Error(data.error || 'Erreur inconnue');
                 }
             })
             .catch(error => {
@@ -644,6 +359,3 @@
         }
     </script>
 {% endblock %}
-
-</body>
-</html>

@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Défis et Challenges{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="text-center mb-5">🚀 Défis et Challenges</h1>
+
+    <div class="row">
+        {% for challenge in challenges %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ challenge.titre }}</h5>
+                        <p class="card-text">{{ challenge.description }}</p>
+                        
+                        <span class="badge 
+                            {% if challenge.niveau == 'Facile' %}bg-success
+                            {% elseif challenge.niveau == 'Intermédiaire' %}bg-warning
+                            {% else %}bg-danger
+                            {% endif %}">
+                            {{ challenge.niveau }}
+                        </span>
+                        
+                        <p class="mt-3">
+                            <small><i class="fa fa-clock-o"></i> Durée: {{ challenge.duree }} minutes</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    Aucun challenge disponible pour le moment.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

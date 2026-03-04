@@ -2,6 +2,7 @@
 // src/Controller/BackofficeController.php
 
 namespace App\Controller;
+
 use App\Entity\Exercice;
 use App\Service\AIExerciseGenerator;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,7 +16,7 @@ use App\Repository\ChallengeRepository;
 use App\Entity\User;
 use App\Entity\Etudiant;
 use App\Entity\Admin;
-use App\Repository\UserRepository; // ← AJOUTEZ CET IMPORT
+use App\Repository\UserRepository;
 use App\DTO\UserCreateDTO;
 use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Http\Attribute\IsGranted; // ← AJOUTEZ CET IMPORT
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class BackofficeController extends AbstractController
 {
@@ -36,45 +37,25 @@ class BackofficeController extends AbstractController
 
     /**
      * Page de gestion des quiz avec pagination
-     * 
-     * Utilise le bundle KnpPaginator pour afficher les quiz par pages
-     * Cela améliore les performances en ne chargeant que quelques quiz à la fois
      */
     #[Route('/backoffice/quiz-management', name: 'backoffice_quiz_management')]
     public function quizManagement(
-        \App\Repository\QuizRepository $quizRepository,
+        QuizRepository $quizRepository,
         Request $request,
-        // Injection du service PaginatorInterface fourni par KnpPaginatorBundle
-        // Ce service permet de paginer n'importe quelle requête Doctrine
         \Knp\Component\Pager\PaginatorInterface $paginator
-    ): Response
-    {
-        // Créer la requête de base avec QueryBuilder
-        // QueryBuilder permet de construire des requêtes SQL complexes de manière orientée objet
+    ): Response {
         $queryBuilder = $quizRepository->createQueryBuilder('q')
-            // Jointure avec l'entité Chapitre pour éviter les requêtes N+1
             ->leftJoin('q.chapitre', 'c')
-            // Ajouter le chapitre dans le SELECT pour le charger en une seule requête
             ->addSelect('c')
-            // Trier les quiz par ID décroissant (les plus récents en premier)
             ->orderBy('q.id', 'DESC');
 
-        // Utiliser KnpPaginator pour paginer les résultats
-        // Le bundle transforme automatiquement le QueryBuilder en requête paginée
         $pagination = $paginator->paginate(
-            // La requête à paginer (QueryBuilder, Query, ou tableau)
             $queryBuilder,
-            // Numéro de page actuel (récupéré depuis l'URL ?page=X, défaut: 1)
             $request->query->getInt('page', 1),
-            // Nombre d'éléments par page (5 quiz par page)
-            // Modifié de 10 à 5 pour un affichage plus compact
             5
         );
 
-        // Passer l'objet pagination au template Twig
-        // Le template utilisera knp_pagination_render() pour afficher les liens de pagination
         return $this->render('backoffice/quiz_management.html.twig', [
-            // L'objet pagination contient les quiz de la page actuelle + métadonnées (total, pages, etc.)
             'pagination' => $pagination,
         ]);
     }
@@ -124,26 +105,21 @@ class BackofficeController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function users(UserRepository $userRepository, Request $request): Response
     {
-        // Get all users for statistics (always show total stats)
         $allUsers = $userRepository->findAll();
 
-        // Calculate statistics from ALL users
         $totalUsers = count($allUsers);
         $students = array_filter($allUsers, fn($user) => $user->getRole() === 'ETUDIANT');
         $admins = array_filter($allUsers, fn($user) => $user->getRole() === 'ADMIN');
 
-        // Users created today
         $today = new \DateTime();
         $today->setTime(0, 0, 0);
         $newToday = array_filter($allUsers, fn($user) => $user->getCreatedAt() >= $today);
 
-        // Handle search and filter
         $search = $request->query->get('search');
-        $roleFilter = $request->query->get('role'); // New: role filter
+        $roleFilter = $request->query->get('role');
 
-        $users = $allUsers; // Start with all users
+        $users = $allUsers;
 
-        // Apply search filter
         if ($search) {
             try {
                 $users = $userRepository->createQueryBuilder('u')
@@ -152,7 +128,6 @@ class BackofficeController extends AbstractController
                     ->orWhere('u.email LIKE :search')
                     ->setParameter('search', '%' . $search . '%');
 
-                // Apply role filter to search query if present
                 if ($roleFilter && in_array($roleFilter, ['ADMIN', 'ETUDIANT'])) {
                     $users->andWhere('u.role = :role')
                           ->setParameter('role', $roleFilter);
@@ -163,7 +138,6 @@ class BackofficeController extends AbstractController
                 $users = $allUsers;
             }
         } elseif ($roleFilter && in_array($roleFilter, ['ADMIN', 'ETUDIANT'])) {
-            // Apply only role filter if no search
             $users = array_filter($allUsers, fn($user) => $user->getRole() === $roleFilter);
         }
 
@@ -178,7 +152,6 @@ class BackofficeController extends AbstractController
         ]);
     }
 
-
     #[Route('/backoffice/users/new', name: 'backoffice_user_new')]
     #[IsGranted('ROLE_ADMIN')]
     public function newUser(
@@ -187,21 +160,14 @@ class BackofficeController extends AbstractController
         EntityManagerInterface $entityManager,
         \App\Service\BrevoMailService $mailService,
         \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
-    ): Response
-    {
+    ): Response {
         $userDto = new UserCreateDTO();
         $form = $this->createForm(UserType::class, $userDto, ['is_edit' => false]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            // Store plain password before hashing
             $plainPassword = $userDto->password;
             
-            // Always create Etudiant
-            $user = new Etudiant();
-
-            // Créer l'utilisateur selon le rôle
             if ($userDto->role === 'ADMIN') {
                 $user = new Admin();
             } else {
@@ -218,10 +184,8 @@ class BackofficeController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // Log the user creation activity
             $activityLogger->logCreate($user);
 
-            // Send welcome email with credentials
             try {
                 $loginUrl = $this->generateUrl('backoffice_login', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
                 $mailService->sendWelcomeEmail(
@@ -252,19 +216,16 @@ class BackofficeController extends AbstractController
         UserPasswordHasherInterface $passwordHasher, 
         EntityManagerInterface $entityManager,
         \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
-    ): Response
-    {
+    ): Response {
         if (!$user) {
             throw $this->createNotFoundException('Utilisateur non trouvé');
         }
         
-        // SIMPLE CHECK: Only allow editing ETUDIANT users
         if ($user->getRole() !== 'ETUDIANT') {
             $this->addFlash('error', 'Vous ne pouvez modifier que les étudiants.');
             return $this->redirectToRoute('backoffice_users');
         }
 
-        // Create DTO
         $userDto = new UserCreateDTO();
         $userDto->nom = $user->getNom();
         $userDto->prenom = $user->getPrenom();
@@ -311,7 +272,6 @@ class BackofficeController extends AbstractController
 
             $entityManager->flush();
             
-            // Log the update activity
             $activityLogger->logUpdate($user, $changes);
             
             $this->addFlash('success', 'Étudiant modifié avec succès!');
@@ -326,6 +286,7 @@ class BackofficeController extends AbstractController
             'hide_role' => true, 
         ]);
     }
+
     #[Route('/backoffice/users/export', name: 'backoffice_users_export')]
     #[IsGranted('ROLE_ADMIN')]
     public function exportUsers(UserRepository $userRepository): Response
@@ -360,13 +321,11 @@ class BackofficeController extends AbstractController
         ?User $user,
         Request $request,
         \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
-    ): Response
-    {
+    ): Response {
         if (!$user) {
             throw $this->createNotFoundException('Utilisateur non trouvé');
         }
         
-        // Log the view activity
         $activityLogger->logView($user);
         
         return $this->render('backoffice/users/user_show.html.twig', [
@@ -382,29 +341,25 @@ class BackofficeController extends AbstractController
         EntityManagerInterface $entityManager,
         \App\Service\BrevoMailService $mailService,
         \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
-    ): Response
-    {
+    ): Response {
         if (!$user) {
             $this->addFlash('error', 'Utilisateur non trouvé');
             return $this->redirectToRoute('backoffice_users');
         }
         
-        // Only allow suspending ETUDIANT users
         if ($user->getRole() !== 'ETUDIANT') {
             $this->addFlash('error', 'Vous ne pouvez suspendre que les étudiants.');
             return $this->redirectToRoute('backoffice_users');
         }
 
-        // Check if already suspended
         if ($user->getIsSuspended()) {
             $this->addFlash('warning', 'Cet étudiant est déjà suspendu.');
             return $this->redirectToRoute('backoffice_users');
         }
 
-        if ($this->isCsrfTokenValid('suspend'.$user->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('suspend' . $user->getId(), $request->request->get('_token'))) {
             $reason = $request->request->get('reason', 'Compte inactif - Inactivité prolongée');
             
-            // Suspend the user
             $user->setIsSuspended(true);
             $user->setSuspendedAt(new \DateTime());
             $user->setSuspensionReason($reason);
@@ -412,10 +367,8 @@ class BackofficeController extends AbstractController
             
             $entityManager->flush();
             
-            // Log the suspension activity
             $activityLogger->logSuspend($user, $reason);
             
-            // Send suspension email
             try {
                 $mailService->sendSuspensionEmail(
                     $user->getEmail(),
@@ -424,9 +377,7 @@ class BackofficeController extends AbstractController
                 );
                 $this->addFlash('success', 'Étudiant suspendu avec succès! Un email de notification a été envoyé à ' . $user->getEmail());
             } catch (\Exception $e) {
-                // Log the full error
                 error_log('Suspension email error: ' . $e->getMessage());
-                error_log('Stack trace: ' . $e->getTraceAsString());
                 $this->addFlash('warning', 'Étudiant suspendu mais l\'email n\'a pas pu être envoyé: ' . $e->getMessage());
             }
         } else {
@@ -444,27 +395,23 @@ class BackofficeController extends AbstractController
         EntityManagerInterface $entityManager,
         \App\Service\BrevoMailService $mailService,
         \App\Bundle\UserActivityBundle\Service\ActivityLogger $activityLogger
-    ): Response
-    {
+    ): Response {
         if (!$user) {
             $this->addFlash('error', 'Utilisateur non trouvé');
             return $this->redirectToRoute('backoffice_users');
         }
         
-        // Only allow reactivating ETUDIANT users
         if ($user->getRole() !== 'ETUDIANT') {
             $this->addFlash('error', 'Vous ne pouvez réactiver que les étudiants.');
             return $this->redirectToRoute('backoffice_users');
         }
 
-        // Check if not suspended
         if (!$user->getIsSuspended()) {
             $this->addFlash('warning', 'Cet étudiant n\'est pas suspendu.');
             return $this->redirectToRoute('backoffice_users');
         }
 
-        if ($this->isCsrfTokenValid('reactivate'.$user->getId(), $request->request->get('_token'))) {
-            // Reactivate the user
+        if ($this->isCsrfTokenValid('reactivate' . $user->getId(), $request->request->get('_token'))) {
             $user->setIsSuspended(false);
             $user->setSuspendedAt(null);
             $user->setSuspensionReason(null);
@@ -472,10 +419,8 @@ class BackofficeController extends AbstractController
             
             $entityManager->flush();
             
-            // Log the reactivation activity
             $activityLogger->logReactivate($user);
             
-            // Send reactivation email
             try {
                 $loginUrl = $this->generateUrl('backoffice_login', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
                 $mailService->sendReactivationEmail(
@@ -485,36 +430,28 @@ class BackofficeController extends AbstractController
                 );
                 $this->addFlash('success', 'Étudiant réactivé avec succès! Un email de notification a été envoyé à ' . $user->getEmail());
             } catch (\Exception $e) {
-                // Log the full error
                 error_log('Reactivation email error: ' . $e->getMessage());
-                error_log('Stack trace: ' . $e->getTraceAsString());
                 $this->addFlash('warning', 'Étudiant réactivé mais l\'email n\'a pas pu être envoyé: ' . $e->getMessage());
             }
         } else {
             $this->addFlash('error', 'Token CSRF invalide.');
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($user);
-            $entityManager->flush();
-            
-            $this->addFlash('success', 'Utilisateur supprimé avec succès!');
         }
 
         return $this->redirectToRoute('backoffice_users');
     }
-    }
+
     #[Route('/backoffice/settings', name: 'backoffice_settings', methods: ['GET', 'POST'])]
     public function settings(
         Request $request,
         EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher): Response {
-        // Get the currently logged-in user
+        UserPasswordHasherInterface $passwordHasher
+    ): Response {
         $user = $this->getUser();
         
         if (!$user) {
             return $this->redirectToRoute('backoffice_login');
         }
 
-        // Hydrate DTO from entity
         $dto = new UserCreateDTO();
         $dto->nom = $user->getNom();
         $dto->prenom = $user->getPrenom();
@@ -531,7 +468,6 @@ class BackofficeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Check if email changed and is unique
             if ($dto->email !== $user->getEmail()) {
                 $existingUser = $entityManager->getRepository(User::class)
                     ->findOneBy(['email' => $dto->email]);
@@ -543,7 +479,6 @@ class BackofficeController extends AbstractController
                 }
             }
 
-            // Update user properties
             $user->setNom($dto->nom);
             $user->setPrenom($dto->prenom);
             $user->setEmail($dto->email);
@@ -552,7 +487,6 @@ class BackofficeController extends AbstractController
                 $user->setNiveau($dto->niveau);
             }
 
-            // Update password only if provided
             if (!empty($dto->password)) {
                 $user->setPassword(
                     $passwordHasher->hashPassword($user, $dto->password)
@@ -594,6 +528,7 @@ class BackofficeController extends AbstractController
     {
         return $this->render('backoffice/register.html.twig');
     }
+
     #[Route('/backoffice/exercices', name: 'backoffice_exercices')]
     public function listExercices(ExerciceRepository $repo): Response
     {
@@ -603,6 +538,7 @@ class BackofficeController extends AbstractController
             'exercices' => $exercices,
         ]);
     }
+
     #[Route('/backoffice/exercice/add', name: 'backoffice_exercice_add')]
     public function add(Request $request, EntityManagerInterface $em): Response
     {
@@ -623,6 +559,7 @@ class BackofficeController extends AbstractController
             'title' => 'Ajouter Exercice'
         ]);
     }
+
     #[Route('/backoffice/exercice/edit/{id}', name: 'backoffice_exercice_edit')]
     public function edit(
         int $id,
@@ -650,6 +587,7 @@ class BackofficeController extends AbstractController
             'title' => 'Modifier Exercice'
         ]);
     }
+
     #[Route('/backoffice/exercice/delete/{id}', name: 'backoffice_exercice_delete')]
     public function delete(
         int $id,
@@ -665,6 +603,65 @@ class BackofficeController extends AbstractController
 
         return $this->redirectToRoute('backoffice_exercices');
     }
+    
+    #[Route('/backoffice/exercice/generate-ai', name: 'backoffice_exercice_generate_ai', methods: ['POST'])]
+    public function generateExercicesAI(
+        Request $request,
+        \App\Service\ExerciceGeneratorAIService $generatorService,
+        EntityManagerInterface $em
+    ): Response {
+        try {
+            $data = json_decode($request->getContent(), true);
+            
+            $sujet = $data['sujet'] ?? '';
+            $niveau = $data['niveau'] ?? '';
+            $nombre = $data['nombre'] ?? 5;
+            
+            if (empty($sujet) || empty($niveau)) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Le sujet et le niveau sont requis'
+                ], 400);
+            }
+            
+            $exercicesData = $generatorService->generateExercices($sujet, $niveau, $nombre);
+            
+            if (empty($exercicesData)) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'L\'IA n\'a pas pu générer d\'exercices valides. Veuillez réessayer avec un sujet plus précis.'
+                ], 500);
+            }
+            
+            $count = 0;
+            foreach ($exercicesData as $exerciceData) {
+                $exercice = new Exercice();
+                $exercice->setQuestion($exerciceData['question']);
+                $exercice->setReponse($exerciceData['reponse']);
+                $exercice->setPoints($exerciceData['points']);
+                
+                $em->persist($exercice);
+                $count++;
+            }
+            
+            $em->flush();
+            
+            return $this->json([
+                'success' => true,
+                'count' => $count,
+                'message' => "$count exercice(s) généré(s) avec succès"
+            ]);
+            
+        } catch (\Exception $e) {
+            error_log('Erreur génération exercices IA: ' . $e->getMessage());
+            
+            return $this->json([
+                'success' => false,
+                'error' => 'Erreur lors de la génération: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     #[Route('/backoffice/challenges', name: 'backoffice_challenges')]
     public function showchallenge(ChallengeRepository $repository): Response
     {
@@ -674,372 +671,330 @@ class BackofficeController extends AbstractController
             'challenges' => $challenges
         ]);
     }
+
     #[Route('/backoffice/challenge/add', name: 'backoffice_challenge_add')]
-public function addchall(
-    Request $request, 
-    EntityManagerInterface $em, 
-    Security $security,
-    ExerciceRepository $exerciceRepository,
-    QuizRepository $quizRepository
-): Response
-{
-    $challenge = new Challenge();
-    $form = $this->createForm(ChallengeType::class, $challenge);
-    $form->handleRequest($request);
+    public function addchall(
+        Request $request, 
+        EntityManagerInterface $em, 
+        Security $security,
+        ExerciceRepository $exerciceRepository,
+        QuizRepository $quizRepository
+    ): Response {
+        $challenge = new Challenge();
+        $form = $this->createForm(ChallengeType::class, $challenge);
+        $form->handleRequest($request);
 
-    // Récupérer tous les exercices et quiz disponibles
-    $allExercices = $exerciceRepository->findAll();
-    $allQuizs = $quizRepository->findAll();
+        $allExercices = $exerciceRepository->findAll();
+        $allQuizs = $quizRepository->findAll();
 
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Récupérer les exercices sélectionnés depuis la requête
-        $selectedExercices = $request->request->all('exercices') ?? [];
-        foreach ($selectedExercices as $exerciceId) {
-            $exercice = $exerciceRepository->find($exerciceId);
-            if ($exercice) {
-                $challenge->addExercice($exercice);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $selectedExerciceIds = $request->request->all('exercices') ?? [];
+            
+            foreach ($selectedExerciceIds as $exerciceId) {
+                $exercice = $exerciceRepository->find($exerciceId);
+                if ($exercice) {
+                    $challenge->addExercice($exercice);
+                }
             }
-        }
-        
-        // Récupérer les quiz sélectionnés depuis la requête
-        $selectedQuizs = $request->request->all('quizs') ?? [];
-        foreach ($selectedQuizs as $quizId) {
-            $quiz = $quizRepository->find($quizId);
-            if ($quiz) {
-                $challenge->addQuiz($quiz);
+            
+            $selectedQuizIds = $request->request->all('quizs') ?? [];
+            
+            foreach ($selectedQuizIds as $quizId) {
+                $quiz = $quizRepository->find($quizId);
+                if ($quiz) {
+                    $challenge->addQuiz($quiz);
+                }
             }
+
+            $challenge->setCreatedBy($security->getUser());
+
+            $em->persist($challenge);
+            $em->flush();
+
+            return $this->redirectToRoute('backoffice_challenges');
         }
 
-        // 🔥 Ici on affecte automatiquement l'utilisateur connecté
-        $challenge->setCreatedBy($security->getUser());
+        return $this->render('backoffice/challenge_form.html.twig', [
+            'form' => $form->createView(),
+            'exercices' => $allExercices,
+            'quizs' => $allQuizs,
+            'exerciceIds' => [],
+            'quizIds' => [],
+            'title' => 'Ajouter un Challenge'
+        ]);
+    }
+
+    #[Route('/backoffice/challenge/edit/{id}', name: 'backoffice_challenge_edit')]
+    public function editchal(
+        $id,
+        ChallengeRepository $repository,
+        Request $request,
+        EntityManagerInterface $em,
+        ExerciceRepository $exerciceRepository,
+        QuizRepository $quizRepository
+    ): Response {
+        $challenge = $repository->find($id);
+
+        if (!$challenge) {
+            throw $this->createNotFoundException('Challenge non trouvé');
+        }
+
+        $form = $this->createForm(ChallengeType::class, $challenge);
+        $form->handleRequest($request);
+
+        $allExercices = $exerciceRepository->findAll();
+        $allQuizs = $quizRepository->findAll();
         
-        $em->persist($challenge);
-        $em->flush();
-
-        return $this->redirectToRoute('backoffice_challenges');
-    }
-
-    return $this->render('backoffice/challenge_form.html.twig', [
-        'form' => $form->createView(),
-        'exercices' => $allExercices,
-        'quizs' => $allQuizs,
-        'title' => 'Ajouter un Challenge'
-    ]);
-}
-#[Route('/backoffice/challenge/edit/{id}', name: 'backoffice_challenge_edit')]
-public function editchal(
-    $id,
-    ChallengeRepository $repository,
-    Request $request,
-    EntityManagerInterface $em,
-    ExerciceRepository $exerciceRepository,
-    QuizRepository $quizRepository
-): Response {
-
-    $challenge = $repository->find($id);
-
-    if (!$challenge) {
-        throw $this->createNotFoundException('Challenge non trouvé');
-    }
-
-    $form = $this->createForm(ChallengeType::class, $challenge);
-    $form->handleRequest($request);
-
-    // Récupérer tous les exercices et quiz disponibles
-    $allExercices = $exerciceRepository->findAll();
-    $allQuizs = $quizRepository->findAll();
-    
-    // Récupérer les IDs des exercices déjà associés
-    $exerciceIds = [];
-    foreach ($challenge->getExercices() as $exercice) {
-        $exerciceIds[] = $exercice->getId();
-    }
-    
-    // Récupérer les IDs des quiz déjà associés
-    $quizIds = [];
-    foreach ($challenge->getQuizzes() as $quiz) {
-        $quizIds[] = $quiz->getId();
-    }
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Récupérer les exercices sélectionnés depuis la requête
-        $selectedExerciceIds = $request->request->all('exercices') ?? [];
-        
-        // Supprimer les exercices qui ne sont plus sélectionnés
+        $exerciceIds = [];
         foreach ($challenge->getExercices() as $exercice) {
-            if (!in_array($exercice->getId(), $selectedExerciceIds)) {
-                $challenge->removeExercice($exercice);
-            }
+            $exerciceIds[] = $exercice->getId();
         }
         
-        // Ajouter les nouveaux exercices sélectionnés
-        foreach ($selectedExerciceIds as $exerciceId) {
-            $exercice = $exerciceRepository->find($exerciceId);
-            if ($exercice && !$challenge->getExercices()->contains($exercice)) {
-                $challenge->addExercice($exercice);
-            }
-        }
-        
-        // Récupérer les quiz sélectionnés depuis la requête
-        $selectedQuizIds = $request->request->all('quizs') ?? [];
-        
-        // Supprimer les quiz qui ne sont plus sélectionnés
+        $quizIds = [];
         foreach ($challenge->getQuizzes() as $quiz) {
-            if (!in_array($quiz->getId(), $selectedQuizIds)) {
-                $challenge->removeQuiz($quiz);
-            }
-        }
-        
-        // Ajouter les nouveaux quiz sélectionnés
-        foreach ($selectedQuizIds as $quizId) {
-            $quiz = $quizRepository->find($quizId);
-            if ($quiz && !$challenge->getQuizzes()->contains($quiz)) {
-                $challenge->addQuiz($quiz);
-            }
+            $quizIds[] = $quiz->getId();
         }
 
+        if ($form->isSubmitted() && $form->isValid()) {
+            $selectedExerciceIds = $request->request->all('exercices') ?? [];
+            
+            foreach ($challenge->getExercices() as $exercice) {
+                if (!in_array($exercice->getId(), $selectedExerciceIds)) {
+                    $challenge->removeExercice($exercice);
+                }
+            }
+            
+            foreach ($selectedExerciceIds as $exerciceId) {
+                $exercice = $exerciceRepository->find($exerciceId);
+                if ($exercice && !$challenge->getExercices()->contains($exercice)) {
+                    $challenge->addExercice($exercice);
+                }
+            }
+            
+            $selectedQuizIds = $request->request->all('quizs') ?? [];
+            
+            foreach ($challenge->getQuizzes() as $quiz) {
+                if (!in_array($quiz->getId(), $selectedQuizIds)) {
+                    $challenge->removeQuiz($quiz);
+                }
+            }
+            
+            foreach ($selectedQuizIds as $quizId) {
+                $quiz = $quizRepository->find($quizId);
+                if ($quiz && !$challenge->getQuizzes()->contains($quiz)) {
+                    $challenge->addQuiz($quiz);
+                }
+            }
+
+            $em->flush();
+
+            return $this->redirectToRoute('backoffice_challenges');
+        }
+
+        return $this->render('backoffice/challenge_form.html.twig', [
+            'form' => $form->createView(),
+            'exercices' => $allExercices,
+            'quizs' => $allQuizs,
+            'exerciceIds' => $exerciceIds,
+            'quizIds' => $quizIds,
+            'title' => 'Modifier le Challenge'
+        ]);
+    }
+
+    #[Route('/backoffice/challenge/delete/{id}', name: 'backoffice_challenge_delete')]
+    public function deletechal(
+        $id,
+        ChallengeRepository $repository,
+        EntityManagerInterface $em
+    ): Response {
+        $challenge = $repository->find($id);
+
+        if (!$challenge) {
+            throw $this->createNotFoundException('Challenge non trouvé');
+        }
+
+        $em->remove($challenge);
         $em->flush();
 
         return $this->redirectToRoute('backoffice_challenges');
     }
 
-    return $this->render('backoffice/challenge_form.html.twig', [
-        'form' => $form->createView(),
-        'title' => 'Modifier le Challenge',
-        'exercices' => $allExercices,
-        'quizs' => $allQuizs,
-        'challenge' => $challenge,
-        'exerciceIds' => $exerciceIds,
-        'quizIds' => $quizIds
-    ]);
-}
-
-#[Route('/backoffice/challenge/delete/{id}', name: 'backoffice_challenge_delete')]
-public function deletechal(
-    $id,
-    ChallengeRepository $repository,
-    EntityManagerInterface $em
-): Response {
-
-    $challenge = $repository->find($id);
-
-    if (!$challenge) {
-        throw $this->createNotFoundException('Challenge non trouvé');
-    }
-
-    $em->remove($challenge);
-    $em->flush();
-
-    return $this->redirectToRoute('backoffice_challenges');
-}
-
-#[Route('/backoffice/api/cours/{id}/chapitres', name: 'backoffice_api_cours_chapitres', methods: ['GET'])]
-public function getCoursChapitres(\App\Entity\GestionDeCours\Cours $cours): Response
-{
-    $chapitres = $cours->getChapitres();
-    $data = [];
-    
-    foreach ($chapitres as $chapitre) {
-        $data[] = [
-            'id' => $chapitre->getId(),
-            'titre' => $chapitre->getTitre(),
-            'ordre' => $chapitre->getOrdre(),
-        ];
-    }
-    
-    return $this->json($data);
-}
-
-#[Route('/backoffice/exercice/ai-generate', name: 'backoffice_exercice_ai_generate', methods: ['POST'])]
-public function aiGenerate(Request $request, AIExerciseGenerator $aiGenerator): JsonResponse
-{
-    // Vérifier l'authentification
-    if (!$this->getUser()) {
-        error_log('AI Generate: Utilisateur non authentifié');
-        return $this->json([
-            'success' => false,
-            'error' => 'Vous devez être connecté pour utiliser cette fonctionnalité'
-        ], 401);
-    }
-
-    try {
-        // Récupérer et décoder les données JSON
-        $content = $request->getContent();
-        error_log('AI Generate - Raw content: ' . $content);
+    #[Route('/backoffice/api/cours/{id}/chapitres', name: 'backoffice_api_cours_chapitres', methods: ['GET'])]
+    public function getCoursChapitres(\App\Entity\GestionDeCours\Cours $cours): Response
+    {
+        $chapitres = $cours->getChapitres();
+        $data = [];
         
-        $data = json_decode($content, true);
-        
-        if (!$data) {
-            error_log('AI Generate - JSON invalide: ' . json_last_error_msg());
-            return $this->json([
-                'success' => false,
-                'error' => 'Données JSON invalides: ' . json_last_error_msg()
-            ], 400);
-        }
-        
-        // Valider les données
-        $theme = $data['theme'] ?? '';
-        $niveau = $data['niveau'] ?? 'Intermédiaire';
-        $type = $data['type'] ?? 'open';
-        
-        error_log("AI Generate - Theme: $theme, Niveau: $niveau, Type: $type");
-        
-        if (empty($theme)) {
-            return $this->json([
-                'success' => false,
-                'error' => 'Le thème est requis'
-            ], 400);
-        }
-        
-        // Générer selon le type
-        try {
-            if ($type === 'qcm') {
-                $exercise = $aiGenerator->generateQCM($theme, $niveau);
-                $exercise['type'] = 'qcm';
-            } else {
-                $exercise = $aiGenerator->generateExercise($theme, $niveau);
-                $exercise['type'] = 'open';
-            }
-        } catch (\Exception $e) {
-            error_log('AI Generate - Erreur du générateur: ' . $e->getMessage());
-            
-            // Fallback: retourner un exercice par défaut
-            $exercise = [
-                'question' => "Question par défaut sur le thème '$theme'",
-                'reponse' => "Réponse par défaut",
-                'points' => 5,
-                'type' => $type
+        foreach ($chapitres as $chapitre) {
+            $data[] = [
+                'id' => $chapitre->getId(),
+                'titre' => $chapitre->getTitre(),
+                'ordre' => $chapitre->getOrdre(),
             ];
+        }
+        
+        return $this->json($data);
+    }
+
+    #[Route('/backoffice/exercice/ai-generate', name: 'backoffice_exercice_ai_generate', methods: ['POST'])]
+    public function aiGenerate(Request $request, AIExerciseGenerator $aiGenerator): JsonResponse
+    {
+        if (!$this->getUser()) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Vous devez être connecté pour utiliser cette fonctionnalité'
+            ], 401);
+        }
+
+        try {
+            $content = $request->getContent();
+            $data = json_decode($content, true);
             
-            if ($type === 'qcm') {
-                $exercise['options'] = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
-                $exercise['bonneReponse'] = 0;
+            if (!$data) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Données JSON invalides: ' . json_last_error_msg()
+                ], 400);
             }
+            
+            $theme = $data['theme'] ?? '';
+            $niveau = $data['niveau'] ?? 'Intermédiaire';
+            $type = $data['type'] ?? 'open';
+            
+            if (empty($theme)) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Le thème est requis'
+                ], 400);
+            }
+            
+            try {
+                if ($type === 'qcm') {
+                    $exercise = $aiGenerator->generateQCM($theme, $niveau);
+                    $exercise['type'] = 'qcm';
+                } else {
+                    $exercise = $aiGenerator->generateExercise($theme, $niveau);
+                    $exercise['type'] = 'open';
+                }
+            } catch (\Exception $e) {
+                $exercise = [
+                    'question' => "Question par défaut sur le thème '$theme'",
+                    'reponse' => "Réponse par défaut",
+                    'points' => 5,
+                    'type' => $type
+                ];
+                
+                if ($type === 'qcm') {
+                    $exercise['options'] = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
+                    $exercise['bonneReponse'] = 0;
+                }
+            }
+            
+            return $this->json([
+                'success' => true,
+                'exercise' => $exercise
+            ]);
+            
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Erreur serveur: ' . $e->getMessage()
+            ], 500);
         }
-        
-        error_log('AI Generate - Exercice généré: ' . print_r($exercise, true));
-        
-        return $this->json([
-            'success' => true,
-            'exercise' => $exercise
-        ]);
-        
-    } catch (\Exception $e) {
-        error_log('AI Generate - ERREUR CRITIQUE: ' . $e->getMessage());
-        error_log('Fichier: ' . $e->getFile() . ' Ligne: ' . $e->getLine());
-        
-        return $this->json([
-            'success' => false,
-            'error' => 'Erreur serveur: ' . $e->getMessage()
-        ], 500);
     }
-}
 
-#[Route('/backoffice/exercice/ai-save', name: 'backoffice_exercice_ai_save', methods: ['POST'])]
-public function aiSave(Request $request, EntityManagerInterface $entityManager): JsonResponse
-{
-    try {
-        $data = json_decode($request->getContent(), true);
-        
-        if (!$data) {
-            return $this->json([
-                'success' => false,
-                'error' => 'Données invalides'
-            ], 400);
-        }
-        
-        // Créer un nouvel exercice
-        $exercice = new Exercice();
-        
-        // Définir la question
-        if (isset($data['question'])) {
-            $exercice->setQuestion($data['question']);
-        } else {
-            return $this->json([
-                'success' => false,
-                'error' => 'Question manquante'
-            ], 400);
-        }
-        
-        // Définir la réponse selon le type
-        if (isset($data['type']) && $data['type'] === 'qcm') {
-            // Pour QCM, stocker les options et la bonne réponse
-            if (isset($data['options']) && isset($data['bonneReponse'])) {
-                $options = implode('|', $data['options']);
-                $exercice->setReponse($options . '||' . $data['bonneReponse']);
+    #[Route('/backoffice/exercice/ai-save', name: 'backoffice_exercice_ai_save', methods: ['POST'])]
+    public function aiSave(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+            
+            if (!$data) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Données invalides'
+                ], 400);
+            }
+            
+            $exercice = new Exercice();
+            
+            if (isset($data['question'])) {
+                $exercice->setQuestion($data['question']);
             } else {
                 return $this->json([
                     'success' => false,
-                    'error' => 'Options du QCM manquantes'
+                    'error' => 'Question manquante'
                 ], 400);
             }
-        } else {
-            // Pour question ouverte
-            if (isset($data['reponse'])) {
-                $exercice->setReponse($data['reponse']);
+            
+            if (isset($data['type']) && $data['type'] === 'qcm') {
+                if (isset($data['options']) && isset($data['bonneReponse'])) {
+                    $options = implode('|', $data['options']);
+                    $exercice->setReponse($options . '||' . $data['bonneReponse']);
+                } else {
+                    return $this->json([
+                        'success' => false,
+                        'error' => 'Options du QCM manquantes'
+                    ], 400);
+                }
             } else {
-                return $this->json([
-                    'success' => false,
-                    'error' => 'Réponse manquante'
-                ], 400);
+                if (isset($data['reponse'])) {
+                    $exercice->setReponse($data['reponse']);
+                } else {
+                    return $this->json([
+                        'success' => false,
+                        'error' => 'Réponse manquante'
+                    ], 400);
+                }
             }
-        }
-        
-        // Définir les points
-        $exercice->setPoints($data['points'] ?? 5);
-        
-        // Sauvegarder
-        $entityManager->persist($exercice);
-        $entityManager->flush();
-        
-        error_log('Exercice sauvegardé avec ID : ' . $exercice->getId());
-        
-        return $this->json([
-            'success' => true,
-            'id' => $exercice->getId()
-        ]);
-        
-    } catch (\Exception $e) {
-        error_log('Erreur AI save : ' . $e->getMessage());
-        return $this->json([
-            'success' => false,
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
-
-/**
- * Optionnel : Route pour générer plusieurs exercices à la fois
- */
-#[Route('/backoffice/exercice/ai-generate-multiple', name: 'backoffice_exercice_ai_generate_multiple', methods: ['POST'])]
-public function aiGenerateMultiple(Request $request, AIExerciseGenerator $aiGenerator): JsonResponse
-{
-    try {
-        $data = json_decode($request->getContent(), true);
-        
-        $theme = $data['theme'] ?? '';
-        $niveau = $data['niveau'] ?? 'Intermédiaire';
-        $count = min($data['count'] ?? 3, 10); // Maximum 10 exercices
-        
-        if (empty($theme)) {
+            
+            $exercice->setPoints($data['points'] ?? 5);
+            
+            $entityManager->persist($exercice);
+            $entityManager->flush();
+            
+            return $this->json([
+                'success' => true,
+                'id' => $exercice->getId()
+            ]);
+            
+        } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
-                'error' => 'Le thème est requis'
-            ], 400);
+                'error' => $e->getMessage()
+            ], 500);
         }
-        
-        $exercises = $aiGenerator->generateMultipleExercises($theme, $niveau, $count);
-        
-        return $this->json([
-            'success' => true,
-            'exercises' => $exercises
-        ]);
-        
-    } catch (\Exception $e) {
-        return $this->json([
-            'success' => false,
-            'error' => $e->getMessage()
-        ], 500);
     }
-}
+
+    #[Route('/backoffice/exercice/ai-generate-multiple', name: 'backoffice_exercice_ai_generate_multiple', methods: ['POST'])]
+    public function aiGenerateMultiple(Request $request, AIExerciseGenerator $aiGenerator): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+            
+            $theme = $data['theme'] ?? '';
+            $niveau = $data['niveau'] ?? 'Intermédiaire';
+            $count = min($data['count'] ?? 3, 10);
+            
+            if (empty($theme)) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Le thème est requis'
+                ], 400);
+            }
+            
+            $exercises = $aiGenerator->generateMultipleExercises($theme, $niveau, $count);
+            
+            return $this->json([
+                'success' => true,
+                'exercises' => $exercises
+            ]);
+            
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
