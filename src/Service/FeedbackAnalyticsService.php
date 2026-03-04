@@ -60,7 +60,16 @@ class FeedbackAnalyticsService
      */
     public function analyzeByEventType(?string $filterType = null): array
     {
-        $events = $this->evenementRepository->findAll();
+        // Charger les événements avec toutes les relations nécessaires (optimisé pour éviter N+1)
+        $events = $this->evenementRepository->createQueryBuilder('e')
+            ->leftJoin('e.participations', 'p')
+            ->addSelect('p')
+            ->leftJoin('p.equipe', 'eq')
+            ->addSelect('eq')
+            ->leftJoin('eq.etudiants', 'et')
+            ->addSelect('et')
+            ->getQuery()
+            ->getResult();
         
         // Filtrer les événements si un type est spécifié
         if ($filterType) {
@@ -220,7 +229,17 @@ class FeedbackAnalyticsService
     public function prepareDataForAI(?string $eventType = null): array
     {
         $byType = $this->analyzeByEventType($eventType);
-        $allEvents = $this->evenementRepository->findAll();
+        
+        // Charger les événements avec toutes les relations nécessaires (optimisé pour éviter N+1)
+        $allEvents = $this->evenementRepository->createQueryBuilder('e')
+            ->leftJoin('e.participations', 'p')
+            ->addSelect('p')
+            ->leftJoin('p.equipe', 'eq')
+            ->addSelect('eq')
+            ->leftJoin('eq.etudiants', 'et')
+            ->addSelect('et')
+            ->getQuery()
+            ->getResult();
         
         // Filtrer les événements si un type est spécifié
         if ($eventType) {

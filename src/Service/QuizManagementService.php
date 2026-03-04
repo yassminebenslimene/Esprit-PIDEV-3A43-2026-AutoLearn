@@ -202,6 +202,8 @@ class QuizManagementService
                 'id' => $question->getId(),
                 'texte' => $question->getTexteQuestion(),
                 'points' => $question->getPoint(),
+                'imageName' => $question->getImageName(), // Nom de l'image
+                'question' => $question, // Objet question complet pour VichUploader
                 'options' => []
             ];
 

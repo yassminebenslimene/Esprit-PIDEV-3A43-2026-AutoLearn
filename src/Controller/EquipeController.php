@@ -18,7 +18,7 @@ final class EquipeController extends AbstractController
     public function index(EquipeRepository $equipeRepository): Response
     {
         return $this->render('backoffice/equipe/index.html.twig', [
-            'equipes' => $equipeRepository->findAll(),
+            'equipes' => $equipeRepository->findAllWithEvenement(),
         ]);
     }
 

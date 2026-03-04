@@ -29,7 +29,14 @@ final class EvenementController extends AbstractController
         EntityManagerInterface $entityManager,
         FeedbackAnalyticsService $analyticsService
     ): Response {
-        $evenements = $evenementRepository->findAll();
+        // Charger les événements avec leurs participations et équipes en une seule query (optimisé)
+        $evenements = $evenementRepository->createQueryBuilder('e')
+            ->leftJoin('e.participations', 'p')
+            ->addSelect('p')
+            ->leftJoin('e.equipes', 'eq')
+            ->addSelect('eq')
+            ->getQuery()
+            ->getResult();
         
         // Mettre à jour le statut de chaque événement
         foreach ($evenements as $evenement) {

@@ -648,6 +648,14 @@
                 {% endif %}
                 
                 <div class="question-text">{{ question.texte }}</div>
+                
+                {# Image de la question si elle existe #}
+                {% if question.imageName %}
+                <div class="quiz-image-display">
+                    <img src="{{ vich_uploader_asset(question.question, 'imageFile') }}" alt="Image de la question" class="quiz-main-image">
+                </div>
+                {% endif %}
+
                 <div class="question-points">
                     <i class="fa fa-star"></i> {{ question.points }} point{{ question.points > 1 ? 's' : '' }}
                 </div>

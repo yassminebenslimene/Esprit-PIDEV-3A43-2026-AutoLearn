@@ -15,7 +15,8 @@ doctrine:
             1002: "SET time_zone = '+00:00'"  # PDO::MYSQL_ATTR_INIT_COMMAND
         
         # Ignorer les tables d'audit lors des mises à jour de schéma
-        schema_filter: ~^(?!user_audit|revisions)~
+        # Le filtre accepte les tables qui NE correspondent PAS au pattern (negative lookahead)
+        schema_filter: '/^(?!.*_audit$)(?!revisions$).*$/'
         
     orm:
         auto_generate_proxy_classes: true

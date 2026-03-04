@@ -18,22 +18,25 @@ class EmailService
     private BadgeService $badgeService;
     private string $fromEmail;
     private string $fromName;
+    private $logger;
 
     public function __construct(
         MailerInterface $mailer, 
         Environment $twig,
         CertificateService $certificateService,
-        BadgeService $badgeService
+        BadgeService $badgeService,
+        $logger = null
     ) {
         $this->mailer = $mailer;
         $this->twig = $twig;
         $this->certificateService = $certificateService;
         $this->badgeService = $badgeService;
+        $this->logger = $logger;
         
         // Configuration Brevo - Email vérifié dans Brevo (Sender Identity)
-        // Cet email DOIT être vérifié dans ton compte Brevo
-        $this->fromEmail = 'autolearnplateforme@gmail.com';
-        $this->fromName = 'Autolearn Platform';
+        // Utilise l'email vérifié: autolearn66@gmail.com
+        $this->fromEmail = 'autolearn66@gmail.com';
+        $this->fromName = 'AutoLearn';
     }
 
     /**
@@ -63,72 +66,102 @@ class EmailService
         string $eventLocation,
         int $participationId
     ): void {
-        $studentName = $studentFirstName . ' ' . $studentLastName;
-        
-        // Créer le contenu du QR code avec format professionnel
-        $qrContent = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-        $qrContent .= "   EVENT PARTICIPATION\n";
-        $qrContent .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
-        $qrContent .= "PARTICIPANT:\n";
-        $qrContent .= "  " . strtoupper($studentName) . "\n\n";
-        $qrContent .= "TEAM:\n";
-        $qrContent .= "  " . $teamName . "\n\n";
-        $qrContent .= "EVENT:\n";
-        $qrContent .= "  " . $eventName . "\n\n";
-        $qrContent .= "DATE:\n";
-        $qrContent .= "  " . $eventDate->format('F d, Y - H:i') . "\n\n";
-        $qrContent .= "REGISTRATION ID:\n";
-        $qrContent .= "  #" . str_pad($participationId, 6, '0', STR_PAD_LEFT) . "\n\n";
-        $qrContent .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-        $qrContent .= "✓ Registration Confirmed\n";
-        $qrContent .= "   AUTOLEARN PLATFORM\n";
-        $qrContent .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
-        
-        // Générer le QR code via API externe (pas besoin de GD)
-        $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($qrContent);
-        
-        // Télécharger l'image du QR code
-        $qrCodeData = @file_get_contents($qrCodeUrl);
-        if ($qrCodeData === false) {
-            // Si l'API externe échoue, continuer sans QR code
-            $qrCodeData = null;
-        }
-        
-        // Générer le badge PDF
-        $badgePdf = $this->badgeService->generateBadge(
-            $studentFirstName,
-            $studentLastName,
-            $teamName,
-            $eventName,
-            $eventDate
-        );
-        
-        // Générer le fichier .ics pour le calendrier
-        $icsContent = $this->generateIcsFile($eventName, $eventDate, $eventLocation);
-        
-        $html = $this->twig->render('emails/participation_confirmation.html.twig', [
-            'studentName' => $studentName,
-            'teamName' => $teamName,
-            'eventName' => $eventName,
-            'eventDate' => $eventDate,
-            'eventLocation' => $eventLocation,
-            'qrCodeData' => $qrCodeData ? base64_encode($qrCodeData) : null,
-        ]);
+        try {
+            if ($this->logger) {
+                $this->logger->info('Début envoi email de confirmation', [
+                    'to' => $toEmail,
+                    'from' => $this->fromEmail,
+                    'event' => $eventName
+                ]);
+            }
+            
+            $studentName = $studentFirstName . ' ' . $studentLastName;
+            
+            // Créer le contenu du QR code avec format professionnel
+            $qrContent = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+            $qrContent .= "   EVENT PARTICIPATION\n";
+            $qrContent .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+            $qrContent .= "PARTICIPANT:\n";
+            $qrContent .= "  " . strtoupper($studentName) . "\n\n";
+            $qrContent .= "TEAM:\n";
+            $qrContent .= "  " . $teamName . "\n\n";
+            $qrContent .= "EVENT:\n";
+            $qrContent .= "  " . $eventName . "\n\n";
+            $qrContent .= "DATE:\n";
+            $qrContent .= "  " . $eventDate->format('F d, Y - H:i') . "\n\n";
+            $qrContent .= "REGISTRATION ID:\n";
+            $qrContent .= "  #" . str_pad($participationId, 6, '0', STR_PAD_LEFT) . "\n\n";
+            $qrContent .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+            $qrContent .= "✓ Registration Confirmed\n";
+            $qrContent .= "   AUTOLEARN PLATFORM\n";
+            $qrContent .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+            
+            // Générer le QR code via API externe (pas besoin de GD)
+            $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($qrContent);
+            
+            // Télécharger l'image du QR code
+            $qrCodeData = @file_get_contents($qrCodeUrl);
+            if ($qrCodeData === false) {
+                // Si l'API externe échoue, continuer sans QR code
+                $qrCodeData = null;
+                if ($this->logger) {
+                    $this->logger->warning('Échec génération QR code');
+                }
+            }
+            
+            // Générer le badge PDF
+            $badgePdf = $this->badgeService->generateBadge(
+                $studentFirstName,
+                $studentLastName,
+                $teamName,
+                $eventName,
+                $eventDate
+            );
+            
+            // Générer le fichier .ics pour le calendrier
+            $icsContent = $this->generateIcsFile($eventName, $eventDate, $eventLocation);
+            
+            $html = $this->twig->render('emails/participation_confirmation.html.twig', [
+                'studentName' => $studentName,
+                'teamName' => $teamName,
+                'eventName' => $eventName,
+                'eventDate' => $eventDate,
+                'eventLocation' => $eventLocation,
+                'qrCodeData' => $qrCodeData ? base64_encode($qrCodeData) : null,
+            ]);
 
-        $email = (new Email())
-            ->from(new Address($this->fromEmail, $this->fromName))
-            ->to($toEmail)
-            ->subject('Participation Confirmed - ' . $eventName)
-            ->html($html)
-            ->addPart(new DataPart($icsContent, 'event.ics', 'text/calendar'))
-            ->addPart(new DataPart($badgePdf, 'event-badge.pdf', 'application/pdf'));
-        
-        // Ajouter le QR code seulement s'il a été généré avec succès
-        if ($qrCodeData) {
-            $email->addPart(new DataPart($qrCodeData, 'qrcode.png', 'image/png'));
-        }
+            $email = (new Email())
+                ->from(new Address($this->fromEmail, $this->fromName))
+                ->to($toEmail)
+                ->subject('Participation Confirmed - ' . $eventName)
+                ->html($html)
+                ->addPart(new DataPart($icsContent, 'event.ics', 'text/calendar'));
+                // Badge PDF temporairement désactivé pour tester
+                // ->addPart(new DataPart($badgePdf, 'event-badge.pdf', 'application/pdf'));
+            
+            // Ajouter le QR code seulement s'il a été généré avec succès
+            if ($qrCodeData) {
+                $email->addPart(new DataPart($qrCodeData, 'qrcode.png', 'image/png'));
+            }
 
-        $this->mailer->send($email);
+            $this->mailer->send($email);
+            
+            if ($this->logger) {
+                $this->logger->info('Email de confirmation envoyé avec succès', [
+                    'to' => $toEmail,
+                    'event' => $eventName
+                ]);
+            }
+        } catch (\Exception $e) {
+            if ($this->logger) {
+                $this->logger->error('Erreur lors de l\'envoi de l\'email de confirmation', [
+                    'error' => $e->getMessage(),
+                    'to' => $toEmail,
+                    'event' => $eventName
+                ]);
+            }
+            throw $e;
+        }
     }
 
     /**
@@ -142,21 +175,46 @@ class EmailService
         \DateTimeInterface $eventDate,
         string $eventLocation
     ): void {
-        $html = $this->twig->render('emails/event_cancelled.html.twig', [
-            'studentName' => $studentName,
-            'teamName' => $teamName,
-            'eventName' => $eventName,
-            'eventDate' => $eventDate,
-            'eventLocation' => $eventLocation,
-        ]);
+        try {
+            if ($this->logger) {
+                $this->logger->info('Début envoi email d\'annulation', [
+                    'to' => $toEmail,
+                    'event' => $eventName
+                ]);
+            }
+            
+            $html = $this->twig->render('emails/event_cancelled.html.twig', [
+                'studentName' => $studentName,
+                'teamName' => $teamName,
+                'eventName' => $eventName,
+                'eventDate' => $eventDate,
+                'eventLocation' => $eventLocation,
+            ]);
 
-        $email = (new Email())
-            ->from(new Address($this->fromEmail, $this->fromName))
-            ->to($toEmail)
-            ->subject('⚠️ Event Cancelled - ' . $eventName)
-            ->html($html);
+            $email = (new Email())
+                ->from(new Address($this->fromEmail, $this->fromName))
+                ->to($toEmail)
+                ->subject('⚠️ Event Cancelled - ' . $eventName)
+                ->html($html);
 
-        $this->mailer->send($email);
+            $this->mailer->send($email);
+            
+            if ($this->logger) {
+                $this->logger->info('Email d\'annulation envoyé avec succès', [
+                    'to' => $toEmail,
+                    'event' => $eventName
+                ]);
+            }
+        } catch (\Exception $e) {
+            if ($this->logger) {
+                $this->logger->error('Erreur lors de l\'envoi de l\'email d\'annulation', [
+                    'error' => $e->getMessage(),
+                    'to' => $toEmail,
+                    'event' => $eventName
+                ]);
+            }
+            throw $e;
+        }
     }
     
     /**
