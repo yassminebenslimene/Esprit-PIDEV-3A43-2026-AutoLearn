@@ -90,7 +90,7 @@ class Evenement
     #[ORM\OneToMany(mappedBy: "evenement", targetEntity: Equipe::class)]
     private Collection $equipes;
 
-    #[ORM\OneToMany(mappedBy: "evenement", targetEntity: Participation::class, cascade: ["persist", "remove"], orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: "evenement", targetEntity: Participation::class)]
     private Collection $participations;
 
     public function __construct()

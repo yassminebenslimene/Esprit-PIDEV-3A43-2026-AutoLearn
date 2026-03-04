@@ -1,5 +1,0 @@
-<?php
-
-// FICHIER DÉSACTIVÉ - Nécessite symfony/workflow
-// Pour réactiver: composer require symfony/workflow
-// Puis renommer en .php
