@@ -87,10 +87,10 @@ class Evenement
     )]
     private int $nbMax;
 
-    #[ORM\OneToMany(mappedBy: "evenement", targetEntity: Equipe::class)]
+    #[ORM\OneToMany(mappedBy: "evenement", targetEntity: Equipe::class, fetch: 'EXTRA_LAZY')]
     private Collection $equipes;
 
-    #[ORM\OneToMany(mappedBy: "evenement", targetEntity: Participation::class, cascade: ['remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: "evenement", targetEntity: Participation::class, cascade: ['remove'], orphanRemoval: true, fetch: 'EXTRA_LAZY')]
     private Collection $participations;
 
     public function __construct()

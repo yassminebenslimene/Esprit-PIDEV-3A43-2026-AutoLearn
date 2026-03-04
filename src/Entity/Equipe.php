@@ -26,7 +26,7 @@ class Equipe
     #[ORM\JoinColumn(nullable: false)]
     private Evenement $evenement;
 
-    #[ORM\ManyToMany(targetEntity: Etudiant::class)]
+    #[ORM\ManyToMany(targetEntity: Etudiant::class, fetch: 'EXTRA_LAZY')]
     #[ORM\JoinTable(name: "equipe_etudiant",
         joinColumns: [new ORM\JoinColumn(name: "equipe_id", referencedColumnName: "id")],
         inverseJoinColumns: [new ORM\JoinColumn(name: "etudiant_id", referencedColumnName: "userId")]
