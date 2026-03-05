@@ -26,7 +26,7 @@ class AdminManagerTest extends TestCase
         $this->assertTrue($this->manager->validate($admin));
     }
 
- 
+
     public function testAdminWithoutNom(): void
     {
         $this->expectException(\InvalidArgumentException::class);
