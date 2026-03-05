@@ -29,7 +29,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class BackofficeController extends AbstractController
 {
@@ -166,17 +165,16 @@ class BackofficeController extends AbstractController
         ];
         
         // Top courses by chapters count (optimized with DTO hydration)
-        $query = $entityManager->getRepository(Cours::class)
+        // Using subquery to avoid setMaxResults with collection join
+        $topCoursData = $entityManager->getRepository(Cours::class)
             ->createQueryBuilder('c')
             ->select('NEW App\DTO\TopCoursDTO(c.id, c.titre, COUNT(ch.id))')
             ->leftJoin('c.chapitres', 'ch')
             ->groupBy('c.id, c.titre')
             ->orderBy('COUNT(ch.id)', 'DESC')
+            ->getQuery()
             ->setMaxResults(5)
-            ->getQuery();
-        
-        $paginator = new Paginator($query, $fetchJoinCollection = true);
-        $topCoursData = iterator_to_array($paginator);
+            ->getResult();
         
         // Fetch full entities for display
         $topCours = [];
@@ -192,17 +190,16 @@ class BackofficeController extends AbstractController
             ->findBy([], ['dateDebut' => 'DESC'], 5);
         
         // Top challenges by exercises count (optimized with DTO hydration)
-        $query = $entityManager->getRepository(Challenge::class)
+        // Using subquery to avoid setMaxResults with collection join
+        $topChallengesData = $entityManager->getRepository(Challenge::class)
             ->createQueryBuilder('ch')
             ->select('NEW App\DTO\TopChallengeDTO(ch.id, ch.titre, COUNT(ex.id))')
             ->leftJoin('ch.exercices', 'ex')
             ->groupBy('ch.id, ch.titre')
             ->orderBy('COUNT(ex.id)', 'DESC')
+            ->getQuery()
             ->setMaxResults(5)
-            ->getQuery();
-        
-        $paginator = new Paginator($query, $fetchJoinCollection = true);
-        $topChallengesData = iterator_to_array($paginator);
+            ->getResult();
         
         // Fetch full entities for display
         $topChallenges = [];
