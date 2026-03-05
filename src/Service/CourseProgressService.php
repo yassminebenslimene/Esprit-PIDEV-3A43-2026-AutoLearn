@@ -107,12 +107,27 @@ class CourseProgressService
         // Extract course IDs
         $coursIds = array_map(fn($cours) => $cours->getId(), $courses);
         
+        // Fetch chapter counts in ONE query
+        $chapterCounts = $this->entityManager->createQueryBuilder()
+            ->select('IDENTITY(ch.cours) as coursId, COUNT(ch.id) as total')
+            ->from('App\Entity\GestionDeCours\Chapitre', 'ch')
+            ->where('ch.cours IN (:coursIds)')
+            ->setParameter('coursIds', $coursIds)
+            ->groupBy('ch.cours')
+            ->getQuery()
+            ->getResult();
+        
+        $chapterCountMap = [];
+        foreach ($chapterCounts as $row) {
+            $chapterCountMap[$row['coursId']] = (int)$row['total'];
+        }
+        
         // Fetch all progress data in ONE query (optimized with DTO hydration)
         $progressMap = $this->progressRepository->countCompletedChaptersByCoursesForUser($user, $coursIds);
 
         $progressData = [];
         foreach ($courses as $cours) {
-            $totalChapters = $cours->getChapitres()->count();
+            $totalChapters = $chapterCountMap[$cours->getId()] ?? 0;
             $completedChapters = $progressMap[$cours->getId()] ?? 0;
             $percentage = $totalChapters > 0 ? round(($completedChapters / $totalChapters) * 100, 2) : 0.0;
 

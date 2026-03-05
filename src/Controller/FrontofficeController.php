@@ -26,8 +26,7 @@ class FrontofficeController extends AbstractController
         ChallengeRepository $challengeRepository,
         EvenementRepository $evenementRepository,
         EquipeRepository $equipeRepository,
-        CoursRepository $coursRepository,
-        CourseProgressService $progressService
+        CoursRepository $coursRepository
     ): Response
     {
         // Si l'utilisateur est connecté
@@ -65,11 +64,8 @@ class FrontofficeController extends AbstractController
             ->getQuery()
             ->getResult();
         
-        // Calculer la progression pour chaque cours si l'utilisateur est connecté
+        // Désactivé temporairement pour debug
         $coursProgress = [];
-        if ($this->getUser()) {
-            $coursProgress = $progressService->getAllCoursesProgress($this->getUser(), $cours);
-        }
         
         return $this->render('frontoffice/index.html.twig', [
             'cours' => $cours,

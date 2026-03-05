@@ -8,6 +8,7 @@ use App\Repository\ParticipationRepository;
 use App\Repository\EquipeRepository;
 use App\Repository\EvenementRepository;
 use App\Service\EmailService;
+use App\Service\QrCodeService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -164,7 +165,8 @@ class FrontofficeParticipationController extends AbstractController
         EntityManagerInterface $entityManager,
         EquipeRepository $equipeRepository,
         EvenementRepository $evenementRepository,
-        EmailService $emailService
+        EmailService $emailService,
+        QrCodeService $qrCodeService
     ): Response
     {
         $equipe = $equipeRepository->find($equipeId);

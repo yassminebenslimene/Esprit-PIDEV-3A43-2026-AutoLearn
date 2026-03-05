@@ -33,7 +33,7 @@ class Quiz
         pattern: "/^[a-zA-Z0-9àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ\s\-',.!?]+$/u",
         message: "Le titre contient des caractères non autorisés."
     )]
-    private ?string $titre = null;
+    private string $titre;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(message: "La description est obligatoire.")]
@@ -43,7 +43,7 @@ class Quiz
         minMessage: "La description doit contenir au moins {{ limit }} caractères.",
         maxMessage: "La description ne peut pas dépasser {{ limit }} caractères."
     )]
-    private ?string $description = null;
+    private string $description;
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: "L'état du quiz est obligatoire.")]
@@ -51,7 +51,7 @@ class Quiz
         choices: ['actif', 'inactif', 'brouillon', 'archive'],
         message: "L'état doit être: actif, inactif, brouillon ou archive."
     )]
-    private ?string $etat = null;
+    private string $etat = 'brouillon';
 
     #[ORM\Column(nullable: true)]
     #[Assert\Positive(message: "La durée doit être un nombre positif.")]
@@ -105,7 +105,7 @@ class Quiz
         return $this->id;
     }
 
-    public function getTitre(): ?string
+    public function getTitre(): string
     {
         return $this->titre;
     }
@@ -116,7 +116,7 @@ class Quiz
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -127,7 +127,7 @@ class Quiz
         return $this;
     }
 
-    public function getEtat(): ?string
+    public function getEtat(): string
     {
         return $this->etat;
     }

@@ -76,14 +76,45 @@ class FrontofficeEvenementController extends AbstractController
         ]);
     }
     
-    /**
-     * Route pour afficher le calendrier des événements
-     * Accessible à tous les étudiants pour voir les dates des événements
-     */
     #[Route('/calendar', name: 'app_events_calendar', methods: ['GET'])]
     public function calendar(): Response
     {
         return $this->render('frontoffice/evenement/calendar.html.twig');
+    }
+    
+    #[Route('/load-events', name: 'fc_load_events', methods: ['GET'])]
+    public function loadEvents(EvenementRepository $evenementRepository): Response
+    {
+        $evenements = $evenementRepository->findAll();
+        
+        $events = [];
+        foreach ($evenements as $evenement) {
+            try {
+                $type = $evenement->getType();
+                $typeValue = $type ? $type->value : 'Autre';
+                
+                $status = $evenement->getStatus();
+                $statusValue = $status ? $status->value : 'Planifié';
+                
+                $events[] = [
+                    'id' => $evenement->getId(),
+                    'title' => $evenement->getTitre() ?? 'Sans titre',
+                    'start' => $evenement->getDateDebut()?->format('Y-m-d\TH:i:s') ?? date('Y-m-d\TH:i:s'),
+                    'end' => $evenement->getDateFin()?->format('Y-m-d\TH:i:s') ?? date('Y-m-d\TH:i:s'),
+                    'description' => $evenement->getDescription() ?? '',
+                    'location' => $evenement->getLieu() ?? '',
+                    'type' => $typeValue,
+                    'status' => $statusValue,
+                    'backgroundColor' => $this->getEventColor($typeValue),
+                    'borderColor' => $this->getEventColor($typeValue),
+                ];
+            } catch (\Exception $e) {
+                // Skip events with errors
+                continue;
+            }
+        }
+        
+        return $this->json($events);
     }
     
     #[Route('/{id}/participate', name: 'app_event_participate', methods: ['GET'])]
@@ -166,5 +197,16 @@ class FrontofficeEvenementController extends AbstractController
         
         $this->addFlash('success', 'Vous avez rejoint l\'équipe "' . $equipe->getNom() . '" avec succès !');
         return $this->redirectToRoute('app_mes_equipes');
+    }
+    
+    private function getEventColor(string $type): string
+    {
+        return match($type) {
+            'Conférence' => '#3788d8',
+            'Atelier' => '#f39c12',
+            'Compétition' => '#e74c3c',
+            'Séminaire' => '#9b59b6',
+            default => '#95a5a6',
+        };
     }
 }

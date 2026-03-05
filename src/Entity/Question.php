@@ -39,7 +39,7 @@ class Question
         minMessage: "La question doit contenir au moins {{ limit }} caractères.",
         maxMessage: "La question ne peut pas dépasser {{ limit }} caractères."
     )]
-    private ?string $texteQuestion = null;
+    private string $texteQuestion;
 
     #[ORM\Column]
     #[Assert\NotNull(message: "Le nombre de points est obligatoire.")]
@@ -53,7 +53,7 @@ class Question
         type: 'integer',
         message: "Le nombre de points doit être un nombre entier."
     )]
-    private ?int $point = null;
+    private int $point;
 
     #[ORM\ManyToOne(inversedBy: 'questions')]
     #[ORM\JoinColumn(nullable: false)]
@@ -190,7 +190,7 @@ class Question
         return $this->id;
     }
 
-    public function getTexteQuestion(): ?string
+    public function getTexteQuestion(): string
     {
         return $this->texteQuestion;
     }
@@ -201,7 +201,7 @@ class Question
         return $this;
     }
 
-    public function getPoint(): ?int
+    public function getPoint(): int
     {
         return $this->point;
     }

@@ -30,7 +30,7 @@ class Chapitre
         pattern: '/^[a-zA-Z0-9\s\-_\'éèêëàâäîïôöûüç]+$/',
         message: 'Le titre contient des caractères non autorisés.'
     )]
-    private ?string $titre = null;
+    private string $titre;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(message: 'Le contenu du chapitre est obligatoire.')]
@@ -38,13 +38,13 @@ class Chapitre
         max: 10000,
         maxMessage: 'Le contenu ne doit pas dépasser {{ limit }} caractères.'
     )]
-    private ?string $contenu = null;
+    private string $contenu;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: "L'ordre du chapitre est obligatoire.")]
     #[Assert\Positive(message: "L'ordre doit être un nombre positif.")]
     #[Assert\Type(type: 'integer', message: "L'ordre doit être un nombre entier.")]
-    private ?int $ordre = null;
+    private int $ordre;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Length(
@@ -86,7 +86,7 @@ class Chapitre
         return $this->id;
     }
 
-    public function getTitre(): ?string
+    public function getTitre(): string
     {
         return $this->titre;
     }
@@ -98,7 +98,7 @@ class Chapitre
         return $this;
     }
 
-    public function getContenu(): ?string
+    public function getContenu(): string
     {
         return $this->contenu;
     }
@@ -110,7 +110,7 @@ class Chapitre
         return $this;
     }
 
-    public function getOrdre(): ?int
+    public function getOrdre(): int
     {
         return $this->ordre;
     }

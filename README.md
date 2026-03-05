@@ -1,217 +1,84 @@
-# AutoLearn – E-Learning Platform
+# AutoLearn - Plateforme d'Apprentissage
 
-## Overview
+## C'est quoi AutoLearn ?
+AutoLearn est une plateforme web pour les étudiants qui veulent apprendre en ligne. On peut suivre des cours, faire des quiz, participer à des événements comme des hackathons, et rejoindre des communautés d'étudiants.
 
-This project was developed as part of the **PIDEV – 3rd Year Engineering Program** at **Esprit School of Engineering** (Academic Year 2025–2026).
+## Les fonctionnalités
 
-AutoLearn is a comprehensive e-learning platform designed to enhance the educational experience through interactive courses, quizzes, events management, and community features. The platform provides both student and administrator interfaces with advanced AI-powered features for content generation and analysis.
+### Ce que tu peux faire en tant qu'étudiant :
+- Suivre des cours avec des chapitres bien organisés
+- Faire des quiz pour tester tes connaissances (avec correction automatique par IA)
+- Relever des challenges de programmation
+- Participer à des événements (hackathons, workshops, conférences)
+- Créer ou rejoindre une équipe pour les événements
+- Rejoindre des communautés et partager des posts
+- Voir ton profil et suivre ta progression
+- Recevoir des notifications pour les nouvelles activités
 
-## Features
+### Ce que les admins peuvent faire :
+- Gérer les comptes étudiants
+- Créer et organiser les cours
+- Organiser des événements
+- Voir les statistiques de la plateforme
+- Consulter l'historique des modifications (audit)
 
-### Course Management
-- Interactive chapters with multimedia content
-- Progress tracking and completion certificates
-- AI-powered chapter explanations
-- Multi-language support (French/English)
-
-### Quiz System
-- AI-generated quizzes using Groq API
-- Multiple question types (MCQ, True/False)
-- Automatic grading and feedback
-- Image support for questions
-- Real-time quiz passage interface
-
-### Event Management
-- Event creation and management (Hackathons, Workshops, Conferences)
-- Team formation and participation
-- Email notifications with QR codes
-- Event calendar integration
-- Feedback collection and AI-powered analytics
-
-### Community Features
-- Community creation and management
-- Posts and comments system
-- Reaction system
-- Member management with roles
-
-### Challenge System
-- Challenge creation and tracking
-- User progress monitoring
-- Voting system
-- Leaderboard
-
-### User Management
-- Role-based access control (Admin, Student)
-- User activity tracking
-- Audit logging
-- Suspension management
-- Password reset functionality
-
-## Tech Stack
-
-### Frontend
-- **Twig** - Template engine
-- **Bootstrap 5** - UI framework
-- **JavaScript** - Client-side interactivity
-- **FullCalendar** - Event calendar
-- **Chart.js** - Data visualization
-
-### Backend
-- **PHP 8.2** - Programming language
-- **Symfony 6.4** - Web framework
-- **Doctrine ORM** - Database abstraction
-- **MySQL/MariaDB** - Database
-
-### AI Integration
-- **Groq API** - AI-powered quiz generation and content analysis
-- **Llama 4 Scout** - Language model for intelligent features
-
-### Email & Notifications
-- **Brevo (Sendinblue)** - Email service provider
-- **Symfony Mailer** - Email handling
-- **QR Code generation** - Event participation tracking
-
-### Development Tools
-- **Composer** - Dependency management
-- **PHPStan** - Static analysis (Level 1 compliant)
-- **Doctrine Migrations** - Database versioning
-- **Symfony Messenger** - Asynchronous processing
-
-## Architecture
-
-```
-autolearn/
-├── config/              # Configuration files
-├── migrations/          # Database migrations
-├── public/              # Public assets
-│   ├── Backoffice/     # Admin panel assets
-│   └── frontoffice/    # Student interface assets
-├── src/
-│   ├── Bundle/         # Custom bundles
-│   ├── Command/        # CLI commands
-│   ├── Controller/     # Application controllers
-│   ├── Entity/         # Doctrine entities
-│   ├── Form/           # Form types
-│   ├── Repository/     # Database repositories
-│   ├── Service/        # Business logic services
-│   └── EventSubscriber/ # Event listeners
-├── templates/
-│   ├── backoffice/     # Admin templates
-│   ├── frontoffice/    # Student templates
-│   └── emails/         # Email templates
-└── tests/              # Unit and functional tests
-```
-
-## Contributors
-
-**Team Brain-Up – Class 3A43**
-
-- **Amira** - Event Management Module
-- **Ilef** - Quiz Management Module
-- **Yassmine** - Course Management Module
-- **Nour** - Community Management Module
-- **Mariem** - Challenge Management Module
-
-## Academic Context
-
-**Developed at Esprit School of Engineering – Tunisia**
-
-- **Program**: PIDEV (Projet Intégré de Développement)
-- **Class**: 3A43
-- **Academic Year**: 2025–2026
-- **Supervisor**: [Supervisor Name]
-
-## Getting Started
-
-### Prerequisites
-
-- PHP 8.2 or higher
-- Composer
-- MySQL/MariaDB
-- Node.js (for asset compilation)
+## Comment ça marche ?
 
 ### Installation
+1. Installer XAMPP (pour avoir PHP et MySQL)
+2. Cloner le projet dans `C:\xampp\htdocs\`
+3. Ouvrir un terminal dans le dossier du projet
+4. Installer les dépendances : `composer install`
+5. Créer la base de données : `php bin/console doctrine:database:create`
+6. Créer les tables : `php bin/console doctrine:migrations:migrate`
+7. Charger des données de test : `php bin/console doctrine:fixtures:load`
 
-1. Clone the repository
+### Démarrer le serveur
 ```bash
-git clone https://github.com/yassminebenslimene/Esprit-PIDEV-3A43-2026-AutoLearn.git
-cd autolearn
+php -S 127.0.0.1:8000 -t public
 ```
 
-2. Install dependencies
-```bash
-composer install
-```
+Puis ouvrir dans le navigateur : http://127.0.0.1:8000/
 
-3. Configure environment variables
-```bash
-cp .env.example .env
-# Edit .env with your database credentials and API keys
-```
+### Se connecter
+Après avoir chargé les fixtures, tu peux te connecter avec :
+- **Admin** : admin@autolearn.com / password
+- **Étudiant** : etudiant@autolearn.com / password
 
-4. Create database and run migrations
-```bash
-php bin/console doctrine:database:create
-php bin/console doctrine:migrations:migrate
-```
+## Technologies utilisées
+- **PHP** : Symfony 7.2
+- **Base de données** : MariaDB
+- **Frontend** : Bootstrap + JavaScript
+- **IA** : Groq (pour générer du contenu et corriger les quiz)
+- **Emails** : Brevo (pour envoyer les confirmations)
 
-5. Load fixtures (optional)
-```bash
-php bin/console doctrine:fixtures:load
-```
+## Configuration importante
 
-6. Start the development server
-```bash
-symfony server:start
-```
+Dans le fichier `.env`, il faut configurer :
 
-7. Access the application
-- Frontend: http://localhost:8000
-- Backend: http://localhost:8000/backoffice
-
-### Configuration
-
-#### Required API Keys
-
-- **GROQ_API_KEY**: For AI-powered features
-- **BREVO_API_KEY**: For email notifications
-- **WEATHER_API_KEY**: For weather integration
-
-#### Email Configuration
-
-Configure Brevo (Sendinblue) in `.env`:
 ```env
-MAILER_DSN=brevo+api://your-api-key@default
-MAIL_FROM_EMAIL=your-verified-email@example.com
+# Base de données
+DATABASE_URL="mysql://root:@127.0.0.1:3306/autolearn_db"
+
+# Email (Brevo)
+BREVO_API_KEY=ta_clé_api
+MAIL_FROM_EMAIL=autolearn66@gmail.com
+
+# IA (Groq)
+GROQ_API_KEY=ta_clé_api
+GROQ_MODEL=llama-3.3-70b-versatile
 ```
 
-## Testing
-
-Run PHPStan static analysis:
-```bash
-vendor/bin/phpstan analyse
+## Structure du projet
+```
+autolearn/
+├── src/                 # Code PHP (Controllers, Services, Entities)
+├── templates/           # Pages HTML (Twig)
+├── public/              # CSS, JS, images
+├── migrations/          # Migrations base de données
+└── config/              # Configuration Symfony
 ```
 
-Run unit tests:
-```bash
-php bin/phpunit
-```
+## Besoin d'aide ?
+Contacte-nous : autolearn66@gmail.com
 
-## Quality Assurance
-
-- ✅ PHPStan Level 1 compliant (0 errors)
-- ✅ Doctrine schema validated
-- ✅ N+1 query optimization implemented
-- ✅ Email notifications tested and functional
-
-## Acknowledgments
-
-Special thanks to:
-- **Esprit School of Engineering** for providing the academic framework
-- Our project supervisor for guidance and support
-- The Symfony community for excellent documentation
-- Groq for providing AI API access
-
----
-
-**© 2026 AutoLearn - Esprit School of Engineering**

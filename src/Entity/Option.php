@@ -23,7 +23,7 @@ class Option
         minMessage: "L'option doit contenir au moins {{ limit }} caractère.",
         maxMessage: "L'option ne peut pas dépasser {{ limit }} caractères."
     )]
-    private ?string $texteOption = null;
+    private string $texteOption;
 
     #[ORM\Column]
     #[Assert\NotNull(message: "Vous devez préciser si l'option est correcte ou non.")]
@@ -31,7 +31,7 @@ class Option
         type: 'bool',
         message: "La valeur doit être un booléen (vrai ou faux)."
     )]
-    private ?bool $estCorrecte = null;
+    private bool $estCorrecte;
 
     #[ORM\ManyToOne(inversedBy: 'options')]
     #[ORM\JoinColumn(nullable: false)]
@@ -43,7 +43,7 @@ class Option
         return $this->id;
     }
 
-    public function getTexteOption(): ?string
+    public function getTexteOption(): string
     {
         return $this->texteOption;
     }
@@ -54,7 +54,7 @@ class Option
         return $this;
     }
 
-    public function isEstCorrecte(): ?bool
+    public function isEstCorrecte(): bool
     {
         return $this->estCorrecte;
     }

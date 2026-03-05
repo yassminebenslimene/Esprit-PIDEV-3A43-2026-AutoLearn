@@ -9,11 +9,6 @@ doctrine:
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
         
-        # Fix timezone mismatch: Set MySQL timezone to +00:00 (UTC offset)
-        # Using offset instead of 'UTC' because timezone tables are not loaded
-        options:
-            1002: "SET time_zone = '+00:00'"  # PDO::MYSQL_ATTR_INIT_COMMAND
-        
         # Ignorer les tables d'audit lors des mises à jour de schéma
         # Le filtre accepte les tables qui NE correspondent PAS au pattern (negative lookahead)
         schema_filter: '/^(?!.*_audit$)(?!revisions$).*$/'
