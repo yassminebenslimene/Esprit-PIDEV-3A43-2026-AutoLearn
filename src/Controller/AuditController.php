@@ -24,8 +24,8 @@ class AuditController extends AbstractController
         $connection = $this->entityManager->getConnection();
         
         // Direct simple test
-        $testQuery = "SELECT COUNT(*) as count FROM user_audit WHERE discr = 'etudiant'";
-        $testResult = $connection->executeQuery($testQuery)->fetchAssociative();
+        $testQuery = "SELECT COUNT(*) as count FROM user_audit WHERE discr = :discr";
+        $testResult = $connection->executeQuery($testQuery, ['discr' => 'etudiant'])->fetchAssociative();
         
         $studentRevisions = [];
         $contentRevisions = [];
@@ -63,12 +63,12 @@ class AuditController extends AbstractController
                             FROM user_audit ua2 
                             WHERE ua2.userId = ua.userId AND ua2.rev < ua.rev
                         )
-                    WHERE ua.userId IS NOT NULL AND ua.discr = 'etudiant'
+                    WHERE ua.userId IS NOT NULL AND ua.discr = :discr
                     ORDER BY r.timestamp DESC 
                     LIMIT 100
                 ";
                 
-                $studentRevisions = $connection->executeQuery($studentSql)->fetchAllAssociative();
+                $studentRevisions = $connection->executeQuery($studentSql, ['discr' => 'etudiant'])->fetchAllAssociative();
             } catch (\Exception $e) {
                 // Store error for display
                 $studentRevisions = [];
@@ -263,11 +263,11 @@ class AuditController extends AbstractController
                          FROM user_audit ua2 
                          WHERE ua2.userId = ua.userId AND ua2.rev < ua.rev
                      )
-                 WHERE ua.discr = 'etudiant'
+                 WHERE ua.discr = :discr
                  GROUP BY 1
                  HAVING count > 0
                  ORDER BY count DESC"
-            )->fetchAllAssociative();
+            , ['discr' => 'etudiant'])->fetchAllAssociative();
             
             $stats['recent_activity'] = $connection->executeQuery(
                 "SELECT DATE(r.timestamp) as date, COUNT(*) as count 
@@ -282,11 +282,11 @@ class AuditController extends AbstractController
                 "SELECT r.username, COUNT(*) as count 
                  FROM revisions r
                  INNER JOIN user u ON u.email = r.username
-                 WHERE r.username IS NOT NULL AND u.role = 'ADMIN'
+                 WHERE r.username IS NOT NULL AND u.role = :role
                  GROUP BY r.username 
                  ORDER BY count DESC 
                  LIMIT 10"
-            )->fetchAllAssociative();
+            , ['role' => 'ADMIN'])->fetchAllAssociative();
             
             // Get admin info for active admins
             foreach ($stats['active_admins'] as &$activeAdmin) {
@@ -299,11 +299,11 @@ class AuditController extends AbstractController
             $stats['active_students'] = $connection->executeQuery(
                 "SELECT ua.userId, ua.nom, ua.prenom, COUNT(*) as count 
                  FROM user_audit ua
-                 WHERE ua.discr = 'etudiant'
+                 WHERE ua.discr = :discr
                  GROUP BY ua.userId, ua.nom, ua.prenom
                  ORDER BY count DESC 
                  LIMIT 10"
-            )->fetchAllAssociative();
+            , ['discr' => 'etudiant'])->fetchAllAssociative();
             
             // Get student info for active students
             foreach ($stats['active_students'] as &$activeStudent) {

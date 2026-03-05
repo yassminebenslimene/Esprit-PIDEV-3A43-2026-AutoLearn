@@ -63,7 +63,9 @@ class TestAuditCommand extends Command
             $io->section('Audit Tables Found:');
             foreach ($tables as $table) {
                 $tableName = array_values($table)[0];
-                $count = $connection->executeQuery("SELECT COUNT(*) FROM $tableName")->fetchOne();
+                $count = $connection->executeQuery(
+                    'SELECT COUNT(*) FROM ' . $connection->quoteIdentifier($tableName)
+                )->fetchOne();
                 $io->writeln("  - $tableName: $count entries");
             }
             
