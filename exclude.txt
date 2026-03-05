@@ -1,5 +1,0 @@
-var\
-vendor\
-node_modules\
-.git\
-.env.local

@@ -18,25 +18,25 @@ class Challenge
 
     #[ORM\Column(length: 20)]
     #[Assert\NotBlank(message: "Le titre ne peut pas être vide.")]
-    private ?string $titre = null;
+    private string $titre;
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: "La description ne peut pas être vide.")]
-    private ?string $description = null;
+    private string $description;
 
     #[ORM\Column(type: 'integer')]
     #[Assert\NotBlank(message: "La durée ne peut pas être vide.")]
     #[Assert\Positive(message: "La durée doit être un nombre positif.")]
-    private ?int $duree = null; // Durée en minutes
+    private int $duree; // Durée en minutes
 
     #[ORM\Column(length: 15)]
     #[Assert\NotBlank(message: "Le niveau ne peut pas être vide.")]
     #[Assert\Choice(choices: ["Débutant", "Intermédiaire", "Avancé"], message: "Le niveau doit être l'un des suivants : Débutant, Intermédiaire, Avancé.")]
-    private ?string $niveau = null;
+    private string $niveau;
 
     #[ORM\ManyToOne(inversedBy: 'challenges')]
     #[ORM\JoinColumn(name: "created_by_id", referencedColumnName: "userId", nullable: false, onDelete: "CASCADE")]
-    private ?User $createdBy = null;
+    private User $createdBy;
 
     /**
      * @var Collection<int, Exercice>
@@ -59,7 +59,7 @@ class Challenge
     /**
      * @var Collection<int, Vote>
      */
-    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'challenge', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'challenge', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $votes;
 
     public function __construct()
@@ -75,7 +75,7 @@ class Challenge
         return $this->id;
     }
 
-    public function getTitre(): ?string
+    public function getTitre(): string
     {
         return $this->titre;
     }
@@ -86,7 +86,7 @@ class Challenge
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -97,7 +97,7 @@ class Challenge
         return $this;
     }
 
-    public function getDuree(): ?int
+    public function getDuree(): int
     {
         return $this->duree;
     }
@@ -108,7 +108,7 @@ class Challenge
         return $this;
     }
 
-    public function getNiveau(): ?string
+    public function getNiveau(): string
     {
         return $this->niveau;
     }
@@ -119,12 +119,12 @@ class Challenge
         return $this;
     }
 
-    public function getCreatedBy(): ?User
+    public function getCreatedBy(): User
     {
         return $this->createdBy;
     }
 
-    public function setCreatedBy(?User $createdBy): static
+    public function setCreatedBy(User $createdBy): static
     {
         $this->createdBy = $createdBy;
         return $this;

@@ -8,6 +8,7 @@ use App\Repository\ParticipationRepository;
 use App\Repository\EquipeRepository;
 use App\Repository\EvenementRepository;
 use App\Service\EmailService;
+use App\Service\QrCodeService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -156,7 +157,8 @@ class FrontofficeParticipationController extends AbstractController
         EntityManagerInterface $entityManager,
         EquipeRepository $equipeRepository,
         EvenementRepository $evenementRepository,
-        EmailService $emailService
+        EmailService $emailService,
+        QrCodeService $qrCodeService
     ): Response
     {
         $equipe = $equipeRepository->find($equipeId);
@@ -210,10 +212,13 @@ class FrontofficeParticipationController extends AbstractController
                 try {
                     $emailService->sendParticipationConfirmation(
                         $email,
-                        $etudiant->getPrenom() . ' ' . $etudiant->getNom(),
+                        $etudiant->getPrenom(),
+                        $etudiant->getNom(),
+                        $equipe->getNom(),
                         $evenement->getTitre(),
                         $evenement->getDateDebut(),
-                        $evenement->getLieu()
+                        $evenement->getLieu(),
+                        $participation->getId()
                     );
                     $successCount++;
                     $debugInfo[] = '  ✅ Email sent successfully to ' . $email;

@@ -21,7 +21,7 @@ class Vote
     private ?User $user = null;
 
     #[ORM\ManyToOne(targetEntity: Challenge::class, inversedBy: "votes")]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
     private ?Challenge $challenge = null;
 
     #[ORM\Column(type: "datetime_immutable")]

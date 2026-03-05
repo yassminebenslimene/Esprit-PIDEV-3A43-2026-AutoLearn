@@ -2,24 +2,22 @@
 
 namespace App\Service;
 
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
-use Symfony\Component\Mime\Address;
 use Twig\Environment;
 
 class EmailService
 {
-    private MailerInterface $mailer;
     private Environment $twig;
     private string $fromEmail;
     private string $fromName;
+    private QrCodeService $qrCodeService;
 
-    public function __construct(MailerInterface $mailer, Environment $twig)
-    {
-        $this->mailer = $mailer;
+    public function __construct(
+        Environment $twig, 
+        QrCodeService $qrCodeService
+    ) {
         $this->twig = $twig;
-        // L'email de ton sender identity SendGrid
-        $this->fromEmail = 'autolearnplateforme@gmail.com';
+        $this->qrCodeService = $qrCodeService;
+        $this->fromEmail = 'autolearn66@gmail.com';
         $this->fromName = 'Autolearn Platform';
     }
 
@@ -28,13 +26,35 @@ class EmailService
      */
     public function sendTestEmail(string $toEmail): void
     {
-        $email = (new Email())
-            ->from(new Address($this->fromEmail, $this->fromName))
-            ->to($toEmail)
-            ->subject('Test Email - Autolearn Platform')
-            ->html('<h1>Test réussi !</h1><p>Ton intégration SendGrid fonctionne parfaitement.</p>');
+        $client = new \GuzzleHttp\Client();
+        $apiKey = $_ENV['BREVO_API_KEY'] ?? '';
+        
+        $response = $client->post('https://api.brevo.com/v3/smtp/email', [
+            'headers' => [
+                'api-key' => $apiKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'json' => [
+                'sender' => [
+                    'name' => $this->fromName,
+                    'email' => $this->fromEmail
+                ],
+                'to' => [
+                    [
+                        'email' => $toEmail,
+                        'name' => 'Test User'
+                    ]
+                ],
+                'subject' => 'Test Email - Autolearn Platform',
+                'htmlContent' => '<h1>Test réussi !</h1><p>Ton intégration Brevo fonctionne parfaitement.</p>',
+            ],
+            'timeout' => 10
+        ]);
 
-        $this->mailer->send($email);
+        if ($response->getStatusCode() !== 201) {
+            throw new \Exception('Failed to send email via Brevo API');
+        }
     }
 
     /**
@@ -42,25 +62,69 @@ class EmailService
      */
     public function sendParticipationConfirmation(
         string $toEmail,
-        string $studentName,
+        string $studentFirstName,
+        string $studentLastName,
+        string $teamName,
         string $eventName,
         \DateTimeInterface $eventDate,
-        string $eventLocation
+        string $eventLocation,
+        int $participationId
     ): void {
+        $studentName = $studentFirstName . ' ' . $studentLastName;
+        
+        // Générer le QR code
+        $qrCodeData = null;
+        try {
+            $qrData = $this->qrCodeService->generateParticipationData(
+                $participationId,
+                $studentName,
+                $eventName,
+                $eventDate
+            );
+            $qrCodeData = $this->qrCodeService->generateQrCodeBase64($qrData);
+        } catch (\Exception $e) {
+            // QR code generation failed, continue without it
+        }
+        
         $html = $this->twig->render('emails/participation_confirmation.html.twig', [
             'studentName' => $studentName,
+            'teamName' => $teamName,
             'eventName' => $eventName,
             'eventDate' => $eventDate,
             'eventLocation' => $eventLocation,
+            'qrCodeData' => $qrCodeData,
         ]);
 
-        $email = (new Email())
-            ->from(new Address($this->fromEmail, $this->fromName))
-            ->to($toEmail)
-            ->subject('Participation Confirmed - ' . $eventName)
-            ->html($html);
+        // Utiliser BrevoMailService avec GuzzleHttp
+        $client = new \GuzzleHttp\Client();
+        $apiKey = $_ENV['BREVO_API_KEY'] ?? '';
+        
+        $response = $client->post('https://api.brevo.com/v3/smtp/email', [
+            'headers' => [
+                'api-key' => $apiKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'json' => [
+                'sender' => [
+                    'name' => $this->fromName,
+                    'email' => $this->fromEmail
+                ],
+                'to' => [
+                    [
+                        'email' => $toEmail,
+                        'name' => $studentName
+                    ]
+                ],
+                'subject' => 'Participation Confirmed - ' . $eventName,
+                'htmlContent' => $html,
+            ],
+            'timeout' => 10
+        ]);
 
-        $this->mailer->send($email);
+        if ($response->getStatusCode() !== 201) {
+            throw new \Exception('Failed to send email via Brevo API: ' . $response->getBody()->getContents());
+        }
     }
 
     /**
@@ -82,13 +146,35 @@ class EmailService
             'eventLocation' => $eventLocation,
         ]);
 
-        $email = (new Email())
-            ->from(new Address($this->fromEmail, $this->fromName))
-            ->to($toEmail)
-            ->subject('⚠️ Event Cancelled - ' . $eventName)
-            ->html($html);
+        $client = new \GuzzleHttp\Client();
+        $apiKey = $_ENV['BREVO_API_KEY'] ?? '';
+        
+        $response = $client->post('https://api.brevo.com/v3/smtp/email', [
+            'headers' => [
+                'api-key' => $apiKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'json' => [
+                'sender' => [
+                    'name' => $this->fromName,
+                    'email' => $this->fromEmail
+                ],
+                'to' => [
+                    [
+                        'email' => $toEmail,
+                        'name' => $studentName
+                    ]
+                ],
+                'subject' => '⚠️ Event Cancelled - ' . $eventName,
+                'htmlContent' => $html,
+            ],
+            'timeout' => 10
+        ]);
 
-        $this->mailer->send($email);
+        if ($response->getStatusCode() !== 201) {
+            throw new \Exception('Failed to send email via Brevo API');
+        }
     }
     
     /**
@@ -110,13 +196,35 @@ class EmailService
             'eventLocation' => $eventLocation,
         ]);
 
-        $email = (new Email())
-            ->from(new Address($this->fromEmail, $this->fromName))
-            ->to($toEmail)
-            ->subject('🚀 Event Started - ' . $eventName)
-            ->html($html);
+        $client = new \GuzzleHttp\Client();
+        $apiKey = $_ENV['BREVO_API_KEY'] ?? '';
+        
+        $response = $client->post('https://api.brevo.com/v3/smtp/email', [
+            'headers' => [
+                'api-key' => $apiKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'json' => [
+                'sender' => [
+                    'name' => $this->fromName,
+                    'email' => $this->fromEmail
+                ],
+                'to' => [
+                    [
+                        'email' => $toEmail,
+                        'name' => $studentName
+                    ]
+                ],
+                'subject' => '🚀 Event Started - ' . $eventName,
+                'htmlContent' => $html,
+            ],
+            'timeout' => 10
+        ]);
 
-        $this->mailer->send($email);
+        if ($response->getStatusCode() !== 201) {
+            throw new \Exception('Failed to send email via Brevo API');
+        }
     }
 
     /**
@@ -136,13 +244,35 @@ class EmailService
             'eventLocation' => $eventLocation,
         ]);
 
-        $email = (new Email())
-            ->from(new Address($this->fromEmail, $this->fromName))
-            ->to($toEmail)
-            ->subject('Reminder: ' . $eventName . ' in 3 days')
-            ->html($html);
+        $client = new \GuzzleHttp\Client();
+        $apiKey = $_ENV['BREVO_API_KEY'] ?? '';
+        
+        $response = $client->post('https://api.brevo.com/v3/smtp/email', [
+            'headers' => [
+                'api-key' => $apiKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'json' => [
+                'sender' => [
+                    'name' => $this->fromName,
+                    'email' => $this->fromEmail
+                ],
+                'to' => [
+                    [
+                        'email' => $toEmail,
+                        'name' => $studentName
+                    ]
+                ],
+                'subject' => 'Reminder: ' . $eventName . ' in 3 days',
+                'htmlContent' => $html,
+            ],
+            'timeout' => 10
+        ]);
 
-        $this->mailer->send($email);
+        if ($response->getStatusCode() !== 201) {
+            throw new \Exception('Failed to send email via Brevo API');
+        }
     }
 
     /**
@@ -162,13 +292,35 @@ class EmailService
             'communityUrl' => $communityUrl,
         ]);
 
-        $email = (new Email())
-            ->from(new Address($this->fromEmail, $this->fromName))
-            ->to($toEmail)
-            ->subject('Invitation à rejoindre ' . $communityName)
-            ->html($html);
+        $client = new \GuzzleHttp\Client();
+        $apiKey = $_ENV['BREVO_API_KEY'] ?? '';
+        
+        $response = $client->post('https://api.brevo.com/v3/smtp/email', [
+            'headers' => [
+                'api-key' => $apiKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'json' => [
+                'sender' => [
+                    'name' => $this->fromName,
+                    'email' => $this->fromEmail
+                ],
+                'to' => [
+                    [
+                        'email' => $toEmail,
+                        'name' => $memberName
+                    ]
+                ],
+                'subject' => 'Invitation à rejoindre ' . $communityName,
+                'htmlContent' => $html,
+            ],
+            'timeout' => 10
+        ]);
 
-        $this->mailer->send($email);
+        if ($response->getStatusCode() !== 201) {
+            throw new \Exception('Failed to send email via Brevo API');
+        }
     }
 
     /**
@@ -191,12 +343,35 @@ class EmailService
             'completedAt' => $completedAt,
         ]);
 
-        $email = (new Email())
-            ->from(new Address($this->fromEmail, $this->fromName))
-            ->to($toEmail)
-            ->subject('🎉 Challenge Completed - ' . $challengeName)
-            ->html($html);
+        $client = new \GuzzleHttp\Client();
+        $apiKey = $_ENV['BREVO_API_KEY'] ?? '';
+        
+        $response = $client->post('https://api.brevo.com/v3/smtp/email', [
+            'headers' => [
+                'api-key' => $apiKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'json' => [
+                'sender' => [
+                    'name' => $this->fromName,
+                    'email' => $this->fromEmail
+                ],
+                'to' => [
+                    [
+                        'email' => $toEmail,
+                        'name' => 'User'
+                    ]
+                ],
+                'subject' => '🎉 Challenge Completed - ' . $challengeName,
+                'htmlContent' => $html,
+            ],
+            'timeout' => 10
+        ]);
 
-        $this->mailer->send($email);
+        if ($response->getStatusCode() !== 201) {
+            throw new \Exception('Failed to send email via Brevo API');
+        }
     }
 }
+

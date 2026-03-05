@@ -29,14 +29,14 @@ class Cours
         pattern: '/^[a-zA-Z0-9\s\-_\'éèêëàâäîïôöûüç]+$/',
         message: 'Le titre contient des caractères non autorisés.'
     )]
-    private ?string $titre = null;
+    private string $titre;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\Length(
         max: 2000,
         maxMessage: 'La description ne doit pas dépasser {{ limit }} caractères.'
     )]
-    private ?string $description = null;
+    private string $description;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'La matière est obligatoire.')]
@@ -44,7 +44,7 @@ class Cours
         max: 255,
         maxMessage: 'La matière ne doit pas dépasser {{ limit }} caractères.'
     )]
-    private ?string $matiere = null;
+    private string $matiere;
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: 'Le niveau est obligatoire.')]
@@ -84,7 +84,7 @@ class Cours
         return $this->id;
     }
 
-    public function getTitre(): ?string
+    public function getTitre(): string
     {
         return $this->titre;
     }
@@ -96,7 +96,7 @@ class Cours
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -108,7 +108,7 @@ class Cours
         return $this;
     }
 
-    public function getMatiere(): ?string
+    public function getMatiere(): string
     {
         return $this->matiere;
     }
