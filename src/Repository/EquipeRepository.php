@@ -16,21 +16,6 @@ class EquipeRepository extends ServiceEntityRepository
         parent::__construct($registry, Equipe::class);
     }
 
-    /**
-     * Trouve toutes les équipes avec leurs événements et étudiants (optimisé pour éviter N+1)
-     * @return Equipe[]
-     */
-    public function findAllWithEvenement(): array
-    {
-        return $this->createQueryBuilder('e')
-            ->leftJoin('e.evenement', 'ev')
-            ->addSelect('ev')
-            ->leftJoin('e.etudiants', 'et')
-            ->addSelect('et')
-            ->getQuery()
-            ->getResult();
-    }
-
     //    /**
     //     * @return Equipe[] Returns an array of Equipe objects
     //     */

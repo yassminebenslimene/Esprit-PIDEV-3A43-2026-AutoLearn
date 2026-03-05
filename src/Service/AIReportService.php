@@ -17,13 +17,13 @@ class AIReportService
     public function __construct(
         HttpClientInterface $httpClient,
         FeedbackAnalyticsService $analyticsService,
-        string $huggingfaceApiKey
+        string $huggingfaceApiKey,
+        string $huggingfaceModel
     ) {
         $this->httpClient = $httpClient;
         $this->analyticsService = $analyticsService;
-        // Utiliser Groq au lieu de Hugging Face
-        $this->apiKey = $_ENV['GROQ_API_KEY'] ?? $huggingfaceApiKey;
-        $this->model = $_ENV['GROQ_MODEL'] ?? 'meta-llama/llama-4-scout-17b-16e-instruct';
+        $this->apiKey = $huggingfaceApiKey;
+        $this->model = $huggingfaceModel;
     }
 
     /**
@@ -202,15 +202,15 @@ PROMPT;
     }
 
     /**
-     * Appelle l'API Groq pour générer les rapports
+     * Appelle l'API Groq (au lieu de Mistral/Hugging Face)
      */
     private function callMistralAPI(string $prompt): ?string
     {
         try {
-            // Utiliser Groq API
-            $groqApiKey = $this->apiKey;
-            $groqModel = $this->model;
-            $groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
+            // Utiliser Groq API qui est déjà configuré
+            $groqApiKey = $_ENV['GROQ_API_KEY'] ?? '';
+            $groqApiUrl = $_ENV['GROQ_API_URL'] ?? 'https://api.groq.com/openai/v1/chat/completions';
+            $groqModel = $_ENV['GROQ_MODEL'] ?? 'llama-3.1-8b-instant';
             
             if (empty($groqApiKey) || $groqApiKey === 'your_groq_api_key_here') {
                 throw new \Exception('Clé API Groq non configurée. Vérifiez GROQ_API_KEY dans .env');
@@ -241,7 +241,7 @@ PROMPT;
             
             if ($statusCode !== 200) {
                 $errorBody = $response->getContent(false);
-                error_log('Erreur API Groq Response: ' . $errorBody);
+                error_log('Erreur API Response: ' . $errorBody);
                 throw new \Exception('API Groq a retourné le code ' . $statusCode);
             }
 

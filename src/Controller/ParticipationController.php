@@ -18,7 +18,7 @@ final class ParticipationController extends AbstractController
     public function index(ParticipationRepository $participationRepository, EntityManagerInterface $entityManager): Response
     {
         // Nettoyer automatiquement les participations refusées
-        $allParticipations = $participationRepository->findAllWithEvenement();
+        $allParticipations = $participationRepository->findAll();
         $deletedCount = 0;
         
         foreach ($allParticipations as $participation) {
@@ -35,10 +35,6 @@ final class ParticipationController extends AbstractController
         
         // Récupérer uniquement les participations acceptées ou en attente
         $participations = $participationRepository->createQueryBuilder('p')
-            ->leftJoin('p.evenement', 'e')
-            ->addSelect('e')
-            ->leftJoin('p.equipe', 'eq')
-            ->addSelect('eq')
             ->where('p.statut != :refuse')
             ->setParameter('refuse', 'Refusé')
             ->getQuery()

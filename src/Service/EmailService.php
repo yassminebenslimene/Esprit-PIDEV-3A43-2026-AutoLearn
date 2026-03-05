@@ -3,14 +3,10 @@
 namespace App\Service;
 
 use Twig\Environment;
-use Endroid\QrCode\QrCode;
-use Endroid\QrCode\Writer\PngWriter;
 
 class EmailService
 {
     private Environment $twig;
-    private CertificateService $certificateService;
-    private BadgeService $badgeService;
     private string $fromEmail;
     private string $fromName;
     private QrCodeService $qrCodeService;
@@ -62,7 +58,7 @@ class EmailService
     }
 
     /**
-     * Envoie un email de confirmation de participation avec QR code et fichier .ics
+     * Envoie un email de confirmation de participation
      */
     public function sendParticipationConfirmation(
         string $toEmail,
@@ -142,21 +138,13 @@ class EmailService
         \DateTimeInterface $eventDate,
         string $eventLocation
     ): void {
-        try {
-            if ($this->logger) {
-                $this->logger->info('Début envoi email d\'annulation', [
-                    'to' => $toEmail,
-                    'event' => $eventName
-                ]);
-            }
-            
-            $html = $this->twig->render('emails/event_cancelled.html.twig', [
-                'studentName' => $studentName,
-                'teamName' => $teamName,
-                'eventName' => $eventName,
-                'eventDate' => $eventDate,
-                'eventLocation' => $eventLocation,
-            ]);
+        $html = $this->twig->render('emails/event_cancelled.html.twig', [
+            'studentName' => $studentName,
+            'teamName' => $teamName,
+            'eventName' => $eventName,
+            'eventDate' => $eventDate,
+            'eventLocation' => $eventLocation,
+        ]);
 
         $client = new \GuzzleHttp\Client();
         $apiKey = $_ENV['BREVO_API_KEY'] ?? '';
@@ -384,89 +372,6 @@ class EmailService
         if ($response->getStatusCode() !== 201) {
             throw new \Exception('Failed to send email via Brevo API');
         }
-    }
-    
-    /**
-     * Envoie un certificat de participation par email
-     */
-    public function sendCertificate(
-        string $toEmail,
-        string $studentFirstName,
-        string $studentLastName,
-        string $eventName,
-        string $eventType,
-        \DateTimeInterface $eventDate
-    ): void {
-        // Générer le certificat PDF
-        $pdfContent = $this->certificateService->generateCertificate(
-            $studentFirstName,
-            $studentLastName,
-            $eventName,
-            $eventType,
-            $eventDate
-        );
-        
-        $html = <<<HTML
-<html>
-<body style="font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5;">
-    <div style="max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px;">
-        <h1 style="color: #667eea; text-align: center;">Congratulations!</h1>
-        <p style="font-size: 16px; color: #333; line-height: 1.6;">
-            Dear <strong>{$studentFirstName} {$studentLastName}</strong>,
-        </p>
-        <p style="font-size: 16px; color: #333; line-height: 1.6;">
-            Thank you for your participation in <strong>{$eventName}</strong>!
-        </p>
-        <p style="font-size: 16px; color: #333; line-height: 1.6;">
-            Please find attached your certificate of participation. You can print it for your records.
-        </p>
-        <p style="font-size: 16px; color: #333; line-height: 1.6; margin-top: 30px;">
-            Best regards,<br>
-            <strong>Autolearn Platform Team</strong>
-        </p>
-    </div>
-</body>
-</html>
-HTML;
-
-        $email = (new Email())
-            ->from(new Address($this->fromEmail, $this->fromName))
-            ->to($toEmail)
-            ->subject('Your Certificate - ' . $eventName)
-            ->html($html)
-            ->addPart(new DataPart($pdfContent, 'certificate.pdf', 'application/pdf'));
-
-        $this->mailer->send($email);
-    }
-    
-    /**
-     * Génère un fichier .ics pour ajouter l'événement au calendrier
-     */
-    private function generateIcsFile(
-        string $eventName,
-        \DateTimeInterface $eventDate,
-        string $location
-    ): string {
-        $dtStart = $eventDate->format('Ymd\THis');
-        $dtEnd = (clone $eventDate)->modify('+2 hours')->format('Ymd\THis');
-        $now = (new \DateTime())->format('Ymd\THis');
-        
-        return <<<ICS
-BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Autolearn Platform//Event//EN
-BEGIN:VEVENT
-UID:{$now}@autolearn.com
-DTSTAMP:{$now}
-DTSTART:{$dtStart}
-DTEND:{$dtEnd}
-SUMMARY:{$eventName}
-LOCATION:{$location}
-DESCRIPTION:You are registered for this event on Autolearn Platform
-STATUS:CONFIRMED
-END:VEVENT
-END:VCALENDAR
-ICS;
     }
 }
 

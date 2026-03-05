@@ -33,6 +33,7 @@ services:
     App\Service\AIReportService:
         arguments:
             $huggingfaceApiKey: '%env(HUGGINGFACE_API_KEY)%'
+            $huggingfaceModel: '%env(HUGGINGFACE_MODEL)%'
     
     App\Service\FeedbackAnalyticsService:
         arguments: []

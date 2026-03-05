@@ -25,14 +25,10 @@ class FrontofficeParticipationController extends AbstractController
     {
         $user = $this->getUser();
         
-        // Récupérer TOUTES les participations des équipes où l'utilisateur est membre (optimisé)
+        // Récupérer TOUTES les participations des équipes où l'utilisateur est membre
         $allParticipations = $participationRepository->createQueryBuilder('p')
-            ->leftJoin('p.evenement', 'ev')
-            ->addSelect('ev')
             ->join('p.equipe', 'e')
-            ->addSelect('e')
             ->join('e.etudiants', 'et')
-            ->addSelect('et')
             ->where('et.id = :userId')
             ->setParameter('userId', $user->getId())
             ->getQuery()
@@ -50,14 +46,10 @@ class FrontofficeParticipationController extends AbstractController
             $entityManager->flush();
         }
         
-        // Récupérer uniquement les participations ACCEPTÉES ou EN_ATTENTE (optimisé)
+        // Récupérer uniquement les participations ACCEPTÉES ou EN_ATTENTE
         $participations = $participationRepository->createQueryBuilder('p')
-            ->leftJoin('p.evenement', 'ev')
-            ->addSelect('ev')
             ->join('p.equipe', 'e')
-            ->addSelect('e')
             ->join('e.etudiants', 'et')
-            ->addSelect('et')
             ->where('et.id = :userId')
             ->andWhere('p.statut != :refuse')
             ->setParameter('userId', $user->getId())

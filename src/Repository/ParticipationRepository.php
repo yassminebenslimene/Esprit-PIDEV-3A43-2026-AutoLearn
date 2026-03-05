@@ -16,21 +16,6 @@ class ParticipationRepository extends ServiceEntityRepository
         parent::__construct($registry, Participation::class);
     }
 
-    /**
-     * Trouve toutes les participations avec leurs événements (optimisé pour éviter N+1)
-     * @return Participation[]
-     */
-    public function findAllWithEvenement(): array
-    {
-        return $this->createQueryBuilder('p')
-            ->leftJoin('p.evenement', 'e')
-            ->addSelect('e')
-            ->leftJoin('p.equipe', 'eq')
-            ->addSelect('eq')
-            ->getQuery()
-            ->getResult();
-    }
-
     //    /**
     //     * @return Participation[] Returns an array of Participation objects
     //     */

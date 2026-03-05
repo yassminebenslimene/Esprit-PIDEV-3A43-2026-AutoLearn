@@ -10,8 +10,7 @@ doctrine:
         use_savepoints: true
         
         # Ignorer les tables d'audit lors des mises à jour de schéma
-        # Le filtre accepte les tables qui NE correspondent PAS au pattern (negative lookahead)
-        schema_filter: '/^(?!.*_audit$)(?!revisions$).*$/'
+        schema_filter: ~^(?!user_audit|revisions)~
         
     orm:
         auto_generate_proxy_classes: true

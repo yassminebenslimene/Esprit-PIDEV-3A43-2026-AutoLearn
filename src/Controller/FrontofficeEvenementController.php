@@ -25,16 +25,7 @@ class FrontofficeEvenementController extends AbstractController
         EntityManagerInterface $entityManager,
         WeatherService $weatherService
     ): Response {
-        // Charger tous les événements avec leurs participations, équipes ET étudiants en une seule query (optimisé)
-        $evenements = $evenementRepository->createQueryBuilder('e')
-            ->leftJoin('e.participations', 'p')
-            ->addSelect('p')
-            ->leftJoin('p.equipe', 'eq')
-            ->addSelect('eq')
-            ->leftJoin('eq.etudiants', 'et')
-            ->addSelect('et')
-            ->getQuery()
-            ->getResult();
+        $evenements = $evenementRepository->findAll();
         
         // Pour chaque événement, mettre à jour le statut et calculer les places disponibles
         $evenementsData = [];
@@ -42,10 +33,13 @@ class FrontofficeEvenementController extends AbstractController
             // Mettre à jour le statut automatiquement
             $evenement->updateStatus();
             
-            // Filtrer les participations acceptées (déjà chargées)
-            $participationsAcceptees = $evenement->getParticipations()->filter(
-                fn($p) => $p->getStatut() === StatutParticipation::ACCEPTE
-            );
+            $participationsAcceptees = $participationRepository->createQueryBuilder('p')
+                ->where('p.evenement = :evenement')
+                ->andWhere('p.statut = :statut')
+                ->setParameter('evenement', $evenement)
+                ->setParameter('statut', 'Accepté')
+                ->getQuery()
+                ->getResult();
             
             $placesOccupees = count($participationsAcceptees);
             $placesDisponibles = $evenement->getNbMax() - $placesOccupees;
@@ -132,12 +126,8 @@ class FrontofficeEvenementController extends AbstractController
             return $this->redirectToRoute('app_events');
         }
         
-        // Récupérer les équipes participantes avec leurs étudiants en une seule query (optimisé)
+        // Récupérer les équipes participantes avec moins de 6 membres
         $participationsAcceptees = $participationRepository->createQueryBuilder('p')
-            ->leftJoin('p.equipe', 'eq')
-            ->addSelect('eq')
-            ->leftJoin('eq.etudiants', 'et')
-            ->addSelect('et')
             ->where('p.evenement = :evenement')
             ->andWhere('p.statut = :statut')
             ->setParameter('evenement', $evenement)

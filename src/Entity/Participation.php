@@ -24,7 +24,6 @@ class Participation
 
     #[ORM\ManyToOne(targetEntity: Evenement::class, inversedBy: "participations")]
     #[ORM\JoinColumn(nullable: false)]
-    #[ORM\BatchFetch(size: 10)]
     private Evenement $evenement;
 
     #[ORM\Column(length:50, enumType: StatutParticipation::class)]

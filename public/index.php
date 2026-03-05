@@ -1,8 +1,5 @@
 <?php
 
-// Set timezone to match MySQL configuration
-date_default_timezone_set('UTC');
-
 use App\Kernel;
 
 require_once dirname(__DIR__).'/vendor/autoload_runtime.php';

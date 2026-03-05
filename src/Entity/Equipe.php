@@ -24,10 +24,9 @@ class Equipe
 
     #[ORM\ManyToOne(targetEntity: Evenement::class, inversedBy: "equipes")]
     #[ORM\JoinColumn(nullable: false)]
-    #[ORM\BatchFetch(size: 10)]
     private Evenement $evenement;
 
-    #[ORM\ManyToMany(targetEntity: Etudiant::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\ManyToMany(targetEntity: Etudiant::class)]
     #[ORM\JoinTable(name: "equipe_etudiant",
         joinColumns: [new ORM\JoinColumn(name: "equipe_id", referencedColumnName: "id")],
         inverseJoinColumns: [new ORM\JoinColumn(name: "etudiant_id", referencedColumnName: "userId")]

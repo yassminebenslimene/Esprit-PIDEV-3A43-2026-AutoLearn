@@ -25,12 +25,9 @@ class FrontofficeEquipeController extends AbstractController
     {
         $user = $this->getUser();
         
-        // Récupérer les équipes où l'utilisateur est membre avec événement et étudiants (optimisé)
+        // Récupérer les équipes où l'utilisateur est membre
         $equipes = $equipeRepository->createQueryBuilder('e')
-            ->leftJoin('e.evenement', 'ev')
-            ->addSelect('ev')
             ->join('e.etudiants', 'et')
-            ->addSelect('et')
             ->where('et.id = :userId')
             ->setParameter('userId', $user->getId())
             ->getQuery()

@@ -3,4 +3,4 @@ parameters:
     paths:
         - src
     ignoreErrors:
-        - '#Attribute class Doctrine\\ORM\\Mapping\\BatchFetch does not exist#'
+        - '#Call to an undefined method#'
