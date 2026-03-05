@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Utils\LikeEscaper;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -47,7 +48,7 @@ class UserRepository extends ServiceEntityRepository
         ->where('u.nom LIKE :search')
         ->orWhere('u.prenom LIKE :search')
         ->orWhere('u.email LIKE :search')
-        ->setParameter('search', '%' . $search . '%')
+        ->setParameter('search', LikeEscaper::escapeAndWrap($search))
         ->getQuery()
         ->getResult();
 }

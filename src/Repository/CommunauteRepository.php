@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Communaute;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Utils\LikeEscaper;
 
 /**
  * @extends ServiceEntityRepository<Communaute>
@@ -25,7 +26,7 @@ class CommunauteRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('c')
             ->where('c.nom LIKE :search')
             ->orWhere('c.description LIKE :search')
-            ->setParameter('search', '%' . $search . '%')
+            ->setParameter('search', LikeEscaper::escapeAndWrap($search))
             ->orderBy('c.nom', 'ASC')
             ->getQuery()
             ->getResult();

@@ -16,6 +16,7 @@ use App\Repository\CommentaireRepository;
 use App\Repository\QuizRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use App\Utils\LikeEscaper;
 
 /**
  * Service d'exécution d'actions pour l'assistant IA
@@ -348,7 +349,7 @@ class ActionExecutorService
             $events = $qb->select('e')
                 ->from(\App\Entity\Evenement::class, 'e')
                 ->where('LOWER(e.titre) LIKE LOWER(:titre)')
-                ->setParameter('titre', '%' . $params['titre'] . '%')
+                ->setParameter('titre', LikeEscaper::escapeAndWrap($params['titre']))
                 ->setMaxResults(1)
                 ->getQuery()
                 ->getResult();
@@ -400,7 +401,7 @@ class ActionExecutorService
             $users = $qb->select('u')
                 ->from(\App\Entity\User::class, 'u')
                 ->where('LOWER(u.nom) LIKE LOWER(:nom)')
-                ->setParameter('nom', '%' . $params['nom'] . '%')
+                ->setParameter('nom', LikeEscaper::escapeAndWrap($params['nom']))
                 ->setMaxResults(1)
                 ->getQuery()
                 ->getResult();
@@ -416,7 +417,7 @@ class ActionExecutorService
             $users = $qb->select('u')
                 ->from(\App\Entity\User::class, 'u')
                 ->where('LOWER(u.prenom) LIKE LOWER(:prenom)')
-                ->setParameter('prenom', '%' . $params['prenom'] . '%')
+                ->setParameter('prenom', LikeEscaper::escapeAndWrap($params['prenom']))
                 ->setMaxResults(1)
                 ->getQuery()
                 ->getResult();
@@ -704,7 +705,7 @@ class ActionExecutorService
         // Recherche par nom ou email
         if (!empty($params['search'])) {
             $qb->andWhere('u.nom LIKE :search OR u.prenom LIKE :search OR u.email LIKE :search')
-                ->setParameter('search', '%' . $params['search'] . '%');
+                ->setParameter('search', LikeEscaper::escapeAndWrap($params['search']));
         }
 
         // Limiter les résultats
@@ -767,7 +768,7 @@ class ActionExecutorService
             $results = $qb->select('e')
                 ->from(\App\Entity\Evenement::class, 'e')
                 ->where('LOWER(e.titre) LIKE LOWER(:titre)')
-                ->setParameter('titre', '%' . $params['evenement_id'] . '%')
+                ->setParameter('titre', LikeEscaper::escapeAndWrap($params['evenement_id']))
                 ->setMaxResults(1)
                 ->getQuery()
                 ->getResult();
@@ -842,8 +843,8 @@ class ActionExecutorService
                         ->andWhere('LOWER(u.nom) LIKE LOWER(:nom)')
                         ->andWhere('u.role = :role')
                         ->andWhere('u.isSuspended = false')
-                        ->setParameter('prenom', '%' . $prenom1 . '%')
-                        ->setParameter('nom', '%' . $nom1 . '%')
+                        ->setParameter('prenom', LikeEscaper::escapeAndWrap($prenom1))
+                        ->setParameter('nom', LikeEscaper::escapeAndWrap($nom1))
                         ->setParameter('role', 'ETUDIANT')
                         ->setMaxResults(1)
                         ->getQuery()
@@ -863,8 +864,8 @@ class ActionExecutorService
                             ->andWhere('LOWER(u.prenom) LIKE LOWER(:prenom)')
                             ->andWhere('u.role = :role')
                             ->andWhere('u.isSuspended = false')
-                            ->setParameter('nom', '%' . $nom2 . '%')
-                            ->setParameter('prenom', '%' . $prenom2 . '%')
+                            ->setParameter('nom', LikeEscaper::escapeAndWrap($nom2))
+                            ->setParameter('prenom', LikeEscaper::escapeAndWrap($prenom2))
                             ->setParameter('role', 'ETUDIANT')
                             ->setMaxResults(1)
                             ->getQuery()
@@ -882,7 +883,7 @@ class ActionExecutorService
                                 ->orWhere('LOWER(CONCAT(u.nom, \' \', u.prenom)) LIKE :fullname')
                                 ->andWhere('u.role = :role')
                                 ->andWhere('u.isSuspended = false')
-                                ->setParameter('fullname', '%' . $fullName . '%')
+                                ->setParameter('fullname', LikeEscaper::escapeAndWrap($fullName))
                                 ->setParameter('role', 'ETUDIANT')
                                 ->setMaxResults(1)
                                 ->getQuery()

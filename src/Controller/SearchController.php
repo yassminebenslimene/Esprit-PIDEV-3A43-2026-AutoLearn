@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Utils\LikeEscaper;
 
 class SearchController extends AbstractController
 {
@@ -26,7 +27,7 @@ class SearchController extends AbstractController
             $coursResults = $entityManager->getRepository('App\Entity\GestionDeCours\Cours')
                 ->createQueryBuilder('c')
                 ->where('c.titre LIKE :query OR c.description LIKE :query')
-                ->setParameter('query', '%' . $query . '%')
+                ->setParameter('query', LikeEscaper::escapeAndWrap($query))
                 ->setMaxResults(10)
                 ->getQuery()
                 ->getResult();
@@ -45,7 +46,7 @@ class SearchController extends AbstractController
             $chapitreResults = $entityManager->getRepository('App\Entity\GestionDeCours\Chapitre')
                 ->createQueryBuilder('ch')
                 ->where('ch.titre LIKE :query OR ch.contenu LIKE :query')
-                ->setParameter('query', '%' . $query . '%')
+                ->setParameter('query', LikeEscaper::escapeAndWrap($query))
                 ->setMaxResults(10)
                 ->getQuery()
                 ->getResult();
@@ -65,7 +66,7 @@ class SearchController extends AbstractController
             $quizResults = $entityManager->getRepository('App\Entity\Quiz')
                 ->createQueryBuilder('q')
                 ->where('q.titre LIKE :query OR q.description LIKE :query')
-                ->setParameter('query', '%' . $query . '%')
+                ->setParameter('query', LikeEscaper::escapeAndWrap($query))
                 ->setMaxResults(10)
                 ->getQuery()
                 ->getResult();
@@ -86,7 +87,7 @@ class SearchController extends AbstractController
                 $eventResults = $entityManager->getRepository('App\Entity\Evenement')
                     ->createQueryBuilder('e')
                     ->where('e.titre LIKE :query OR e.description LIKE :query')
-                    ->setParameter('query', '%' . $query . '%')
+                    ->setParameter('query', LikeEscaper::escapeAndWrap($query))
                     ->setMaxResults(10)
                     ->getQuery()
                     ->getResult();
@@ -109,7 +110,7 @@ class SearchController extends AbstractController
                 $challengeResults = $entityManager->getRepository('App\Entity\Challenge')
                     ->createQueryBuilder('ch')
                     ->where('ch.titre LIKE :query OR ch.description LIKE :query')
-                    ->setParameter('query', '%' . $query . '%')
+                    ->setParameter('query', LikeEscaper::escapeAndWrap($query))
                     ->setMaxResults(10)
                     ->getQuery()
                     ->getResult();

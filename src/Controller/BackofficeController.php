@@ -29,6 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Utils\LikeEscaper;
 
 class BackofficeController extends AbstractController
 {
@@ -248,7 +249,7 @@ class BackofficeController extends AbstractController
                         ->where('u.nom LIKE :search')
                         ->orWhere('u.prenom LIKE :search')
                         ->orWhere('u.email LIKE :search')
-                        ->setParameter('search', '%' . $search . '%');
+                        ->setParameter('search', LikeEscaper::escapeAndWrap($search));
 
                     // Apply role filter to search query if present
                     if ($roleFilter && in_array($roleFilter, ['ADMIN', 'ETUDIANT'])) {

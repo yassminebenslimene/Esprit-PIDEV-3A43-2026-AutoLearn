@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Utils\LikeEscaper;
 
 #[Route('/backoffice/commentaires')]
 #[IsGranted('ROLE_ADMIN')]
@@ -29,7 +30,7 @@ final class CommentaireBackofficeController extends AbstractController
             $qb->where('c.contenu LIKE :search')
                ->orWhere('u.nom LIKE :search')
                ->orWhere('u.prenom LIKE :search')
-               ->setParameter('search', '%' . $search . '%');
+               ->setParameter('search', LikeEscaper::escapeAndWrap($search));
         }
         
         if ($postId) {

@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Utils\LikeEscaper;
 
 #[Route('/backoffice/communautes')]
 #[IsGranted('ROLE_ADMIN')]
@@ -28,7 +29,7 @@ final class CommunauteBackofficeController extends AbstractController
                 ->orWhere('c.description LIKE :search')
                 ->orWhere('o.nom LIKE :search')
                 ->orWhere('o.prenom LIKE :search')
-                ->setParameter('search', '%' . $search . '%')
+                ->setParameter('search', LikeEscaper::escapeAndWrap($search))
                 ->getQuery()
                 ->getResult();
         } else {

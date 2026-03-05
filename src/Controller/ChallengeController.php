@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Utils\LikeEscaper;
 
 class ChallengeController extends AbstractController
 {
@@ -542,7 +543,7 @@ class ChallengeController extends AbstractController
         
         if (!empty($data['titre'])) {
             $qb->andWhere('c.titre LIKE :titre')
-               ->setParameter('titre', '%' . $data['titre'] . '%');
+               ->setParameter('titre', LikeEscaper::escapeAndWrap($data['titre']));
         }
         
         if (!empty($data['niveau'])) {
@@ -552,7 +553,7 @@ class ChallengeController extends AbstractController
         
         if (!empty($data['createdBy'])) {
             $qb->andWhere('u.nom LIKE :createdBy OR u.prenom LIKE :createdBy')
-               ->setParameter('createdBy', '%' . $data['createdBy'] . '%');
+               ->setParameter('createdBy', LikeEscaper::escapeAndWrap($data['createdBy']));
         }
         
         $challenges = $qb->getQuery()->getResult();
