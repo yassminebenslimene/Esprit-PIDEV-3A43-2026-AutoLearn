@@ -175,7 +175,7 @@ class BackofficeController extends AbstractController
             ->setMaxResults(5)
             ->getQuery();
         
-        $paginator = new Paginator($query, false);
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
         $topCoursData = iterator_to_array($paginator);
         
         // Fetch full entities for display
@@ -201,7 +201,7 @@ class BackofficeController extends AbstractController
             ->setMaxResults(5)
             ->getQuery();
         
-        $paginator = new Paginator($query, false);
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
         $topChallengesData = iterator_to_array($paginator);
         
         // Fetch full entities for display
