@@ -29,6 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class BackofficeController extends AbstractController
 {
@@ -165,15 +166,17 @@ class BackofficeController extends AbstractController
         ];
         
         // Top courses by chapters count (optimized with DTO hydration)
-        $topCoursData = $entityManager->getRepository(Cours::class)
+        $query = $entityManager->getRepository(Cours::class)
             ->createQueryBuilder('c')
             ->select('NEW App\DTO\TopCoursDTO(c.id, c.titre, COUNT(ch.id))')
             ->leftJoin('c.chapitres', 'ch')
             ->groupBy('c.id, c.titre')
             ->orderBy('COUNT(ch.id)', 'DESC')
             ->setMaxResults(5)
-            ->getQuery()
-            ->getResult();
+            ->getQuery();
+        
+        $paginator = new Paginator($query, false);
+        $topCoursData = iterator_to_array($paginator);
         
         // Fetch full entities for display
         $topCours = [];
@@ -189,15 +192,17 @@ class BackofficeController extends AbstractController
             ->findBy([], ['dateDebut' => 'DESC'], 5);
         
         // Top challenges by exercises count (optimized with DTO hydration)
-        $topChallengesData = $entityManager->getRepository(Challenge::class)
+        $query = $entityManager->getRepository(Challenge::class)
             ->createQueryBuilder('ch')
             ->select('NEW App\DTO\TopChallengeDTO(ch.id, ch.titre, COUNT(ex.id))')
             ->leftJoin('ch.exercices', 'ex')
             ->groupBy('ch.id, ch.titre')
             ->orderBy('COUNT(ex.id)', 'DESC')
             ->setMaxResults(5)
-            ->getQuery()
-            ->getResult();
+            ->getQuery();
+        
+        $paginator = new Paginator($query, false);
+        $topChallengesData = iterator_to_array($paginator);
         
         // Fetch full entities for display
         $topChallenges = [];
