@@ -35,7 +35,7 @@ class Challenge
     private ?string $niveau = null;
 
     #[ORM\ManyToOne(inversedBy: 'challenges')]
-    #[ORM\JoinColumn(name: "created_by_id", referencedColumnName: "userId", nullable: false, onDelete: "CASCADE")]
+    #[ORM\JoinColumn(name: "created_by", referencedColumnName: "userId", nullable: false, onDelete: "CASCADE")]
     private ?User $createdBy = null;
 
     /**
